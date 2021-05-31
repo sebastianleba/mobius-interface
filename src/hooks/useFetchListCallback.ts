@@ -1,3 +1,4 @@
+import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { nanoid } from '@reduxjs/toolkit'
 import { ChainId } from '@ubeswap/sdk'
 import { TokenList } from '@uniswap/token-lists'
@@ -8,10 +9,12 @@ import { AppDispatch } from '../state'
 import { fetchTokenList } from '../state/lists/actions'
 import getTokenList from '../utils/getTokenList'
 import resolveENSContentHash from '../utils/resolveENSContentHash'
-import { useActiveWeb3React } from './index'
 
 export function useFetchListCallback(): (listUrl: string, sendDispatch?: boolean) => Promise<TokenList> {
-  const { chainId, library } = useActiveWeb3React()
+  const {
+    network: { chainId },
+  } = useContractKit()
+  const library = useProvider()
   const dispatch = useDispatch<AppDispatch>()
 
   const ensResolver = useCallback(
