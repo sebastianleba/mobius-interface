@@ -1,11 +1,10 @@
-import { TransactionResponse } from '@ethersproject/providers'
 import { useContractKit } from '@ubeswap/use-contractkit'
+import { useDoTransaction } from 'components/swap/routing'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { useStakingContract } from '../../hooks/useContract'
 import { StakingInfo } from '../../state/stake/hooks'
-import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
 import { AutoColumn } from '../Column'
@@ -28,7 +27,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
   const { address: account } = useContractKit()
 
   // monitor call to help UI loading state
-  const addTransaction = useTransactionAdder()
+  const doTransaction = useDoTransaction()
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
 
@@ -43,18 +42,15 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
   async function onClaimReward() {
     if (stakingContract && stakingInfo?.stakedAmount) {
       setAttempting(true)
-      await stakingContract
-        .getReward({ gasLimit: 350000 })
-        .then((response: TransactionResponse) => {
-          addTransaction(response, {
-            summary: `Claim accumulated UBE rewards`,
-          })
-          setHash(response.hash)
-        })
-        .catch((error: any) => {
-          setAttempting(false)
-          console.log(error)
-        })
+      await doTransaction(stakingContract, 'getReward', {
+        args: [],
+        overrides: {
+          gasLimit: 350000,
+        },
+        summary: `Claim accumulated UBE rewards`,
+      }).catch(() => {
+        setAttempting(false)
+      })
     }
   }
 
