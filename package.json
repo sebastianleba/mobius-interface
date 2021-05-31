@@ -115,7 +115,6 @@
     "prettier": "^2.3.0"
   },
   "dependencies": {
-    "@celo-tools/use-contractkit": "^1.0.0-beta.11",
     "@celo/connect": "^1.2.0",
     "@celo/contractkit": "^1.2.0",
     "@celo/utils": "^1.2.1",
@@ -130,6 +129,7 @@
     "@ubeswap/default-token-list": "^2.1.0",
     "@ubeswap/moola": "^0.2.0",
     "@ubeswap/sdk": "^2.1.0",
+    "@ubeswap/use-contractkit": "^1.0.0-beta.12",
     "ethers": "^5.2.0",
     "eventemitter3": "^4.0.7",
     "lodash": "^4.17.21",

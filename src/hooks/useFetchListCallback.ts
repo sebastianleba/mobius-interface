@@ -1,6 +1,6 @@
-import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { nanoid } from '@reduxjs/toolkit'
 import { ChainId } from '@ubeswap/sdk'
+import { useContractKit, useProvider } from '@ubeswap/use-contractkit'
 import { TokenList } from '@uniswap/token-lists'
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
