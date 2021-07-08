@@ -1,5 +1,5 @@
+import { useContractKit, WalletTypes } from '@celo-tools/use-contractkit'
 import * as Sentry from '@sentry/react'
-import { useContractKit, WalletTypes } from '@ubeswap/use-contractkit'
 import useAccountSummary from 'hooks/useAccountSummary'
 import { darken, lighten } from 'polished'
 import React, { useEffect, useMemo } from 'react'
@@ -108,11 +108,7 @@ function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
 
 const StatusIcon: React.FC = () => {
   const { walletType } = useContractKit()
-  if (
-    walletType === WalletTypes.MetaMask ||
-    walletType === WalletTypes.CeloExtensionWallet ||
-    walletType === WalletTypes.Injected
-  ) {
+  if (walletType === WalletTypes.CeloExtensionWallet) {
     return <Identicon />
   }
   return null

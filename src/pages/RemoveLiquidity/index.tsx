@@ -1,6 +1,7 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { useProvider } from '@celo-tools/use-contractkit/lib/ethers'
 import { Contract } from '@ethersproject/contracts'
 import { ChainId, Percent, Token } from '@ubeswap/sdk'
-import { useContractKit, useProvider } from '@ubeswap/use-contractkit'
 import { useDoTransaction } from 'components/swap/routing'
 import React, { useCallback, useContext, useState } from 'react'
 import { ArrowDown, Plus } from 'react-feather'

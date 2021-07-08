@@ -1,5 +1,5 @@
+import { SupportedProviders, useContractKit, WalletTypes } from '@celo-tools/use-contractkit'
 import { getBlockscoutLink } from '@ubeswap/sdk'
-import { SupportedProviders, useContractKit, WalletTypes } from '@ubeswap/use-contractkit'
 import React, { useCallback, useContext } from 'react'
 import { ExternalLink as LinkIcon } from 'react-feather'
 import { useDispatch } from 'react-redux'
@@ -229,12 +229,13 @@ export default function AccountDetails({
     if (walletType === WalletTypes.Unauthenticated) {
       return null
     }
-    const name = walletType === WalletTypes.DappKit ? SupportedProviders.Valora : SupportedProviders[walletType]
+    // TODO(igm): should be valora??
+    const name = walletType === WalletTypes.Unauthenticated ? SupportedProviders.Valora : SupportedProviders[walletType]
     return <WalletName>Connected with {name}</WalletName>
   }
 
   function getStatusIcon() {
-    if (walletType === WalletTypes.MetaMask) {
+    if (walletType === WalletTypes.CeloExtensionWallet) {
       return (
         <IconWrapper size={16}>
           <Identicon />
@@ -261,14 +262,17 @@ export default function AccountDetails({
               <AccountGroupingRow>
                 {formatConnectorName()}
                 <div>
-                  {walletType !== WalletTypes.Injected && walletType !== WalletTypes.MetaMask && (
-                    <WalletAction
-                      style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
-                      onClick={destroy}
-                    >
-                      Disconnect
-                    </WalletAction>
-                  )}
+                  {
+                    // TODO(igm): exclude metamask and injected
+                    walletType !== WalletTypes.CeloExtensionWallet && (
+                      <WalletAction
+                        style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
+                        onClick={destroy}
+                      >
+                        Disconnect
+                      </WalletAction>
+                    )
+                  }
                   <WalletAction
                     style={{ fontSize: '.825rem', fontWeight: 400 }}
                     onClick={() => {

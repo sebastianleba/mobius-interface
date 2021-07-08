@@ -1,8 +1,8 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { BigNumber } from '@ethersproject/bignumber'
 import { CELO, ChainId, cUSD, Fraction, TokenAmount, TradeType } from '@ubeswap/sdk'
-import { useContractKit } from '@ubeswap/use-contractkit'
 import { ErrorText } from 'components/swap/styleds'
 import { usePair } from 'data/Reserves'
-import { BigNumber } from 'ethers'
 import React, { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from 'styled-components'
 
@@ -26,17 +26,16 @@ export const MoolaDirectTradeDetails: React.FC<Props> = ({ trade }: Props) => {
   const [, pair] = usePair(celo, cUSD[chainId])
   const cusdPrice = pair?.priceOf(cUSD[chainId])
 
-  const [userData, setUserData] =
-    useState<{
-      totalLiquidityETH: BigNumber
-      totalCollateralETH: BigNumber
-      totalBorrowsETH: BigNumber
-      totalFeesETH: BigNumber
-      availableBorrowsETH: BigNumber
-      currentLiquidationThreshold: BigNumber
-      ltv: BigNumber
-      healthFactor: BigNumber
-    } | null>(null)
+  const [userData, setUserData] = useState<{
+    totalLiquidityETH: BigNumber
+    totalCollateralETH: BigNumber
+    totalBorrowsETH: BigNumber
+    totalFeesETH: BigNumber
+    availableBorrowsETH: BigNumber
+    currentLiquidationThreshold: BigNumber
+    ltv: BigNumber
+    healthFactor: BigNumber
+  } | null>(null)
   useEffect(() => {
     if (account) {
       ;(async () => {

@@ -1,6 +1,7 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { useGetConnectedSigner } from '@celo-tools/use-contractkit/lib/ethers'
 import { MaxUint256 } from '@ethersproject/constants'
 import { TokenAmount, Trade } from '@ubeswap/sdk'
-import { useContractKit, useGetConnectedSigner } from '@ubeswap/use-contractkit'
 import { useDoTransaction } from 'components/swap/routing'
 import { MoolaRouterTrade } from 'components/swap/routing/hooks/useTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'

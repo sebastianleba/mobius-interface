@@ -1,7 +1,8 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { useProvider } from '@celo-tools/use-contractkit/lib/ethers'
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
 import { ChainId } from '@ubeswap/sdk'
-import { useContractKit, useProvider } from '@ubeswap/use-contractkit'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
@@ -31,7 +32,7 @@ function useContract(address: string | undefined, ABI: any, withSignerIfPossible
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Erc20 | null {
-  return useContract(tokenAddress, ERC20_ABI, withSignerIfPossible) as Erc20
+  return useContract(tokenAddress, ERC20_ABI, withSignerIfPossible) as Erc20 | null
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -59,16 +60,20 @@ export function useMulticallContract(): Contract | null {
 }
 
 export function useStakingContract(stakingAddress?: string, withSignerIfPossible?: boolean): StakingRewards | null {
-  return useContract(stakingAddress, STAKING_REWARDS_ABI, withSignerIfPossible) as StakingRewards
+  return useContract(stakingAddress, STAKING_REWARDS_ABI, withSignerIfPossible) as StakingRewards | null
 }
 
 export function usePoolManagerContract(
   poolManagerAddress?: string,
   withSignerIfPossible?: boolean
 ): PoolManager | null {
-  return useContract(poolManagerAddress, POOL_MANAGER_ABI, withSignerIfPossible) as PoolManager
+  return useContract(poolManagerAddress, POOL_MANAGER_ABI, withSignerIfPossible) as PoolManager | null
 }
 
 export function useReleaseUbeContract(withSignerIfPossible?: boolean): ReleaseUbe | null {
-  return useContract('0x5Ed248077bD07eE9B530f7C40BE0c1dAE4c131C0', RELEASE_UBE_ABI, withSignerIfPossible) as ReleaseUbe
+  return useContract(
+    '0x5Ed248077bD07eE9B530f7C40BE0c1dAE4c131C0',
+    RELEASE_UBE_ABI,
+    withSignerIfPossible
+  ) as ReleaseUbe | null
 }

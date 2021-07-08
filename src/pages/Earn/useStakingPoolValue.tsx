@@ -1,5 +1,5 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
 import { ChainId, cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
-import { useContractKit } from '@ubeswap/use-contractkit'
 import { BIG_INT_ZERO } from 'constants/index'
 import { usePair } from 'data/Reserves'
 import { useTotalSupply } from 'data/TotalSupply'
@@ -68,7 +68,10 @@ export const useStakingPoolValue = (stakingInfo?: StakingInfo): IStakingPoolValu
   }
 
   const userAmountTokenA =
-    stakingTokenPair && stakingInfo?.stakedAmount && totalSupplyOfStakingToken
+    stakingTokenPair &&
+    stakingInfo?.stakedAmount &&
+    totalSupplyOfStakingToken &&
+    !totalSupplyOfStakingToken.equalTo('0')
       ? new TokenAmount(
           stakingTokenPair.reserve0.token,
           JSBI.divide(
@@ -79,7 +82,10 @@ export const useStakingPoolValue = (stakingInfo?: StakingInfo): IStakingPoolValu
       : undefined
 
   const userAmountTokenB =
-    stakingTokenPair && stakingInfo?.stakedAmount && totalSupplyOfStakingToken
+    stakingTokenPair &&
+    stakingInfo?.stakedAmount &&
+    totalSupplyOfStakingToken &&
+    !totalSupplyOfStakingToken.equalTo('0')
       ? new TokenAmount(
           stakingTokenPair.reserve1.token,
           JSBI.divide(

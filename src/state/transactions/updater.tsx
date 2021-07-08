@@ -1,4 +1,5 @@
-import { useContractKit, useProvider } from '@ubeswap/use-contractkit'
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { useProvider } from '@celo-tools/use-contractkit/lib/ethers'
 import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 

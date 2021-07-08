@@ -1,5 +1,6 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { useProvider } from '@celo-tools/use-contractkit/lib/ethers'
 import { TokenAmount } from '@ubeswap/sdk'
-import { useContractKit, useProvider } from '@ubeswap/use-contractkit'
 import SendHeader from 'components/send/SendHeader'
 import { useDoTransaction } from 'components/swap/routing'
 import { ERC20_ABI } from 'constants/abis/erc20'

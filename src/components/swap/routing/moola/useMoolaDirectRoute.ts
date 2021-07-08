@@ -1,5 +1,6 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { useProvider } from '@celo-tools/use-contractkit/lib/ethers'
 import { ChainId, currencyEquals, JSBI, Pair, Route, Token, TokenAmount } from '@ubeswap/sdk'
-import { useContractKit, useProvider } from '@ubeswap/use-contractkit'
 import { useMemo } from 'react'
 import { useUserAllowMoolaWithdrawal } from 'state/user/hooks'
 

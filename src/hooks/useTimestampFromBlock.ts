@@ -1,4 +1,4 @@
-import { useProvider } from '@ubeswap/use-contractkit'
+import { useProvider } from '@celo-tools/use-contractkit/lib/ethers'
 import { useEffect, useState } from 'react'
 
 export function useTimestampFromBlock(block: number | undefined): number | undefined {

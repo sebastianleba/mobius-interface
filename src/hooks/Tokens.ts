@@ -1,7 +1,7 @@
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { arrayify } from '@ethersproject/bytes'
 import { parseBytes32String } from '@ethersproject/strings'
 import { ChainId, currencyEquals, Token } from '@ubeswap/sdk'
-import { useContractKit } from '@ubeswap/use-contractkit'
-import { arrayify } from 'ethers/lib/utils'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
