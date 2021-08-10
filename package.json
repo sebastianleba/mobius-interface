@@ -87,6 +87,7 @@
     "clean": "rm -fr src/generated/",
     "start:alfajores": "REACT_APP_CHAIN_ID=44787 craco start",
     "typechain": "typechain --target=ethers-v5 'src/**/abis/**/*.json' --out-dir src/generated/",
+    "typechain:windows": "typechain --target=ethers-v5 src/**/abis/**/*.json --out-dir src/generated/",
     "test": "craco test --env=jsdom",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
