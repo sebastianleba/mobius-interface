@@ -22,3 +22,14 @@ export const UBE = makeTokens(
   'UBE',
   'Ubeswap'
 )
+
+export const USD_LP = makeTokens(
+  {
+    [ChainId.MAINNET]: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
+    [ChainId.ALFAJORES]: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
+    [ChainId.BAKLAVA]: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
+  },
+  18,
+  'USD_LP',
+  'USD LP Tokens'
+)

@@ -8,6 +8,7 @@ import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import DUAL_REWARDS_ABI from '../constants/abis/moola/MoolaStakingRewards.json'
 import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
+import STABLE_SWAP from '../constants/abis/StableSwap.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards } from '../generated'
@@ -49,6 +50,10 @@ export function useBytes32TokenContract(tokenAddress?: string, withSignerIfPossi
 
 export function usePairContract(pairAddress?: string, withSignerIfPossible?: boolean): Contract | null {
   return useContract(pairAddress, IUniswapV2PairABI, withSignerIfPossible)
+}
+
+export function useStableSwapContract(swapAddress?: string, withSignerIfPossible?: boolean): Contract | null {
+  return useContract(swapAddress, STABLE_SWAP, withSignerIfPossible)
 }
 
 export function useMulticallContract(): Contract | null {

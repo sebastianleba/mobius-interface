@@ -1,5 +1,4 @@
 import { CELO, ChainId, TokenAmount } from '@ubeswap/sdk'
-import { CardNoise } from 'components/earn/styled'
 import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
@@ -11,16 +10,12 @@ import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
-import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
-import { CountUp } from 'use-count-up'
 
-import Logo from '../../assets/svg/logo.svg'
-import LogoDark from '../../assets/svg/logo-dark.svg'
+import Logo from '../../assets/images/MobiusLogo.png'
 import { useActiveWeb3React } from '../../hooks'
 import { useDarkModeManager } from '../../state/user/hooks'
 import { YellowCard } from '../Card'
-import Menu from '../Menu'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
 import UbeBalanceContent from './UbeBalanceContent'
@@ -150,6 +145,9 @@ const BalanceText = styled(Text)`
 
 const Title = styled(NavLink)`
   display: flex;
+  color: ${({ theme }) => theme.text1};
+  textdecoration: none;
+  fontsize: 1.5rem;
   align-items: center;
   pointer-events: auto;
   justify-self: flex-start;
@@ -162,8 +160,9 @@ const Title = styled(NavLink)`
   }
 `
 
-const UbeIcon = styled.div`
+const MobiusIcon = styled.div`
   transition: transform 0.3s ease;
+  marginright: -1rem;
   :hover {
     transform: rotate(-5deg);
   }
@@ -281,9 +280,10 @@ export default function Header() {
       </Modal>
       <HeaderRow>
         <Title to="/">
-          <UbeIcon>
-            <img width={'140px'} src={darkMode ? LogoDark : Logo} alt="logo" />
-          </UbeIcon>
+          <MobiusIcon>
+            <img width={'80px'} src={Logo} alt="logo" />
+          </MobiusIcon>
+          Mobius
         </Title>
         <HeaderLinks>
           {isMobile && chainId && NETWORK_LABELS[chainId] && (
@@ -308,9 +308,6 @@ export default function Header() {
           <StyledNavLink id="farm-nav-link" to="/farm">
             Farm
           </StyledNavLink>
-          <StyledExternalLink id={`stake-nav-link`} href={'https://info.ubeswap.org'}>
-            Charts <span style={{ fontSize: '11px' }}>↗</span>
-          </StyledExternalLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
@@ -321,7 +318,7 @@ export default function Header() {
             )}
           </HideSmall>
 
-          {aggregateBalance && (
+          {/* {aggregateBalance && (
             <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
@@ -346,7 +343,7 @@ export default function Header() {
               </UBEAmount>
               <CardNoise />
             </UBEWrapper>
-          )}
+          )} */}
 
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
             {account && userCELOBalance ? (
@@ -361,7 +358,7 @@ export default function Header() {
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
-          <Menu />
+          {/* <Menu /> */}
         </HeaderElementWrap>
       </HeaderControls>
     </HeaderFrame>

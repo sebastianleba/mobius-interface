@@ -9,6 +9,17 @@ export const defaultRouter: TradeRouter = {
   routerAddress: ROUTER_ADDRESS,
 }
 
+export class MobiusTrade extends Trade {
+  hidePairAnalytics = false
+  router: TradeRouter
+  readonly path: readonly Token[]
+
+  constructor(route: Route, amount: TokenAmount, tradeType: TradeType, router: TradeRouter, path: readonly Token[]) {
+    super(route, amount, tradeType)
+    this.router = router
+    this.path = path
+  }
+}
 export class UbeswapTrade extends Trade {
   hidePairAnalytics = false
   router: TradeRouter

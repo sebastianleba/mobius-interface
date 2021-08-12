@@ -13,6 +13,61 @@ export interface TagInfo extends TagDetails {
   id: string
 }
 
+export const StableTokens: TokenList = {
+  name: 'Mobius',
+  timestamp: '2021-08-10T17:02:02.069Z',
+  tokens: [
+    {
+      address: '0x695218A22c805Bab9C6941546CF5395F169Ad871',
+      name: 'USD Coin',
+      symbol: 'cUSDC',
+      chainId: ChainId.ALFAJORES,
+      decimals: 18,
+      logoURI: 'https://bit.ly/3CwGimW',
+    },
+    {
+      address: '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
+      name: 'Tether',
+      symbol: 'cUSDT',
+      chainId: ChainId.ALFAJORES,
+      decimals: 18,
+      logoURI: 'https://bit.ly/3AMrCyD',
+    },
+  ],
+  version: {
+    major: 1,
+    minor: 0,
+    patch: 0,
+  },
+}
+
+DEFAULT_TOKEN_LIST.tokens = DEFAULT_TOKEN_LIST.tokens.concat([
+  {
+    address: '0x695218A22c805Bab9C6941546CF5395F169Ad871',
+    name: 'USD Coin',
+    symbol: 'cUSDC',
+    chainId: ChainId.ALFAJORES,
+    decimals: 18,
+    logoURI: 'https://bit.ly/3CwGimW',
+  },
+  {
+    address: '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
+    name: 'Tether',
+    symbol: 'cUSDT',
+    chainId: ChainId.ALFAJORES,
+    decimals: 18,
+    logoURI: 'https://bit.ly/3AMrCyD',
+  },
+  {
+    address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+    name: 'Celo Dollar',
+    symbol: 'cUSD',
+    chainId: ChainId.ALFAJORES,
+    decimals: 18,
+    logoURI: 'https://bit.ly/3AMrCyD',
+  },
+])
+
 /**
  * Token instances created from token info.
  */

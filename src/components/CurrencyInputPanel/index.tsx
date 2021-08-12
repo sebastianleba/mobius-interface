@@ -16,9 +16,15 @@ import { RowBetween } from '../Row'
 import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
 
 const InputRow = styled.div<{ selected: boolean }>`
-  ${({ theme }) => theme.flexRowNoWrap}
+  ${({ theme }) => theme.flexRowNoWrap};
   align-items: center;
+  justify-content: space-between;
   padding: ${({ selected }) => (selected ? '0.75rem 0.5rem 0.75rem 1rem' : '0.75rem 0.75rem 0.75rem 1rem')};
+`
+
+const InputDiv = styled.div`
+  display: flex;
+  min-width: 40%;
 `
 
 const CurrencySelect = styled.button<{ selected: boolean }>`
@@ -91,6 +97,7 @@ const StyledTokenName = styled.span<{ active?: boolean }>`
 `
 
 const StyledBalanceMax = styled.button`
+  marginleft: auto;
   height: 28px;
   background-color: ${({ theme }) => theme.primary5};
   border: 1px solid ${({ theme }) => theme.primary5};
@@ -186,20 +193,6 @@ export default function CurrencyInputPanel({
           </LabelRow>
         )}
         <InputRow style={hideInput ? { padding: '0', borderRadius: '8px' } : {}} selected={disableCurrencySelect}>
-          {!hideInput && (
-            <>
-              <NumericalInput
-                className="token-amount-input"
-                value={value}
-                onUserInput={(val) => {
-                  onUserInput(val)
-                }}
-              />
-              {account && currency && showMaxButton && label !== 'To' && (
-                <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
-              )}
-            </>
-          )}
           <CurrencySelect
             selected={!!currency}
             className="open-currency-select-button"
@@ -231,6 +224,20 @@ export default function CurrencyInputPanel({
               {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}
             </Aligner>
           </CurrencySelect>
+          {!hideInput && (
+            <InputDiv>
+              {account && currency && showMaxButton && label !== 'To' && (
+                <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
+              )}
+              <NumericalInput
+                className="token-amount-input"
+                value={value}
+                onUserInput={(val) => {
+                  onUserInput(val)
+                }}
+              />
+            </InputDiv>
+          )}
         </InputRow>
       </Container>
       {!disableCurrencySelect && onCurrencySelect && (

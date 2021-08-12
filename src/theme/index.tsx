@@ -34,6 +34,7 @@ const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } 
 
 const white = '#FFFFFF'
 const black = '#000000'
+const MobiusGreen = '#52D07F'
 
 export function colors(darkMode: boolean): Colors {
   return {
@@ -60,7 +61,8 @@ export function colors(darkMode: boolean): Colors {
     advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#8878C3' : '#8878C3',
+    //primary1: darkMode ? '#8878C3' : '#8878C3',
+    primary1: MobiusGreen,
     primary2: darkMode ? '#E3DFF3' : '#FF8CC3',
     primary3: darkMode ? '#BFB7DE' : '#FF99C9',
     primary4: darkMode ? '#6D619A' : '#F6DDE8',
