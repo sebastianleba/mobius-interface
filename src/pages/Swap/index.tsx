@@ -1,4 +1,5 @@
 import { JSBI, Token, TokenAmount, Trade } from '@ubeswap/sdk'
+import SettingsTab from 'components/Settings'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
@@ -24,7 +25,6 @@ import AdvancedSwapDetailsDropdown from '../../components/swap/AdvancedSwapDetai
 import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
-import SwapHeader from '../../components/swap/SwapHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
@@ -271,7 +271,7 @@ export default function Swap() {
       />
       <SwapPoolTabs active={'swap'} />
       <AppBodyNoBackground>
-        <SwapHeader title={actionLabel} />
+        {/* <SwapHeader title={actionLabel} /> */}
         <Wrapper id="swap-page">
           <ConfirmSwapModal
             isOpen={showConfirm}
@@ -463,6 +463,10 @@ export default function Swap() {
             )}
             {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
           </BottomGrouping>
+          <AutoRow>
+            <SettingsTab />
+            <div>Advanced Settings</div>
+          </AutoRow>
         </Wrapper>
       </AppBodyNoBackground>
       {!swapIsUnsupported ? (

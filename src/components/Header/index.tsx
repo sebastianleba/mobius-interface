@@ -3,8 +3,9 @@ import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-// import { isMobile } from 'react-device-detect'
+import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
+import HamburgerMenu from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -91,6 +92,7 @@ const HeaderElementWrap = styled.div`
 const HeaderRow = styled(RowFixed)`
   ${({ theme }) => theme.mediaWidth.upToMedium`
    width: 100%;
+    justify-content: space-between;
   `};
 `
 
@@ -271,6 +273,7 @@ export default function Header() {
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
   const [darkMode, toggleDarkMode] = useDarkModeManager()
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
+  const [toggleMenu, setToggleMenu] = useState<boolean>(false)
   const aggregateBalance: TokenAmount | undefined = useAggregateUbeBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
@@ -287,27 +290,41 @@ export default function Header() {
           </MobiusIcon>
           Mobius
         </Title>
-        <HeaderLinks>
-          <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-            {t('swap')}
-          </StyledNavLink>
-          <StyledNavLink
-            id={`pool-nav-link`}
-            to={'/pool'}
-            isActive={(match, { pathname }) =>
-              Boolean(match) ||
-              pathname.startsWith('/add') ||
-              pathname.startsWith('/remove') ||
-              pathname.startsWith('/create') ||
-              pathname.startsWith('/find')
-            }
-          >
-            {t('pool')}
-          </StyledNavLink>
-          <StyledNavLink id="farm-nav-link" to="/farm">
-            Farm
-          </StyledNavLink>
-        </HeaderLinks>
+        {isMobile ? (
+          <HamburgerMenu
+            isOpen={toggleMenu}
+            menuClicked={() => setToggleMenu(!toggleMenu)}
+            width={18}
+            height={15}
+            strokeWidth={1}
+            rotate={0}
+            color="black"
+            borderRadius={0}
+            animationDuration={0.5}
+          />
+        ) : (
+          <HeaderLinks>
+            <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
+              {t('swap')}
+            </StyledNavLink>
+            <StyledNavLink
+              id={`pool-nav-link`}
+              to={'/pool'}
+              isActive={(match, { pathname }) =>
+                Boolean(match) ||
+                pathname.startsWith('/add') ||
+                pathname.startsWith('/remove') ||
+                pathname.startsWith('/create') ||
+                pathname.startsWith('/find')
+              }
+            >
+              {t('pool')}
+            </StyledNavLink>
+            <StyledNavLink id="farm-nav-link" to="/farm">
+              Farm
+            </StyledNavLink>
+          </HeaderLinks>
+        )}
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>

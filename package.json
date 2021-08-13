@@ -155,6 +155,7 @@
     "randombytes": "^2.1.0",
     "react-circular-progressbar": "^2.0.4",
     "react-countdown": "^2.3.2",
+    "react-hamburger-menu": "^1.2.1",
     "react-is": "^17.0.2",
     "react-router": "^5.2.0",
     "rebass": "^4.0.7",
