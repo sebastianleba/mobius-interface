@@ -12,9 +12,25 @@ export const BodyWrapper = styled.div`
   /* padding: 1rem; */
 `
 
+export const BodyWrapperNoBackground = styled.div`
+  position: relative;
+  max-width: 420px;
+  width: 100%;
+  background: none;
+  border-radius: 30px;
+  /* padding: 1rem; */
+`
+
 /**
  * The styled container element that wraps the content of most pages and the tabs.
  */
 export default function AppBody({ children }: { children: React.ReactNode }) {
   return <BodyWrapper>{children}</BodyWrapper>
+}
+
+/**
+ * The styled container element that wraps the content of most pages and the tabs.
+ */
+export function AppBodyNoBackground({ children }: { children: React.ReactNode }) {
+  return <BodyWrapperNoBackground>{children}</BodyWrapperNoBackground>
 }

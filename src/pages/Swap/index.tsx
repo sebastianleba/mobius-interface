@@ -43,7 +43,7 @@ import { useExpertModeManager, useUserSingleHopOnly, useUserSlippageTolerance } 
 import { LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
-import AppBody from '../AppBody'
+import { AppBodyNoBackground } from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 
 export default function Swap() {
@@ -270,7 +270,7 @@ export default function Swap() {
         onConfirm={handleConfirmTokenWarning}
       />
       <SwapPoolTabs active={'swap'} />
-      <AppBody>
+      <AppBodyNoBackground>
         <SwapHeader title={actionLabel} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal
@@ -464,7 +464,7 @@ export default function Swap() {
             {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
           </BottomGrouping>
         </Wrapper>
-      </AppBody>
+      </AppBodyNoBackground>
       {!swapIsUnsupported ? (
         <AdvancedSwapDetailsDropdown trade={trade} />
       ) : (

@@ -99,20 +99,23 @@ const StyledTokenName = styled.span<{ active?: boolean }>`
 const StyledBalanceMax = styled.button`
   marginleft: auto;
   height: 28px;
-  background-color: ${({ theme }) => theme.primary5};
-  border: 1px solid ${({ theme }) => theme.primary5};
+  background-color: ${({ theme }) => theme.bg5};
+  border: 1px solid ${({ theme }) => theme.bg3};
   border-radius: 0.5rem;
   font-size: 0.875rem;
+  transition: all 0.2s ease-in-out;
 
   font-weight: 500;
   cursor: pointer;
   margin-right: 0.5rem;
-  color: ${({ theme }) => theme.primaryText1};
+  color: ${({ theme }) => theme.white};
   :hover {
     border: 1px solid ${({ theme }) => theme.primary1};
+    background-color: ${({ theme }) => theme.primary5};
   }
   :focus {
     border: 1px solid ${({ theme }) => theme.primary1};
+    background-color: ${({ theme }) => theme.primary5};
     outline: none;
   }
 
@@ -193,42 +196,44 @@ export default function CurrencyInputPanel({
           </LabelRow>
         )}
         <InputRow style={hideInput ? { padding: '0', borderRadius: '8px' } : {}} selected={disableCurrencySelect}>
-          <CurrencySelect
-            selected={!!currency}
-            className="open-currency-select-button"
-            onClick={() => {
-              if (!disableCurrencySelect) {
-                setModalOpen(true)
-              }
-            }}
-          >
-            <Aligner>
-              {pair ? (
-                <DoubleCurrencyLogo currency0={pair.token0} currency1={pair.token1} size={24} margin={true} />
-              ) : currency ? (
-                <CurrencyLogo currency={currency} size={'24px'} />
-              ) : null}
-              {pair ? (
-                <StyledTokenName className="pair-name-container">
-                  {pair?.token0.symbol}:{pair?.token1.symbol}
-                </StyledTokenName>
-              ) : (
-                <StyledTokenName className="token-symbol-container" active={Boolean(currency && currency.symbol)}>
-                  {(currency && currency.symbol && currency.symbol.length > 20
-                    ? currency.symbol.slice(0, 4) +
-                      '...' +
-                      currency.symbol.slice(currency.symbol.length - 5, currency.symbol.length)
-                    : currency?.symbol) || t('selectToken')}
-                </StyledTokenName>
-              )}
-              {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}
-            </Aligner>
-          </CurrencySelect>
+          <Aligner>
+            <CurrencySelect
+              selected={!!currency}
+              className="open-currency-select-button"
+              onClick={() => {
+                if (!disableCurrencySelect) {
+                  setModalOpen(true)
+                }
+              }}
+            >
+              <Aligner>
+                {pair ? (
+                  <DoubleCurrencyLogo currency0={pair.token0} currency1={pair.token1} size={24} margin={true} />
+                ) : currency ? (
+                  <CurrencyLogo currency={currency} size={'24px'} />
+                ) : null}
+                {pair ? (
+                  <StyledTokenName className="pair-name-container">
+                    {pair?.token0.symbol}:{pair?.token1.symbol}
+                  </StyledTokenName>
+                ) : (
+                  <StyledTokenName className="token-symbol-container" active={Boolean(currency && currency.symbol)}>
+                    {(currency && currency.symbol && currency.symbol.length > 20
+                      ? currency.symbol.slice(0, 4) +
+                        '...' +
+                        currency.symbol.slice(currency.symbol.length - 5, currency.symbol.length)
+                      : currency?.symbol) || t('selectToken')}
+                  </StyledTokenName>
+                )}
+                {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}
+              </Aligner>
+            </CurrencySelect>
+            {account && currency && showMaxButton && label !== 'To' && (
+              <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
+            )}
+          </Aligner>
           {!hideInput && (
             <InputDiv>
-              {account && currency && showMaxButton && label !== 'To' && (
-                <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
-              )}
               <NumericalInput
                 className="token-amount-input"
                 value={value}

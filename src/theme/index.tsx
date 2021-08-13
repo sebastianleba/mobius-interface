@@ -35,6 +35,7 @@ const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } 
 const white = '#FFFFFF'
 const black = '#000000'
 const MobiusGreen = '#52D07F'
+const MobiusGreenShades = ['#b2eac6', '#73d997', '#4bce79', '#31b460', '#268c4b', '#1b6435', '#103c20', '#0d2e19']
 
 export function colors(darkMode: boolean): Colors {
   return {
@@ -63,10 +64,12 @@ export function colors(darkMode: boolean): Colors {
     //primary colors
     //primary1: darkMode ? '#8878C3' : '#8878C3',
     primary1: MobiusGreen,
-    primary2: darkMode ? '#E3DFF3' : '#FF8CC3',
-    primary3: darkMode ? '#BFB7DE' : '#FF99C9',
-    primary4: darkMode ? '#6D619A' : '#F6DDE8',
-    primary5: darkMode ? '#6D619A70' : '#E3DFF3',
+    primary2: MobiusGreenShades[darkMode ? 3 : 4],
+    primary3: MobiusGreenShades[darkMode ? 2 : 5],
+    primary4: MobiusGreenShades[darkMode ? 1 : 6],
+    primary5: MobiusGreenShades[darkMode ? 7 : 0],
+
+    // primary5: darkMode ? '#6D619A70' : '#E3DFF3',
 
     // color text
     primaryText1: darkMode ? '#E3DFF3' : '#8878C3',

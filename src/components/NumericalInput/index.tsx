@@ -7,6 +7,8 @@ const StyledInput = styled.input<{ error?: boolean; fontSize?: string; align?: s
   color: ${({ error, theme }) => (error ? theme.red1 : theme.text1)};
   width: 0;
   position: relative;
+  text-overflow: ellipsis;
+  text-align: right;
   font-weight: 500;
   outline: none;
   border: none;
@@ -16,7 +18,6 @@ const StyledInput = styled.input<{ error?: boolean; fontSize?: string; align?: s
   text-align: ${({ align }) => align && align};
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
   padding: 0px;
   -webkit-appearance: textfield;
 

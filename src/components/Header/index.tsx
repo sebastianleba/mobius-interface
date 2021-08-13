@@ -146,7 +146,7 @@ const BalanceText = styled(Text)`
 const Title = styled(NavLink)`
   display: flex;
   color: ${({ theme }) => theme.text1};
-  textdecoration: none;
+  text-decoration: none;
   fontsize: 1.5rem;
   align-items: center;
   pointer-events: auto;
