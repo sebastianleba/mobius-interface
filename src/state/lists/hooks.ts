@@ -64,7 +64,7 @@ DEFAULT_TOKEN_LIST.tokens = DEFAULT_TOKEN_LIST.tokens.concat([
     symbol: 'cUSD',
     chainId: ChainId.ALFAJORES,
     decimals: 18,
-    logoURI: 'https://bit.ly/3AMrCyD',
+    logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
   },
 ])
 

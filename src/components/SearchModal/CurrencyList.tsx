@@ -4,6 +4,7 @@ import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
+import checkedLogo from '../../assets/svg/mobius.svg'
 import { useActiveWeb3React } from '../../hooks'
 import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
 import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
@@ -100,6 +101,11 @@ function CurrencyRow({
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
   const customAdded = useIsUserAddedToken(currency)
   const balance = useCurrencyBalance(account ?? undefined, currency)
+  if (isSelected || otherSelected)
+    currency = {
+      ...currency,
+      logoURI: checkedLogo,
+    } as WrappedTokenInfo
 
   // only show add or remove buttons if not on selected list
   return (

@@ -1,9 +1,9 @@
-import { CELO, ChainId, TokenAmount } from '@ubeswap/sdk'
+import { CELO, TokenAmount } from '@ubeswap/sdk'
 import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { isMobile } from 'react-device-detect'
+// import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -12,10 +12,9 @@ import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import { ExternalLink } from 'theme/components'
 
-import Logo from '../../assets/images/MobiusLogo.png'
+import Logo from '../../assets/svg/mobius.svg'
 import { useActiveWeb3React } from '../../hooks'
 import { useDarkModeManager } from '../../state/user/hooks'
-import { YellowCard } from '../Card'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
 import UbeBalanceContent from './UbeBalanceContent'
@@ -124,18 +123,18 @@ const HideSmall = styled.span`
   `};
 `
 
-const NetworkCard = styled(YellowCard)`
-  border-radius: 12px;
-  padding: 8px 12px;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    margin: 0;
-    margin-right: 0.5rem;
-    width: initial;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-shrink: 1;
-  `};
-`
+// const NetworkCard = styled(YellowCard)`
+//   border-radius: 12px;
+//   padding: 8px 12px;
+//   ${({ theme }) => theme.mediaWidth.upToSmall`
+//     margin: 0;
+//     margin-right: 0.5rem;
+//     width: initial;
+//     overflow: hidden;
+//     text-overflow: ellipsis;
+//     flex-shrink: 1;
+//   `};
+// `
 
 const BalanceText = styled(Text)`
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
@@ -147,13 +146,15 @@ const Title = styled(NavLink)`
   display: flex;
   color: ${({ theme }) => theme.text1};
   text-decoration: none;
-  fontsize: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: 1000;
   align-items: center;
   pointer-events: auto;
   justify-self: flex-start;
   margin-right: 12px;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     justify-self: center;
+    font-size: 1.25rem;
   `};
   :hover {
     cursor: pointer;
@@ -162,10 +163,11 @@ const Title = styled(NavLink)`
 
 const MobiusIcon = styled.div`
   transition: transform 0.3s ease;
-  marginright: -1rem;
-  :hover {
-    transform: rotate(-5deg);
-  }
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+  // :hover {
+  //   transform: rotate(-5deg);
+  // }
 `
 
 const activeClassName = 'ACTIVE'
@@ -257,10 +259,10 @@ export const StyledMenuButton = styled.button`
   }
 `
 
-const NETWORK_LABELS: { [chainId in ChainId]?: string } = {
-  [ChainId.ALFAJORES]: 'Alfajores',
-  [ChainId.BAKLAVA]: 'Baklava',
-}
+// const NETWORK_LABELS: { [chainId in ChainId]?: string } = {
+//   [ChainId.ALFAJORES]: 'Alfajores',
+//   [ChainId.BAKLAVA]: 'Baklava',
+// }
 
 export default function Header() {
   const { account, chainId } = useActiveWeb3React()
@@ -281,14 +283,11 @@ export default function Header() {
       <HeaderRow>
         <Title to="/">
           <MobiusIcon>
-            <img width={'80px'} src={Logo} alt="logo" />
+            <img width={'50px'} src={Logo} alt="logo" />
           </MobiusIcon>
           Mobius
         </Title>
         <HeaderLinks>
-          {isMobile && chainId && NETWORK_LABELS[chainId] && (
-            <NetworkCard title={NETWORK_LABELS[chainId]}>{NETWORK_LABELS[chainId]}</NetworkCard>
-          )}
           <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
             {t('swap')}
           </StyledNavLink>
@@ -312,12 +311,6 @@ export default function Header() {
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>
-          <HideSmall>
-            {chainId && NETWORK_LABELS[chainId] && (
-              <NetworkCard title={NETWORK_LABELS[chainId]}>{NETWORK_LABELS[chainId]}</NetworkCard>
-            )}
-          </HideSmall>
-
           {/* {aggregateBalance && (
             <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>

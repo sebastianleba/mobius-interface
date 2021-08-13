@@ -20,9 +20,11 @@ const StyledDialogOverlay = styled(AnimatedDialogOverlay)`
     align-items: center;
     justify-content: center;
 
-    background-color: ${({ theme }) => theme.modalBG};
+    background-color: none;
+    backdrop-filter: blur(3px);
   }
 `
+//${({ theme }) => theme.modalBG};
 
 const AnimatedDialogContent = animated(DialogContent)
 // destructure to not pass custom props to Dialog DOM element
@@ -118,7 +120,7 @@ export default function Modal({
       {fadeTransition.map(
         ({ item, key, props }) =>
           item && (
-            <StyledDialogOverlay key={key} style={props} onDismiss={onDismiss} initialFocusRef={initialFocusRef}>
+            <StyledDialogOverlay key={key} style={{ ...props }} onDismiss={onDismiss} initialFocusRef={initialFocusRef}>
               <StyledDialogContent
                 {...(isMobile
                   ? {
