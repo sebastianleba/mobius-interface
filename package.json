@@ -83,6 +83,8 @@
   "scripts": {
     "build": "REACT_APP_SENTRY_DSN=$SENTRY_DSN npm run build:local",
     "build:local": "npm run typechain && craco build",
+    "build:alfajores": "REACT_APP_CHAIN_ID=44787 craco build",
+    "postinstall": "npm run typechain",
     "start": "craco start",
     "clean": "rm -fr src/generated/",
     "start:alfajores": "REACT_APP_CHAIN_ID=44787 craco start",
