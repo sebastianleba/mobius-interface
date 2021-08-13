@@ -205,6 +205,7 @@ export default function CurrencyInputPanel({
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <CurrencySelect
               selected={!!currency}
+              walletConnected={!!account}
               className="open-currency-select-button"
               onClick={() => {
                 if (!disableCurrencySelect) {
