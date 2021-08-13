@@ -196,7 +196,7 @@ export default function CurrencyInputPanel({
           </LabelRow>
         )}
         <InputRow style={hideInput ? { padding: '0', borderRadius: '8px' } : {}} selected={disableCurrencySelect}>
-          <Aligner>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <CurrencySelect
               selected={!!currency}
               className="open-currency-select-button"
@@ -231,7 +231,7 @@ export default function CurrencyInputPanel({
             {account && currency && showMaxButton && label !== 'To' && (
               <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
             )}
-          </Aligner>
+          </div>
           {!hideInput && (
             <InputDiv>
               <NumericalInput
