@@ -119,7 +119,7 @@ const AccountElement = styled.div<{ active: boolean }>`
 `
 
 const HideSmall = styled.span`
-  ${({ theme }) => theme.mediaWidth.upToSmall`
+  ${({ theme }) => theme.mediaWidth.upToMedium`
     display: none;
   `};
 `
