@@ -10,18 +10,8 @@ import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
-import {
-  MOO_DUAL_POOL1,
-  MOO_DUAL_POOL2,
-  MOO_LP1,
-  MOO_LP2,
-  POOF_DUAL_LP,
-  POOF_DUAL_POOL,
-  StakingInfo,
-  useStakingInfo,
-} from '../../state/stake/hooks'
+import { MOO_LP1, MOO_LP2, POOF_DUAL_LP, StakingInfo, useStakingInfo } from '../../state/stake/hooks'
 import { ExternalLink, TYPE } from '../../theme'
-import { DualPoolCard } from './DualPoolCard'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
 const PageWrapper = styled(AutoColumn)`
@@ -77,6 +67,23 @@ export default function Earn() {
   const mcUSDmcEURLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP1)
   const moomCELOLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP2)
 
+  const inactiveDisplay = inactivePools.length > 0 && (
+    <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
+      <DataRow style={{ alignItems: 'baseline' }}>
+        <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Inactive Pools</TYPE.mediumHeader>
+        <div>{/* TODO(igm): show TVL here */}</div>
+      </DataRow>
+
+      <PoolSection>
+        {inactivePools.map((pool) => (
+          <ErrorBoundary key={pool.stakingRewardAddress}>
+            <PoolCard stakingInfo={pool} />
+          </ErrorBoundary>
+        ))}
+      </PoolSection>
+    </AutoColumn>
+  )
+
   return (
     <PageWrapper gap="lg" justify="center">
       {isGenesisOver && (
@@ -86,11 +93,12 @@ export default function Earn() {
             <CardSection>
               <AutoColumn gap="md">
                 <RowBetween>
-                  <TYPE.white fontWeight={600}>Ubeswap liquidity mining</TYPE.white>
+                  <TYPE.white fontWeight={600}>Mobius liquidity mining</TYPE.white>
                 </RowBetween>
                 <RowBetween>
                   <TYPE.white fontSize={14}>
-                    Deposit your Liquidity Provider tokens to receive UBE, the Ubeswap protocol governance token.
+                    Provide Liquidity to receive LP Tokens and earn a chunk of fees from trades that route through the
+                    pool.
                   </TYPE.white>
                 </RowBetween>{' '}
                 <ExternalLink
@@ -98,7 +106,7 @@ export default function Earn() {
                   href="https://docs.ubeswap.org/faq"
                   target="_blank"
                 >
-                  <TYPE.white fontSize={14}>Read more about UBE</TYPE.white>
+                  <TYPE.white fontSize={14}>Read more about MOBI</TYPE.white>
                 </ExternalLink>
               </AutoColumn>
             </CardSection>
@@ -108,35 +116,6 @@ export default function Earn() {
       )}
 
       {!isGenesisOver && <LaunchCountdown />}
-
-      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
-        <DataRow style={{ alignItems: 'baseline' }}>
-          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Dual Pools</TYPE.mediumHeader>
-        </DataRow>
-        {!(mcUSDmcEURLP && poofUBELP && moomCELOLP) && <Loader />}
-        {mcUSDmcEURLP && (
-          <PoolSection>
-            <ErrorBoundary>
-              <DualPoolCard poolAddress={MOO_DUAL_POOL1} underlyingPool={mcUSDmcEURLP} />
-            </ErrorBoundary>
-          </PoolSection>
-        )}
-        {moomCELOLP && (
-          <PoolSection>
-            <ErrorBoundary>
-              <DualPoolCard poolAddress={MOO_DUAL_POOL2} underlyingPool={moomCELOLP} />
-            </ErrorBoundary>
-          </PoolSection>
-        )}
-        {poofUBELP && (
-          <PoolSection>
-            <ErrorBoundary>
-              <DualPoolCard poolAddress={POOF_DUAL_POOL} underlyingPool={poofUBELP} />
-            </ErrorBoundary>
-          </PoolSection>
-        )}
-      </AutoColumn>
-
       {stakedPools.length > 0 && (
         <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
           <DataRow style={{ alignItems: 'baseline' }}>
@@ -181,23 +160,6 @@ export default function Earn() {
           )}
         </PoolSection>
       </AutoColumn>
-
-      {inactivePools.length > 0 && (
-        <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
-          <DataRow style={{ alignItems: 'baseline' }}>
-            <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Inactive Pools</TYPE.mediumHeader>
-            <div>{/* TODO(igm): show TVL here */}</div>
-          </DataRow>
-
-          <PoolSection>
-            {inactivePools.map((pool) => (
-              <ErrorBoundary key={pool.stakingRewardAddress}>
-                <PoolCard stakingInfo={pool} />
-              </ErrorBoundary>
-            ))}
-          </PoolSection>
-        </AutoColumn>
-      )}
     </PageWrapper>
   )
 }

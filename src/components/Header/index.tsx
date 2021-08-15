@@ -318,10 +318,7 @@ export default function Header() {
                 pathname.startsWith('/find')
               }
             >
-              {t('pool')}
-            </StyledNavLink>
-            <StyledNavLink id="farm-nav-link" to="/farm">
-              Farm
+              Pool
             </StyledNavLink>
           </HeaderLinks>
         )}
