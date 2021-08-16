@@ -4,7 +4,6 @@ import React, { Suspense } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
-import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
 import Header from '../components/Header'
 import Polling from '../components/Header/Polling'
 import URLWarning from '../components/Header/URLWarning'
@@ -20,6 +19,7 @@ import {
 } from './AddLiquidity/redirects'
 import Earn from './Earn'
 import Manage from './Earn/Manage'
+import LandingPage from './LandingPage'
 import PoolFinder from './PoolFinder'
 import RemoveLiquidity from './RemoveLiquidity'
 import { RedirectOldRemoveLiquidityPathStructure } from './RemoveLiquidity/redirects'
@@ -86,21 +86,30 @@ export default function App() {
       }
     }
   }, [location])
+  console.log(location)
   return (
     <Suspense fallback={null}>
-      <Route component={GoogleAnalyticsReporter} />
       <Route component={DarkModeQueryParamReader} />
       <AppWrapper>
-        <URLWarning />
-        <HeaderWrapper>
-          <Header />
-        </HeaderWrapper>
+        {location.pathname !== '/' && (
+          <>
+            <URLWarning />
+            <HeaderWrapper>
+              <Header />
+            </HeaderWrapper>
+          </>
+        )}
         <BodyWrapper>
-          <Popups />
-          <Polling />
+          {location.pathname !== '/' && (
+            <>
+              <Popups />
+              <Polling />
+            </>
+          )}
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Web3ReactManager>
               <Switch>
+                <Route exact path="/" component={LandingPage} />
                 <Route exact strict path="/swap" component={Swap} />
                 <Route exact strict path="/claim" component={OpenClaimAddressModalAndRedirectToSwap} />
                 <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
@@ -123,7 +132,7 @@ export default function App() {
               </Switch>
             </Web3ReactManager>
           </ErrorBoundary>
-          <Marginer />
+          {location.pathname !== '/' && <Marginer />}
         </BodyWrapper>
       </AppWrapper>
     </Suspense>
