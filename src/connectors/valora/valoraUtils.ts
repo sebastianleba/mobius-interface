@@ -51,7 +51,7 @@ export const parseDappkitResponseDeeplinkHashAware = (
   return parseDappkitResponseDeeplink(`https://fakehost/?${realQs.toString()}`)
 }
 
-const localStorageKey = 'ubeswap/dappkit'
+const localStorageKey = 'mobius/dappkit'
 
 // hack to get around deeplinking issue where new tabs are opened
 // and the url hash state is not respected (Note this implementation
@@ -156,7 +156,7 @@ export const requestValoraTransaction = async (
   const requestId = `signTransaction-${randomString()}`
   await requestTxSig(kit, txs, {
     requestId,
-    dappName: 'Ubeswap',
+    dappName: 'Mobius',
     callback: window.location.href,
   })
   return await waitForSignedTxs(requestId)

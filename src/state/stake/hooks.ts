@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { ChainId, JSBI, Pair, Token, TokenAmount } from '@ubeswap/sdk'
+import { ChainId, cUSD, JSBI, Pair, Token, TokenAmount } from '@ubeswap/sdk'
 import { POOL_MANAGER } from 'constants/poolManager'
 import { UBE } from 'constants/tokens'
 import { PoolManager } from 'generated/'
@@ -14,6 +14,7 @@ import ERC_20_INTERFACE from '../../constants/abis/erc20'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
 import { UNISWAP_V2_PAIR_INTERFACE } from '../../constants/abis/uniswap-v2-pair'
+import { USD_POOL_ADDRESSES } from '../../constants/StablePools'
 import { useActiveWeb3React } from '../../hooks'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import {
@@ -41,7 +42,7 @@ export interface StakingInfo {
   // the token of the liquidity pool
   readonly stakingToken: Token
   // the tokens involved in this pair
-  readonly tokens: readonly [Token, Token]
+  readonly tokens: readonly Token[]
   // the amount of token currently staked, or undefined if no account
   readonly stakedAmount?: TokenAmount
   // the amount of reward token earned by the active account, or undefined if no account
@@ -71,6 +72,18 @@ export interface StakingInfo {
   readonly dollarRewardPerYear: TokenAmount | undefined
   readonly rewardToken: Token | undefined
   readonly dualRewards: boolean
+}
+
+export interface StablePoolInfo {
+  readonly name: string
+  readonly poolAddress?: string
+  readonly stakingToken?: Token
+  readonly lpToken?: Token
+  readonly tokens: readonly Token[]
+  readonly amountDeposited?: TokenAmount
+  readonly apr?: TokenAmount
+  readonly totalStakedAmount: TokenAmount
+  readonly stakedAmount: TokenAmount
 }
 
 export const usePairStakingInfo = (pairToFilterBy?: Pair | null): StakingInfo | undefined => {
@@ -164,6 +177,82 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
     noncirculatingSupply: balanceRemaining && earned ? balanceRemaining.sub(earned) : null,
   }
 }
+
+export function useStableSwapInfo(pairToFilterBy?: Pair | null): readonly StablePoolInfo[] {
+  const { chainId } = useActiveWeb3React()
+  const tokens = useAllTokens()
+  const celoAddress =
+    chainId == ChainId.MAINNET
+      ? '0x471EcE3750Da237f93B8E339c536989b8978a438'
+      : '0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9'
+  const rCeloAddress =
+    chainId == ChainId.MAINNET
+      ? '0x1a8Dbe5958c597a744Ba51763AbEBD3355996c3e'
+      : '0xBDeedCDA79BAbc4Eb509aB689895a3054461691e'
+  const stakedToken = celoAddress
+  const cusd = tokens[cUSD[chainId].address]
+  const usdt = tokens['0x4DA9471c101e0cac906E52DF4f00943b21863efF']
+  const usdc = tokens['0x695218A22c805Bab9C6941546CF5395F169Ad871']
+
+  const zeroTokenAmount = {
+    stakedAmount: new TokenAmount(cusd, JSBI.BigInt('0')),
+    totalStakedAmount: new TokenAmount(cusd, JSBI.BigInt('0')),
+  }
+
+  const STAKED_CELO_POOL: StablePoolInfo = {
+    name: 'Staked Celo Pool',
+    tokens: [tokens[celoAddress], tokens[rCeloAddress]],
+    ...zeroTokenAmount,
+  }
+
+  const USD_POOL: StablePoolInfo = {
+    name: 'US Dollar Pool',
+    tokens: [cusd, usdt, usdc],
+    poolAddress: USD_POOL_ADDRESSES[chainId || ChainId.MAINNET] || '0x000',
+    ...zeroTokenAmount,
+  }
+
+  const EURO_POOL: StablePoolInfo = {
+    name: 'EURO Pool',
+    tokens: [],
+    ...zeroTokenAmount,
+  }
+
+  return [STAKED_CELO_POOL, USD_POOL]
+}
+
+// {
+//   stakingRewardAddress: USD_POOL_ADDRESSES[chainId || ChainId.MAINNET] || '0x000',
+//   stakingToken: new Token(chainId, stakedToken, 18),
+//   tokens: [tokens[celoAddress], tokens[rCeloAddress]],
+//   stakedAmount: undefined,
+//   earnedAmount: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   earnedAmountUbe: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   totalStakedAmount: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   totalRewardRate: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   ubeRewardRate: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   totalUBERewardRate: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   rewardRate: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   active: true,
+//   periodFinish: undefined,
+//   getHypotheticalRewardRate: (
+//     stakedAmount: TokenAmount,
+//     totalStakedAmount: TokenAmount,
+//     totalRewardRate: TokenAmount
+//   ) => new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   nextPeriodRewards: new TokenAmount(tokens[stakedToken], JSBI.BigInt(0)),
+//   poolInfo: {
+//     index: 0,
+//     stakingToken: stakedToken,
+//     poolAddress: USD_POOL_ADDRESSES[chainId || ChainId.MAINNET] || '0x000',
+//     weight: 0,
+//     nextPeriod: 0,
+//     nextPeriodRewards: null,
+//   },
+//   dollarRewardPerYear: new TokenAmount(tokens[stakedToken], JSBI.BigInt('0')),
+//   rewardToken: undefined,
+//   dualRewards: false,
+// }
 
 // gets the staking info from the network for the active chain id
 export function useStakingInfo(pairToFilterBy?: Pair | null): readonly StakingInfo[] {

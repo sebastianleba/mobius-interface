@@ -46,7 +46,7 @@ DEFAULT_TOKEN_LIST.tokens = DEFAULT_TOKEN_LIST.tokens.concat([
     address: '0x695218A22c805Bab9C6941546CF5395F169Ad871',
     name: 'USD Coin',
     symbol: 'cUSDC',
-    chainId: ChainId.ALFAJORES,
+    chainId: ChainId.MAINNET,
     decimals: 18,
     logoURI: 'https://bit.ly/3CwGimW',
   },
@@ -54,18 +54,18 @@ DEFAULT_TOKEN_LIST.tokens = DEFAULT_TOKEN_LIST.tokens.concat([
     address: '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
     name: 'Tether',
     symbol: 'cUSDT',
-    chainId: ChainId.ALFAJORES,
+    chainId: ChainId.MAINNET,
     decimals: 18,
     logoURI: 'https://bit.ly/3AMrCyD',
   },
-  {
-    address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
-    name: 'Celo Dollar',
-    symbol: 'cUSD',
-    chainId: ChainId.ALFAJORES,
-    decimals: 18,
-    logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
-  },
+  // {
+  //   address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+  //   name: 'Celo Dollar',
+  //   symbol: 'cUSD',
+  //   chainId: ChainId.MAINNET,
+  //   decimals: 18,
+  //   logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+  // },
 ])
 
 /**

@@ -6,11 +6,20 @@ import styled from 'styled-components'
 
 import { AutoColumn } from '../../components/Column'
 import { PoolCard } from '../../components/earn/PoolCard'
+import { StablePoolCard } from '../../components/earn/StablePoolCard'
 import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
-import { MOO_LP1, MOO_LP2, POOF_DUAL_LP, StakingInfo, useStakingInfo } from '../../state/stake/hooks'
+import {
+  MOO_LP1,
+  MOO_LP2,
+  POOF_DUAL_LP,
+  StablePoolInfo,
+  StakingInfo,
+  useStableSwapInfo,
+  useStakingInfo,
+} from '../../state/stake/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
@@ -66,6 +75,13 @@ export default function Earn() {
   const poofUBELP = allPools.find((pool) => pool.stakingToken.address === POOF_DUAL_LP)
   const mcUSDmcEURLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP1)
   const moomCELOLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP2)
+
+  const stablePools = useStableSwapInfo()
+  const sortedStablePools = stablePools.slice().sort((a: StablePoolInfo, b: StablePoolInfo) => {
+    if (a.poolAddress && b.poolAddress) return JSBI.toNumber(JSBI.subtract(b.apr.raw, a.apr.raw))
+    if (a.poolAddress) return -1
+    return 1
+  })
 
   const inactiveDisplay = inactivePools.length > 0 && (
     <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
@@ -135,26 +151,15 @@ export default function Earn() {
 
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <DataRow style={{ alignItems: 'baseline' }}>
-          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Available Pools</TYPE.mediumHeader>
-          <div>
-            {!isGenesisOver && (
-              <span>
-                Rewards begin on{' '}
-                {new Date(COUNTDOWN_END).toLocaleString('en-us', {
-                  timeZoneName: 'short',
-                })}
-              </span>
-            )}
-          </div>
-          {/* TODO(igm): show TVL here */}
+          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Coming Soon!</TYPE.mediumHeader>
         </DataRow>
         <PoolSection>
-          {stakingRewardsExist && stakingInfos?.length === 0 ? (
+          {sortedStablePools && sortedStablePools?.length === 0 ? (
             <Loader style={{ margin: 'auto' }} />
           ) : (
-            activePools?.map((pool) => (
-              <ErrorBoundary key={pool.stakingRewardAddress}>
-                <PoolCard stakingInfo={pool} />
+            sortedStablePools?.map((pool) => (
+              <ErrorBoundary key={pool.poolAddress || '000'}>
+                <StablePoolCard poolInfo={pool} />
               </ErrorBoundary>
             ))
           )}

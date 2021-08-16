@@ -3,7 +3,7 @@ import { BIG_INT_ZERO } from 'constants/index'
 import { usePair } from 'data/Reserves'
 import { useTotalSupply } from 'data/TotalSupply'
 import { useActiveWeb3React } from 'hooks/index'
-import { StakingInfo } from 'state/stake/hooks'
+import { StablePoolInfo, StakingInfo } from 'state/stake/hooks'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 interface IStakingPoolValue {
@@ -15,7 +15,7 @@ interface IStakingPoolValue {
   userAmountTokenB?: TokenAmount
 }
 
-export const useStakingPoolValue = (stakingInfo?: StakingInfo | null): IStakingPoolValue => {
+export const useStakingPoolValue = (stakingInfo?: StakingInfo | StablePoolInfo | null): IStakingPoolValue => {
   const { chainId } = useActiveWeb3React()
   const totalSupplyOfStakingToken = useTotalSupply(stakingInfo?.stakingToken)
   const [, stakingTokenPair] = usePair(stakingInfo?.tokens[0], stakingInfo?.tokens[1])
