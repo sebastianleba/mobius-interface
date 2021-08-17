@@ -4,13 +4,32 @@ import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useColor } from '../../hooks/useColor'
+import { generateGradient } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stake/hooks'
 import { TYPE } from '../../theme'
+import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import { RowBetween, RowFixed } from '../Row'
-import { Break, CardNoise } from './styled'
+import { CardNoise } from './styled'
+
+const SubHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  padding-top: 0;
+`
+
+const VerticalDivider = styled.div`
+  width: 1px;
+  height: 100%;
+  margin-right: 0.5rem;
+  background: ${({ theme }) => theme.bg4};
+`
+
+const StyledButton = styled(ButtonPrimary)`
+  flex: 1;
+`
 
 const StatContainer = styled.div`
   display: flex;
@@ -25,12 +44,21 @@ const StatContainer = styled.div`
 `};
 `
 
-const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
+const InfoContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  padding: 8px;
+`
+// background: ${({ bgColor1, bgColor2 }) =>
+// `radial-gradient(91.85% 100% at 1.84% 0%, ${bgColor1} 0%, ${bgColor2} 100%) `};
+
+const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background }>`
   border-radius: 12px;
   width: 100%;
   overflow: hidden;
   position: relative;
-  background: ${({ bgColor }) => `radial-gradient(91.85% 100% at 1.84% 0%, ${bgColor} 0%, #212429 100%) `};
+  background: ${({ background }) => background};
   color: ${({ theme, showBackground }) => (showBackground ? theme.white : theme.text1)} !important;
   ${({ showBackground }) =>
     showBackground &&
@@ -43,6 +71,7 @@ const TopSection = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 1rem;
+  padding-bottom: 0.25rem;
   z-index: 1;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 48px 1fr 96px;
@@ -68,7 +97,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const tokens = poolInfo.tokens
 
   // get the color of the token
-  const backgroundColor = useColor(tokens[0])
+  const backgroundColorStart = null //useColor(tokens[0])
+  let backgroundColorEnd = null //useColor(tokens[tokens.length - 1])
+  const backgroundGradient = generateGradient(tokens.slice())
+  console.log(backgroundGradient)
+
+  if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
   // get the USD value of staked WETH
   const {
@@ -98,7 +132,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   }
 
   return (
-    <Wrapper showBackground={true} bgColor={backgroundColor}>
+    <Wrapper
+      showBackground={true}
+      background={backgroundGradient}
+      bgColor1={backgroundColorStart}
+      bgColor2={backgroundColorEnd}
+    >
       <CardNoise />
       <TopSection>
         <TYPE.white fontWeight={600} fontSize={[18, 24]}>
@@ -114,8 +153,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           </TYPE.white>
         )}
       </TopSection>
-
-      <StatContainer>
+      <SubHeader>
         <RowBetween>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} />
           <PoolInfo style={{ marginLeft: '8px' }}>
@@ -124,62 +162,67 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </TYPE.white>
           </PoolInfo>
         </RowBetween>
-
-        <RowBetween>
-          <TYPE.white>Total deposited</TYPE.white>
-          <TYPE.white>
-            {valueOfTotalStakedAmountInCUSD
-              ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
-                  groupSeparator: ',',
-                })}`
-              : '-'}
-          </TYPE.white>
-        </RowBetween>
-        {apy && apy.greaterThan('0') && (
-          <RowBetween>
-            <RowFixed>
-              <TYPE.white>APR</TYPE.white>
-              <LightQuestionHelper
-                text={
-                  <>
-                    Yield/day: {dpy?.toSignificant(4)}%<br />
-                    APY (weekly compounded): {weeklyAPY}%
-                  </>
-                }
-              />
-            </RowFixed>
-            <TYPE.white>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
-            </TYPE.white>
-          </RowBetween>
-        )}
-      </StatContainer>
-
-      {isStaking && (
-        <>
-          <Break />
-          <BottomSection showBackground={true}>
-            {userValueCUSD && (
+      </SubHeader>
+      <InfoContainer>
+        <div style={{ flex: 3 }}>
+          <StatContainer>
+            <RowBetween>
+              <TYPE.white>Total deposited</TYPE.white>
+              <TYPE.white>
+                {valueOfTotalStakedAmountInCUSD
+                  ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
+                      groupSeparator: ',',
+                    })}`
+                  : '-'}
+              </TYPE.white>
+            </RowBetween>
+            {apy && apy.greaterThan('0') && (
               <RowBetween>
-                <TYPE.black color={'white'} fontWeight={500}>
-                  <span>Your stake</span>
-                </TYPE.black>
-
                 <RowFixed>
-                  <TYPE.black style={{ textAlign: 'right' }} color={'white'} fontWeight={500}>
-                    ${userValueCUSD.toFixed(0, { groupSeparator: ',' })}
-                  </TYPE.black>
-                  <QuestionHelper
-                    text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                      userAmountTokenA?.token.symbol
-                    }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
+                  <TYPE.white>APR</TYPE.white>
+                  <LightQuestionHelper
+                    text={
+                      <>
+                        Yield/day: {dpy?.toSignificant(4)}%<br />
+                        APY (weekly compounded): {weeklyAPY}%
+                      </>
+                    }
                   />
                 </RowFixed>
+                <TYPE.white>
+                  {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
+                </TYPE.white>
               </RowBetween>
             )}
-          </BottomSection>
-        </>
-      )}
+          </StatContainer>
+
+          {isStaking && (
+            <>
+              <BottomSection showBackground={true}>
+                {userValueCUSD && (
+                  <RowBetween>
+                    <TYPE.black color={'white'} fontWeight={500}>
+                      <span>Your share</span>
+                    </TYPE.black>
+
+                    <RowFixed>
+                      <TYPE.black style={{ textAlign: 'right' }} color={'white'} fontWeight={500}>
+                        ${userValueCUSD.toFixed(0, { groupSeparator: ',' })}
+                      </TYPE.black>
+                      <QuestionHelper
+                        text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
+                          userAmountTokenA?.token.symbol
+                        }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
+                      />
+                    </RowFixed>
+                  </RowBetween>
+                )}
+              </BottomSection>
+            </>
+          )}
+        </div>
+        <StyledButton>Deposit</StyledButton>
+      </InfoContainer>
     </Wrapper>
   )
 }

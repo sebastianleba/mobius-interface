@@ -119,7 +119,7 @@ export default function Earn() {
                 </RowBetween>{' '}
                 <ExternalLink
                   style={{ color: 'white', textDecoration: 'underline' }}
-                  href="https://docs.ubeswap.org/faq"
+                  href="https://medium.com"
                   target="_blank"
                 >
                   <TYPE.white fontSize={14}>Read more about MOBI</TYPE.white>

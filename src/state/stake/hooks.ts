@@ -84,6 +84,7 @@ export interface StablePoolInfo {
   readonly apr?: TokenAmount
   readonly totalStakedAmount: TokenAmount
   readonly stakedAmount: TokenAmount
+  readonly totalVolume?: TokenAmount
 }
 
 export const usePairStakingInfo = (pairToFilterBy?: Pair | null): StakingInfo | undefined => {
@@ -201,8 +202,11 @@ export function useStableSwapInfo(pairToFilterBy?: Pair | null): readonly Stable
 
   const STAKED_CELO_POOL: StablePoolInfo = {
     name: 'Staked Celo Pool',
+    stakingToken: new Token(chainId, '0xb5108b01280f994e67dc8bc3cd1e2433fa3a1b41', 18),
     tokens: [tokens[celoAddress], tokens[rCeloAddress]],
-    ...zeroTokenAmount,
+    totalVolume: new TokenAmount(cusd, JSBI.BigInt('10000000')),
+    totalStakedAmount: new TokenAmount(cusd, JSBI.BigInt('10000000')),
+    stakedAmount: new TokenAmount(cusd, JSBI.BigInt('100000')),
   }
 
   const USD_POOL: StablePoolInfo = {
