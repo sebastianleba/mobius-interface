@@ -1,10 +1,11 @@
 import React from 'react'
+import { isMobile } from 'react-device-detect'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
+import Logo from '../../assets/images/mobius-ring.png'
 import discord from '../../assets/svg/discord.svg'
 import github from '../../assets/svg/github.svg'
-import Logo from '../../assets/svg/mobius.svg'
 import twitter from '../../assets/svg/twitter.svg'
 import { colors, TYPE } from '../../theme'
 
@@ -39,6 +40,7 @@ const ExternalLink = styled.a`
 
 const LogoContainer = styled.div`
   width: min(30rem, 95%);
+  margin-top: 2rem;
 `
 
 export const StyledMenuButton = styled(NavLink)`
@@ -123,7 +125,7 @@ export default function LandingPage() {
         Mobius
       </TYPE.largeHeader>
       <TYPE.subHeader style={{ textAlign: 'center' }}>
-        A mobile-first DeFi exchange <br /> bridging Celo, Ethereum & more.
+        A mobile-first DeFi exchange {isMobile && <br />} bridging Celo, Ethereum & more.
       </TYPE.subHeader>
       <LogoContainer>
         <img width="100%" src={Logo} alt="logo" />
