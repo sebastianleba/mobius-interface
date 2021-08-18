@@ -7,6 +7,7 @@ import UnsupportedCurrencyFooter from 'components/swap/UnsupportedCurrencyFooter
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import useENS from 'hooks/useENS'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
@@ -272,7 +273,7 @@ export default function Swap() {
       <SwapPoolTabs active={'swap'} />
       <AppBodyNoBackground>
         {/* <SwapHeader title={actionLabel} /> */}
-        <Wrapper id="swap-page">
+        <Wrapper style={{ marginTop: !isMobile && '3rem' }} id="swap-page">
           <ConfirmSwapModal
             isOpen={showConfirm}
             trade={trade}
@@ -465,9 +466,8 @@ export default function Swap() {
             )}
             {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
           </BottomGrouping>
-          <AutoRow>
+          <AutoRow style={{ justifyContent: 'center' }}>
             <SettingsTab />
-            <div>Advanced Settings</div>
           </AutoRow>
         </Wrapper>
       </AppBodyNoBackground>

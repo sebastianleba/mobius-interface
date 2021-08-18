@@ -68,7 +68,7 @@ const localStorageKey = 'valoraRedirect'
 
 export default function App() {
   const location = useLocation()
-  const isLive = false
+  const isLive = true
   React.useEffect(() => {
     // Close window if search params from Valora redirect are present (handles Valora connection issue)
     if (typeof window !== 'undefined') {

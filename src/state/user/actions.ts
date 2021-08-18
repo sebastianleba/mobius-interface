@@ -37,3 +37,4 @@ export const toggleURLWarning = createAction<void>('app/toggleURLWarning')
 
 export const setValoraAccount = createAction<{ address: string; phoneNumber: string }>('user/setValoraAccount')
 export const clearValoraAccount = createAction<void>('user/clearValoraAccount')
+export const setUseUbeswap = createAction<{ useUbeswap: boolean }>('user/setUseUbeswap')
