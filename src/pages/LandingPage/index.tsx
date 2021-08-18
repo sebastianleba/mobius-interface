@@ -26,6 +26,9 @@ const Container = styled.div`
   align-items: center;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     width: 100vw;
+    padding: 1rem;
+    padding-top: 0.5rem;
+    height: 80vh;
   `}
   overflow: none;
 `

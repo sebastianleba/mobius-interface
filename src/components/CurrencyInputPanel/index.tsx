@@ -281,7 +281,7 @@ export default function CurrencyInputPanel({
                 {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}
               </Aligner>
             </CurrencySelect>
-            {account && currency && showMaxButton && label !== 'To' && (
+            {false && account && currency && showMaxButton && label !== 'To' && (
               <StyledBalanceMax onClick={onMax}>MAX</StyledBalanceMax>
             )}
           </div>

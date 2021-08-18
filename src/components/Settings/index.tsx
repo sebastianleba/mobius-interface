@@ -9,6 +9,7 @@ import { ApplicationModal } from '../../state/application/actions'
 import { useModalOpen, useToggleSettingsMenu } from '../../state/application/hooks'
 import {
   useExpertModeManager,
+  useIsDarkMode,
   useUbeswapToggle,
   useUserSingleHopOnly,
   useUserSlippageTolerance,
@@ -134,6 +135,7 @@ export default function SettingsTab() {
   const [allowMoolaWithdrawal, setAllowMoolaWithdrawal] = useUserAllowMoolaWithdrawal()
   const [disableSmartRouting, setDisableSmartRouting] = useUserDisableSmartRouting()
   const [useUbeswap, setUseUbeswap] = useUbeswapToggle()
+  const isDarkMode = useIsDarkMode()
 
   const [ttl, setTtl] = useUserTransactionTTL()
 
@@ -195,7 +197,12 @@ export default function SettingsTab() {
             </span>
           </EmojiWrapper>
         ) : null}{' '}
-        <Text style={{ margin: 'auto', marginLeft: '.25rem' }} fontWeight={400} fontSize={16}>
+        <Text
+          style={{ margin: 'auto', marginLeft: '.25rem' }}
+          fontWeight={400}
+          fontSize={16}
+          color={isDarkMode && 'white'}
+        >
           Advanced Settings
         </Text>
       </StyledMenuButton>
