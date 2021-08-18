@@ -1,4 +1,5 @@
 import React from 'react'
+import Countdown from 'react-countdown'
 import { isMobile } from 'react-device-detect'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
@@ -11,15 +12,20 @@ import { colors, TYPE } from '../../theme'
 
 const { primary1: mobiGreen, bg4 } = colors(false)
 
+const StyledCountdown = styled(Countdown)`
+  padding: 2rem;
+  font-size: 3rem;
+`
+
 const Container = styled.div`
+  padding-top: 4rem;
   width: 50vw;
-  height: 50vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     width: 100vw;
-    height: 100vh;
   `}
   overflow: none;
 `
@@ -39,7 +45,7 @@ const ExternalLink = styled.a`
 `
 
 const LogoContainer = styled.div`
-  width: min(30rem, 95%);
+  width: min(25rem, 95%);
   margin-top: 2rem;
 `
 
@@ -56,7 +62,6 @@ export const StyledMenuButton = styled(NavLink)`
   margin-top: 0.5rem;
   padding: 1rem;
   height: 35px;
-  margin-left: 8px;
   border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 1000;
@@ -92,7 +97,6 @@ export const ComingSoon = styled.div`
   margin-top: 0;
   padding: 1.5rem;
   height: 35px;
-  margin-left: 8px;
   border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 1000;
@@ -119,23 +123,31 @@ export const ComingSoon = styled.div`
 // }
 
 export default function LandingPage() {
+  const isLive = false
+
   return (
     <Container>
       <TYPE.largeHeader fontWeight={1000} fontSize={[36, 48]}>
         Mobius
       </TYPE.largeHeader>
-      <TYPE.subHeader style={{ textAlign: 'center' }}>
+      <TYPE.mediumHeader style={{ textAlign: 'center' }}>
         A mobile-first DeFi exchange {isMobile && <br />} bridging Celo, Ethereum & more.
-      </TYPE.subHeader>
+      </TYPE.mediumHeader>
       <LogoContainer>
         <img width="100%" src={Logo} alt="logo" />
       </LogoContainer>
-      <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
-        Open Mobius
-      </StyledMenuButton>
-      <ComingSoon>
-        Bridge Assets <br /> (Coming Soon)
-      </ComingSoon>
+      {isLive ? (
+        <>
+          <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
+            Open Mobius
+          </StyledMenuButton>
+          <ComingSoon>
+            Bridge Assets <br /> (Coming Soon)
+          </ComingSoon>
+        </>
+      ) : (
+        <StyledCountdown date={new Date('2021-08-23')} />
+      )}
 
       <Footer>
         <ExternalLink href="https://github.com/mobiusAMM" target="_blank">

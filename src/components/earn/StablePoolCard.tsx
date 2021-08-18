@@ -4,14 +4,14 @@ import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import React from 'react'
 import styled from 'styled-components'
 
-import { generateGradient } from '../../hooks/useColor'
+import { useColor } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stake/hooks'
 import { TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import { RowBetween, RowFixed } from '../Row'
-import { CardNoise } from './styled'
+//import { CardNoise } from './styled'
 
 const SubHeader = styled.div`
   display: flex;
@@ -27,8 +27,12 @@ const VerticalDivider = styled.div`
   background: ${({ theme }) => theme.bg4};
 `
 
-const StyledButton = styled(ButtonPrimary)`
+const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any }>`
+  background: ${({ background }) => background};
   flex: 1;
+  &:hover {
+    background: ${({ backgroundHover }) => backgroundHover};
+  }
 `
 
 const StatContainer = styled.div`
@@ -53,13 +57,13 @@ const InfoContainer = styled.div`
 // background: ${({ bgColor1, bgColor2 }) =>
 // `radial-gradient(91.85% 100% at 1.84% 0%, ${bgColor1} 0%, ${bgColor2} 100%) `};
 
-const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background }>`
+const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>`
   border-radius: 12px;
   width: 100%;
   overflow: hidden;
   position: relative;
-  background: ${({ background }) => background};
-  color: ${({ theme, showBackground }) => (showBackground ? theme.white : theme.text1)} !important;
+  background: ${({ theme }) => theme.bg3};
+  color: ${({ theme }) => theme.text1} !important;
   ${({ showBackground }) =>
     showBackground &&
     `  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
@@ -97,10 +101,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const tokens = poolInfo.tokens
 
   // get the color of the token
-  const backgroundColorStart = null //useColor(tokens[0])
-  let backgroundColorEnd = null //useColor(tokens[tokens.length - 1])
-  const backgroundGradient = generateGradient(tokens.slice())
-  console.log(backgroundGradient)
+  const backgroundColorStart = useColor(tokens[0])
+  let backgroundColorEnd = useColor(tokens[tokens.length - 1])
+  const backgroundGradient = null //generateGradient(tokens.slice())
+  console.log(backgroundColorEnd)
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
@@ -138,28 +142,27 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       bgColor1={backgroundColorStart}
       bgColor2={backgroundColorEnd}
     >
-      <CardNoise />
       <TopSection>
-        <TYPE.white fontWeight={600} fontSize={[18, 24]}>
+        <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
-        </TYPE.white>
+        </TYPE.black>
         {apy && apy.greaterThan('0') ? (
           <TYPE.small className="apr" fontWeight={400} fontSize={14}>
             {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
           </TYPE.small>
         ) : (
-          <TYPE.white fontWeight={600} fontSize={[14, 18]}>
+          <TYPE.black fontWeight={600} fontSize={[14, 18]}>
             Coming Soon!
-          </TYPE.white>
+          </TYPE.black>
         )}
       </TopSection>
       <SubHeader>
         <RowBetween>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} />
           <PoolInfo style={{ marginLeft: '8px' }}>
-            <TYPE.white fontWeight={600} fontSize={[18, 24]}>
+            <TYPE.black fontWeight={600} fontSize={[18, 24]}>
               {tokens.map((t) => t.symbol).join(' / ')}
-            </TYPE.white>
+            </TYPE.black>
           </PoolInfo>
         </RowBetween>
       </SubHeader>
@@ -167,19 +170,19 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <div style={{ flex: 3 }}>
           <StatContainer>
             <RowBetween>
-              <TYPE.white>Total deposited</TYPE.white>
-              <TYPE.white>
+              <TYPE.black>Total deposited</TYPE.black>
+              <TYPE.black>
                 {valueOfTotalStakedAmountInCUSD
                   ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
                       groupSeparator: ',',
                     })}`
                   : '-'}
-              </TYPE.white>
+              </TYPE.black>
             </RowBetween>
             {apy && apy.greaterThan('0') && (
               <RowBetween>
                 <RowFixed>
-                  <TYPE.white>APR</TYPE.white>
+                  <TYPE.black>APR</TYPE.black>
                   <LightQuestionHelper
                     text={
                       <>
@@ -189,9 +192,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     }
                   />
                 </RowFixed>
-                <TYPE.white>
+                <TYPE.black>
                   {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
-                </TYPE.white>
+                </TYPE.black>
               </RowBetween>
             )}
           </StatContainer>
@@ -201,12 +204,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <BottomSection showBackground={true}>
                 {userValueCUSD && (
                   <RowBetween>
-                    <TYPE.black color={'white'} fontWeight={500}>
+                    <TYPE.black fontWeight={500}>
                       <span>Your share</span>
                     </TYPE.black>
 
                     <RowFixed>
-                      <TYPE.black style={{ textAlign: 'right' }} color={'white'} fontWeight={500}>
+                      <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         ${userValueCUSD.toFixed(0, { groupSeparator: ',' })}
                       </TYPE.black>
                       <QuestionHelper
@@ -221,7 +224,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        <StyledButton>Deposit</StyledButton>
+        <StyledButton background={backgroundColorStart} backgroundHover={backgroundColorEnd}>
+          Deposit
+        </StyledButton>
       </InfoContainer>
     </Wrapper>
   )

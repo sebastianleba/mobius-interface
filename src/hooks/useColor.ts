@@ -70,6 +70,15 @@ export function generateGradient(tokens: Token[]) {
   return `radial-gradient(91.85% 100% at 1.84% 0%, ${colors.join(', ')})`
 }
 
+export function generateColorPallete(tokens: Token[]) {
+  const prevColor = ''
+  let colors = tokens.map((t) => useColor(t))
+  const increment = 100 / colors.length
+  colors = colors.map((color, i) => `${i * increment}% { background: ${color};}`)
+
+  return colors.join('\n')
+}
+
 export function useColor(token?: Token) {
   const theme = useTheme()
   const [color, setColor] = useState(theme.primary1)

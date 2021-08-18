@@ -2,7 +2,7 @@ import { Pair, Token } from '@ubeswap/sdk'
 import { darken } from 'polished'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import { useActiveWeb3React } from '../../hooks'
@@ -14,6 +14,12 @@ import DoubleCurrencyLogo from '../DoubleLogo'
 import { Input as NumericalInput } from '../NumericalInput'
 import { RowBetween } from '../Row'
 import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
+
+const ColorShift = keyframes`
+0% { background: #52D07F;}
+50% { background: #6076b3;}
+100% { background: #a6af62; }
+`
 
 const InputRow = styled.div<{ selected: boolean }>`
   ${({ theme }) => theme.flexRowNoWrap};
@@ -34,11 +40,16 @@ const CurrencySelect = styled.button<{ selected: boolean; walletConnected: boole
   font-size: 20px;
   font-weight: 500;
   background-color: ${({ selected, theme, walletConnected }) =>
-    selected ? theme.bg1 : walletConnected ? theme.primary1 : theme.bg4};
+    selected ? theme.bg1 : walletConnected ? '' : theme.bg4};
   color: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
   border-radius: 12px;
   box-shadow: ${({ selected }) => (selected ? 'none' : '0px 6px 10px rgba(0, 0, 0, 0.075)')};
   outline: none;
+  ${({ selected }) =>
+    !selected &&
+    `
+    animation: 10s ${ColorShift.getName()} ease-in-out infinite
+  `}
   cursor: pointer;
   user-select: none;
   border: none;
@@ -146,6 +157,7 @@ interface CurrencyInputPanelProps {
   id: string
   showCommonBases?: boolean
   customBalanceText?: string
+  tokens: Token[]
 }
 
 export default function CurrencyInputPanel({
@@ -164,6 +176,7 @@ export default function CurrencyInputPanel({
   id,
   showCommonBases,
   customBalanceText,
+  tokens,
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
 
