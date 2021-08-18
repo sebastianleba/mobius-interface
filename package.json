@@ -1,6 +1,6 @@
 {
-  "name": "@ubeswap/interface",
-  "description": "Ubeswap Interface",
+  "name": "@mobiusamm/interface",
+  "description": "Mobius Interface",
   "homepage": ".",
   "private": true,
   "devDependencies": {
