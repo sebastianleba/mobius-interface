@@ -4,7 +4,6 @@ import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
 import useToggle from 'hooks/useToggle'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Edit } from 'react-feather'
 import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -15,10 +14,10 @@ import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import { useAllTokens, useFoundOnInactiveList, useIsUserAddedToken, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
-import { ButtonText, CloseIcon, IconWrapper, TYPE } from '../../theme'
+import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
-import Row, { RowBetween, RowFixed } from '../Row'
+import Row, { RowBetween } from '../Row'
 import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { filterTokens } from './filtering'
@@ -291,7 +290,12 @@ export function CurrencySearch({
             </ButtonLight>
           </Row>
         )}
-      <Footer>
+    </ContentWrapper>
+  )
+}
+
+/*
+<Footer>
         <Row justify="center">
           <ButtonText onClick={showManageView} color={theme.blue1} className="list-token-manage-button">
             <RowFixed>
@@ -303,6 +307,4 @@ export function CurrencySearch({
           </ButtonText>
         </Row>
       </Footer>
-    </ContentWrapper>
-  )
-}
+      */
