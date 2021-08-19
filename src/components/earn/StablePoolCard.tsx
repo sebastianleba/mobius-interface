@@ -1,6 +1,7 @@
 import { Percent } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
+import { darken } from 'polished'
 import React from 'react'
 import styled from 'styled-components'
 
@@ -31,7 +32,7 @@ const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: a
   background: ${({ background }) => background};
   flex: 1;
   &:hover {
-    background: ${({ backgroundHover }) => backgroundHover};
+    background: ${({ background }) => darken(0.1, background)};
   }
 `
 
@@ -44,7 +45,7 @@ const StatContainer = styled.div`
   margin-right: 1rem;
   margin-left: 1rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  display: none;
+  
 `};
 `
 
@@ -62,12 +63,17 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>
   width: 100%;
   overflow: hidden;
   position: relative;
-  background: ${({ theme }) => theme.bg3};
+  padding: 1rem;
+  background: ${({ theme }) => theme.bg1};
   color: ${({ theme }) => theme.text1} !important;
   ${({ showBackground }) =>
     showBackground &&
     `  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);`}
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+`}
 `
 
 const TopSection = styled.div`
@@ -76,6 +82,7 @@ const TopSection = styled.div`
   justify-content: space-between;
   padding: 1rem;
   padding-bottom: 0.25rem;
+  padding-top: 0;
   z-index: 1;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 48px 1fr 96px;
@@ -160,7 +167,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <RowBetween>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} />
           <PoolInfo style={{ marginLeft: '8px' }}>
-            <TYPE.black fontWeight={600} fontSize={[18, 24]}>
+            <TYPE.black fontWeight={600} fontSize={[14, 24]}>
               {tokens.map((t) => t.symbol).join(' / ')}
             </TYPE.black>
           </PoolInfo>

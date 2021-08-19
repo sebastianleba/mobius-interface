@@ -8,6 +8,7 @@ import styled, { css, keyframes } from 'styled-components'
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import { useActiveWeb3React } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
+import { useIsDarkMode } from '../../state/user/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import CurrencyLogo from '../CurrencyLogo'
@@ -47,7 +48,7 @@ const ColorShift = keyframes`
 100% { background: red;}`
 
 const ColorShiftAnimation = css`
-  animation: ${ColorShift} 5s linear infinite;
+  animation: ${ColorShift} 8s linear infinite;
 `
 
 const InputRow = styled.div<{ selected: boolean }>`
@@ -62,14 +63,20 @@ const InputDiv = styled.div`
   min-width: 40%;
 `
 
-const CurrencySelect = styled.button<{ selected: boolean; walletConnected: boolean; bgColor: any }>`
+const CurrencySelect = styled.button<{
+  selected: boolean
+  walletConnected: boolean
+  bgColor: any
+  isDarkMode: boolean
+}>`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 2.2rem;
   font-size: 20px;
   font-weight: 500;
-  ${({ selected, bgColor }) => selected && `background-color: ${bgColor};`}
+  ${({ selected, bgColor, isDarkMode }) =>
+    selected && `background-color: ${darken(isDarkMode ? 0.2 : -0.425, bgColor)};`}
   color: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
   border-radius: 12px;
   box-shadow: ${({ selected }) => (selected ? 'none' : '0px 6px 10px rgba(0, 0, 0, 0.075)')};
@@ -86,8 +93,8 @@ const CurrencySelect = styled.button<{ selected: boolean; walletConnected: boole
 
   :focus,
   :hover {
-    background-color: ${({ selected, theme, bgColor }) =>
-      selected ? darken(0.05, bgColor) : darken(0.05, theme.primary1)};
+    background-color: ${({ selected, theme, bgColor, isDarkMode }) =>
+      selected ? darken(isDarkMode ? 0.25 : -0.35, bgColor) : darken(0.05, theme.primary1)};
   }
 `
 
@@ -115,7 +122,7 @@ const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
   height: 35%;
 
   path {
-    stroke: ${({ selected, theme }) => theme.white};
+    stroke: ${({ selected, theme }) => theme.text1};
     stroke-width: 1.5px;
   }
 `
@@ -134,14 +141,12 @@ const Container = styled.div<{ hideInput: boolean }>`
   border: 1px solid ${({ theme }) => theme.bg2};
   background-color: ${({ theme }) => theme.bg1};
   padding: 0.5rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
 `
 
 const StyledTokenName = styled.span<{ active?: boolean }>`
   ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}
   font-size:  ${({ active }) => (active ? '20px' : '16px')};
-  color: ${({ theme }) => theme.white};
+  color: ${({ theme }) => theme.text1};
 `
 
 const StyledBalanceMax = styled.button`
@@ -211,6 +216,7 @@ export default function CurrencyInputPanel({
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
   const tokenSelectBackground = useColor(currency || undefined)
+  const isDarkMode = useIsDarkMode()
 
   const [modalOpen, setModalOpen] = useState(false)
   const { account } = useActiveWeb3React()
@@ -249,6 +255,7 @@ export default function CurrencyInputPanel({
         <InputRow style={hideInput ? { padding: '0', borderRadius: '8px' } : {}} selected={disableCurrencySelect}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <CurrencySelect
+              isDarkMode={isDarkMode}
               bgColor={tokenSelectBackground}
               selected={!!currency}
               walletConnected={!!account}
