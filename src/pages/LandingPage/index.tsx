@@ -25,11 +25,11 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    width: 100vw;
+    width: 90vw;
     padding: 1rem;
     padding-top: 0.5rem;
     height: 80vh;
-  `}
+`}
   overflow: none;
 `
 
