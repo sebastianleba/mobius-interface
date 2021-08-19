@@ -179,7 +179,23 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
   }
 }
 
-export function useStableSwapInfo(pairToFilterBy?: Pair | null): readonly StablePoolInfo[] {
+export function useTokensTradeable(tokenIn: Token | null | undefined): readonly [{ [address: string]: Token }] {
+  const tradeable: { [address: string]: Token } = {}
+  const pools = useStableSwapInfo()
+
+  if (!tokenIn) return [{}]
+
+  pools
+    .filter(({ tokens }) => tokens.includes(tokenIn))
+    .flatMap(({ tokens }) => tokens)
+    .forEach((token) => {
+      if (token !== tokenIn) tradeable[token.address] = token
+    })
+
+  return [tradeable]
+}
+
+export function useStableSwapInfo(): readonly StablePoolInfo[] {
   const { chainId } = useActiveWeb3React()
   const tokens = useAllTokens()
   const celoAddress =

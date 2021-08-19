@@ -14,6 +14,7 @@ import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useAllTokens, useFoundOnInactiveList, useIsUserAddedToken, useToken } from '../../hooks/Tokens'
+import { useTokensTradeable } from '../../state/stake/hooks'
 import { ButtonText, CloseIcon, IconWrapper, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
@@ -81,6 +82,9 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
   const searchTokenIsAdded = useIsUserAddedToken(searchToken)
+  const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  let tokensToSelect = allTokens
+  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
 
   useEffect(() => {
     if (isAddressSearch) {
@@ -100,8 +104,8 @@ export function CurrencySearch({
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
   const filteredTokens: Token[] = useMemo(() => {
-    return filterTokens(Object.values(allTokens), searchQuery)
-  }, [allTokens, searchQuery])
+    return filterTokens(Object.values(tokensToSelect), searchQuery)
+  }, [tokensToSelect, searchQuery])
 
   const filteredSortedTokens: Token[] = useMemo(() => {
     const sorted = filteredTokens.sort(tokenComparator)
@@ -244,7 +248,7 @@ export function CurrencySearch({
       ) : (
         <Column style={{ padding: '20px', height: '100%' }}>
           <TYPE.main color={theme.text3} textAlign="center" mb="20px">
-            No results found in active lists.
+            No results found in active pools.
           </TYPE.main>
           {inactiveTokens &&
             inactiveTokens.length > 0 &&
