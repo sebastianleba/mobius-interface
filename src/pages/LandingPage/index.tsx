@@ -149,7 +149,7 @@ export default function LandingPage() {
           </ComingSoon>
         </>
       ) : (
-        <StyledCountdown date={new Date('2021-08-23')} />
+        <StyledCountdown date={new Date('2021-08-24')} />
       )}
 
       <Footer>
