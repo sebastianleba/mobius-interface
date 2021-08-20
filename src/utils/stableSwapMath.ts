@@ -1,14 +1,5 @@
 import { BigintIsh, JSBI } from '@ubeswap/sdk'
-import { NULL_ADDRESS } from '@celo/base'
-
-export type StableSwapConstants = {
-  rates: JSBI[]
-  lendingPrecision: JSBI
-  precision: JSBI
-  feeDenominator: JSBI
-  precisionMul: JSBI[]
-  feeIndex: number
-}
+import { StableSwapMathConstants } from 'state/stablePools/reducer'
 
 const ZERO = JSBI.BigInt('0')
 
@@ -21,7 +12,7 @@ export class StableSwapMath {
   public readonly N_COINS: number
   public readonly FEE_INDEX: number
 
-  constructor({ rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex }: StableSwapConstants) {
+  constructor({ rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex }: StableSwapMathConstants) {
     this.RATES = rates
     this.LENDING_PRECISION = lendingPrecision
     this.PRECISION = precision

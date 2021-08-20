@@ -4,7 +4,6 @@ import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
 import useToggle from 'hooks/useToggle'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Edit } from 'react-feather'
 import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -14,10 +13,11 @@ import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useAllTokens, useFoundOnInactiveList, useIsUserAddedToken, useToken } from '../../hooks/Tokens'
-import { ButtonText, CloseIcon, IconWrapper, TYPE } from '../../theme'
+import { useTokensTradeable } from '../../state/stake/hooks'
+import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
-import Row, { RowBetween, RowFixed } from '../Row'
+import Row, { RowBetween } from '../Row'
 import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { filterTokens } from './filtering'
@@ -81,6 +81,9 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
   const searchTokenIsAdded = useIsUserAddedToken(searchToken)
+  const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  let tokensToSelect = allTokens
+  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
 
   useEffect(() => {
     if (isAddressSearch) {
@@ -100,8 +103,8 @@ export function CurrencySearch({
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
   const filteredTokens: Token[] = useMemo(() => {
-    return filterTokens(Object.values(allTokens), searchQuery)
-  }, [allTokens, searchQuery])
+    return filterTokens(Object.values(tokensToSelect), searchQuery)
+  }, [tokensToSelect, searchQuery])
 
   const filteredSortedTokens: Token[] = useMemo(() => {
     const sorted = filteredTokens.sort(tokenComparator)
@@ -244,7 +247,7 @@ export function CurrencySearch({
       ) : (
         <Column style={{ padding: '20px', height: '100%' }}>
           <TYPE.main color={theme.text3} textAlign="center" mb="20px">
-            No results found in active lists.
+            No results found in active pools.
           </TYPE.main>
           {inactiveTokens &&
             inactiveTokens.length > 0 &&
@@ -287,7 +290,12 @@ export function CurrencySearch({
             </ButtonLight>
           </Row>
         )}
-      <Footer>
+    </ContentWrapper>
+  )
+}
+
+/*
+<Footer>
         <Row justify="center">
           <ButtonText onClick={showManageView} color={theme.blue1} className="list-token-manage-button">
             <RowFixed>
@@ -299,6 +307,4 @@ export function CurrencySearch({
           </ButtonText>
         </Row>
       </Footer>
-    </ContentWrapper>
-  )
-}
+      */

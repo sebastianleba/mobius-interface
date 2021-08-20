@@ -16,6 +16,7 @@ import {
   removeSerializedToken,
   SerializedPair,
   SerializedToken,
+  setUseUbeswap,
   setValoraAccount,
   toggleURLWarning,
   updateUserAllowMoolaWithdrawal,
@@ -187,6 +188,20 @@ export function useUserSlippageTolerance(): [number, (slippage: number) => void]
   )
 
   return [userSlippageTolerance, setUserSlippageTolerance]
+}
+
+export function useUbeswapToggle(): [boolean, (useUbeswap: boolean) => void] {
+  const dispatch = useDispatch<AppDispatch>()
+  const usesUbeswap = useSelector<AppState, AppState['user']['useUbeswap']>((state) => state.user.useUbeswap)
+
+  const setUsesUbeswap = useCallback(
+    (useUbeswap: boolean) => {
+      dispatch(setUseUbeswap({ useUbeswap }))
+    },
+    [dispatch]
+  )
+
+  return [usesUbeswap || false, setUsesUbeswap]
 }
 
 export function useUserTransactionTTL(): [number, (slippage: number) => void] {

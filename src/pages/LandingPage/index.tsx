@@ -126,7 +126,7 @@ export const ComingSoon = styled.div`
 // }
 
 export default function LandingPage() {
-  const isLive = false
+  const isLive = true
 
   return (
     <Container>
