@@ -204,7 +204,7 @@ export function useDerivedStableSwapInfo(): {
 
   const parsedAmount = tryParseAmount(typedValue, inputCurrency ?? undefined)
 
-  const stableSwapContract = useStableSwapContract(poolInfo.address)
+  const stableSwapContract = useStableSwapContract(poolInfo?.address)
   const tokenOrder = poolInfo ? poolInfo.tokens : []
   const inputIndex = tokenOrder.indexOf(inputCurrencyId || '')
   const outputIndex = tokenOrder.indexOf(outputCurrencyId || '')
