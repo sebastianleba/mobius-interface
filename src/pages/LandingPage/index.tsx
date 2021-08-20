@@ -1,6 +1,5 @@
 import React from 'react'
 import Countdown from 'react-countdown'
-import { isMobile } from 'react-device-detect'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -26,8 +25,9 @@ const Container = styled.div`
   align-items: center;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     width: 90vw;
-    padding: 1rem;
-    padding-top: 0.5rem;
+    padding: 1.25rem;
+    padding-top: 0;
+    margin-top: 0;
     height: 80vh;
 `}
   overflow: none;
@@ -133,8 +133,8 @@ export default function LandingPage() {
       <TYPE.largeHeader fontWeight={1000} fontSize={[36, 48]}>
         Mobius
       </TYPE.largeHeader>
-      <TYPE.mediumHeader style={{ textAlign: 'center' }}>
-        A mobile-first DeFi exchange {isMobile && <br />} bridging Celo, Ethereum & more.
+      <TYPE.mediumHeader style={{ textAlign: 'center' }} fontWeight={300}>
+        A cross-chain stableswap DeFi exchange on Celo
       </TYPE.mediumHeader>
       <LogoContainer>
         <img width="100%" src={Logo} alt="logo" />
@@ -149,7 +149,7 @@ export default function LandingPage() {
           </ComingSoon>
         </>
       ) : (
-        <StyledCountdown date={new Date('2021-08-23')} />
+        <StyledCountdown date={new Date('2021-08-25')} />
       )}
 
       <Footer>
