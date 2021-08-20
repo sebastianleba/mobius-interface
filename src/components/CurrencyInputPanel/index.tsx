@@ -193,7 +193,6 @@ interface CurrencyInputPanelProps {
   id: string
   showCommonBases?: boolean
   customBalanceText?: string
-  tokens: Token[]
 }
 
 export default function CurrencyInputPanel({
@@ -212,7 +211,6 @@ export default function CurrencyInputPanel({
   id,
   showCommonBases,
   customBalanceText,
-  tokens,
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
   const tokenSelectBackground = useColor(currency || undefined)

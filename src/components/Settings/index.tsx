@@ -218,7 +218,7 @@ export default function SettingsTab() {
               deadline={ttl}
               setDeadline={setTtl}
             />
-            <Text fontWeight={600} fontSize={14}>
+            {/* <Text fontWeight={600} fontSize={14}>
               Interface Settings
             </Text>
             <RowBetween>
@@ -229,7 +229,7 @@ export default function SettingsTab() {
                 <QuestionHelper text="Allows trades to be routed through Ubeswap." />
               </RowFixed>
               <Toggle id="toggle-expert-mode-button" isActive={useUbeswap} toggle={() => setUseUbeswap(!useUbeswap)} />
-            </RowBetween>
+            </RowBetween> */}
 
             {useUbeswap && (
               <>
