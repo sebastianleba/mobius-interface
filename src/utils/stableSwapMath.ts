@@ -12,6 +12,8 @@ export class StableSwapMath {
   public readonly PRECISION_MUL: JSBI[]
   public readonly N_COINS: number
   public readonly FEE_INDEX: number
+  public D: JSBI | undefined
+  public xp: JSBI[] | undefined
 
   constructor({ rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex }: StableSwapMathConstants) {
     this.RATES = rates
@@ -24,12 +26,16 @@ export class StableSwapMath {
   }
 
   calc_xp_mem(balances: BigintIsh[]): JSBI[] {
+    if (this.xp) return this.xp
     const balancesCasted = balances.map((b) => JSBI.BigInt(b.toString))
     const result = this.RATES.slice()
-    return result.map((r, i) => JSBI.divide(JSBI.multiply(r, balancesCasted[i]), this.PRECISION))
+    const xp = result.map((r, i) => JSBI.divide(JSBI.multiply(r, balancesCasted[i]), this.PRECISION))
+    this.xp = xp
+    return xp
   }
 
   calc_D(xp: JSBI[], amp: JSBI): JSBI {
+    if (this.D) return this.D
     const S = xp.reduce((accum, cur) => JSBI.add(accum, cur))
     const N_COINS = JSBI.BigInt(this.N_COINS)
     let Dprev = ZERO
@@ -48,6 +54,7 @@ export class StableSwapMath {
 
       D = JSBI.divide(left, right)
     }
+    this.D = D
     return D
   }
 
