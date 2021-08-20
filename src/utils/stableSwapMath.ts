@@ -11,7 +11,7 @@ export type StableSwapConstants = {
 
 const ZERO = JSBI.BigInt('0')
 
-class StableSwapMath {
+export class StableSwapMath {
   public readonly RATES: JSBI[]
   public readonly LENDING_PRECISION: JSBI
   public readonly PRECISION: JSBI
