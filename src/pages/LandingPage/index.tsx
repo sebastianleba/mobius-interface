@@ -149,7 +149,10 @@ export default function LandingPage() {
           </ComingSoon>
         </>
       ) : (
-        <StyledCountdown date={new Date('2021-08-25')} />
+        // <StyledCountdown date={new Date('2021-08-25')} />
+        <TYPE.largeHeader fontWeight={1000} fontSize={[36, 48]} style={{ margin: '1rem' }}>
+          SEPTEMBER
+        </TYPE.largeHeader>
       )}
 
       <Footer>
