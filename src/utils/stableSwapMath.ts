@@ -12,6 +12,8 @@ export class StableSwapMath {
   public readonly PRECISION_MUL: JSBI[]
   public readonly N_COINS: number
   public readonly FEE_INDEX: number
+  public readonly DECIMALS: JSBI[]
+  public readonly POOL_PRECISION_DECIMALS = JSBI.BigInt('18')
   public readonly tokenPrecisionMultipliers: JSBI[]
 
   public lpTotalSupply: JSBI
@@ -29,7 +31,7 @@ export class StableSwapMath {
     feeDenominator,
     precisionMul,
     feeIndex,
-    tokenPrecisionMultipliers,
+    decimals,
   }: StableSwapMathConstants) {
     this.RATES = rates
     this.LENDING_PRECISION = lendingPrecision
@@ -38,6 +40,11 @@ export class StableSwapMath {
     this.PRECISION_MUL = precisionMul
     this.N_COINS = rates.length
     this.FEE_INDEX = feeIndex
+    this.DECIMALS = decimals
+    const tokenPrecisionMultipliers = decimals.map((deci) =>
+      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.subtract(this.POOL_PRECISION_DECIMALS, deci))
+    )
+
     this.tokenPrecisionMultipliers = tokenPrecisionMultipliers
 
     this.currentWithdrawFee = ZERO

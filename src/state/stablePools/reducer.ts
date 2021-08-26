@@ -17,7 +17,7 @@ export type StableSwapMathConstants = {
   feeDenominator: JSBI
   precisionMul: JSBI[]
   feeIndex: number
-  tokenPrecisionMultipliers: JSBI[]
+  decimals: JSBI[]
 }
 
 export type StableSwapConstants = StableSwapMathConstants & {
@@ -45,7 +45,7 @@ const initialState: PoolState = {
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
     .addCase(initPool, (state, { payload: { name, pool } }) => {
-      const { rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex } = pool
+      const { rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex, decimals } = pool
       const mathModel = new StableSwapMath({
         rates,
         lendingPrecision,
@@ -53,6 +53,7 @@ export default createReducer<PoolState>(initialState, (builder) =>
         feeDenominator,
         precisionMul,
         feeIndex,
+        decimals,
       })
       return {
         ...state,
