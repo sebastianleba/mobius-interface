@@ -12,10 +12,25 @@ export class StableSwapMath {
   public readonly PRECISION_MUL: JSBI[]
   public readonly N_COINS: number
   public readonly FEE_INDEX: number
+  public readonly tokenPrecisionMultipliers: JSBI[]
+
+  public lpTotalSupply: JSBI
+  public swapFee: JSBI
+  public currentWithdrawFee: JSBI
+  public balances: JSBI[]
+  public amp: JSBI
   public D: JSBI | undefined
   public xp: JSBI[] | undefined
 
-  constructor({ rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex }: StableSwapMathConstants) {
+  constructor({
+    rates,
+    lendingPrecision,
+    precision,
+    feeDenominator,
+    precisionMul,
+    feeIndex,
+    tokenPrecisionMultipliers,
+  }: StableSwapMathConstants) {
     this.RATES = rates
     this.LENDING_PRECISION = lendingPrecision
     this.PRECISION = precision
@@ -23,18 +38,37 @@ export class StableSwapMath {
     this.PRECISION_MUL = precisionMul
     this.N_COINS = rates.length
     this.FEE_INDEX = feeIndex
+    this.tokenPrecisionMultipliers = tokenPrecisionMultipliers
+
+    this.currentWithdrawFee = ZERO
+    this.swapFee = ONE
+    this.amp = ONE
+    this.balances = Array(this.N_COINS).fill(ZERO)
+    this.lpTotalSupply = ONE
+  }
+
+  updateInfo(withdrawFee: JSBI, swapFee: JSBI, amp: JSBI, balances: JSBI[], lpTotalSupply: JSBI) {
+    this.currentWithdrawFee = withdrawFee
+    this.swapFee = swapFee
+    this.amp = amp
+    this.balances = balances
+    this.lpTotalSupply = lpTotalSupply
   }
 
   calc_xp_mem(balances: BigintIsh[]): JSBI[] {
     if (this.xp) return this.xp
     const balancesCasted = balances.map((b) => JSBI.BigInt(b.toString))
-    const result = this.RATES.slice()
-    const xp = result.map((r, i) => JSBI.divide(JSBI.multiply(r, balancesCasted[i]), this.PRECISION))
+    const result = this.tokenPrecisionMultipliers.slice()
+    const xp = result.map((r, i) => JSBI.multiply(r, balancesCasted[i]))
     this.xp = xp
     return xp
   }
 
-  calc_D(xp: JSBI[], amp: JSBI): JSBI {
+  calc_xp(): JSBI[] {
+    return this.calc_xp_mem(this.balances)
+  }
+
+  calc_D_xp(xp: JSBI[], amp: JSBI): JSBI {
     if (this.D) return this.D
     const S = xp.reduce((accum, cur) => JSBI.add(accum, cur))
     const N_COINS = JSBI.BigInt(this.N_COINS)
@@ -58,16 +92,16 @@ export class StableSwapMath {
     return D
   }
 
-  calc_D_using_balance(balances: BigintIsh[], amp: JSBI): JSBI {
-    return this.calc_D(this.calc_xp_mem(balances), amp)
+  calc_D(): JSBI {
+    return this.calc_D_xp(this.calc_xp_mem(this.balances), this.amp)
   }
 
-  get_y(i: number, j: number, x: JSBI, xp: JSBI[], amp: JSBI): JSBI {
-    const D = this.calc_D(xp, amp)
+  get_y(i: number, j: number, x: JSBI, xp: JSBI[]): JSBI {
+    const D = this.calc_D()
     let c = D
     let S = ZERO
     const N_COINS = JSBI.BigInt(this.N_COINS)
-    const Ann = JSBI.multiply(amp, N_COINS)
+    const Ann = JSBI.multiply(this.amp, N_COINS)
 
     let _x = ZERO
     for (let _i = 0; _i < this.N_COINS; _i += 1) {
@@ -102,15 +136,37 @@ export class StableSwapMath {
     return y
   }
 
-  get_dy(i: number, j: number, dx: JSBI, xp: JSBI[], amp: JSBI): JSBI {
+  get_dy(i: number, j: number, dx: JSBI, xp: JSBI[]): JSBI {
     const x: JSBI = JSBI.add(JSBI.divide(JSBI.multiply(dx, this.RATES[i]), this.PRECISION), xp[i])
-    const y: JSBI = this.get_y(i, j, x, xp, amp)
+    const y: JSBI = this.get_y(i, j, x, xp)
     const dy: JSBI = JSBI.divide(JSBI.multiply(JSBI.subtract(xp[j], y), this.PRECISION), this.RATES[j])
     const _fee: JSBI = JSBI.divide(JSBI.divide(JSBI.BigInt(this.FEE_INDEX.toString), dy), this.FEE_DENOMINATOR) //TODO: is fee index the right variable?
     return JSBI.subtract(dy, _fee)
   }
 
-  get_dx(i: number, j: number, dy: JSBI, xp: JSBI[], amp: JSBI): JSBI {
+  // getY(indexFrom: number, indexTo: number, x: JSBI, xp: JSBI[], this.amp: JSBI): JSBI {
+  //   const d =
+  // }
+
+  calculateSwap(indexFrom: number, indexTo: number, dx: JSBI, xp: JSBI[]): [JSBI, JSBI] {
+    const x = JSBI.add(xp[indexFrom], JSBI.multiply(this.tokenPrecisionMultipliers[indexFrom], dx))
+    const y = this.get_y(indexFrom, indexTo, x, xp)
+    let dy = JSBI.subtract(JSBI.subtract(xp[indexTo], y), ONE)
+    const dyFee = JSBI.divide(JSBI.multiply(dy, this.swapFee), this.FEE_DENOMINATOR)
+    dy = JSBI.divide(JSBI.subtract(dy, dyFee), this.tokenPrecisionMultipliers[indexTo])
+    return [dy, dyFee]
+  }
+
+  calculateRemoveLiquidity(amount: JSBI, lpTotalSupply: JSBI) {
+    const feeAdjustedAmount = JSBI.divide(
+      JSBI.multiply(JSBI.subtract(this.FEE_DENOMINATOR, this.currentWithdrawFee), amount),
+      this.FEE_DENOMINATOR
+    )
+    const amounts = this.balances.map((bal) => JSBI.divide(JSBI.multiply(bal, feeAdjustedAmount), lpTotalSupply))
+    return amounts
+  }
+
+  get_dx(i: number, j: number, dy: JSBI, xp: JSBI[]): JSBI {
     const y: JSBI = JSBI.subtract(
       xp[j],
       JSBI.divide(
@@ -124,7 +180,7 @@ export class StableSwapMath {
         this.PRECISION
       )
     )
-    const x: JSBI = this.get_y(j, i, y, xp, amp)
+    const x: JSBI = this.get_y(j, i, y, xp)
     const dx: JSBI = JSBI.divide(JSBI.multiply(JSBI.subtract(x, xp[i]), this.PRECISION), this.RATES[i])
     return dx
   }

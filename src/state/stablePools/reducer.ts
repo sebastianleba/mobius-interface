@@ -17,6 +17,7 @@ export type StableSwapMathConstants = {
   feeDenominator: JSBI
   precisionMul: JSBI[]
   feeIndex: number
+  tokenPrecisionMultipliers: JSBI[]
 }
 
 export type StableSwapConstants = StableSwapMathConstants & {
