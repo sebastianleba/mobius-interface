@@ -74,19 +74,6 @@ export interface StakingInfo {
   readonly dualRewards: boolean
 }
 
-export interface StablePoolInfo {
-  readonly name: string
-  readonly poolAddress?: string
-  readonly stakingToken?: Token
-  readonly lpToken?: Token
-  readonly tokens: readonly Token[]
-  readonly amountDeposited?: TokenAmount
-  readonly apr?: TokenAmount
-  readonly totalStakedAmount: TokenAmount
-  readonly stakedAmount: TokenAmount
-  readonly totalVolume?: TokenAmount
-}
-
 export const usePairStakingInfo = (pairToFilterBy?: Pair | null): StakingInfo | undefined => {
   return useStakingInfo(pairToFilterBy)[0] ?? undefined
 }

@@ -10,7 +10,7 @@ import { StablePoolCard } from '../../components/earn/StablePoolCard'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
-import { usePools } from '../../state/stablePools/hooks'
+import { useStablePoolInfo } from '../../state/stablePools/hooks'
 import { MOO_LP1, MOO_LP2, POOF_DUAL_LP, StakingInfo, useStakingInfo } from '../../state/stake/hooks'
 import { TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
@@ -86,7 +86,7 @@ export default function Earn() {
   const mcUSDmcEURLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP1)
   const moomCELOLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP2)
 
-  const stablePools = usePools()
+  const stablePools = useStablePoolInfo()
   const sortedStablePools = stablePools
 
   const inactiveDisplay = inactivePools.length > 0 && (

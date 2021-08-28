@@ -1,9 +1,24 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
+import { Token, TokenAmount } from '@ubeswap/sdk'
+import { useSwappableTokens } from 'hooks/Tokens'
 import { useSelector } from 'react-redux'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
 import { StableSwapPool } from './reducer'
+
+export interface StablePoolInfo {
+  readonly name: string
+  readonly poolAddress?: string
+  readonly stakingToken?: Token
+  readonly lpToken?: Token
+  readonly tokens: readonly Token[]
+  readonly amountDeposited?: TokenAmount
+  readonly apr?: TokenAmount
+  readonly totalStakedAmount: TokenAmount
+  readonly stakedAmount: TokenAmount
+  readonly totalVolume?: TokenAmount
+}
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
   const pools = useSelector<AppState, StableSwapPool[]>((state) =>
@@ -19,6 +34,20 @@ export function usePools(): readonly StableSwapPool[] {
     Object.values(state.stablePools.pools).map(({ pool }) => pool)
   )
   return pools
+}
+
+export function useStablePoolInfo(): readonly StablePoolInfo[] {
+  const pools = usePools()
+  const tokens = useSwappableTokens()
+  return pools.map((pool) => ({
+    name: pool.name,
+    poolAddress: pool.address,
+    lpToken: pool.lpToken,
+    tokens: pool.tokenAddresses.map((address) => tokens[address]),
+    amountDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+    totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+    stakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+  }))
 }
 
 export function useMathUtil(pool: StableSwapPool | string): readonly [StableSwapMath] {
