@@ -7,10 +7,13 @@ import { initPool, updateVariableData } from './actions'
 
 export type StableSwapVariable = {
   balances: JSBI[]
-  A: JSBI[]
+  amp: JSBI
+  lpTotalSupply: JSBI
+  swapFee: JSBI
 }
 
 export type StableSwapMathConstants = {
+  name: string
   rates: JSBI[]
   lendingPrecision: JSBI
   precision: JSBI
@@ -45,16 +48,7 @@ const initialState: PoolState = {
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
     .addCase(initPool, (state, { payload: { name, pool } }) => {
-      const { rates, lendingPrecision, precision, feeDenominator, precisionMul, feeIndex, decimals } = pool
-      const mathModel = new StableSwapMath({
-        rates,
-        lendingPrecision,
-        precision,
-        feeDenominator,
-        precisionMul,
-        feeIndex,
-        decimals,
-      })
+      const mathModel = new StableSwapMath(pool)
       return {
         ...state,
         pools: {

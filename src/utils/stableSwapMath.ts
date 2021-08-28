@@ -1,5 +1,5 @@
 import { BigintIsh, JSBI } from '@ubeswap/sdk'
-import { StableSwapMathConstants } from 'state/stablePools/reducer'
+import { StableSwapMathConstants, StableSwapVariable } from 'state/stablePools/reducer'
 
 const ZERO = JSBI.BigInt('0')
 const ONE = JSBI.BigInt('1')
@@ -32,7 +32,11 @@ export class StableSwapMath {
     precisionMul,
     feeIndex,
     decimals,
-  }: StableSwapMathConstants) {
+    amp,
+    balances,
+    lpTotalSupply,
+    swapFee,
+  }: StableSwapMathConstants & StableSwapVariable) {
     this.RATES = rates
     this.LENDING_PRECISION = lendingPrecision
     this.PRECISION = precision
@@ -54,8 +58,7 @@ export class StableSwapMath {
     this.lpTotalSupply = ONE
   }
 
-  updateInfo(withdrawFee: JSBI, swapFee: JSBI, amp: JSBI, balances: JSBI[], lpTotalSupply: JSBI) {
-    this.currentWithdrawFee = withdrawFee
+  updateInfo(swapFee: JSBI, amp: JSBI, balances: JSBI[], lpTotalSupply: JSBI) {
     this.swapFee = swapFee
     this.amp = amp
     this.balances = balances

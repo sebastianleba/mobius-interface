@@ -12,6 +12,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [],
   [ChainId.ALFAJORES]: [
     {
+      name: 'test-pool-1',
       tokenAddresses: ['0xa3629788a1a5276dD0586D270B899A32bEE4680f', '0x5eA9Ab65b4Fe4D8A866Ee119Fa07C26BA57b8764'],
       address: '0xa06A9fc206981eeca570Da400A16119A55e5b429',
       lpToken: new Token(ChainId.ALFAJORES, '0xa3629788a1a5276dD0586D270B899A32bEE4680f', 18),
