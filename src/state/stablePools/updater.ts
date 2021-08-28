@@ -27,11 +27,11 @@ export function UpdatePools(): null {
       lpToken: Erc20 | undefined
     ) => {
       if (!contract || !lpToken) return
-      const amp = JSBI.BigInt(await contract.getA())
-      const balances = (await contract.getBalances()).map((num) => JSBI.BigInt(num))
-      const swapFee = JSBI.BigInt(await contract.getSwapFee())
+      const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
+      const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
+      const swapFee = JSBI.BigInt(await contract.getSwapFee({ gasLimit: 350000 }))
 
-      const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply())
+      const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply({ gasLimit: 350000 }))
 
       dispatch(initPool({ name: poolInfo.name, pool: { ...poolInfo, balances, amp, lpTotalSupply, swapFee } }))
     }

@@ -10,15 +10,8 @@ import { StablePoolCard } from '../../components/earn/StablePoolCard'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
-import {
-  MOO_LP1,
-  MOO_LP2,
-  POOF_DUAL_LP,
-  StablePoolInfo,
-  StakingInfo,
-  useStableSwapInfo,
-  useStakingInfo,
-} from '../../state/stake/hooks'
+import { usePools } from '../../state/stablePools/hooks'
+import { MOO_LP1, MOO_LP2, POOF_DUAL_LP, StakingInfo, useStakingInfo } from '../../state/stake/hooks'
 import { TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
@@ -93,12 +86,8 @@ export default function Earn() {
   const mcUSDmcEURLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP1)
   const moomCELOLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP2)
 
-  const stablePools = useStableSwapInfo()
-  const sortedStablePools = stablePools.slice().sort((a: StablePoolInfo, b: StablePoolInfo) => {
-    if (a.poolAddress && b.poolAddress) return JSBI.toNumber(JSBI.subtract(b.apr.raw, a.apr.raw))
-    if (a.poolAddress) return -1
-    return 1
-  })
+  const stablePools = usePools()
+  const sortedStablePools = stablePools
 
   const inactiveDisplay = inactivePools.length > 0 && (
     <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>

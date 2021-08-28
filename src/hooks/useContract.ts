@@ -54,11 +54,11 @@ export function usePairContract(pairAddress?: string, withSignerIfPossible?: boo
 }
 
 export function useStableSwapContract(swapAddress?: string, withSignerIfPossible?: boolean): Swap | null {
-  return useContract(swapAddress, STABLE_SWAP, withSignerIfPossible) as Swap | null
+  return useContract(swapAddress, STABLE_SWAP.abi, withSignerIfPossible) as Swap | null
 }
 
 export function useLpTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Erc20 | null {
-  return useContract(tokenAddress, LP, withSignerIfPossible) as Erc20 | null
+  return useContract(tokenAddress, LP.abi, withSignerIfPossible) as Erc20 | null
 }
 
 export function useMulticallContract(): Contract | null {
