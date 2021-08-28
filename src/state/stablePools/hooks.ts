@@ -1,13 +1,22 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { ChainId } from '@ubeswap/sdk'
+import { useSelector } from 'react-redux'
 
-import { STATIC_POOL_INFO } from '../../constants/StablePools'
+import { AppState } from '..'
+import { StableSwapPool } from './reducer'
 
-export const initPools = (chainId: ChainId) => {
-  //const dispatch = useDispatch()
-  const poolsForChainId = STATIC_POOL_INFO[chainId]
+export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
+  const pools = useSelector<AppState, StableSwapPool[]>((state) =>
+    Object.values(state.stablePools.pools)
+      .map(({ pool }) => pool)
+      .filter(({ tokenAddresses }) => tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2))
+  )
+  return [pools.length > 0 ? pools[0] : null]
+}
 
-  poolsForChainId.forEach((pool) => {
-    console.log(pool)
-  })
+export function usePool(): readonly [StableSwapPool] {
+  const [tok1, tok2] = useSelector<AppState, [string, string]>((state) => [
+    state.swap.INPUT.currencyId,
+    state.swap.OUTPUT.currencyId,
+  ])
+  return getCurrentPool(tok1, tok2)
 }

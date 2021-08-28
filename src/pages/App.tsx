@@ -9,6 +9,7 @@ import Polling from '../components/Header/Polling'
 import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
+import { UpdatePools } from '../state/stablePools/updater'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import AddLiquidity from './AddLiquidity'
@@ -87,7 +88,9 @@ export default function App() {
       }
     }
   }, [location])
-  console.log(location)
+
+  UpdatePools()
+
   return (
     <Suspense fallback={null}>
       <Route component={DarkModeQueryParamReader} />
