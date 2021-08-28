@@ -4,6 +4,7 @@ import { currencyEquals, Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
+import { STATIC_POOL_INFO } from '../constants/StablePools'
 import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useUserAddedTokens } from '../state/user/hooks'
@@ -44,6 +45,22 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
 
     return mapWithoutUrls
   }, [chainId, userAddedTokens, tokenMap, includeUserAdded])
+}
+
+export function useSwappableTokens(): { [address: string]: Token } {
+  const { chainId } = useActiveWeb3React()
+  const pools = STATIC_POOL_INFO[chainId]
+  const defaultList = useDefaultTokenList()
+  const tokenMap = useTokensFromMap(defaultList, false)
+  const swappableTokens: { [address: string]: Token } = {}
+
+  pools
+    .flatMap(({ tokenAddresses }) => tokenAddresses)
+    .forEach((address) => {
+      if (swappableTokens[address]) return
+      swappableTokens[address] = tokenMap[address] || new Token(chainId, address, 18, '?', address)
+    })
+  return swappableTokens
 }
 
 export function useDefaultTokens(): { [address: string]: Token } {

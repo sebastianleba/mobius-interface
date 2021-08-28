@@ -1,21 +1,26 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { Token } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
+import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
+import { initPool, updateVariableData } from './actions'
 
 export type StableSwapVariable = {
   balances: JSBI[]
-  A: JSBI[]
+  amp: JSBI
+  lpTotalSupply: JSBI
+  swapFee: JSBI
 }
 
 export type StableSwapMathConstants = {
+  name: string
   rates: JSBI[]
   lendingPrecision: JSBI
   precision: JSBI
   feeDenominator: JSBI
   precisionMul: JSBI[]
   feeIndex: number
+  decimals: JSBI[]
 }
 
 export type StableSwapConstants = StableSwapMathConstants & {
@@ -28,65 +33,47 @@ export type StableSwapConstants = StableSwapMathConstants & {
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
 
 export interface PoolState {
-  readonly pools: StableSwapPool[]
+  readonly pools: {
+    [name: string]: {
+      pool: StableSwapPool
+      math: StableSwapMath
+    }
+  }
 }
 
 const initialState: PoolState = {
-  pools: [],
+  pools: {},
 }
 
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
-    .addCase(
-      replaceSwapState,
-      (state, { payload: { typedValue, recipient, field, inputCurrencyId, outputCurrencyId } }) => {
-        return {
-          [Field.INPUT]: {
-            currencyId: inputCurrencyId,
-          },
-          [Field.OUTPUT]: {
-            currencyId: outputCurrencyId,
-          },
-          independentField: field,
-          typedValue: typedValue,
-          recipient,
-        }
-      }
-    )
-    .addCase(selectCurrency, (state, { payload: { currencyId, field } }) => {
-      const otherField = field === Field.INPUT ? Field.OUTPUT : Field.INPUT
-      if (currencyId === state[otherField].currencyId) {
-        // the case where we have to swap the order
-        return {
-          ...state,
-          independentField: state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
-          [field]: { currencyId: currencyId },
-          [otherField]: { currencyId: state[field].currencyId },
-        }
-      } else {
-        // the normal case
-        return {
-          ...state,
-          [field]: { currencyId: currencyId },
-        }
-      }
-    })
-    .addCase(switchCurrencies, (state) => {
+    .addCase(initPool, (state, { payload: { name, pool } }) => {
+      const mathModel = new StableSwapMath(pool)
       return {
         ...state,
-        independentField: state.independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT,
-        [Field.INPUT]: { currencyId: state[Field.OUTPUT].currencyId },
-        [Field.OUTPUT]: { currencyId: state[Field.INPUT].currencyId },
+        pools: {
+          ...state.pools,
+          [name]: {
+            pool,
+            math: mathModel,
+          },
+        },
       }
     })
-    .addCase(typeInput, (state, { payload: { field, typedValue } }) => {
+    .addCase(updateVariableData, (state, { payload: { name, variableData } }) => {
+      const pool = state.pools[name]
       return {
         ...state,
-        independentField: field,
-        typedValue,
+        pools: {
+          ...state.pools,
+          [name]: {
+            ...pool,
+            pool: {
+              ...pool.pool,
+              ...variableData,
+            },
+          },
+        },
       }
-    })
-    .addCase(setRecipient, (state, { payload: { recipient } }) => {
-      state.recipient = recipient
     })
 )

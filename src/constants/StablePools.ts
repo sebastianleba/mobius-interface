@@ -1,10 +1,32 @@
-import { ChainId, Token } from '@ubeswap/sdk'
+import { ChainId, JSBI, Token } from '@ubeswap/sdk'
+import { StableSwapConstants } from 'state/stablePools/reducer'
 
 export type StablePoolInfo = {
   poolAddress: string
   lpAddress: string
   token: Array<Token | string>
   name: string
+}
+
+export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
+  [ChainId.MAINNET]: [],
+  [ChainId.ALFAJORES]: [
+    {
+      name: 'test-pool-1',
+      tokenAddresses: ['0xa3629788a1a5276dD0586D270B899A32bEE4680f', '0x5eA9Ab65b4Fe4D8A866Ee119Fa07C26BA57b8764'],
+      address: '0xa06A9fc206981eeca570Da400A16119A55e5b429',
+      lpToken: new Token(ChainId.ALFAJORES, '0xa3629788a1a5276dD0586D270B899A32bEE4680f', 18),
+      fee: JSBI.BigInt('0'),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.BigInt('10000000000'),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+    },
+  ],
+  [ChainId.BAKLAVA]: [],
 }
 
 export const STAKED_CELO_POOL: StablePoolInfo = {
