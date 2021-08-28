@@ -13,8 +13,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.ALFAJORES]: [
     {
       name: 'test-pool-1',
-      tokenAddresses: ['0xa3629788a1a5276dD0586D270B899A32bEE4680f', '0x5eA9Ab65b4Fe4D8A866Ee119Fa07C26BA57b8764'],
-      address: '0xa06A9fc206981eeca570Da400A16119A55e5b429',
+      tokenAddresses: ['0x9A5B788B4a3A128035e7a73e35832Cc5B4dFc77e', '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa'],
+      address: '0x907251d7Ed4ba084f8Db377696F4a1679E424849',
       lpToken: new Token(ChainId.ALFAJORES, '0xa3629788a1a5276dD0586D270B899A32bEE4680f', 18),
       fee: JSBI.BigInt('0'),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
