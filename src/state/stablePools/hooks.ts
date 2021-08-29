@@ -1,6 +1,9 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { useActiveWeb3React } from 'hooks'
 import { useSwappableTokens } from 'hooks/Tokens'
+import { useStableSwapContract } from 'hooks/useContract'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
@@ -39,9 +42,6 @@ export function usePools(): readonly StableSwapPool[] {
   return pools
 }
 
-const myDivision = (numerator: JSBI, denominator: JSBI): JSBI =>
-  JSBI.equal(denominator, JSBI.BigInt('0')) ? JSBI.BigInt('0') : JSBI.divide(numerator, denominator)
-
 const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
   new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
 
@@ -61,6 +61,24 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
     virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
     priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
   }))
+}
+
+export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[]): TokenAmount {
+  const contract = useStableSwapContract(pool.poolAddress)
+  const { account } = useActiveWeb3React()
+  const [expectedOut, setExpectedOut] = useState(new TokenAmount(pool.lpToken, JSBI.BigInt('0')))
+  useEffect(() => {
+    const updateData = async () => {
+      const newExpected = await contract?.calculateTokenAmount(
+        account,
+        tokenAmounts.map(({ raw }) => BigInt.from(raw.toString())),
+        true,
+        { gasLimit: 350000 }
+      )
+      setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString || '0')))
+    }
+  })
+  return expectedOut
 }
 
 export function useMathUtil(pool: StableSwapPool | string): readonly [StableSwapMath] {

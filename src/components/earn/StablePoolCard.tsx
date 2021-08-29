@@ -2,7 +2,7 @@ import { JSBI, Percent } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import { darken } from 'polished'
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { useColor } from '../../hooks/useColor'
@@ -12,6 +12,7 @@ import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import { RowBetween, RowFixed } from '../Row'
+import DepositModal from './DepositModal'
 //import { CardNoise } from './styled'
 
 const SubHeader = styled.div`
@@ -106,6 +107,7 @@ interface Props {
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { tokens, peggedTo, virtualPrice, priceOfStaked } = poolInfo
+  const [openModal, setOpenModal] = useState(false)
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -150,6 +152,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       bgColor1={backgroundColorStart}
       bgColor2={backgroundColorEnd}
     >
+      <DepositModal isOpen={openModal} onDismiss={() => setOpenModal(false)} poolInfo={poolInfo} />
       <TopSection>
         <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
@@ -233,7 +236,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        <StyledButton background={backgroundColorStart} backgroundHover={backgroundColorEnd}>
+        <StyledButton
+          background={backgroundColorStart}
+          backgroundHover={backgroundColorEnd}
+          onClick={() => setOpenModal(true)}
+        >
           {isStaking ? 'Manage' : 'Deposit'}
         </StyledButton>
       </InfoContainer>
