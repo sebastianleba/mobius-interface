@@ -12,7 +12,7 @@ import { initPool } from './actions'
 import { StableSwapConstants } from './reducer'
 
 export function UpdatePools(): null {
-  const { library, chainId } = useActiveWeb3React()
+  const { library, chainId, account } = useActiveWeb3React()
   const blockNumber = useCurrentBlockTimestamp()
   const dispatch = useDispatch<AppDispatch>()
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
@@ -30,10 +30,17 @@ export function UpdatePools(): null {
       const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
       const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
       const swapFee = JSBI.BigInt(await contract.getSwapFee({ gasLimit: 350000 }))
+      const virtualPrice = JSBI.BigInt(await contract.getVirtualPrice({ gasLimit: 350000 }))
 
       const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply({ gasLimit: 350000 }))
+      const lpOwned = JSBI.BigInt(!account ? '0' : await lpToken.balanceOf(account))
 
-      dispatch(initPool({ name: poolInfo.name, pool: { ...poolInfo, balances, amp, lpTotalSupply, swapFee } }))
+      dispatch(
+        initPool({
+          name: poolInfo.name,
+          pool: { ...poolInfo, virtualPrice, balances, amp, lpTotalSupply, swapFee, lpOwned },
+        })
+      )
     }
 
     pools.forEach((pool, i) => {

@@ -1,4 +1,4 @@
-import { Percent } from '@ubeswap/sdk'
+import { JSBI, Percent } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import { darken } from 'polished'
@@ -6,7 +6,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useColor } from '../../hooks/useColor'
-import { StablePoolInfo } from '../../state/stake/hooks'
+import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -105,13 +105,12 @@ interface Props {
 }
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
-  const tokens = poolInfo.tokens
+  const { tokens, peggedTo, virtualPrice, priceOfStaked } = poolInfo
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
   const backgroundGradient = null //generateGradient(tokens.slice())
-  console.log(backgroundColorEnd)
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
@@ -124,7 +123,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } = useStakingPoolValue(poolInfo)
   const apyFraction = poolInfo.apr || undefined
   const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
-  const isStaking = userValueCUSD
+  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0'))
+
+  console.log({ isStaking, priceOfStaked })
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -179,8 +180,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             <RowBetween>
               <TYPE.black>Total deposited</TYPE.black>
               <TYPE.black>
-                {valueOfTotalStakedAmountInCUSD
-                  ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
+                {virtualPrice
+                  ? `${peggedTo}${virtualPrice.toFixed(0, {
                       groupSeparator: ',',
                     })}`
                   : '-'}
@@ -209,7 +210,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           {isStaking && (
             <>
               <BottomSection showBackground={true}>
-                {userValueCUSD && (
+                {isStaking && (
                   <RowBetween>
                     <TYPE.black fontWeight={500}>
                       <span>Your share</span>
@@ -217,7 +218,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
-                        ${userValueCUSD.toFixed(0, { groupSeparator: ',' })}
+                        {peggedTo}
+                        {priceOfStaked.toFixed(0, { groupSeparator: ',' })}
                       </TYPE.black>
                       <QuestionHelper
                         text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
@@ -232,7 +234,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           )}
         </div>
         <StyledButton background={backgroundColorStart} backgroundHover={backgroundColorEnd}>
-          Deposit
+          {isStaking ? 'Manage' : 'Deposit'}
         </StyledButton>
       </InfoContainer>
     </Wrapper>

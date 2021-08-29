@@ -1,5 +1,5 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { useSwappableTokens } from 'hooks/Tokens'
 import { useSelector } from 'react-redux'
 
@@ -18,6 +18,9 @@ export interface StablePoolInfo {
   readonly totalStakedAmount: TokenAmount
   readonly stakedAmount: TokenAmount
   readonly totalVolume?: TokenAmount
+  readonly peggedTo: string
+  readonly virtualPrice: TokenAmount
+  readonly priceOfStaked: TokenAmount
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -36,6 +39,12 @@ export function usePools(): readonly StableSwapPool[] {
   return pools
 }
 
+const myDivision = (numerator: JSBI, denominator: JSBI): JSBI =>
+  JSBI.equal(denominator, JSBI.BigInt('0')) ? JSBI.BigInt('0') : JSBI.divide(numerator, denominator)
+
+const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
+  new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
+
 export function useStablePoolInfo(): readonly StablePoolInfo[] {
   const pools = usePools()
   const tokens = useSwappableTokens()
@@ -44,9 +53,13 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
     poolAddress: pool.address,
     lpToken: pool.lpToken,
     tokens: pool.tokenAddresses.map((address) => tokens[address]),
-    amountDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+    amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
     totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
-    stakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+    stakedAmount: new TokenAmount(pool.lpToken, pool.lpOwned),
+    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000')),
+    peggedTo: pool.peggedTo,
+    virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
+    priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
   }))
 }
 
