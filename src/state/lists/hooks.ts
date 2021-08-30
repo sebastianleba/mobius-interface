@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import sortByListPriority from 'utils/listSort'
 
+import getStableTokens from '../../constants/tokens'
 import { AppState } from '../index'
 import { UNSUPPORTED_LIST_URLS } from './../../constants/lists'
 
@@ -221,7 +222,8 @@ export function useDefaultTokenList(): TokenAddressMap {
 }
 
 export function useStableTokenList(): TokenAddressMap {
-  return listToTokenMap(StableTokens)
+  const stableTokens = getStableTokens()
+  return listToTokenMap(stableTokens)
 }
 
 // list of tokens not supported on interface, used to show warnings and prevent swaps and adds

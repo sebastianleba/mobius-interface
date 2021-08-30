@@ -172,6 +172,19 @@ export function useTokensTradeable(tokenIn: Token | null | undefined): readonly 
   const { chainId } = useActiveWeb3React()
 
   if (!tokenIn) return [{}]
+  console.log(tokenIn)
+  console.log('her')
+  for (const item in pools[chainId]) {
+    console.log(item)
+  }
+  // }
+  // pools[chainId]
+  //   .map(({ tokens }) => tokens)
+  //   .filter((ele) => ele.includes(tokenIn.address))
+  //   .flatMap((tokens) => tokens)
+  //   .forEach(( token )=> {
+  //     if (token !== tokenIn.address) tradeable[token] = token
+  //   }))
 
   pools[chainId]
     .filter(({ tokens }) => tokens.includes(tokenIn))

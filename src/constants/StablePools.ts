@@ -13,10 +13,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.ALFAJORES]: [
     {
       name: 'test-pool-1',
-      tokenAddresses: ['0x9A5B788B4a3A128035e7a73e35832Cc5B4dFc77e', '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa'],
+      tokenAddresses: ['0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1', '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa'],
       tokens: [
-        new Token(ChainId.ALFAJORES, '0x9A5B788B4a3A128035e7a73e35832Cc5B4dFc77e', 18),
-        new Token(ChainId.ALFAJORES, '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa', 18),
+        new Token(ChainId.ALFAJORES, '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1', 18, 'cUSD', 'Celo Dollar'),
+        new Token(ChainId.ALFAJORES, '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa', 18, 'USDC', 'USD Coin'),
       ],
       address: '0x907251d7Ed4ba084f8Db377696F4a1679E424849',
       lpToken: new Token(ChainId.ALFAJORES, '0xa3629788a1a5276dD0586D270B899A32bEE4680f', 18),

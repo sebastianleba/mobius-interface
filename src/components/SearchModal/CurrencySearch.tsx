@@ -83,8 +83,10 @@ export function CurrencySearch({
   console.log(isAddressSearch, searchToken)
   const searchTokenIsAdded = useIsUserAddedToken(searchToken)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
-  let tokensToSelect = allTokens
-  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
+  console.log(tokensInSamePool)
+  const tokensToSelect = allTokens
+  // if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
+  console.log(tokensToSelect)
 
   useEffect(() => {
     if (isAddressSearch) {

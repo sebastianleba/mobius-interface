@@ -421,11 +421,11 @@ export function useDefaultsFromURLSearch():
   const [result, setResult] = useState<
     { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined
   >()
-
   useEffect(() => {
     if (!chainId) return
     const parsed = queryParametersToSwapState(parsedQs, chainId)
 
+    console.log('id', parsed[Field.INPUT].currencyId)
     dispatch(
       replaceSwapState({
         typedValue: parsed.typedValue,
