@@ -12,7 +12,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useFoundOnInactiveList, useIsUserAddedToken, useStableTokens, useToken } from '../../hooks/Tokens'
+import { useFoundOnInactiveList, useIsUserAddedToken, useSwappableTokens, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
@@ -74,7 +74,7 @@ export function CurrencySearch({
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [invertSearchOrder] = useState<boolean>(false)
 
-  const allTokens = useStableTokens()
+  const allTokens = useSwappableTokens()
   // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
 
   // if they input an address, use it
@@ -84,8 +84,8 @@ export function CurrencySearch({
   const searchTokenIsAdded = useIsUserAddedToken(searchToken)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
   console.log(tokensInSamePool)
-  const tokensToSelect = allTokens
-  // if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
+  let tokensToSelect = allTokens
+  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
   console.log(tokensToSelect)
 
   useEffect(() => {
