@@ -14,7 +14,7 @@ import ERC_20_INTERFACE from '../../constants/abis/erc20'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
 import { UNISWAP_V2_PAIR_INTERFACE } from '../../constants/abis/uniswap-v2-pair'
-import { USD_POOL_ADDRESSES } from '../../constants/StablePools'
+import { STATIC_POOL_INFO, USD_POOL_ADDRESSES } from '../../constants/StablePools'
 import { useActiveWeb3React } from '../../hooks'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import {
@@ -168,11 +168,12 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
 
 export function useTokensTradeable(tokenIn: Token | null | undefined): readonly [{ [address: string]: Token }] {
   const tradeable: { [address: string]: Token } = {}
-  const pools = useStableSwapInfo()
+  const pools = STATIC_POOL_INFO
+  const { chainId } = useActiveWeb3React()
 
   if (!tokenIn) return [{}]
 
-  pools
+  pools[chainId]
     .filter(({ tokens }) => tokens.includes(tokenIn))
     .flatMap(({ tokens }) => tokens)
     .forEach((token) => {

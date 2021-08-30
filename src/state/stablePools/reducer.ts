@@ -26,6 +26,7 @@ export type StableSwapMathConstants = {
 }
 
 export type StableSwapConstants = StableSwapMathConstants & {
+  tokens: Token[]
   tokenAddresses: string[]
   address: string
   lpToken: Token

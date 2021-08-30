@@ -9,7 +9,12 @@ import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/h
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useUserAddedTokens } from '../state/user/hooks'
 import { isAddress } from '../utils'
-import { TokenAddressMap, useDefaultTokenList, useUnsupportedTokenList } from './../state/lists/hooks'
+import {
+  TokenAddressMap,
+  useDefaultTokenList,
+  useStableTokenList,
+  useUnsupportedTokenList,
+} from './../state/lists/hooks'
 import { useActiveWeb3React } from './index'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
 
@@ -71,6 +76,11 @@ export function useDefaultTokens(): { [address: string]: Token } {
 export function useAllTokens(): { [address: string]: Token } {
   const allTokens = useCombinedActiveList()
   return useTokensFromMap(allTokens, true)
+}
+
+export function useStableTokens(): { [address: string]: Token } {
+  const stableList = useStableTokenList()
+  return useTokensFromMap(stableList, false)
 }
 
 export function useAllInactiveTokens(): { [address: string]: Token } {

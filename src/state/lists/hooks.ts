@@ -33,6 +33,14 @@ export const StableTokens: TokenList = {
       decimals: 18,
       logoURI: 'https://bit.ly/3AMrCyD',
     },
+    {
+      address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+      name: 'Celo Dollar',
+      symbol: 'cUSD',
+      chainId: ChainId.ALFAJORES,
+      decimals: 18,
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+    },
   ],
   version: {
     major: 1,
@@ -210,6 +218,10 @@ export function useCombinedInactiveList(): TokenAddressMap {
 // used to hide warnings on import for default tokens
 export function useDefaultTokenList(): TokenAddressMap {
   return listToTokenMap(DEFAULT_TOKEN_LIST)
+}
+
+export function useStableTokenList(): TokenAddressMap {
+  return listToTokenMap(StableTokens)
 }
 
 // list of tokens not supported on interface, used to show warnings and prevent swaps and adds

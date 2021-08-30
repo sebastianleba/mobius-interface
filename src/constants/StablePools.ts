@@ -14,6 +14,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     {
       name: 'test-pool-1',
       tokenAddresses: ['0x9A5B788B4a3A128035e7a73e35832Cc5B4dFc77e', '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa'],
+      tokens: [
+        new Token(ChainId.ALFAJORES, '0x9A5B788B4a3A128035e7a73e35832Cc5B4dFc77e', 18),
+        new Token(ChainId.ALFAJORES, '0x0Ce734Ffe87e7EEaEf8ef4A97dA4261966Ae4bEa', 18),
+      ],
       address: '0x907251d7Ed4ba084f8Db377696F4a1679E424849',
       lpToken: new Token(ChainId.ALFAJORES, '0xa3629788a1a5276dD0586D270B899A32bEE4680f', 18),
       fee: JSBI.BigInt('0'),
@@ -29,6 +33,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     {
       name: 'test-pool-2',
       tokenAddresses: ['0x55cfdcdd6766cdd58b9945c1a2933b4c38518dd7', '0xf0f4DF0cDE2C8cB8660ed022d7a22488F723e702'],
+      tokens: [
+        new Token(ChainId.ALFAJORES, '0x55cfdcdd6766cdd58b9945c1a2933b4c38518dd7', 18),
+        new Token(ChainId.ALFAJORES, '0xf0f4DF0cDE2C8cB8660ed022d7a22488F723e702', 18),
+      ],
       address: '0xa95B3abe4834b7310a0F12f67c35F73dbDc53a87',
       lpToken: new Token(ChainId.ALFAJORES, '0x5a26a9d8ef3ee6991946843251e274705370d129', 18),
       fee: JSBI.BigInt('0'),
