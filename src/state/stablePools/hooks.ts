@@ -71,13 +71,14 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
     const updateData = async () => {
       const newExpected = await contract?.calculateTokenAmount(
         account,
-        tokenAmounts.map(({ raw }) => BigInt.from(raw.toString())),
+        tokenAmounts.map((t) => BigInt(t.raw.toString())),
         true,
         { gasLimit: 350000 }
       )
-      setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString || '0')))
+      setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
     }
-  })
+    updateData()
+  }, [account, pool, tokenAmounts])
   return expectedOut
 }
 

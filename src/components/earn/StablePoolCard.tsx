@@ -127,8 +127,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
   const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0'))
 
-  console.log({ isStaking, priceOfStaked })
-
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
     : undefined
@@ -152,7 +150,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       bgColor1={backgroundColorStart}
       bgColor2={backgroundColorEnd}
     >
-      <DepositModal isOpen={openModal} onDismiss={() => setOpenModal(false)} poolInfo={poolInfo} />
+      {openModal && <DepositModal isOpen={openModal} onDismiss={() => setOpenModal(false)} poolInfo={poolInfo} />}
       <TopSection>
         <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
