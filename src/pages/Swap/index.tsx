@@ -13,7 +13,7 @@ import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
-import { ButtonConfirmed, ButtonError, ButtonLight, ButtonPrimary } from '../../components/Button'
+import { ButtonConfirmed, ButtonError, ButtonPrimary } from '../../components/Button'
 import Card, { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
@@ -38,7 +38,12 @@ import {
   useSwapActionHandlers,
   useSwapState,
 } from '../../state/swap/hooks'
-import { useExpertModeManager, useUserSingleHopOnly, useUserSlippageTolerance } from '../../state/user/hooks'
+import {
+  useExpertModeManager,
+  useIsDarkMode,
+  useUserSingleHopOnly,
+  useUserSlippageTolerance,
+} from '../../state/user/hooks'
 import { LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
@@ -47,6 +52,7 @@ import { ClickableText } from '../Pool/styleds'
 
 export default function Swap() {
   const loadedUrlParams = useDefaultsFromURLSearch()
+  const isDarkMode = useIsDarkMode()
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
@@ -257,7 +263,7 @@ export default function Swap() {
       <SwapPoolTabs active={'swap'} />
       <AppBodyNoBackground>
         {/* <SwapHeader title={actionLabel} /> */}
-        <Wrapper style={{ marginTop: !isMobile && '3rem' }} id="swap-page">
+        <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
           <ConfirmSwapModal
             isOpen={showConfirm}
             trade={trade}
@@ -360,7 +366,9 @@ export default function Swap() {
                 <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
               </ButtonPrimary>
             ) : !account ? (
-              <ButtonLight onClick={toggleWalletModal}>Connect Wallet</ButtonLight>
+              <ButtonError disabled={true} onClick={toggleWalletModal}>
+                Connect Wallet
+              </ButtonError>
             ) : noRoute && userHasSpecifiedInputOutput ? (
               <GreyCard style={{ textAlign: 'center' }}>
                 <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
@@ -432,7 +440,7 @@ export default function Swap() {
                 disabled={!isValid || (priceImpactSeverity > 3 && !isExpertMode) || !!swapCallbackError}
                 error={isValid && priceImpactSeverity > 2 && !swapCallbackError}
               >
-                <Text fontSize={20} fontWeight={500}>
+                <Text fontSize={20} fontWeight={500} color={isValid && actionLabel && (isDarkMode ? 'black' : 'white')}>
                   {swapInputError
                     ? swapInputError
                     : priceImpactSeverity > 3 && !isExpertMode

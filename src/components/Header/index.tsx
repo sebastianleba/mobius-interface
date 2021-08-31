@@ -4,7 +4,6 @@ import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { isMobile } from 'react-device-detect'
-import { Moon, Sun } from 'react-feather'
 import HamburgerMenu from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -362,9 +361,7 @@ export default function Header() {
           </AccountElement>
         </HeaderElement>
         <HeaderElementWrap>
-          <StyledMenuButton onClick={() => toggleDarkMode()}>
-            {darkMode ? <Moon size={20} /> : <Sun size={20} />}
-          </StyledMenuButton>
+          <StyledMenuButton onClick={() => toggleDarkMode()}>{darkMode ? '🌉' : '🌁'}</StyledMenuButton>
           {/* <Menu /> */}
         </HeaderElementWrap>
       </HeaderControls>

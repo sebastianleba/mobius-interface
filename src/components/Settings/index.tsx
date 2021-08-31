@@ -59,6 +59,7 @@ const StyledMenuButton = styled.button`
   border: none;
   background-color: transparent;
   margin: 0;
+  margin-top: 1rem;
   padding: 0;
   height: 35px;
 
@@ -101,7 +102,7 @@ const MenuFlyout = styled.span`
   flex-direction: column;
   font-size: 1rem;
   position: absolute;
-  top: 3rem;
+  bottom: 100%;
   z-index: 100;
 
   ${({ theme }) => theme.mediaWidth.upToMedium`

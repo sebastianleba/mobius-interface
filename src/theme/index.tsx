@@ -34,7 +34,7 @@ const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } 
 
 const white = '#FFFFFF'
 const black = '#000000'
-const MobiusGreen = '#52D07F'
+const MobiusGreen = '#35D07F'
 const MobiusGreenShades = ['#b2eac6', '#73d997', '#4bce79', '#31b460', '#268c4b', '#1b6435', '#103c20', '#0d2e19']
 
 export function colors(darkMode: boolean): Colors {

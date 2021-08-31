@@ -25,12 +25,6 @@ if (window.celo) {
   window.celo.autoRefreshOnNetworkChange = false
 }
 
-const environment = window.location.hostname.includes('app-staging')
-  ? 'staging'
-  : window.location.hostname.includes('ubeswap.org')
-  ? 'production'
-  : process.env.REACT_APP_VERCEL_ENV ?? null
-
 if (process.env.REACT_APP_SENTRY_DSN) {
   const sentryCfg = {
     environment: `${process.env.REACT_APP_VERCEL_ENV ?? 'unknown'}`,

@@ -388,6 +388,10 @@ export function useMobiusTradeInfo(): {
 
   const [input, output] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
 
+  if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
+    inputError = 'Insufficient Balance'
+  }
+
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
 
