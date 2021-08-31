@@ -60,10 +60,10 @@ export function useSwappableTokens(): { [address: string]: Token } {
   const swappableTokens: { [address: string]: Token } = {}
 
   pools
-    .flatMap(({ tokenAddresses }) => tokenAddresses)
-    .forEach((address) => {
-      if (swappableTokens[address]) return
-      swappableTokens[address] = tokenMap[address] || new Token(chainId, address, 18, '?', address)
+    .flatMap(({ tokens }) => tokens)
+    .forEach((token) => {
+      if (swappableTokens[token.address]) return
+      swappableTokens[token.address] = token
     })
   return swappableTokens
 }
