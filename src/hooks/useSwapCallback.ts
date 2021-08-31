@@ -177,8 +177,8 @@ export function useSwapCallback(
           .then((response: any) => {
             const inputSymbol = trade.input.currency.symbol
             const outputSymbol = trade.output.currency.symbol
-            const inputAmount = trade.input.toSignificant(3)
-            const outputAmount = trade.output.toSignificant(3)
+            const inputAmount = trade.input.toSignificant(6)
+            const outputAmount = trade.output.toSignificant(6)
 
             const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
             const withRecipient =

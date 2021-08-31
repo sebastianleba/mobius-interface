@@ -13,6 +13,7 @@ import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
+import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
@@ -78,9 +79,9 @@ export function CurrencySearch({
   // if they input an address, use it
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
-  //const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
-  const tokensToSelect = allTokens
-  //if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
+  const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  let tokensToSelect = allTokens
+  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
 
   useEffect(() => {
     if (isAddressSearch) {
