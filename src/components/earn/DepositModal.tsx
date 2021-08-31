@@ -13,7 +13,7 @@ import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hoo
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { useUserTransactionTTL } from '../../state/user/hooks'
-import { useCurrencyBalance } from '../../state/wallet/hooks'
+import { useCurrencyBalance, useTokenBalance } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -48,6 +48,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [ttl] = useUserTransactionTTL()
   const blockTimeStamp = useCurrentBlockTimestamp()
   const deadline = useTransactionDeadline()
+  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
 
   const expectedLPTokens = useExpectedLpTokens(poolInfo, selectedAmounts)
   const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
@@ -100,6 +101,10 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
     error = error ?? 'Enter an amount'
   }
 
+  if (insufficientFunds) {
+    error = 'Insufficient Funds'
+  }
+
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
       {!attempting && !hash && (
@@ -119,6 +124,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
                     ...selectedAmounts.slice(i + 1, selectedAmounts.length),
                   ])
                 }
+                setUsingInsufficientFunds={setInsufficientFunds}
               />
               {i !== selectedAmounts.length - 1 && (
                 <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>
@@ -176,6 +182,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
 type CurrencyRowProps = {
   tokenAmount: TokenAmount
   setTokenAmount: (tokenAmount: TokenAmount) => void
+  setUsingInsufficientFunds: (isInsufficient: boolean) => void
 }
 
 const InputRowLeft = styled.div``
@@ -225,12 +232,20 @@ const BalanceText = styled(TYPE.subHeader)`
   cursor: pointer;
 `
 
-const CurrencyRow = ({ tokenAmount, setTokenAmount }: CurrencyRowProps) => {
+const CurrencyRow = ({ tokenAmount, setTokenAmount, setUsingInsufficientFunds }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
   const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')
   const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))
+
+  const balance = useTokenBalance(tokenAmount.token.address)
+
+  if (balance?.lessThan(tokenAmount)) {
+    setUsingInsufficientFunds(true)
+  } else {
+    setUsingInsufficientFunds(false)
+  }
 
   const scaledDown = (num: JSBI) => JSBI.divide(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
   const scaleUp = (num: JSBI) => JSBI.multiply(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))

@@ -509,7 +509,9 @@ function parseCurrencyFromURLParameter(urlParam: any, chainId: ChainId): string 
     if (urlParam.toUpperCase() === 'CUSD') return cUSD[chainId].address
     if (valid === false) return cUSD[chainId].address
   }
-  return ''
+  return chainId === ChainId.ALFAJORES
+    ? '0x2AaF20d89277BF024F463749045964D7e7d3A774'
+    : '0x765DE816845861e75A25fCA122bb6898B8B1282a'
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {

@@ -1,6 +1,7 @@
 import * as UbeswapDefaultList from '@ubeswap/default-token-list'
 import * as UbeswapExperimentalList from '@ubeswap/default-token-list/ubeswap-experimental.token-list.json'
 import { ChainId, Token } from '@ubeswap/sdk'
+import { STATIC_POOL_INFO } from 'constants/StablePools'
 import Vibrant from 'node-vibrant'
 import { shade } from 'polished'
 import { useLayoutEffect, useState } from 'react'
@@ -10,9 +11,16 @@ import { hex } from 'wcag-contrast'
 
 const images: Record<string, string> = {}
 
-UbeswapDefaultList.tokens.concat(UbeswapExperimentalList.tokens).forEach((token) => {
-  images[token.address] = token.logoURI
-})
+const stablePoolTokens = Object.values(STATIC_POOL_INFO)
+  .flatMap((pools) => pools)
+  .flatMap(({ tokens }) => tokens)
+
+UbeswapDefaultList.tokens
+  .concat(UbeswapExperimentalList.tokens)
+  .concat(stablePoolTokens)
+  .forEach((token) => {
+    images[token.address] = token.logoURI
+  })
 
 async function getColorFromToken(token: Token): Promise<string | null> {
   if (token.chainId === ChainId.ALFAJORES && token.address === '0xc7AD46e0b8a400Bb3C915120d284AafbA8fc4735') {

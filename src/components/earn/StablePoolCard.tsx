@@ -33,7 +33,7 @@ const VerticalDivider = styled.div`
 
 const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any }>`
   background: ${({ background }) => background};
-  flex: 1;
+  flex: 0.6;
   &:hover {
     background: ${({ background }) => darken(0.1, background)};
   }
@@ -169,9 +169,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           {poolInfo.name}
         </TYPE.black>
         {apy && apy.greaterThan('0') ? (
-          <TYPE.small className="apr" fontWeight={400} fontSize={14}>
+          <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
-          </TYPE.small>
+          </TYPE.subHeader>
         ) : (
           <TYPE.black fontWeight={600} fontSize={[14, 18]}>
             Coming Soon!

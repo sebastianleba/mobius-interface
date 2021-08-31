@@ -13,7 +13,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [],
   [ChainId.ALFAJORES]: [
     {
-      name: 'Stable Test Pool',
+      name: 'Celo Pool',
       tokenAddresses: ['0x2AaF20d89277BF024F463749045964D7e7d3A774', '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609'],
       tokens: [
         new WrappedTokenInfo(
@@ -40,7 +40,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0xaAB4a154EE836fcDaa706da7BE3Cd36d116dcF84',
-      lpToken: new Token(ChainId.ALFAJORES, '0x5078111F81481C3583d6011355e69C44B3FF253d', 18),
+      lpToken: new Token(
+        ChainId.ALFAJORES,
+        '0x5078111F81481C3583d6011355e69C44B3FF253d',
+        18,
+        'MobiLP',
+        'Mobius Celo LP'
+      ),
       fee: JSBI.BigInt('50000000'),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -49,10 +55,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
-      peggedTo: '$',
+      peggedTo: 'CELO: ',
     },
     {
-      name: 'Test 3Pool',
+      name: 'USD Pool',
       tokenAddresses: [
         '0x7588110A070987ea0347Cf788226c28d1476d641',
         '0x17Ec8dab839a9880D656c3cEF40cf4038657d168',
@@ -94,7 +100,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0xFB80520416685420751B2CD8E2c305aCbd5F756E',
-      lpToken: new Token(ChainId.ALFAJORES, '0x18B1cC7ac290591853b9728BF0a88085EBc7F981', 18),
+      lpToken: new Token(
+        ChainId.ALFAJORES,
+        '0x18B1cC7ac290591853b9728BF0a88085EBc7F981',
+        18,
+        'MobiLP',
+        'Mobius USD LP'
+      ),
       fee: JSBI.BigInt('10000000'),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -103,7 +115,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
-      peggedTo: '€',
+      peggedTo: '$',
     },
   ],
   [ChainId.BAKLAVA]: [],

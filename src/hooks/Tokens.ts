@@ -160,7 +160,7 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
 // otherwise returns the token
 export function useToken(tokenAddress?: string): Token | undefined | null {
   const { chainId } = useActiveWeb3React()
-  const tokens = useAllTokens()
+  const tokens = useSwappableTokens()
 
   const address = isAddress(tokenAddress)
 

@@ -11,7 +11,7 @@ import useTransactionDeadline from '../../hooks/useTransactionDeadline'
 import { StablePoolInfo, useExpectedTokens } from '../../state/stablePools/hooks'
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
-import { useCurrencyBalance } from '../../state/wallet/hooks'
+import { useCurrencyBalance, useTokenBalance } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -37,6 +37,7 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, lpToken } = poolInfo
+  const lpBalance = useTokenBalance(lpToken.address)
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
@@ -79,6 +80,10 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
   }
   if (!poolInfo?.stakedAmount) {
     error = error ?? 'Enter an amount'
+  }
+
+  if (selectedAmount.greaterThan(lpBalance || JSBI.BigInt('0'))) {
+    error = error ?? 'Insufficient Funds'
   }
 
   return (
