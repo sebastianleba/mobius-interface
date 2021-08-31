@@ -30,7 +30,9 @@ export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwap
   const pools = useSelector<AppState, StableSwapPool[]>((state) =>
     Object.values(state.stablePools.pools)
       .map(({ pool }) => pool)
-      .filter(({ tokenAddresses }) => tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2))
+      .filter(({ tokenAddresses }) => {
+        return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
+      })
   )
   return [pools.length > 0 ? pools[0] : null]
 }
@@ -81,10 +83,10 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
   return expectedOut
 }
 
-export function useMathUtil(pool: StableSwapPool | string): readonly [StableSwapMath] {
-  const name = typeof pool == 'string' ? pool : pool.name
-  const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name].math)
-  return [math]
+export function useMathUtil(pool: StableSwapPool | string): StableSwapMath | undefined {
+  const name = !pool ? '' : typeof pool == 'string' ? pool : pool.name
+  const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name]?.math)
+  return math
 }
 
 export function usePool(): readonly [StableSwapPool] {

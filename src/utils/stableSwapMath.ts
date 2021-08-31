@@ -56,6 +56,7 @@ export class StableSwapMath {
     this.amp = ONE
     this.balances = Array(this.N_COINS).fill(ZERO)
     this.lpTotalSupply = ONE
+    this.updateInfo(swapFee, amp, balances, lpTotalSupply)
   }
 
   updateInfo(swapFee: JSBI, amp: JSBI, balances: JSBI[], lpTotalSupply: JSBI) {
@@ -67,7 +68,7 @@ export class StableSwapMath {
 
   calc_xp_mem(balances: BigintIsh[]): JSBI[] {
     if (this.xp) return this.xp
-    const balancesCasted = balances.map((b) => JSBI.BigInt(b.toString))
+    const balancesCasted = balances.map((b) => JSBI.BigInt(b.toString()))
     const result = this.tokenPrecisionMultipliers.slice()
     const xp = result.map((r, i) => JSBI.multiply(r, balancesCasted[i]))
     this.xp = xp
@@ -83,7 +84,7 @@ export class StableSwapMath {
     const S = xp.reduce((accum, cur) => JSBI.add(accum, cur))
     const N_COINS = JSBI.BigInt(this.N_COINS)
     let Dprev = ZERO
-    let D = JSBI.BigInt(S.toString)
+    let D = JSBI.BigInt(S.toString())
     const Ann = JSBI.multiply(amp, N_COINS)
 
     for (let i = 0; i < 255; i++) {
@@ -150,7 +151,7 @@ export class StableSwapMath {
     const x: JSBI = JSBI.add(JSBI.divide(JSBI.multiply(dx, this.RATES[i]), this.PRECISION), xp[i])
     const y: JSBI = this.get_y(i, j, x, xp)
     const dy: JSBI = JSBI.divide(JSBI.multiply(JSBI.subtract(xp[j], y), this.PRECISION), this.RATES[j])
-    const _fee: JSBI = JSBI.divide(JSBI.divide(JSBI.BigInt(this.FEE_INDEX.toString), dy), this.FEE_DENOMINATOR) //TODO: is fee index the right variable?
+    const _fee: JSBI = JSBI.divide(JSBI.divide(JSBI.BigInt(this.FEE_INDEX.toString()), dy), this.FEE_DENOMINATOR) //TODO: is fee index the right variable?
     return JSBI.subtract(dy, _fee)
   }
 
@@ -183,7 +184,7 @@ export class StableSwapMath {
         JSBI.multiply(
           JSBI.divide(
             JSBI.multiply(dy, this.FEE_DENOMINATOR),
-            JSBI.subtract(this.FEE_DENOMINATOR, JSBI.BigInt(this.FEE_INDEX.toString))
+            JSBI.subtract(this.FEE_DENOMINATOR, JSBI.BigInt(this.FEE_INDEX.toString()))
           ),
           this.RATES[j]
         ),

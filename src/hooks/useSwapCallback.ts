@@ -1,13 +1,12 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
-import { JSBI, Percent, Router, SwapParameters, Trade } from '@ubeswap/sdk'
-import { MoolaRouterTrade } from 'components/swap/routing/hooks/useTrade'
+import { JSBI, SwapParameters } from '@ubeswap/sdk'
 import { useMemo } from 'react'
-import invariant from 'tiny-invariant'
 
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
+import { MobiusTrade } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getMoolaRouterContract, getRouterContract, isAddress, shortenAddress } from '../utils'
+import { calculateGasMargin, getStableSwapContract, isAddress, shortenAddress } from '../utils'
 import isZero from '../utils/isZero'
 import { useActiveWeb3React } from './index'
 import useENS from './useENS'
@@ -43,7 +42,7 @@ type EstimatedSwapCall = SuccessfulCall | FailedCall
  * @param recipientAddressOrName
  */
 function useSwapCallArguments(
-  trade: Trade | undefined, // trade to execute, required
+  trade: MobiusTrade | undefined, // trade to execute, required
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): SwapCall[] {
@@ -55,36 +54,25 @@ function useSwapCallArguments(
 
   return useMemo(() => {
     if (!trade || !recipient || !library || !account || !chainId || !deadline) return []
+    console.log({ trade })
 
-    const contract =
-      trade instanceof MoolaRouterTrade
-        ? getMoolaRouterContract(chainId, library, account)
-        : getRouterContract(chainId, library, account)
+    const contract = getStableSwapContract(trade.pool.address, library, account)
+    const { indexFrom = 0, indexTo = 0 } = trade || {}
+    const outputRaw = trade.output.raw
+    const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
 
-    const swapCallParameters = Router.swapCallParameters(trade, {
-      feeOnTransfer: false,
-      allowedSlippage: new Percent(JSBI.BigInt(allowedSlippage), BIPS_BASE),
-      recipient,
-      deadline: deadline.toNumber(),
-    })
-    invariant(Array.isArray(swapCallParameters.args[2]), 'arg 2 not path')
-    if (trade instanceof MoolaRouterTrade) {
-      swapCallParameters.args[2] = trade.path.map((p) => p.address)
+    const swapCallParameters: SwapParameters = {
+      methodName: 'swap',
+      args: [
+        indexFrom.toString(),
+        indexTo.toString(),
+        trade.input.raw.toString(),
+        minDy.toString(),
+        deadline.toString(),
+      ],
+      value: '0',
     }
-
     const swapMethods = [swapCallParameters]
-
-    // TODO(igm): figure out why this is failing
-    // if (trade.tradeType === TradeType.EXACT_INPUT) {
-    //   swapMethods.push(
-    //     Router.swapCallParameters(trade, {
-    //       feeOnTransfer: true,
-    //       allowedSlippage: new Percent(JSBI.BigInt(allowedSlippage), BIPS_BASE),
-    //       recipient,
-    //       deadline: deadline.toNumber()
-    //     })
-    //   )
-    // }
 
     return swapMethods.map((parameters) => ({ parameters, contract }))
   }, [account, allowedSlippage, chainId, deadline, library, recipient, trade])
@@ -93,7 +81,7 @@ function useSwapCallArguments(
 // returns a function that will execute a swap, if the parameters are all valid
 // and the user has approved the slippage adjusted input amount for the trade
 export function useSwapCallback(
-  trade: Trade | undefined, // trade to execute, required
+  trade: MobiusTrade | undefined, // trade to execute, required
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } {
@@ -187,14 +175,10 @@ export function useSwapCallback(
           ...(value && !isZero(value) ? { value, from: account } : { from: account }),
         })
           .then((response: any) => {
-            const inputSymbol =
-              trade instanceof MoolaRouterTrade ? trade.path[0].symbol : trade.inputAmount.currency.symbol
-            const outputSymbol =
-              trade instanceof MoolaRouterTrade
-                ? trade.path[trade.path.length - 1].symbol
-                : trade.outputAmount.currency.symbol
-            const inputAmount = trade.inputAmount.toSignificant(3)
-            const outputAmount = trade.outputAmount.toSignificant(3)
+            const inputSymbol = trade.input.currency.symbol
+            const outputSymbol = trade.output.currency.symbol
+            const inputAmount = trade.input.toSignificant(3)
+            const outputAmount = trade.output.toSignificant(3)
 
             const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
             const withRecipient =

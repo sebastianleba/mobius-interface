@@ -13,15 +13,6 @@ export const defaultRouter: TradeRouter = {
   routerAddress: ROUTER_ADDRESS,
 }
 
-export class MobiusTrade extends Trade {
-  hidePairAnalytics = false
-  pool: PoolLocation
-
-  constructor(route: Route, amount: TokenAmount, tradeType: TradeType, pool: PoolLocation) {
-    super(route, amount, tradeType)
-    this.pool = pool
-  }
-}
 export class UbeswapTrade extends Trade {
   hidePairAnalytics = false
   router: TradeRouter
@@ -45,5 +36,15 @@ export class UbeswapTrade extends Trade {
 
   static fromNormalTrade(trade: Trade): UbeswapTrade {
     return UbeswapTrade.fromInnerTrade(trade, defaultRouter, trade.route.path)
+  }
+}
+
+export class MobiusTrade extends UbeswapTrade {
+  hidePairAnalytics = false
+  pool: PoolLocation
+
+  constructor(route: Route, amount: TokenAmount, tradeType: TradeType, pool: PoolLocation, pair: readonly Token[]) {
+    super(null, amount, tradeType, null, pair)
+    this.pool = pool
   }
 }

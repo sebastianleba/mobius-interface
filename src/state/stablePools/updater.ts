@@ -21,6 +21,7 @@ export function UpdatePools(): null {
 
   // automatically update lists if versions are minor/patch
   useEffect(() => {
+    console.log('updating...')
     const updatePool = async (
       poolInfo: StableSwapConstants,
       contract: Swap | undefined,

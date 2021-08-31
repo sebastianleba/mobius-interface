@@ -1,12 +1,11 @@
-import { ChainId, Trade } from '@ubeswap/sdk'
+import { ChainId } from '@ubeswap/sdk'
 import { useActiveWeb3React } from 'hooks'
 import { SwapCallbackState, useSwapCallback } from 'hooks/useSwapCallback'
 import { useMemo } from 'react'
 
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../../constants'
+import { MobiusTrade } from '../../../state/swap/hooks'
 import { useDoTransaction } from '.'
-import { executeMoolaDirectTrade } from './moola/executeMoolaDirectTrade'
-import { MoolaDirectTrade } from './moola/MoolaDirectTrade'
 
 /**
  * Use callback to allow trading
@@ -16,7 +15,7 @@ import { MoolaDirectTrade } from './moola/MoolaDirectTrade'
  * @returns
  */
 export const useTradeCallback = (
-  trade: Trade | undefined, // trade to execute, required
+  trade: MobiusTrade | undefined, // trade to execute, required
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } => {
@@ -44,13 +43,7 @@ export const useTradeCallback = (
 
     const signer = library.getSigner(account)
     const env = { signer, chainId, doTransaction }
-    if (trade instanceof MoolaDirectTrade) {
-      return {
-        state: SwapCallbackState.VALID,
-        callback: async () => (await executeMoolaDirectTrade({ ...env, trade })).hash,
-        error: null,
-      }
-    } else if (swapCallback) {
+    if (swapCallback) {
       return { state: SwapCallbackState.VALID, callback: swapCallback, error: null }
     } else {
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Unknown trade type' }

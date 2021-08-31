@@ -1,5 +1,6 @@
-import { currencyEquals, Trade } from '@ubeswap/sdk'
+import { currencyEquals } from '@ubeswap/sdk'
 import React, { useCallback, useMemo } from 'react'
+import { MobiusTrade } from 'state/swap/hooks'
 
 import TransactionConfirmationModal, {
   ConfirmationModalContent,
@@ -14,13 +15,12 @@ import SwapModalHeader from './SwapModalHeader'
  * @param tradeA trade A
  * @param tradeB trade B
  */
-function tradeMeaningfullyDiffers(tradeA: Trade, tradeB: Trade): boolean {
+function tradeMeaningfullyDiffers(tradeA: MobiusTrade, tradeB: MobiusTrade): boolean {
   return (
-    tradeA.tradeType !== tradeB.tradeType ||
-    !currencyEquals(tradeA.inputAmount.currency, tradeB.inputAmount.currency) ||
-    !tradeA.inputAmount.equalTo(tradeB.inputAmount) ||
-    !currencyEquals(tradeA.outputAmount.currency, tradeB.outputAmount.currency) ||
-    !tradeA.outputAmount.equalTo(tradeB.outputAmount)
+    !currencyEquals(tradeA.input.currency, tradeB.input.currency) ||
+    !tradeA.input.equalTo(tradeB.input) ||
+    !currencyEquals(tradeA.output.currency, tradeB.output.currency) ||
+    !tradeA.output.equalTo(tradeB.output)
   )
 }
 
@@ -38,8 +38,8 @@ export default function ConfirmSwapModal({
   txHash,
 }: {
   isOpen: boolean
-  trade: Trade | undefined
-  originalTrade: Trade | undefined
+  trade: MobiusTrade | undefined
+  originalTrade: MobiusTrade | undefined
   attemptingTxn: boolean
   txHash: string | undefined
   recipient: string | null
@@ -80,9 +80,9 @@ export default function ConfirmSwapModal({
   }, [allowedSlippage, onConfirm, showAcceptChanges, swapErrorMessage, trade])
 
   // text to show while loading
-  const pendingText = `Swapping ${trade?.inputAmount?.toSignificant(6)} ${
-    trade?.inputAmount?.currency?.symbol
-  } for ${trade?.outputAmount?.toSignificant(6)} ${trade?.outputAmount?.currency?.symbol}`
+  const pendingText = `Swapping ${trade?.input?.toSignificant(6)} ${
+    trade?.input?.currency?.symbol
+  } for ${trade?.output?.toSignificant(6)} ${trade?.output?.currency?.symbol}`
 
   const confirmationContent = useCallback(
     () =>
