@@ -1,9 +1,8 @@
-import { JSBI, Token, TokenAmount, Trade } from '@ubeswap/sdk'
+import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import SettingsTab from 'components/Settings'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
-import UnsupportedCurrencyFooter from 'components/swap/UnsupportedCurrencyFooter'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import useENS from 'hooks/useENS'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -22,21 +21,20 @@ import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import ProgressSteps from '../../components/ProgressSteps'
 import { AutoRow, RowBetween } from '../../components/Row'
-import AdvancedSwapDetailsDropdown from '../../components/swap/AdvancedSwapDetailsDropdown'
-import confirmPriceImpactWithoutFee from '../../components/swap/confirmPriceImpactWithoutFee'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
-import { useAllTokens, useCurrency } from '../../hooks/Tokens'
-import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useApproveCallback'
+import { useAllTokens, useCurrency, useStableTokens } from '../../hooks/Tokens'
+import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
 import { Field } from '../../state/swap/actions'
 import {
+  MobiusTrade,
   useDefaultsFromURLSearch,
-  useDerivedSwapInfo,
+  useMobiusTradeInfo,
   useSwapActionHandlers,
   useSwapState,
 } from '../../state/swap/hooks'
@@ -66,6 +64,7 @@ export default function Swap() {
 
   // dismiss warning if all imported tokens are in active lists
   const defaultTokens = useAllTokens()
+  const stableTokens = useStableTokens()
   const importTokensNotInDefault = []
   // urlLoadedTokens &&
   // urlLoadedTokens.filter((token: Token) => {
@@ -87,14 +86,14 @@ export default function Swap() {
 
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
-  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useDerivedSwapInfo()
+  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMobiusTradeInfo()
 
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
 
   const parsedAmounts = {
-    [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.inputAmount,
-    [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.outputAmount,
+    [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.input,
+    [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.output,
   }
 
   const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
@@ -117,7 +116,7 @@ export default function Swap() {
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
     showConfirm: boolean
-    tradeToConfirm: Trade | undefined
+    tradeToConfirm: MobiusTrade | undefined
     attemptingTxn: boolean
     swapErrorMessage: string | undefined
     txHash: string | undefined
@@ -140,11 +139,11 @@ export default function Swap() {
   const userHasSpecifiedInputOutput = Boolean(
     currencies[Field.INPUT] && currencies[Field.OUTPUT] && parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0))
   )
-  const route = trade?.route
-  const noRoute = !route
+  const route = null
+  const noRoute = false
 
   // check whether the user has approved the router on the input token
-  const [approval, approveCallback] = useApproveCallbackFromTrade(trade, allowedSlippage)
+  const [approval, approveCallback] = useApproveCallback(trade?.input, trade?.pool.poolAddress)
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
@@ -167,12 +166,6 @@ export default function Swap() {
   const [singleHopOnly] = useUserSingleHopOnly()
 
   const handleSwap = useCallback(() => {
-    if (priceImpactWithoutFee && !confirmPriceImpactWithoutFee(priceImpactWithoutFee)) {
-      return
-    }
-    if (!swapCallback) {
-      return
-    }
     setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
     swapCallback()
       .then((hash) => {
@@ -186,7 +179,7 @@ export default function Swap() {
               : (recipientAddress ?? recipient) === account
               ? 'Swap w/o Send + recipient'
               : 'Swap w/ Send',
-          label: [trade?.inputAmount?.currency?.symbol, trade?.outputAmount?.currency?.symbol].join('/'),
+          label: [trade?.input?.currency?.symbol, trade?.output?.currency?.symbol].join('/'),
         })
 
         ReactGA.event({
@@ -203,17 +196,7 @@ export default function Swap() {
           txHash: undefined,
         })
       })
-  }, [
-    priceImpactWithoutFee,
-    swapCallback,
-    tradeToConfirm,
-    showConfirm,
-    recipient,
-    recipientAddress,
-    account,
-    trade,
-    singleHopOnly,
-  ])
+  }, [swapCallback, tradeToConfirm, showConfirm, recipient, recipientAddress, account, trade, singleHopOnly])
 
   // errors
   const [showInverted, setShowInverted] = useState<boolean>(false)
@@ -470,11 +453,11 @@ export default function Swap() {
           </AutoRow>
         </Wrapper>
       </AppBodyNoBackground>
-      {!swapIsUnsupported ? (
+      {/* {!swapIsUnsupported ? (
         <AdvancedSwapDetailsDropdown trade={trade} />
       ) : (
         <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )}
+      )} */}
     </>
   )
 }

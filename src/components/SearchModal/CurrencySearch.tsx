@@ -12,7 +12,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useAllTokens, useFoundOnInactiveList, useIsUserAddedToken, useToken } from '../../hooks/Tokens'
+import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
@@ -21,7 +21,6 @@ import Row, { RowBetween } from '../Row'
 import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { filterTokens } from './filtering'
-import ImportRow from './ImportRow'
 import { useTokenComparator } from './sorting'
 import { PaddedColumn, SearchInput, Separator } from './styleds'
 
@@ -74,13 +73,12 @@ export function CurrencySearch({
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [invertSearchOrder] = useState<boolean>(false)
 
-  const allTokens = useAllTokens()
+  const allTokens = useSwappableTokens()
   // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
 
   // if they input an address, use it
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
-  const searchTokenIsAdded = useIsUserAddedToken(searchToken)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
@@ -95,10 +93,11 @@ export function CurrencySearch({
     }
   }, [isAddressSearch])
 
-  const showETH: boolean = useMemo(() => {
-    const s = searchQuery.toLowerCase().trim()
-    return s === '' || s === 'e' || s === 'et' || s === 'eth'
-  }, [searchQuery])
+  // const showETH: boolean = useMemo(() => {
+  //   const s = searchQuery.toLowerCase().trim()
+  //   return s === '' || s === 'e' || s === 'et' || s === 'eth'
+  // }, [searchQuery])
+  const showETH = false
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -220,11 +219,7 @@ export function CurrencySearch({
         )}
       </PaddedColumn>
       <Separator />
-      {searchToken && !searchTokenIsAdded ? (
-        <Column style={{ padding: '20px 0', height: '100%' }}>
-          <ImportRow token={searchToken} showImportView={showImportView} setImportToken={setImportToken} />
-        </Column>
-      ) : filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
+      {filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
         <div style={{ flex: '1' }}>
           <AutoSizer disableWidth>
             {({ height }) => (
@@ -251,7 +246,7 @@ export function CurrencySearch({
           </TYPE.main>
           {inactiveTokens &&
             inactiveTokens.length > 0 &&
-            !(searchToken && !searchTokenIsAdded) &&
+            !searchToken &&
             searchQuery.length > 1 &&
             filteredSortedTokens?.length === 0 && (
               // expand button in line with no results
@@ -273,7 +268,7 @@ export function CurrencySearch({
 
       {inactiveTokens &&
         inactiveTokens.length > 0 &&
-        !(searchToken && !searchTokenIsAdded) &&
+        !searchToken &&
         (searchQuery.length > 1 || showExpanded) &&
         (filteredSortedTokens?.length !== 0 || showExpanded) && (
           // button fixed to bottom

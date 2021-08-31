@@ -1,7 +1,7 @@
-import { Trade } from '@ubeswap/sdk'
 import React, { useContext, useMemo, useState } from 'react'
 import { Repeat } from 'react-feather'
 import { Text } from 'rebass'
+import { MobiusTrade } from 'state/swap/hooks'
 import { ThemeContext } from 'styled-components'
 
 import { computeTradePriceBreakdown, formatExecutionPrice, warningSeverity } from '../../utils/prices'
@@ -19,7 +19,7 @@ export default function SwapModalFooter({
   swapErrorMessage,
   disabledConfirm,
 }: {
-  trade: Trade
+  trade: MobiusTrade
   allowedSlippage: number
   onConfirm: () => void
   swapErrorMessage: string | undefined
