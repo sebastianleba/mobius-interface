@@ -1,5 +1,6 @@
 import { JSBI, Percent } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
+import { useActiveWeb3React } from 'hooks'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import { darken } from 'polished'
 import React, { useState } from 'react'
@@ -112,6 +113,7 @@ interface Props {
 }
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
+  const { account } = useActiveWeb3React()
   const { tokens, peggedTo, virtualPrice, priceOfStaked } = poolInfo
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
@@ -245,7 +247,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        {!openManage && (
+        {!!account && !openManage && (
           <StyledButton
             background={backgroundColorStart}
             backgroundHover={backgroundColorEnd}
