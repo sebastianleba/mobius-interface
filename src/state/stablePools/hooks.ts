@@ -24,6 +24,7 @@ export interface StablePoolInfo {
   readonly peggedTo: string
   readonly virtualPrice: TokenAmount
   readonly priceOfStaked: TokenAmount
+  readonly usersBalance: TokenAmount[]
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -62,7 +63,25 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
     peggedTo: pool.peggedTo,
     virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
     priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
+    usersBalance: pool.tokenAddresses.map((address, i) => tokenAmountScaled(tokens[address], pool.balances[i])),
   }))
+}
+
+export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
+  const contract = useStableSwapContract(pool.poolAddress)
+  const { tokens } = pool
+  const { account } = useActiveWeb3React()
+  const [expectedOut, setExpectedOut] = useState<TokenAmount[]>(
+    tokens.map((token) => new TokenAmount(token, JSBI.BigInt('0')))
+  )
+  useEffect(() => {
+    const updateData = async () => {
+      const newTokenAmounts = await contract?.calculateRemoveLiquidity(account, lpAmount.raw.toString())
+      setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt(newTokenAmounts[i].toString()))))
+    }
+    updateData()
+  }, [account, pool, lpAmount])
+  return expectedOut
 }
 
 export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[]): TokenAmount {
@@ -73,13 +92,14 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
     const updateData = async () => {
       const newExpected = await contract?.calculateTokenAmount(
         account,
-        tokenAmounts.map(({ raw }) => BigInt.from(raw.toString())),
+        tokenAmounts.map((t) => BigInt(t.raw.toString())),
         true,
         { gasLimit: 350000 }
       )
-      setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString || '0')))
+      setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
     }
-  })
+    updateData()
+  }, [account, pool, tokenAmounts])
   return expectedOut
 }
 

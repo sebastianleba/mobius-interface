@@ -7,12 +7,10 @@ import styled from 'styled-components'
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
-import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
-import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hooks'
+import { StablePoolInfo, useExpectedTokens } from '../../state/stablePools/hooks'
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
-import { useUserTransactionTTL } from '../../state/user/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
@@ -27,44 +25,27 @@ const ContentWrapper = styled(AutoColumn)`
   padding: 1rem;
 `
 
-interface DepositModalProps {
+interface WithdrawModalProps {
   isOpen: boolean
   onDismiss: () => void
   poolInfo: StablePoolInfo
 }
 
-export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositModalProps) {
+export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawModalProps) {
   const { library, account } = useActiveWeb3React()
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
-  const { tokens } = poolInfo
+  const { tokens, lpToken } = poolInfo
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
-  const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
-    poolInfo.tokens.map((t) => new TokenAmount(t, JSBI.BigInt('0')))
-  )
-  const [ttl] = useUserTransactionTTL()
-  const blockTimeStamp = useCurrentBlockTimestamp()
+  const [selectedAmount, setSelectedAmount] = useState<TokenAmount>(new TokenAmount(lpToken, JSBI.BigInt('0')))
+
   const deadline = useTransactionDeadline()
 
-  const expectedLPTokens = useExpectedLpTokens(poolInfo, selectedAmounts)
-  const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
-  const approvals = [
-    useApproveCallback(selectedAmounts[0], poolInfo.poolAddress),
-    useApproveCallback(selectedAmounts[1], poolInfo.poolAddress),
-    useApproveCallback(selectedAmounts[selectedAmounts.length - 1], poolInfo.poolAddress),
-  ]
-  if (selectedAmounts.length == 2) {
-    approvals.pop()
-  }
-  const toApprove = approvals
-    .map(([approvalState], i) => {
-      if (approvalState !== ApprovalState.APPROVED) return i
-      else return null
-    })
-    .filter((x) => x !== null)
+  const expectedTokens = useExpectedTokens(poolInfo, selectedAmount)
+  const [approvalStatus, approvalCallback] = useApproveCallback(selectedAmount, poolInfo.poolAddress)
 
   function wrappedOndismiss() {
     setHash(undefined)
@@ -73,15 +54,15 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   }
 
   const stakingContract = useStableSwapContract(poolInfo.poolAddress)
-  async function onDeposit() {
+  async function onWithdraw() {
     if (stakingContract && poolInfo?.stakedAmount) {
       setAttempting(true)
-      const amounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
+      const expected = expectedTokens.map((amount) => BigInt(amount.raw.toString()))
       await stakingContract
-        .addLiquidity(amounts, withSlippage.toString(), deadline)
+        .removeLiquidity(selectedAmount.raw.toString(), expected, deadline)
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Deposit Liquidity into ${poolInfo.name}`,
+            summary: `Withdraw Liquidity from ${poolInfo.name}`,
           })
           setHash(response.hash)
         })
@@ -105,50 +86,48 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
       {!attempting && !hash && (
         <ContentWrapper gap="lg">
           <RowBetween>
-            <TYPE.largeHeader>Deposit to {poolInfo.name}</TYPE.largeHeader>
+            <TYPE.largeHeader>Withdraw from {poolInfo.name}</TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          {poolInfo.tokens.map((token, i) => (
-            <div key={`deposit-row-${token.symbol}-${i}-${poolInfo.name}`}>
-              <CurrencyRow
-                tokenAmount={selectedAmounts[i]}
-                setTokenAmount={(val: TokenAmount) =>
-                  setSelectedAmounts([
-                    ...selectedAmounts.slice(0, i),
-                    val,
-                    ...selectedAmounts.slice(i + 1, selectedAmounts.length),
-                  ])
-                }
-              />
-              {i !== selectedAmounts.length - 1 && (
-                <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>
-              )}
-            </div>
-          ))}
-          <TYPE.mediumHeader style={{ textAlign: 'center' }}>
-            Expected Lp Tokens Received: {expectedLPTokens.toFixed(2)}
-          </TYPE.mediumHeader>
-          {toApprove.length > 0 && expectedLPTokens.greaterThan(JSBI.BigInt('0')) && (
-            <div style={{ display: 'flex' }}>
-              {toApprove.map((i) => (
-                <ButtonPrimary
-                  key={i}
-                  disabled={approving}
-                  onClick={async () => {
-                    setApproving(true)
-                    await approvals[i][1]()
-                    await new Promise((resolve) => setTimeout(resolve, 20000))
-                    setApproving(false)
-                  }}
-                >
-                  Approve {tokens[i].symbol}
-                </ButtonPrimary>
+          <CurrencyRow tokenAmount={selectedAmount} setTokenAmount={(val: TokenAmount) => setSelectedAmount(val)} />
+          {selectedAmount.greaterThan(JSBI.BigInt('0')) && (
+            <div>
+              <TYPE.mediumHeader style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+                You will received
+              </TYPE.mediumHeader>
+              {expectedTokens.map((tokenAmount, i) => (
+                <>
+                  <CurrencyRow
+                    key={'expected-' + tokenAmount.token.address}
+                    tokenAmount={tokenAmount}
+                    setTokenAmount={(val: TokenAmount) => null}
+                    readOnly={true}
+                  />
+                  {i !== expectedTokens.length - 1 && (
+                    <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>
+                      +
+                    </TYPE.largeHeader>
+                  )}
+                </>
               ))}
             </div>
           )}
-          {toApprove.length === 0 && (
-            <ButtonError disabled={!!error} error={!!error && !!poolInfo?.stakedAmount} onClick={onDeposit}>
-              {error ?? 'Deposit'}
+          {approvalStatus !== ApprovalState.APPROVED && selectedAmount.greaterThan(JSBI.BigInt('0')) && (
+            <ButtonPrimary
+              disabled={approving}
+              onClick={async () => {
+                setApproving(true)
+                await approvalCallback()
+                await new Promise((resolve) => setTimeout(resolve, 20000))
+                setApproving(false)
+              }}
+            >
+              Approve LP Token
+            </ButtonPrimary>
+          )}
+          {approvalStatus === ApprovalState.APPROVED && (
+            <ButtonError disabled={!!error} error={!!error && !!poolInfo?.stakedAmount} onClick={onWithdraw}>
+              {error ?? 'Withdraw'}
             </ButtonError>
           )}
         </ContentWrapper>
@@ -156,8 +135,8 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Depositing</TYPE.body>
-            <TYPE.body fontSize={20}>Claiming {expectedLPTokens.toSignificant(4)} LP Tokens</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrawing</TYPE.body>
+            <TYPE.body fontSize={20}>Claiming Tokens!</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -165,7 +144,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Claimed LP Tokens!</TYPE.body>
+            <TYPE.body fontSize={20}>Claimed Tokens!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}
@@ -176,6 +155,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
 type CurrencyRowProps = {
   tokenAmount: TokenAmount
   setTokenAmount: (tokenAmount: TokenAmount) => void
+  readOnly: boolean | undefined
 }
 
 const InputRowLeft = styled.div``
@@ -225,7 +205,7 @@ const BalanceText = styled(TYPE.subHeader)`
   cursor: pointer;
 `
 
-const CurrencyRow = ({ tokenAmount, setTokenAmount }: CurrencyRowProps) => {
+const CurrencyRow = ({ tokenAmount, setTokenAmount, readOnly }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
   const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
@@ -252,6 +232,7 @@ const CurrencyRow = ({ tokenAmount, setTokenAmount }: CurrencyRowProps) => {
       <InputDiv>
         <NumericalInput
           className="token-amount-input"
+          disabled={readOnly}
           value={scaledDown(tokenAmount.raw)}
           onUserInput={(val) => {
             const amount = tryParseAmount(val, currency)
@@ -261,7 +242,7 @@ const CurrencyRow = ({ tokenAmount, setTokenAmount }: CurrencyRowProps) => {
       </InputDiv>
     </InputRow>
   )
-  const balanceRow = (
+  const balanceRow = !readOnly && (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
       <BalanceText onClick={() => setTokenAmount(tokenBalance || ZERO_TOK)}>
         Balance: {tokenBalance?.toFixed(2)}

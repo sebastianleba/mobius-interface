@@ -26,7 +26,6 @@ const CoveredLogo = styled(CurrencyLogo)<{ sizeraw: number }>`
 `
 
 export default function CurrencyPoolLogo({ tokens, size = 16, margin = false }: CurrencyLogoProps) {
-  console.log(tokens)
   return (
     <Wrapper sizeraw={size} margin={margin}>
       {tokens[0] && <HigherLogo currency={tokens[0]} size={size.toString() + 'px'} />}
