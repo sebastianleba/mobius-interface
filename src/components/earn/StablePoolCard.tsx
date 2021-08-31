@@ -13,6 +13,7 @@ import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import { RowBetween, RowFixed } from '../Row'
 import DepositModal from './DepositModal'
+import WithdrawModal from './WithdrawModal'
 //import { CardNoise } from './styled'
 
 const SubHeader = styled.div`
@@ -101,13 +102,20 @@ const BottomSection = styled.div<{ showBackground: boolean }>`
   z-index: 1;
 `
 
+const DepositWithdrawBtn = styled(StyledButton)`
+  width: 40%;
+  flex: none;
+`
+
 interface Props {
   poolInfo: StablePoolInfo
 }
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { tokens, peggedTo, virtualPrice, priceOfStaked } = poolInfo
-  const [openModal, setOpenModal] = useState(false)
+  const [openDeposit, setOpenDeposit] = useState(false)
+  const [openWithdraw, setOpenWithdraw] = useState(false)
+  const [openManage, setOpenManage] = useState(false)
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -150,7 +158,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       bgColor1={backgroundColorStart}
       bgColor2={backgroundColorEnd}
     >
-      {openModal && <DepositModal isOpen={openModal} onDismiss={() => setOpenModal(false)} poolInfo={poolInfo} />}
+      {openDeposit && <DepositModal isOpen={openDeposit} onDismiss={() => setOpenDeposit(false)} poolInfo={poolInfo} />}
+      {openWithdraw && (
+        <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
+      )}
       <TopSection>
         <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
@@ -234,14 +245,42 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        <StyledButton
+        {!openManage && (
+          <StyledButton
+            background={backgroundColorStart}
+            backgroundHover={backgroundColorEnd}
+            onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
+          >
+            {isStaking ? 'Manage' : 'Deposit'}
+          </StyledButton>
+        )}
+      </InfoContainer>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          visibility: openManage ? 'visible' : 'hidden',
+          transition: 'all 0.3s ease-in',
+          height: !openManage ? '0px' : '100%',
+        }}
+      >
+        <DepositWithdrawBtn
           background={backgroundColorStart}
           backgroundHover={backgroundColorEnd}
-          onClick={() => setOpenModal(true)}
+          onClick={() => setOpenDeposit(true)}
+          style={{ width: '30%' }}
         >
-          {isStaking ? 'Manage' : 'Deposit'}
-        </StyledButton>
-      </InfoContainer>
+          Deposit
+        </DepositWithdrawBtn>
+        <DepositWithdrawBtn
+          background={backgroundColorStart}
+          backgroundHover={backgroundColorEnd}
+          onClick={() => setOpenWithdraw(true)}
+          style={{ width: '30%' }}
+        >
+          Withdraw
+        </DepositWithdrawBtn>
+      </div>
     </Wrapper>
   )
 }

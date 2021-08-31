@@ -63,6 +63,23 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
   }))
 }
 
+export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
+  const contract = useStableSwapContract(pool.poolAddress)
+  const { tokens } = pool
+  const { account } = useActiveWeb3React()
+  const [expectedOut, setExpectedOut] = useState<TokenAmount[]>(
+    tokens.map((token) => new TokenAmount(token, JSBI.BigInt('0')))
+  )
+  useEffect(() => {
+    const updateData = async () => {
+      const newTokenAmounts = await contract?.calculateRemoveLiquidity(account, lpAmount.raw.toString())
+      setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt(newTokenAmounts[i].toString()))))
+    }
+    updateData()
+  }, [account, pool, lpAmount])
+  return expectedOut
+}
+
 export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[]): TokenAmount {
   const contract = useStableSwapContract(pool.poolAddress)
   const { account } = useActiveWeb3React()
