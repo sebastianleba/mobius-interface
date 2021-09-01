@@ -47,7 +47,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         'MobiLP',
         'Mobius Celo LP'
       ),
-      fee: JSBI.BigInt('50000000'),
+      swapFee: JSBI.BigInt('50000000'),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
       precision: JSBI.BigInt('18'),
@@ -107,12 +107,12 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         'MobiLP',
         'Mobius USD LP'
       ),
-      fee: JSBI.BigInt('10000000'),
+      swapFee: JSBI.BigInt('10000000'),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
       precision: JSBI.BigInt('18'),
       feeDenominator: JSBI.BigInt('10000000000'),
-      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',

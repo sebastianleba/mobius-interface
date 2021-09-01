@@ -25,7 +25,7 @@ export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
   // the amount of the input that accrues to LPs
   const realizedLPFeeAmount = new TokenAmount(trade.input.token, JSBI.BigInt('0'))
 
-  return { priceImpactWithoutFee: priceImpact, realizedLPFee: realizedLPFeeAmount }
+  return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
 }
 
 // computes the minimum amount out and maximum amount in for a trade given a user specified allowed slippage in bips

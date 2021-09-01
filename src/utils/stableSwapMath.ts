@@ -15,6 +15,8 @@ export class StableSwapMath {
   public readonly DECIMALS: JSBI[]
   public readonly POOL_PRECISION_DECIMALS = JSBI.BigInt('18')
   public readonly tokenPrecisionMultipliers: JSBI[]
+  public readonly MAX_LOOP_LIMIT = 256
+  public readonly A_PRECISION = JSBI.BigInt('100')
 
   public lpTotalSupply: JSBI
   public swapFee: JSBI
@@ -23,6 +25,7 @@ export class StableSwapMath {
   public amp: JSBI
   public D: JSBI | undefined
   public xp: JSBI[] | undefined
+  public aPrecise: JSBI
 
   constructor({
     rates,
@@ -36,6 +39,7 @@ export class StableSwapMath {
     balances,
     lpTotalSupply,
     swapFee,
+    aPrecise,
   }: StableSwapMathConstants & StableSwapVariable) {
     this.RATES = rates
     this.LENDING_PRECISION = lendingPrecision
@@ -56,6 +60,7 @@ export class StableSwapMath {
     this.amp = ONE
     this.balances = Array(this.N_COINS).fill(ZERO)
     this.lpTotalSupply = ONE
+    this.aPrecise = aPrecise
     this.updateInfo(swapFee, amp, balances, lpTotalSupply)
   }
 
@@ -75,12 +80,82 @@ export class StableSwapMath {
     return xp
   }
 
-  getD(xp: JSBI[], a: JSBI): JSBI {
-    const numTokens = this.N_COINS
+  within1(a: JSBI, b: JSBI): boolean {
+    let difference = JSBI.subtract(a, b)
+    if (JSBI.greaterThan(a, b)) difference = JSBI.subtract(b, a)
+
+    return JSBI.lessThanOrEqual(difference, ONE)
+  }
+
+  _getD(xp: JSBI[], a: JSBI): JSBI {
+    const numTokens = JSBI.BigInt(this.N_COINS)
     const s = xp.reduce((accum, cur) => JSBI.add(accum, cur))
     if (JSBI.equal(s, ZERO)) return ZERO
     // To do - finish implementing
+    let prevD = ZERO
+    let d = s
+    const nA = JSBI.multiply(a, numTokens)
+
+    for (let i = 0; i < this.MAX_LOOP_LIMIT; i++) {
+      const dP = xp.reduce((_dp, _xp) => JSBI.divide(JSBI.multiply(_dp, d), JSBI.multiply(_xp, numTokens)), d)
+      prevD = d
+      const numerator = JSBI.multiply(
+        JSBI.add(JSBI.divide(JSBI.multiply(nA, s), this.A_PRECISION), JSBI.multiply(dP, numTokens)),
+        d
+      )
+      const denominator = JSBI.add(
+        JSBI.divide(JSBI.multiply(JSBI.subtract(nA, this.A_PRECISION), d), this.A_PRECISION),
+        JSBI.multiply(JSBI.add(numTokens, ONE), dP)
+      )
+      d = JSBI.divide(numerator, denominator)
+      if (this.within1(d, prevD)) {
+        return d
+      }
+    }
+    console.error('D does not converge!')
     return ZERO
+  }
+
+  getD(): JSBI {
+    return this._getD(this.calc_xp(), this.amp)
+  }
+
+  getY(indexFrom: number, indexTo: number, x: JSBI): JSBI {
+    const xp = this.calc_xp()
+    const numTokens = JSBI.BigInt(this.N_COINS)
+    if (indexFrom === indexTo) {
+      console.error('indexFrom should not equal indexTo')
+      return ZERO
+    }
+    const a = this.aPrecise
+    const d = this.getD()
+    let c = d
+    let s = ZERO
+    const nA = JSBI.multiply(numTokens, a)
+
+    let _x = ZERO
+    for (let i = 0; i < this.N_COINS; i++) {
+      if (i === indexFrom) _x = x
+      else if (i === indexTo) _x = xp[i]
+      else continue
+
+      s = JSBI.add(s, _x)
+      c = JSBI.divide(JSBI.multiply(c, d), JSBI.multiply(_x, numTokens))
+    }
+    c = JSBI.divide(JSBI.multiply(JSBI.multiply(c, d), this.A_PRECISION), JSBI.multiply(nA, numTokens))
+    const b = JSBI.add(s, JSBI.divide(JSBI.multiply(d, this.A_PRECISION), nA))
+    let yPrev = ZERO
+    let y = d
+
+    for (let i = 0; i < this.MAX_LOOP_LIMIT; i++) {
+      yPrev = y
+      y = JSBI.divide(JSBI.add(JSBI.multiply(y, y), c), JSBI.subtract(JSBI.add(JSBI.multiply(y, TWO), b), d))
+      if (this.within1(y, yPrev)) {
+        return y
+      }
+    }
+    console.error('Y did not converge!')
+    return y
   }
 
   calc_xp(): JSBI[] {
@@ -166,6 +241,16 @@ export class StableSwapMath {
   // getY(indexFrom: number, indexTo: number, x: JSBI, xp: JSBI[], this.amp: JSBI): JSBI {
   //   const d =
   // }
+
+  _calculateSwap(indexFrom: number, indexTo: number, dx: JSBI): [JSBI, JSBI] {
+    const xp = this.calc_xp()
+    const x = JSBI.add(JSBI.multiply(dx, this.tokenPrecisionMultipliers[indexFrom]), xp[indexFrom])
+    const y = this.getY(indexFrom, indexTo, x)
+    let dy = JSBI.subtract(JSBI.subtract(xp[indexTo], y), ONE)
+    const dyFee = JSBI.divide(JSBI.multiply(dy, this.swapFee), this.FEE_DENOMINATOR)
+    dy = JSBI.divide(JSBI.subtract(dy, dyFee), this.tokenPrecisionMultipliers[indexTo])
+    return [dy, dyFee]
+  }
 
   calculateSwap(indexFrom: number, indexTo: number, dx: JSBI, xp: JSBI[]): [JSBI, JSBI] {
     const x = JSBI.add(xp[indexFrom], JSBI.multiply(this.tokenPrecisionMultipliers[indexFrom], dx))

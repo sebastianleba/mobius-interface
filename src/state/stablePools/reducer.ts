@@ -9,9 +9,9 @@ export type StableSwapVariable = {
   balances: JSBI[]
   amp: JSBI
   lpTotalSupply: JSBI
-  swapFee: JSBI
   lpOwned: JSBI
   virtualPrice: JSBI
+  aPrecise: JSBI
 }
 
 export type StableSwapMathConstants = {
@@ -23,6 +23,7 @@ export type StableSwapMathConstants = {
   precisionMul: JSBI[]
   feeIndex: number
   decimals: JSBI[]
+  swapFee: JSBI
 }
 
 export type StableSwapConstants = StableSwapMathConstants & {
@@ -30,7 +31,6 @@ export type StableSwapConstants = StableSwapMathConstants & {
   tokenAddresses: string[]
   address: string
   lpToken: Token
-  fee: JSBI
   peggedTo: string
 }
 

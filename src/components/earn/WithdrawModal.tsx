@@ -37,7 +37,7 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, lpToken } = poolInfo
-  const lpBalance = useTokenBalance(lpToken.address)
+  const lpBalance = useTokenBalance(account, lpToken)
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)

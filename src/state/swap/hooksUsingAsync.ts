@@ -6,6 +6,7 @@ import { useStableSwapContract } from 'hooks/useContract'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useBlockNumber } from 'state/application/hooks'
 import { StableSwapPool } from 'state/stablePools/reducer'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
@@ -337,8 +338,11 @@ export function useMobiusTradeInfo(): {
   const inputCurrency = useCurrency(inputCurrencyId)
   const outputCurrency = useCurrency(outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
+  const block = useBlockNumber()
 
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
+  const contract = useStableSwapContract(pool?.address)
+  const [expectedOut, setExpectedOut] = useState<TokenAmount | undefined>(undefined)
   const mathUtil = useMathUtil(pool)
 
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
@@ -359,6 +363,22 @@ export function useMobiusTradeInfo(): {
     [Field.INPUT]: inputCurrency ?? undefined,
     [Field.OUTPUT]: outputCurrency ?? undefined,
   }
+  const { tokens = [] } = pool || {}
+
+  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
+  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
+
+  // const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
+
+  useEffect(() => {
+    const updateValue = async () => {
+      const expected = await contract?.calculateSwap(indexFrom, indexTo, parsedAmount?.raw.toString() ?? '1')
+      setExpectedOut(
+        outputCurrency ? new TokenAmount(outputCurrency, JSBI.BigInt(expected?.toString() || '1')) : undefined
+      )
+    }
+    updateValue()
+  }, [inputCurrency, outputCurrency, account, block, parsedAmount])
 
   let inputError: string | undefined
   if (!account) {
@@ -389,18 +409,16 @@ export function useMobiusTradeInfo(): {
       v2Trade: undefined,
     }
   }
-  const { tokens = [] } = pool || {}
 
-  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
-  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
-
-  const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
+  const feeAmount = JSBI.divide(JSBI.multiply(parsedAmount.raw, pool.swapFee), pool.feeDenominator)
+  const fee = new TokenAmount(inputCurrency, feeAmount)
+  const [input, output] = [parsedAmount, expectedOut]
 
   if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
     inputError = 'Insufficient Balance'
   }
 
-  const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
+  const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw || '1')
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
 
   const v2Trade: MobiusTrade | undefined =

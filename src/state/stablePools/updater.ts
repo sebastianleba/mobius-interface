@@ -30,8 +30,9 @@ export function UpdatePools(): null {
       if (!contract || !lpToken) return
       const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
       const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
-      const swapFee = JSBI.BigInt(await contract.getSwapFee({ gasLimit: 350000 }))
+      //const swapFee = JSBI.BigInt(await contract.getSwapFee({ gasLimit: 350000 }))
       const virtualPrice = JSBI.BigInt(await contract.getVirtualPrice({ gasLimit: 350000 }))
+      const aPrecise = JSBI.BigInt(await contract.getAPrecise())
 
       const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply({ gasLimit: 350000 }))
       const lpOwned = JSBI.BigInt(!account ? '0' : await lpToken.balanceOf(account))
@@ -39,7 +40,7 @@ export function UpdatePools(): null {
       dispatch(
         initPool({
           name: poolInfo.name,
-          pool: { ...poolInfo, virtualPrice, balances, amp, lpTotalSupply, swapFee, lpOwned },
+          pool: { ...poolInfo, virtualPrice, balances, amp, lpTotalSupply, lpOwned, aPrecise },
         })
       )
     }
