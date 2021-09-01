@@ -75,6 +75,14 @@ export class StableSwapMath {
     return xp
   }
 
+  getD(xp: JSBI[], a: JSBI): JSBI {
+    const numTokens = this.N_COINS
+    const s = xp.reduce((accum, cur) => JSBI.add(accum, cur))
+    if (JSBI.equal(s, ZERO)) return ZERO
+    // To do - finish implementing
+    return ZERO
+  }
+
   calc_xp(): JSBI[] {
     return this.calc_xp_mem(this.balances)
   }
