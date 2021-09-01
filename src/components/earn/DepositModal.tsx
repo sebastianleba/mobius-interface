@@ -13,7 +13,7 @@ import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hoo
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { useUserTransactionTTL } from '../../state/user/hooks'
-import { useCurrencyBalance, useTokenBalance } from '../../state/wallet/hooks'
+import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -239,14 +239,6 @@ const CurrencyRow = ({ tokenAmount, setTokenAmount, setUsingInsufficientFunds }:
   const TEN = JSBI.BigInt('10')
   const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))
 
-  const balance = useTokenBalance(tokenAmount.token.address)
-
-  if (balance?.lessThan(tokenAmount)) {
-    setUsingInsufficientFunds(true)
-  } else {
-    setUsingInsufficientFunds(false)
-  }
-
   const scaledDown = (num: JSBI) => JSBI.divide(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
   const scaleUp = (num: JSBI) => JSBI.multiply(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
 
@@ -270,6 +262,7 @@ const CurrencyRow = ({ tokenAmount, setTokenAmount, setUsingInsufficientFunds }:
           value={scaledDown(tokenAmount.raw)}
           onUserInput={(val) => {
             const amount = tryParseAmount(val, currency)
+            setUsingInsufficientFunds(amount?.greaterThan(tokenBalance) || false)
             setTokenAmount(amount || ZERO_TOK)
           }}
         />
