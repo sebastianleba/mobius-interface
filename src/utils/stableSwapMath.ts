@@ -65,14 +65,6 @@ export class StableSwapMath {
   }
 
   updateInfo(swapFee: JSBI, amp: JSBI, balances: JSBI[], lpTotalSupply: JSBI) {
-    // this.swapFee = JSBI.BigInt("2000000")
-    // this.amp = JSBI.BigInt(800)
-    // this.balances = new Array(
-    //   JSBI.BigInt('35566380994328951185096816'),
-    //   JSBI.BigInt('31104701911236708477299414'),
-    //   JSBI.BigInt('36869889445780418149536001')
-    // )
-    // this.lpTotalSupply = JSBI.BigInt("103231736538563944080229466")
     this.swapFee = swapFee
     this.amp = amp
     this.balances = balances
@@ -87,46 +79,6 @@ export class StableSwapMath {
     this.xp = xp
     return xp
   }
-
-  within1(a: JSBI, b: JSBI): boolean {
-    let difference = JSBI.subtract(a, b)
-    if (JSBI.greaterThan(a, b)) difference = JSBI.subtract(b, a)
-
-    return JSBI.lessThanOrEqual(difference, ONE)
-  }
-
-  _getD(xp: JSBI[], a: JSBI): JSBI {
-    const numTokens = JSBI.BigInt(this.N_COINS)
-    const s = xp.reduce((accum, cur) => JSBI.add(accum, cur))
-    if (JSBI.equal(s, ZERO)) return ZERO
-    // To do - finish implementing
-    let prevD = ZERO
-    let d = s
-    const nA = JSBI.multiply(a, numTokens)
-
-    for (let i = 0; i < this.MAX_LOOP_LIMIT; i++) {
-      const dP = xp.reduce((_dp, _xp) => JSBI.divide(JSBI.multiply(_dp, d), JSBI.multiply(_xp, numTokens)), d)
-      prevD = d
-      const numerator = JSBI.multiply(
-        JSBI.add(JSBI.divide(JSBI.multiply(nA, s), this.A_PRECISION), JSBI.multiply(dP, numTokens)),
-        d
-      )
-      const denominator = JSBI.add(
-        JSBI.divide(JSBI.multiply(JSBI.subtract(nA, this.A_PRECISION), d), this.A_PRECISION),
-        JSBI.multiply(JSBI.add(numTokens, ONE), dP)
-      )
-      d = JSBI.divide(numerator, denominator)
-      if (this.within1(d, prevD)) {
-        return d
-      }
-    }
-    console.error('D does not converge!')
-    return ZERO
-  }
-
-  // getD(): JSBI {
-  //   return this._getD(this.calc_xp(), this.amp)
-  // }
 
   calc_xp(): JSBI[] {
     return this.calc_xp_mem(this.balances)
@@ -158,11 +110,6 @@ export class StableSwapMath {
         D
       )
 
-      // const right = JSBI.ADD(
-      //   JSBI.multiply(JSBI.subtract(Ann, JSBI.BigInt('1')), D),
-      //   JSBI.multiply(JSBI.add(N_COINS, JSBI.BigInt('1')), D_P)
-      // )
-
       const right = JSBI.add(
         JSBI.divide(JSBI.multiply(JSBI.subtract(na, this.A_PRECISION), D), this.A_PRECISION),
         JSBI.multiply(JSBI.add(N_COINS, ONE), dP)
@@ -186,55 +133,6 @@ export class StableSwapMath {
 
   calc_D(): JSBI {
     return this.calc_D_xp(this.calc_xp_mem(this.balances), JSBI.multiply(this.amp, this.A_PRECISION))
-  }
-
-  get_y(indexFrom: number, indexTo: number, x: JSBI, xp: JSBI[]): JSBI {
-    const N_COINS = JSBI.BigInt(this.N_COINS)
-    const a = JSBI.multiply(this.amp, this.A_PRECISION)
-    const D = this.calc_D()
-    let c = D
-    let S = ZERO
-    const na = JSBI.multiply(a, N_COINS)
-
-    let _x = ZERO
-    for (let i = 0; i < this.N_COINS; i += 1) {
-      if (i === indexFrom) {
-        _x = x
-      } else if (i !== indexTo) {
-        _x = xp[i]
-      } else {
-        continue
-      }
-      S = JSBI.add(S, _x)
-      c = JSBI.divide(JSBI.multiply(c, D), JSBI.multiply(x, N_COINS))
-    }
-    c = JSBI.divide(JSBI.multiply(c, D), JSBI.multiply(na, N_COINS))
-    const b = JSBI.add(S, JSBI.divide(JSBI.multiply(D, this.A_PRECISION), na))
-    let y_prev = ZERO
-    let y = D
-
-    for (let _i = 0; _i < 255; _i += 1) {
-      y_prev = y
-      y = JSBI.divide(JSBI.add(JSBI.multiply(y, y), c), JSBI.subtract(JSBI.add(JSBI.multiply(TWO, y), b), D))
-      if (JSBI.greaterThan(y, y_prev)) {
-        if (JSBI.lessThanOrEqual(JSBI.subtract(y, y_prev), ONE)) {
-          break
-        }
-      } else {
-        if (JSBI.lessThanOrEqual(JSBI.subtract(y_prev, y), ONE)) {
-          break
-        }
-      }
-    }
-    return y
-  }
-
-  get_dy(i: number, j: number, dx: JSBI, xp: JSBI[]): JSBI {
-    const x: JSBI = JSBI.add(JSBI.divide(JSBI.multiply(dx, this.RATES[i]), this.PRECISION), xp[i])
-    const y: JSBI = this.get_y(i, j, x, xp)
-    const dy: JSBI = JSBI.divide(JSBI.multiply(JSBI.subtract(xp[j], y), this.PRECISION), this.RATES[j])
-    const _fee: JSBI = JSBI.divide(JSBI.divide(JSBI.BigInt(this.FEE_INDEX.toString()), dy), this.FEE_DENOMINATOR) //TODO: is fee index the right variable?
-    return JSBI.subtract(dy, _fee)
   }
 
   getD(xp: JSBI[], amp: JSBI): JSBI {
@@ -353,7 +251,7 @@ export class StableSwapMath {
         this.PRECISION
       )
     )
-    const x: JSBI = this.get_y(j, i, y, xp)
+    const x: JSBI = this.getY(j, i, y, xp)
     const dx: JSBI = JSBI.divide(JSBI.multiply(JSBI.subtract(x, xp[i]), this.PRECISION), this.RATES[i])
     return dx
   }

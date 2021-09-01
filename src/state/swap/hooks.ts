@@ -309,6 +309,7 @@ function calcInputOutput(
   } else {
     details[1] = parsedAmount
     const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
+    console.log('in', String(requiredIn))
     details[0] = new TokenAmount(input, requiredIn)
     details[2] = new TokenAmount(input, JSBI.BigInt('0'))
   }
@@ -390,6 +391,8 @@ export function useMobiusTradeInfo(): {
 
   const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
   const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
+  console.log('exact', isExactIn)
+  console.log('parsed', parsedAmount.toFixed())
 
   const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
 

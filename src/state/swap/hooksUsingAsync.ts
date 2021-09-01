@@ -311,6 +311,7 @@ function calcInputOutput(
     details[2] = new TokenAmount(input, fee)
   } else {
     details[1] = parsedAmount
+    // TODO: add fee to this
     const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
     details[0] = new TokenAmount(input, requiredIn)
     details[2] = new TokenAmount(input, JSBI.BigInt('0'))
