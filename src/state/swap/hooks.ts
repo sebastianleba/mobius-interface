@@ -238,9 +238,6 @@ export function useDerivedStableSwapInfo(): {
     inputError = inputError ?? 'Enter a recipient'
   }
 
-  console.log({
-    parsedAmount,
-  })
   if (!poolInfo) {
     console.log('No pool!')
     return {
@@ -303,10 +300,10 @@ function calcInputOutput(
     undefined,
     undefined,
   ]
+
   if (isExactIn) {
     details[0] = parsedAmount
     const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    console.log(expectedOut.toString())
     details[1] = new TokenAmount(output, expectedOut)
     details[2] = new TokenAmount(input, fee)
   } else {

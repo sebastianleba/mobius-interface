@@ -307,7 +307,6 @@ function calcInputOutput(
   if (isExactIn) {
     details[0] = parsedAmount
     const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    console.log(expectedOut.toString())
     details[1] = new TokenAmount(output, expectedOut)
     details[2] = new TokenAmount(input, fee)
   } else {
