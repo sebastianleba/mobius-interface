@@ -60,7 +60,7 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
     amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
     totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
     stakedAmount: new TokenAmount(pool.lpToken, pool.lpOwned),
-    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000')),
+    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
     peggedTo: pool.peggedTo,
     virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
     priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
