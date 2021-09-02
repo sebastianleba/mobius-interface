@@ -149,7 +149,7 @@ export default function Swap() {
   const noRoute = false
 
   // check whether the user has approved the router on the input token
-  const [approval, approveCallback] = useApproveCallback(trade?.input, trade?.pool.poolAddress)
+  const [approval, approveCallback] = useApproveCallback(trade?.input, trade?.pool.address)
 
   // check if user has gone through approval process, used to show two step buttons, reset on token change
   const [approvalSubmitted, setApprovalSubmitted] = useState<boolean>(false)
