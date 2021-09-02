@@ -1,6 +1,14 @@
 import { createReducer } from '@reduxjs/toolkit'
 
-import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
+import {
+  deselectOpposingCurrency,
+  Field,
+  replaceSwapState,
+  selectCurrency,
+  setRecipient,
+  switchCurrencies,
+  typeInput,
+} from './actions'
 
 export interface SwapState {
   readonly independentField: Field
@@ -29,6 +37,17 @@ const initialState: SwapState = {
 
 export default createReducer<SwapState>(initialState, (builder) =>
   builder
+    .addCase(deselectOpposingCurrency, (state, { payload: { field } }) => {
+      if (!!state[Field.INPUT].currencyId && !!state[Field.OUTPUT].currencyId) {
+        return {
+          ...state,
+          [field === Field.INPUT ? Field.OUTPUT : Field.INPUT]: {
+            currencyId: undefined,
+          },
+        }
+      }
+      return state
+    })
     .addCase(
       replaceSwapState,
       (state, { payload: { typedValue, recipient, field, inputCurrencyId, outputCurrencyId } }) => {
@@ -57,6 +76,17 @@ export default createReducer<SwapState>(initialState, (builder) =>
         }
       } else {
         // the normal case
+        if (!!state[Field.INPUT].currencyId && !!state[Field.OUTPUT].currencyId) {
+          return {
+            ...state,
+            [otherField]: {
+              currencyId: undefined,
+            },
+            [field]: {
+              currencyId: currencyId,
+            },
+          }
+        }
         return {
           ...state,
           [field]: { currencyId: currencyId },
