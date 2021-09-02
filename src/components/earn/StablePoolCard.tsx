@@ -1,4 +1,4 @@
-import { JSBI, Percent } from '@ubeswap/sdk'
+import { Fraction, JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useActiveWeb3React } from 'hooks'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
@@ -114,10 +114,17 @@ interface Props {
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { account } = useActiveWeb3React()
-  const { tokens, peggedTo, virtualPrice, priceOfStaked } = poolInfo
+  const { tokens, peggedTo, virtualPrice, priceOfStaked, balances, totalStakedAmount, stakedAmount, pegComesAfter } =
+    poolInfo
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
+
+  const userBalances = balances.map((amount) => {
+    const fraction = new Fraction(stakedAmount.raw, totalStakedAmount.raw)
+    const ratio = fraction.multiply(amount.raw)
+    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
+  })
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -193,15 +200,22 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <StatContainer>
             <RowBetween>
               <TYPE.black>Total deposited</TYPE.black>
-              <TYPE.black>
-                {virtualPrice
-                  ? `${peggedTo}${virtualPrice.toFixed(0, {
-                      groupSeparator: ',',
-                    })}`
-                  : '-'}
-              </TYPE.black>
+              <RowFixed>
+                <TYPE.black>
+                  {virtualPrice
+                    ? `${!pegComesAfter ? peggedTo : ''}${virtualPrice.toFixed(0, {
+                        groupSeparator: ',',
+                      })} ${pegComesAfter ? peggedTo : ''}`
+                    : '-'}
+                </TYPE.black>
+                <QuestionHelper
+                  text={balances
+                    .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                    .join(', ')}
+                />
+              </RowFixed>
             </RowBetween>
-            {apy && apy.greaterThan('0') && (
+            {false && apy.greaterThan('0') && (
               <RowBetween>
                 <RowFixed>
                   <TYPE.black>APR</TYPE.black>
@@ -232,13 +246,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
-                        {peggedTo}
+                        {!pegComesAfter && peggedTo}
                         {priceOfStaked.toFixed(0, { groupSeparator: ',' })}
+                        {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
-                        text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                          userAmountTokenA?.token.symbol
-                        }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
+                        text={userBalances
+                          .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                          .join(', ')}
                       />
                     </RowFixed>
                   </RowBetween>

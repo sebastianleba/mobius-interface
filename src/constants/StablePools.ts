@@ -55,7 +55,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
-      peggedTo: 'CELO: ',
+      peggedTo: 'CELO',
+      pegComesAfter: true,
     },
     {
       name: 'USD Pool',
@@ -116,6 +117,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
+      pegComesAfter: false,
     },
   ],
   [ChainId.BAKLAVA]: [],

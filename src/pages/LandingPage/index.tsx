@@ -57,7 +57,7 @@ export const StyledMenuButton = styled(NavLink)`
   align-items: center;
   justify-content: center;
   position: relative;
-  width: min(15rem, 47%);
+  width: min(15rem, 70%);
   height: 100%;
   border: none;
   background-color: ${mobiGreen};
@@ -92,7 +92,7 @@ export const ComingSoon = styled.div`
   align-items: center;
   justify-content: center;
   position: relative;
-  width: min(15rem, 47%);
+  width: min(15rem, 70%);
   height: 100%;
   border: none;
   background-color: ${bg4};

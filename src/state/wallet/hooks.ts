@@ -78,7 +78,6 @@ export function useCurrencyBalances(account?: string, currencies?: (Token | unde
 }
 
 export function useCurrencyBalance(account?: string, currency?: Token): TokenAmount | undefined {
-  console.log('account', account, 'token', currency)
   return useCurrencyBalances(account, [currency])[0]
 }
 

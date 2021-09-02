@@ -24,7 +24,8 @@ export interface StablePoolInfo {
   readonly peggedTo: string
   readonly virtualPrice: TokenAmount
   readonly priceOfStaked: TokenAmount
-  readonly usersBalance: TokenAmount[]
+  readonly balances: TokenAmount[]
+  readonly pegComesAfter: boolean | undefined
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -59,11 +60,12 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
     amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
     totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
     stakedAmount: new TokenAmount(pool.lpToken, pool.lpOwned),
-    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000')),
+    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
     peggedTo: pool.peggedTo,
     virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
     priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
-    usersBalance: pool.tokenAddresses.map((address, i) => tokenAmountScaled(tokens[address], pool.balances[i])),
+    balances: pool.tokenAddresses.map((address, i) => new TokenAmount(tokens[address], pool.balances[i])),
+    pegComesAfter: pool.pegComesAfter,
   }))
 }
 
@@ -84,7 +86,7 @@ export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): 
   return expectedOut
 }
 
-export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[]): TokenAmount {
+export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[], isDeposit = true): TokenAmount {
   const contract = useStableSwapContract(pool.poolAddress)
   const { account } = useActiveWeb3React()
   const [expectedOut, setExpectedOut] = useState(new TokenAmount(pool.lpToken, JSBI.BigInt('0')))
@@ -93,7 +95,7 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
       const newExpected = await contract?.calculateTokenAmount(
         account,
         tokenAmounts.map((t) => BigInt(t.raw.toString())),
-        true,
+        isDeposit,
         { gasLimit: 350000 }
       )
       setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
