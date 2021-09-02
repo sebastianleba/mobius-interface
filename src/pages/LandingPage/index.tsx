@@ -86,7 +86,7 @@ export const StyledMenuButton = styled(NavLink)`
   }
 `
 
-export const ComingSoon = styled.div`
+export const ComingSoon = styled.a`
   text-align: center;
   display: flex;
   align-items: center;
@@ -144,7 +144,7 @@ export default function LandingPage() {
           <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
             Open Mobius
           </StyledMenuButton>
-          <ComingSoon>
+          <ComingSoon href="https://bridge-celo.web.app/" target="_blank">
             Bridge Assets <br /> (Coming Soon)
           </ComingSoon>
         </>

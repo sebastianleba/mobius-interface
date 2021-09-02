@@ -10,7 +10,54 @@ export type StablePoolInfo = {
 }
 
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
-  [ChainId.MAINNET]: [],
+  [ChainId.MAINNET]: [
+    {
+      name: 'USD Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e',
+            decimals: 18,
+            symbol: 'bUSDC',
+            name: 'US Dollar Coin',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x0ff04189Ef135b6541E56f7C638489De92E9c778',
+      lpToken: new Token(
+        ChainId.ALFAJORES,
+        '0x635aec36c4b61bac5eB1C3EEe191147d006F8a21',
+        18,
+        'MobLP',
+        'Mobius cUSD/bUSDC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+    },
+  ],
   [ChainId.ALFAJORES]: [
     {
       name: 'Celo Pool',

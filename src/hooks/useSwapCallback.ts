@@ -54,7 +54,6 @@ function useSwapCallArguments(
 
   return useMemo(() => {
     if (!trade || !recipient || !library || !account || !chainId || !deadline) return []
-    console.log({ trade })
 
     const contract = getStableSwapContract(trade.pool.address, library, account)
     const { indexFrom = 0, indexTo = 0 } = trade || {}

@@ -21,7 +21,6 @@ export function UpdatePools(): null {
 
   // automatically update lists if versions are minor/patch
   useEffect(() => {
-    console.log('Update Pools')
     const updatePool = async (
       poolInfo: StableSwapConstants,
       contract: Swap | undefined,
@@ -36,6 +35,14 @@ export function UpdatePools(): null {
 
       const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply({ gasLimit: 350000 }))
       const lpOwned = JSBI.BigInt(!account ? '0' : await lpToken.balanceOf(account))
+
+      console.log({
+        balances,
+        amp,
+        virtualPrice,
+        aPrecise,
+        lpTotalSupply,
+      })
 
       dispatch(
         initPool({

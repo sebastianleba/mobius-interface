@@ -3,6 +3,7 @@ import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -344,8 +345,15 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
+        <StyledMenuButton onClick={() => window.open('https://bridge-celo.web.app/', '_blank')}>
+          {darkMode ? '🌉' : '🌁'}
+        </StyledMenuButton>
+
         <HeaderElementWrap>
-          <StyledMenuButton onClick={() => toggleDarkMode()}>{darkMode ? '🌉' : '🌁'}</StyledMenuButton>
+          <StyledMenuButton onClick={() => toggleDarkMode()}>
+            {darkMode ? <Moon size={20} /> : <Sun size={20} />}
+          </StyledMenuButton>
+
           {/* <Menu /> */}
         </HeaderElementWrap>
       </HeaderControls>

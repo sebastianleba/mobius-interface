@@ -391,8 +391,6 @@ export function useMobiusTradeInfo(): {
 
   const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
   const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
-  console.log('exact', isExactIn)
-  console.log('parsed', parsedAmount.toFixed())
 
   const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
 
@@ -581,7 +579,6 @@ export function useDefaultsFromURLSearch():
     if (!chainId) return
     const parsed = queryParametersToSwapState(parsedQs, chainId)
 
-    console.log('id', parsed[Field.INPUT].currencyId)
     dispatch(
       replaceSwapState({
         typedValue: parsed.typedValue,

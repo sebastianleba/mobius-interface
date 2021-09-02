@@ -52,21 +52,23 @@ const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
 export function useStablePoolInfo(): readonly StablePoolInfo[] {
   const pools = usePools()
   const tokens = useSwappableTokens()
-  return pools.map((pool) => ({
-    name: pool.name,
-    poolAddress: pool.address,
-    lpToken: pool.lpToken,
-    tokens: pool.tokenAddresses.map((address) => tokens[address]),
-    amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
-    totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
-    stakedAmount: new TokenAmount(pool.lpToken, pool.lpOwned),
-    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
-    peggedTo: pool.peggedTo,
-    virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
-    priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
-    balances: pool.tokenAddresses.map((address, i) => new TokenAmount(tokens[address], pool.balances[i])),
-    pegComesAfter: pool.pegComesAfter,
-  }))
+  return pools.map((pool) => {
+    return {
+      name: pool.name,
+      poolAddress: pool.address,
+      lpToken: pool.lpToken,
+      tokens: pool.tokenAddresses.map((address) => tokens[address]),
+      amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
+      totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+      stakedAmount: new TokenAmount(pool.lpToken, pool.lpOwned),
+      apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
+      peggedTo: pool.peggedTo,
+      virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
+      priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
+      balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
+      pegComesAfter: pool.pegComesAfter,
+    }
+  })
 }
 
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {

@@ -117,7 +117,6 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
   const poolsCount = poolsCountBigNumber?.toNumber() ?? 0
   const poolAddresses = useStakingPoolAddresses(poolManagerContract, poolsCount)
 
-  console.log('stake/hooks')
   // compute amount that is locked up
   const balancesRaw = useSingleContractMultipleData(
     ubeContract,
@@ -173,7 +172,6 @@ export function useTokensTradeable(tokenIn: Token | null | undefined): readonly 
   const { chainId } = useActiveWeb3React()
 
   if (!tokenIn) return [{}]
-  console.log({ tokenIn })
   // }
   // pools[chainId]
   //   .map(({ tokens }) => tokens)

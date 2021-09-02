@@ -56,7 +56,6 @@ export function useSwappableTokens(): { [address: string]: Token } {
   const { chainId } = useActiveWeb3React()
   const pools = STATIC_POOL_INFO[chainId]
   const defaultList = useStableTokenList()
-  const tokenMap = useTokensFromMap(defaultList, false)
   const swappableTokens: { [address: string]: Token } = {}
 
   pools

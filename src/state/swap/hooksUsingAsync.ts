@@ -239,9 +239,6 @@ export function useDerivedStableSwapInfo(): {
     inputError = inputError ?? 'Enter a recipient'
   }
 
-  console.log({
-    parsedAmount,
-  })
   if (!poolInfo) {
     console.log('No pool!')
     return {
@@ -599,7 +596,6 @@ export function useDefaultsFromURLSearch():
     if (!chainId) return
     const parsed = queryParametersToSwapState(parsedQs, chainId)
 
-    console.log('id', parsed[Field.INPUT].currencyId)
     dispatch(
       replaceSwapState({
         typedValue: parsed.typedValue,
