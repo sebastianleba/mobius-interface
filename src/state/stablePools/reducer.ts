@@ -32,6 +32,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   address: string
   lpToken: Token
   peggedTo: string
+  pegComesAfter: boolean | undefined
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
