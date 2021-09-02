@@ -20,11 +20,18 @@ import { AutoColumn } from '../Column'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { Input as NumericalInput } from '../NumericalInput'
-import { RowBetween } from '../Row'
+import QuestionHelper from '../QuestionHelper'
+import { RowBetween, RowFixed } from '../Row'
+import Toggle from '../Toggle'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
   padding: 1rem;
+`
+
+const ApprovalButton = styled(ButtonPrimary)`
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
 `
 
 interface DepositModalProps {
@@ -45,6 +52,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
     poolInfo.tokens.map((t) => new TokenAmount(t, JSBI.BigInt('0')))
   )
+  const [useEqualAmount, setUseEqualAmount] = useState<boolean>(false)
   const [ttl] = useUserTransactionTTL()
   const blockTimeStamp = useCurrentBlockTimestamp()
   const deadline = useTransactionDeadline()
@@ -113,17 +121,34 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             <TYPE.largeHeader>Deposit to {poolInfo.name}</TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
+          <RowBetween>
+            <RowFixed>
+              <TYPE.subHeader fontWeight={400} fontSize={14}>
+                Equal Amount
+              </TYPE.subHeader>
+              <QuestionHelper text="Automatically deposit an equal amount of each token." />
+            </RowFixed>
+            <Toggle
+              id="toggle-equal-amount-button"
+              isActive={useEqualAmount}
+              toggle={() => setUseEqualAmount(!useEqualAmount)}
+            />
+          </RowBetween>
           {poolInfo.tokens.map((token, i) => (
             <div key={`deposit-row-${token.symbol}-${i}-${poolInfo.name}`}>
               <CurrencyRow
                 tokenAmount={selectedAmounts[i]}
-                setTokenAmount={(val: TokenAmount) =>
-                  setSelectedAmounts([
-                    ...selectedAmounts.slice(0, i),
-                    val,
-                    ...selectedAmounts.slice(i + 1, selectedAmounts.length),
-                  ])
-                }
+                setTokenAmount={(val: TokenAmount) => {
+                  if (useEqualAmount) {
+                    setSelectedAmounts(poolInfo.tokens.map((token) => new TokenAmount(token, val.raw)))
+                  } else {
+                    setSelectedAmounts([
+                      ...selectedAmounts.slice(0, i),
+                      val,
+                      ...selectedAmounts.slice(i + 1, selectedAmounts.length),
+                    ])
+                  }
+                }}
                 setUsingInsufficientFunds={setInsufficientFunds}
               />
               {i !== selectedAmounts.length - 1 && (
@@ -137,7 +162,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
           {toApprove.length > 0 && expectedLPTokens.greaterThan(JSBI.BigInt('0')) && (
             <div style={{ display: 'flex' }}>
               {toApprove.map((i) => (
-                <ButtonPrimary
+                <ApprovalButton
                   key={i}
                   disabled={approving}
                   onClick={async () => {
@@ -148,7 +173,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
                   }}
                 >
                   Approve {tokens[i].symbol}
-                </ButtonPrimary>
+                </ApprovalButton>
               ))}
             </div>
           )}

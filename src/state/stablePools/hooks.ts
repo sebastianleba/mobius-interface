@@ -84,7 +84,7 @@ export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): 
   return expectedOut
 }
 
-export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[]): TokenAmount {
+export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmount[], isDeposit = true): TokenAmount {
   const contract = useStableSwapContract(pool.poolAddress)
   const { account } = useActiveWeb3React()
   const [expectedOut, setExpectedOut] = useState(new TokenAmount(pool.lpToken, JSBI.BigInt('0')))
@@ -93,7 +93,7 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
       const newExpected = await contract?.calculateTokenAmount(
         account,
         tokenAmounts.map((t) => BigInt(t.raw.toString())),
-        true,
+        isDeposit,
         { gasLimit: 350000 }
       )
       setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
