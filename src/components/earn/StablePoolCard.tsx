@@ -188,7 +188,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             Fees Generated: {peggedTo}
             {feesGenerated.denominator.toString() !== '0'
-              ? `${feesGenerated.toFixed(0, { groupSeparator: ',' })}`
+              ? `${feesGenerated.toFixed(2, { groupSeparator: ',' })}`
               : '-'}{' '}
           </TYPE.subHeader>
         ) : (
