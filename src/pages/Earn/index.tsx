@@ -7,25 +7,18 @@ import styled from 'styled-components'
 import { AutoColumn } from '../../components/Column'
 import { PoolCard } from '../../components/earn/PoolCard'
 import { StablePoolCard } from '../../components/earn/StablePoolCard'
-import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { RowBetween } from '../../components/Row'
 import { BIG_INT_ZERO } from '../../constants'
-import {
-  MOO_LP1,
-  MOO_LP2,
-  POOF_DUAL_LP,
-  StablePoolInfo,
-  StakingInfo,
-  useStableSwapInfo,
-  useStakingInfo,
-} from '../../state/stake/hooks'
-import { ExternalLink, TYPE } from '../../theme'
+import { useStablePoolInfo } from '../../state/stablePools/hooks'
+import { MOO_LP1, MOO_LP2, POOF_DUAL_LP, StakingInfo, useStakingInfo } from '../../state/stake/hooks'
+import { TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
   width: 100%;
+  margin-top: 3rem;
 `
 
 const TopSection = styled(AutoColumn)`
@@ -93,12 +86,8 @@ export default function Earn() {
   const mcUSDmcEURLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP1)
   const moomCELOLP = allPools.find((pool) => pool.stakingToken.address === MOO_LP2)
 
-  const stablePools = useStableSwapInfo()
-  const sortedStablePools = stablePools.slice().sort((a: StablePoolInfo, b: StablePoolInfo) => {
-    if (a.poolAddress && b.poolAddress) return JSBI.toNumber(JSBI.subtract(b.apr.raw, a.apr.raw))
-    if (a.poolAddress) return -1
-    return 1
-  })
+  const stablePools = useStablePoolInfo()
+  const sortedStablePools = stablePools
 
   const inactiveDisplay = inactivePools.length > 0 && (
     <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
@@ -116,44 +105,44 @@ export default function Earn() {
       </PoolSection>
     </AutoColumn>
   )
+  // {isGenesisOver && (
+  //   <TopSection gap="md">
+  //     <DataCard>
+  //       <CardNoise />
+  //       <CardSection>
+  //         <AutoColumn gap="md">
+  //           <RowBetween>
+  //             <TYPE.white fontWeight={600}>Mobius liquidity mining</TYPE.white>
+  //           </RowBetween>
+  //           <RowBetween>
+  //             <TYPE.white fontSize={14}>
+  //               Provide Liquidity to receive LP Tokens and earn a chunk of fees from trades that route through the
+  //               pool.
+  //             </TYPE.white>
+  //           </RowBetween>{' '}
+  //           <ExternalLink
+  //             style={{ color: 'white', textDecoration: 'underline' }}
+  //             href="https://medium.com"
+  //             target="_blank"
+  //           >
+  //             <TYPE.white fontSize={14}>Read more about MOBI</TYPE.white>
+  //           </ExternalLink>
+  //         </AutoColumn>
+  //       </CardSection>
+  //       <CardNoise />
+  //     </DataCard>
+  //   </TopSection>
+  // )}
+
+  // <DataRow style={{ alignItems: 'baseline' }}>
+  //         <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Coming Soon!</TYPE.mediumHeader>
+  //       </DataRow>
 
   return (
     <PageWrapper gap="lg" justify="center">
-      {isGenesisOver && (
-        <TopSection gap="md">
-          <DataCard>
-            <CardNoise />
-            <CardSection>
-              <AutoColumn gap="md">
-                <RowBetween>
-                  <TYPE.white fontWeight={600}>Mobius liquidity mining</TYPE.white>
-                </RowBetween>
-                <RowBetween>
-                  <TYPE.white fontSize={14}>
-                    Provide Liquidity to receive LP Tokens and earn a chunk of fees from trades that route through the
-                    pool.
-                  </TYPE.white>
-                </RowBetween>{' '}
-                <ExternalLink
-                  style={{ color: 'white', textDecoration: 'underline' }}
-                  href="https://medium.com"
-                  target="_blank"
-                >
-                  <TYPE.white fontSize={14}>Read more about MOBI</TYPE.white>
-                </ExternalLink>
-              </AutoColumn>
-            </CardSection>
-            <CardNoise />
-          </DataCard>
-        </TopSection>
-      )}
-
       {!isGenesisOver && <LaunchCountdown />}
 
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
-        <DataRow style={{ alignItems: 'baseline' }}>
-          <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Coming Soon!</TYPE.mediumHeader>
-        </DataRow>
         <PoolSection>
           {sortedStablePools && sortedStablePools?.length === 0 ? (
             <Loader style={{ margin: 'auto' }} />

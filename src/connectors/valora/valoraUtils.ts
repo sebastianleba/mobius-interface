@@ -138,7 +138,7 @@ export const requestValoraAuth = async (): Promise<AccountAuthResponseSuccess> =
   const requestId = `login-${randomString()}`
   requestAccountAddress({
     requestId,
-    dappName: 'Ubeswap',
+    dappName: 'Mobius',
     callback: window.location.href,
   })
   return await waitForAccountAuth(requestId)

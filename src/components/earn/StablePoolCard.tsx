@@ -1,16 +1,20 @@
-import { Percent } from '@ubeswap/sdk'
+import { Fraction, JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
+import { useActiveWeb3React } from 'hooks'
 import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
-import React from 'react'
+import { darken } from 'polished'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { useColor } from '../../hooks/useColor'
-import { StablePoolInfo } from '../../state/stake/hooks'
+import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import { RowBetween, RowFixed } from '../Row'
+import DepositModal from './DepositModal'
+import WithdrawModal from './WithdrawModal'
 //import { CardNoise } from './styled'
 
 const SubHeader = styled.div`
@@ -29,9 +33,9 @@ const VerticalDivider = styled.div`
 
 const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any }>`
   background: ${({ background }) => background};
-  flex: 1;
+  flex: 0.6;
   &:hover {
-    background: ${({ backgroundHover }) => backgroundHover};
+    background: ${({ background }) => darken(0.1, background)};
   }
 `
 
@@ -44,7 +48,7 @@ const StatContainer = styled.div`
   margin-right: 1rem;
   margin-left: 1rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  display: none;
+  
 `};
 `
 
@@ -62,12 +66,17 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>
   width: 100%;
   overflow: hidden;
   position: relative;
-  background: ${({ theme }) => theme.bg3};
+  padding: 1rem;
+  background: ${({ theme }) => theme.bg1};
   color: ${({ theme }) => theme.text1} !important;
   ${({ showBackground }) =>
     showBackground &&
     `  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);`}
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+`}
 `
 
 const TopSection = styled.div`
@@ -76,6 +85,7 @@ const TopSection = styled.div`
   justify-content: space-between;
   padding: 1rem;
   padding-bottom: 0.25rem;
+  padding-top: 0;
   z-index: 1;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 48px 1fr 96px;
@@ -93,18 +103,42 @@ const BottomSection = styled.div<{ showBackground: boolean }>`
   z-index: 1;
 `
 
+const DepositWithdrawBtn = styled(StyledButton)`
+  width: 40%;
+  flex: none;
+`
+
 interface Props {
   poolInfo: StablePoolInfo
 }
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
-  const tokens = poolInfo.tokens
+  const { account } = useActiveWeb3React()
+  const {
+    tokens,
+    peggedTo,
+    virtualPrice,
+    priceOfStaked,
+    balances,
+    totalStakedAmount,
+    stakedAmount,
+    pegComesAfter,
+    feesGenerated,
+  } = poolInfo
+  const [openDeposit, setOpenDeposit] = useState(false)
+  const [openWithdraw, setOpenWithdraw] = useState(false)
+  const [openManage, setOpenManage] = useState(false)
+
+  const userBalances = balances.map((amount) => {
+    const fraction = new Fraction(stakedAmount.raw, totalStakedAmount.raw)
+    const ratio = fraction.multiply(amount.raw)
+    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
+  })
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
   const backgroundGradient = null //generateGradient(tokens.slice())
-  console.log(backgroundColorEnd)
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
@@ -117,7 +151,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } = useStakingPoolValue(poolInfo)
   const apyFraction = poolInfo.apr || undefined
   const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
-  const isStaking = userValueCUSD
+  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0'))
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -142,14 +176,21 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       bgColor1={backgroundColorStart}
       bgColor2={backgroundColorEnd}
     >
+      {openDeposit && <DepositModal isOpen={openDeposit} onDismiss={() => setOpenDeposit(false)} poolInfo={poolInfo} />}
+      {openWithdraw && (
+        <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
+      )}
       <TopSection>
         <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
         </TYPE.black>
-        {apy && apy.greaterThan('0') ? (
-          <TYPE.small className="apr" fontWeight={400} fontSize={14}>
-            {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
-          </TYPE.small>
+        {feesGenerated ? (
+          <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
+            Fees Generated: {peggedTo}
+            {feesGenerated.denominator.toString() !== '0'
+              ? `${feesGenerated.toFixed(2, { groupSeparator: ',' })}`
+              : '-'}{' '}
+          </TYPE.subHeader>
         ) : (
           <TYPE.black fontWeight={600} fontSize={[14, 18]}>
             Coming Soon!
@@ -160,7 +201,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <RowBetween>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} />
           <PoolInfo style={{ marginLeft: '8px' }}>
-            <TYPE.black fontWeight={600} fontSize={[18, 24]}>
+            <TYPE.black fontWeight={600} fontSize={[14, 24]}>
               {tokens.map((t) => t.symbol).join(' / ')}
             </TYPE.black>
           </PoolInfo>
@@ -171,15 +212,22 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <StatContainer>
             <RowBetween>
               <TYPE.black>Total deposited</TYPE.black>
-              <TYPE.black>
-                {valueOfTotalStakedAmountInCUSD
-                  ? `$${valueOfTotalStakedAmountInCUSD.toFixed(0, {
-                      groupSeparator: ',',
-                    })}`
-                  : '-'}
-              </TYPE.black>
+              <RowFixed>
+                <TYPE.black>
+                  {virtualPrice
+                    ? `${!pegComesAfter ? peggedTo : ''}${virtualPrice.toFixed(0, {
+                        groupSeparator: ',',
+                      })} ${pegComesAfter ? peggedTo : ''}`
+                    : '-'}
+                </TYPE.black>
+                <QuestionHelper
+                  text={balances
+                    .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                    .join(', ')}
+                />
+              </RowFixed>
             </RowBetween>
-            {apy && apy.greaterThan('0') && (
+            {false && apy.greaterThan('0') && (
               <RowBetween>
                 <RowFixed>
                   <TYPE.black>APR</TYPE.black>
@@ -202,7 +250,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           {isStaking && (
             <>
               <BottomSection showBackground={true}>
-                {userValueCUSD && (
+                {isStaking && (
                   <RowBetween>
                     <TYPE.black fontWeight={500}>
                       <span>Your share</span>
@@ -210,12 +258,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
-                        ${userValueCUSD.toFixed(0, { groupSeparator: ',' })}
+                        {!pegComesAfter && peggedTo}
+                        {priceOfStaked.toFixed(0, { groupSeparator: ',' })}
+                        {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
-                        text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                          userAmountTokenA?.token.symbol
-                        }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
+                        text={userBalances
+                          .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                          .join(', ')}
                       />
                     </RowFixed>
                   </RowBetween>
@@ -224,10 +274,42 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        <StyledButton background={backgroundColorStart} backgroundHover={backgroundColorEnd}>
-          Deposit
-        </StyledButton>
+        {!!account && !openManage && (
+          <StyledButton
+            background={backgroundColorStart}
+            backgroundHover={backgroundColorEnd}
+            onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
+          >
+            {isStaking ? 'Manage' : 'Deposit'}
+          </StyledButton>
+        )}
       </InfoContainer>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          visibility: openManage ? 'visible' : 'hidden',
+          transition: 'all 0.3s ease-in',
+          height: !openManage ? '0px' : '100%',
+        }}
+      >
+        <DepositWithdrawBtn
+          background={backgroundColorStart}
+          backgroundHover={backgroundColorEnd}
+          onClick={() => setOpenDeposit(true)}
+          style={{ width: '30%' }}
+        >
+          Deposit
+        </DepositWithdrawBtn>
+        <DepositWithdrawBtn
+          background={backgroundColorStart}
+          backgroundHover={backgroundColorEnd}
+          onClick={() => setOpenWithdraw(true)}
+          style={{ width: '30%' }}
+        >
+          Withdraw
+        </DepositWithdrawBtn>
+      </div>
     </Wrapper>
   )
 }

@@ -1,4 +1,5 @@
-import { Fraction, JSBI, Percent, TokenAmount, Trade } from '@ubeswap/sdk'
+import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
+import { MobiusTrade } from 'state/swap/hooks'
 
 import {
   ALLOWED_PRICE_IMPACT_HIGH,
@@ -14,47 +15,34 @@ const ONE_HUNDRED_PERCENT = new Percent(JSBI.BigInt(10000), JSBI.BigInt(10000))
 const INPUT_FRACTION_AFTER_FEE = ONE_HUNDRED_PERCENT.subtract(BASE_FEE)
 
 // computes price breakdown for the trade
-export function computeTradePriceBreakdown(trade?: Trade | null): {
+export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
   priceImpactWithoutFee: Percent | undefined
   realizedLPFee: TokenAmount | undefined | null
 } {
-  // for each hop in our trade, take away the x*y=k price impact from 0.3% fees
-  // e.g. for 3 tokens/2 hops: 1 - ((1 - .03) * (1-.03))
-  const realizedLPFee = !trade
-    ? undefined
-    : ONE_HUNDRED_PERCENT.subtract(
-        trade.route.pairs.reduce<Fraction>(
-          (currentFee: Fraction): Fraction => currentFee.multiply(INPUT_FRACTION_AFTER_FEE),
-          ONE_HUNDRED_PERCENT
-        )
-      )
-
-  // remove lp fees from price impact
-  const priceImpactWithoutFeeFraction = trade && realizedLPFee ? trade.priceImpact.subtract(realizedLPFee) : undefined
-
-  // the x*y=k impact
-  const priceImpactWithoutFeePercent = priceImpactWithoutFeeFraction
-    ? new Percent(priceImpactWithoutFeeFraction?.numerator, priceImpactWithoutFeeFraction?.denominator)
-    : undefined
+  if (!trade) return {}
+  const priceImpact = new Percent(JSBI.subtract(trade?.input.raw, trade?.output.raw), trade?.output.raw)
 
   // the amount of the input that accrues to LPs
-  const realizedLPFeeAmount =
-    realizedLPFee &&
-    trade &&
-    new TokenAmount(trade.inputAmount.token, realizedLPFee.multiply(trade.inputAmount.raw).quotient)
+  const realizedLPFeeAmount = new TokenAmount(trade.input.token, JSBI.BigInt('0'))
 
-  return { priceImpactWithoutFee: priceImpactWithoutFeePercent, realizedLPFee: realizedLPFeeAmount }
+  return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
 }
 
 // computes the minimum amount out and maximum amount in for a trade given a user specified allowed slippage in bips
 export function computeSlippageAdjustedAmounts(
-  trade: Trade | undefined,
+  trade: MobiusTrade | undefined,
   allowedSlippage: number
 ): { [field in Field]?: TokenAmount } {
+  if (!trade) return {}
   const pct = basisPointsToPercent(allowedSlippage)
+  const inputRaw = trade?.input.raw
+  const outputRaw = trade?.output.raw
+
+  const maxInput = JSBI.add(inputRaw, JSBI.divide(JSBI.multiply(inputRaw, pct.numerator), pct.denominator))
+  const minOutput = JSBI.subtract(outputRaw, JSBI.divide(JSBI.multiply(outputRaw, pct.numerator), pct.denominator))
   return {
-    [Field.INPUT]: trade?.maximumAmountIn(pct),
-    [Field.OUTPUT]: trade?.minimumAmountOut(pct),
+    [Field.INPUT]: new TokenAmount(trade?.input.currency, maxInput),
+    [Field.OUTPUT]: new TokenAmount(trade?.output.currency, minOutput),
   }
 }
 
@@ -66,15 +54,13 @@ export function warningSeverity(priceImpact: Percent | undefined): 0 | 1 | 2 | 3
   return 0
 }
 
-export function formatExecutionPrice(trade?: Trade, inverted?: boolean): string {
+export function formatExecutionPrice(trade?: MobiusTrade, inverted?: boolean): string {
   if (!trade) {
     return ''
   }
   return inverted
-    ? `${trade.executionPrice.invert().toSignificant(6)} ${trade.inputAmount.currency.symbol} / ${
-        trade.outputAmount.currency.symbol
+    ? `${trade.executionPrice.invert().toSignificant(6)} ${trade.input.currency.symbol} / ${
+        trade.output.currency.symbol
       }`
-    : `${trade.executionPrice.toSignificant(6)} ${trade.outputAmount.currency.symbol} / ${
-        trade.inputAmount.currency.symbol
-      }`
+    : `${trade.executionPrice.toSignificant(6)} ${trade.output.currency.symbol} / ${trade.input.currency.symbol}`
 }

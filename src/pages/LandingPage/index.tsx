@@ -57,7 +57,7 @@ export const StyledMenuButton = styled(NavLink)`
   align-items: center;
   justify-content: center;
   position: relative;
-  width: min(15rem, 47%);
+  width: min(15rem, 70%);
   height: 100%;
   border: none;
   background-color: ${mobiGreen};
@@ -86,13 +86,13 @@ export const StyledMenuButton = styled(NavLink)`
   }
 `
 
-export const ComingSoon = styled.div`
+export const ComingSoon = styled.a`
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  width: min(15rem, 47%);
+  width: min(15rem, 70%);
   height: 100%;
   border: none;
   background-color: ${bg4};
@@ -126,7 +126,9 @@ export const ComingSoon = styled.div`
 // }
 
 export default function LandingPage() {
-  const isLive = false
+  const launchTime = new Date(Date.UTC(2021, 8, 3, 21))
+  const now = new Date()
+  const isLive = now >= launchTime
 
   return (
     <Container>
@@ -144,15 +146,12 @@ export default function LandingPage() {
           <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
             Open Mobius
           </StyledMenuButton>
-          <ComingSoon>
-            Bridge Assets <br /> (Coming Soon)
+          <ComingSoon href="https://bridge-celo.web.app/" target="_blank">
+            Bridge Assets
           </ComingSoon>
         </>
       ) : (
-        // <StyledCountdown date={new Date('2021-08-25')} />
-        <TYPE.largeHeader fontWeight={1000} fontSize={[36, 48]} style={{ margin: '1rem' }}>
-          SEPTEMBER
-        </TYPE.largeHeader>
+        <StyledCountdown date={launchTime} />
       )}
 
       <Footer>

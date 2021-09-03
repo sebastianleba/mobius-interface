@@ -7,6 +7,7 @@ import { updateVersion } from './global/actions'
 import lists from './lists/reducer'
 import mint from './mint/reducer'
 import multicall from './multicall/reducer'
+import stablePools from './stablePools/reducer'
 import swap from './swap/reducer'
 import transactions from './transactions/reducer'
 import user from './user/reducer'
@@ -23,6 +24,7 @@ const store = configureStore({
     burn,
     multicall,
     lists,
+    stablePools,
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_KEYS })],
   preloadedState: load({ states: PERSISTED_KEYS }),

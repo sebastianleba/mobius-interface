@@ -1,10 +1,13 @@
 import { parseUnits } from '@ethersproject/units'
-import { ChainId, cUSD, JSBI, Token, TokenAmount, Trade } from '@ubeswap/sdk'
+import { ChainId, cUSD, JSBI, Percent, Price, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
 import { useUbeswapTradeExactIn, useUbeswapTradeExactOut } from 'components/swap/routing/hooks/useTrade'
 import { UbeswapTrade } from 'components/swap/routing/trade'
+import { useStableSwapContract } from 'hooks/useContract'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { StableSwapPool } from 'state/stablePools/reducer'
+import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { ROUTER_ADDRESS } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
@@ -14,10 +17,13 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
+import { useCurrentPool, useMathUtil } from '../stablePools/hooks'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
 import { SwapState } from './reducer'
+
+const ZERO = JSBI.BigInt('0')
 
 export function useSwapState(): AppState['swap'] {
   return useSelector<AppState, AppState['swap']>((state) => state.swap)
@@ -103,6 +109,308 @@ function involvesAddress(trade: Trade, checksummedAddress: string): boolean {
     trade.route.path.some((token) => token.address === checksummedAddress) ||
     trade.route.pairs.some((pair) => pair.liquidityToken.address === checksummedAddress)
   )
+}
+
+export type MobiTrade = {
+  poolName?: string
+  poolAddress?: string
+  inputAmount?: TokenAmount
+  outputAmount?: TokenAmount
+  executionPrice?: Price
+  nextMidPrice?: Price
+  priceImpact?: Percent
+}
+
+type PoolInfo = {
+  name: string
+  address: string
+  lpToken: string
+  tokens: string[]
+}
+
+export const POOLS_TO_TOKENS: { [c: number]: PoolInfo[] } = {
+  [ChainId.MAINNET]: [
+    {
+      name: 'Staked Celo Pool',
+      tokens: ['0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9', '0xBDeedCDA79BAbc4Eb509aB689895a3054461691e'],
+      address: '',
+      lpToken: '',
+    },
+    {
+      name: 'US Dollar Pool',
+      address: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
+      tokens: [
+        '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+        '0x695218A22c805Bab9C6941546CF5395F169Ad871',
+        '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
+      ],
+      lpToken: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
+    },
+  ],
+  [ChainId.ALFAJORES]: [
+    {
+      name: 'Staked Celo Pool',
+      tokens: ['0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9', '0xBDeedCDA79BAbc4Eb509aB689895a3054461691e'],
+      address: '',
+      lpToken: '',
+    },
+    {
+      name: 'US Dollar Pool',
+      address: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
+      tokens: [
+        '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+        '0x695218A22c805Bab9C6941546CF5395F169Ad871',
+        '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
+      ],
+      lpToken: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
+    },
+  ],
+}
+
+export function useDerivedStableSwapInfo(): {
+  currencies?: { [field in Field]?: Token }
+  currencyBalances?: { [field in Field]?: TokenAmount }
+  parsedAmount?: TokenAmount | undefined
+  v2Trade?: MobiTrade | undefined
+  inputError?: string
+} {
+  const { account, chainId } = useActiveWeb3React()
+  const ONE = JSBI.BigInt(1)
+
+  const {
+    typedValue,
+    [Field.INPUT]: { currencyId: inputCurrencyId },
+    [Field.OUTPUT]: { currencyId: outputCurrencyId },
+    recipient,
+  } = useSwapState()
+
+  const inputCurrency = useCurrency(inputCurrencyId)
+  const outputCurrency = useCurrency(outputCurrencyId)
+  const recipientLookup = useENS(recipient ?? undefined)
+  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
+  const [poolInfo] = POOLS_TO_TOKENS[chainId].filter(
+    ({ tokens }) => tokens.includes(inputCurrency?.address || '') && tokens.includes(outputCurrency?.address || '')
+  )
+
+  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+    inputCurrency ?? undefined,
+    outputCurrency ?? undefined,
+  ])
+
+  const currencies: { [field in Field]?: Token } = {
+    [Field.INPUT]: inputCurrency ?? undefined,
+    [Field.OUTPUT]: outputCurrency ?? undefined,
+  }
+
+  const currencyBalances = {
+    [Field.INPUT]: relevantTokenBalances[0],
+    [Field.OUTPUT]: relevantTokenBalances[1],
+  }
+
+  const parsedAmount = tryParseAmount(typedValue, inputCurrency ?? undefined)
+
+  const stableSwapContract = useStableSwapContract(poolInfo?.address)
+  const tokenOrder = poolInfo ? poolInfo.tokens : []
+  const inputIndex = tokenOrder.indexOf(inputCurrencyId || '')
+  const outputIndex = tokenOrder.indexOf(outputCurrencyId || '')
+
+  let inputError: string | undefined
+  if (!account) {
+    inputError = 'Connect Wallet'
+  }
+
+  if (!parsedAmount) {
+    inputError = inputError ?? 'Enter an amount'
+  }
+
+  if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
+    inputError = inputError ?? 'Select a token'
+  }
+
+  const v2Trade: MobiTrade = {
+    poolAddress: poolInfo?.address || '',
+    poolName: poolInfo?.name || 'Inactive pool',
+    inputAmount: parsedAmount,
+  }
+
+  const formattedTo = isAddress(to)
+  if (!to || !formattedTo) {
+    inputError = inputError ?? 'Enter a recipient'
+  }
+
+  if (!poolInfo) {
+    console.log('No pool!')
+    return {
+      currencies,
+      currencyBalances,
+    }
+  }
+  const asyncUpdateMobiTrade = async () => {
+    const expectedOut = await stableSwapContract?.functions.get_dy_underlying(inputIndex, outputIndex, parsedAmount)
+    const price = new Price(inputCurrency, outputCurrency, parsedAmount?.raw, expectedOut?.raw)
+    v2Trade.outputAmount = new TokenAmount(outputCurrency, expectedOut)
+    v2Trade.executionPrice = price
+  }
+
+  parsedAmount && asyncUpdateMobiTrade()
+
+  return {
+    currencies,
+    currencyBalances,
+    parsedAmount,
+    v2Trade: v2Trade ?? undefined,
+    inputError,
+  }
+}
+
+export type MobiusTrade = {
+  input: TokenAmount
+  output: TokenAmount
+  pool: StableSwapPool
+  indexFrom: number
+  indexTo: number
+  executionPrice: Price
+  tradeType: TradeType
+  fee: TokenAmount
+}
+
+function calcInputOutput(
+  input: Token | undefined,
+  output: Token | undefined,
+  isExactIn: boolean,
+  parsedAmount: TokenAmount | undefined,
+  math: StableSwapMath,
+  poolInfo: StableSwapPool
+): readonly [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] {
+  if (!input && !output) {
+    return [undefined, undefined, undefined]
+  }
+  const { tokens } = poolInfo
+  if (!output) {
+    return [parsedAmount, undefined, undefined]
+  }
+  if (!input) {
+    return [undefined, parsedAmount, undefined]
+  }
+  const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
+  const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
+
+  const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
+    undefined,
+    undefined,
+    undefined,
+  ]
+
+  if (isExactIn) {
+    details[0] = parsedAmount
+    const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
+    details[1] = new TokenAmount(output, expectedOut)
+    details[2] = new TokenAmount(input, fee)
+  } else {
+    details[1] = parsedAmount
+    const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
+    console.log('in', String(requiredIn))
+    details[0] = new TokenAmount(input, requiredIn)
+    details[2] = new TokenAmount(input, JSBI.BigInt('0'))
+  }
+  return details
+}
+
+export function useMobiusTradeInfo(): {
+  currencies: { [field in Field]?: Token }
+  currencyBalances: { [field in Field]?: TokenAmount }
+  parsedAmount: TokenAmount | undefined
+  v2Trade: MobiusTrade | undefined
+  inputError?: string
+} {
+  const { account } = useActiveWeb3React()
+
+  const {
+    independentField,
+    typedValue,
+    [Field.INPUT]: { currencyId: inputCurrencyId },
+    [Field.OUTPUT]: { currencyId: outputCurrencyId },
+    recipient,
+  } = useSwapState()
+  const inputCurrency = useCurrency(inputCurrencyId)
+  const outputCurrency = useCurrency(outputCurrencyId)
+  const recipientLookup = useENS(recipient ?? undefined)
+
+  const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
+  const mathUtil = useMathUtil(pool)
+
+  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
+  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+    inputCurrency ?? undefined,
+    outputCurrency ?? undefined,
+  ])
+
+  const isExactIn: boolean = independentField === Field.INPUT
+  const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
+
+  const currencyBalances = {
+    [Field.INPUT]: relevantTokenBalances[0],
+    [Field.OUTPUT]: relevantTokenBalances[1],
+  }
+
+  const currencies: { [field in Field]?: Token } = {
+    [Field.INPUT]: inputCurrency ?? undefined,
+    [Field.OUTPUT]: outputCurrency ?? undefined,
+  }
+
+  let inputError: string | undefined
+  if (!account) {
+    inputError = 'Connect Wallet'
+  }
+
+  if (!parsedAmount) {
+    inputError = inputError ?? 'Enter an amount'
+  }
+
+  if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
+    inputError = inputError ?? 'Select a token'
+  }
+  const formattedTo = isAddress(to)
+  if (!to || !formattedTo) {
+    inputError = inputError ?? 'Enter a recipient'
+  } else {
+    if (BAD_RECIPIENT_ADDRESSES.indexOf(formattedTo) !== -1) {
+      inputError = inputError ?? 'Invalid recipient'
+    }
+  }
+  if (!inputCurrency || !outputCurrency || !parsedAmount) {
+    return {
+      currencies,
+      currencyBalances,
+      parsedAmount,
+      inputError,
+      v2Trade: undefined,
+    }
+  }
+  const { tokens = [] } = pool || {}
+
+  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
+  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
+
+  const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
+
+  if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
+    inputError = 'Insufficient Balance'
+  }
+
+  const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
+  const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+
+  const v2Trade: MobiusTrade | undefined =
+    input && output && pool ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee } : undefined
+
+  return {
+    currencies,
+    currencyBalances,
+    parsedAmount,
+    v2Trade,
+    inputError,
+  }
 }
 
 // from the current swap inputs, compute the best trade and return it.
@@ -207,7 +515,9 @@ function parseCurrencyFromURLParameter(urlParam: any, chainId: ChainId): string 
     if (urlParam.toUpperCase() === 'CUSD') return cUSD[chainId].address
     if (valid === false) return cUSD[chainId].address
   }
-  return cUSD[chainId].address ?? ''
+  return chainId === ChainId.ALFAJORES
+    ? '0x2AaF20d89277BF024F463749045964D7e7d3A774'
+    : '0x765DE816845861e75A25fCA122bb6898B8B1282a'
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {
@@ -262,9 +572,9 @@ export function useDefaultsFromURLSearch():
   const { chainId } = useActiveWeb3React()
   const dispatch = useDispatch<AppDispatch>()
   const parsedQs = useParsedQueryString()
-  const [result, setResult] =
-    useState<{ inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined>()
-
+  const [result, setResult] = useState<
+    { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined
+  >()
   useEffect(() => {
     if (!chainId) return
     const parsed = queryParametersToSwapState(parsedQs, chainId)

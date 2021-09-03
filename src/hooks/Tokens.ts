@@ -4,11 +4,17 @@ import { currencyEquals, Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
+import { STATIC_POOL_INFO } from '../constants/StablePools'
 import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useUserAddedTokens } from '../state/user/hooks'
 import { isAddress } from '../utils'
-import { TokenAddressMap, useDefaultTokenList, useUnsupportedTokenList } from './../state/lists/hooks'
+import {
+  TokenAddressMap,
+  useDefaultTokenList,
+  useStableTokenList,
+  useUnsupportedTokenList,
+} from './../state/lists/hooks'
 import { useActiveWeb3React } from './index'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
 
@@ -46,6 +52,21 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
   }, [chainId, userAddedTokens, tokenMap, includeUserAdded])
 }
 
+export function useSwappableTokens(): { [address: string]: Token } {
+  const { chainId } = useActiveWeb3React()
+  const pools = STATIC_POOL_INFO[chainId]
+  const defaultList = useStableTokenList()
+  const swappableTokens: { [address: string]: Token } = {}
+
+  pools
+    .flatMap(({ tokens }) => tokens)
+    .forEach((token) => {
+      if (swappableTokens[token.address]) return
+      swappableTokens[token.address] = token
+    })
+  return swappableTokens
+}
+
 export function useDefaultTokens(): { [address: string]: Token } {
   const defaultList = useDefaultTokenList()
   return useTokensFromMap(defaultList, false)
@@ -54,6 +75,11 @@ export function useDefaultTokens(): { [address: string]: Token } {
 export function useAllTokens(): { [address: string]: Token } {
   const allTokens = useCombinedActiveList()
   return useTokensFromMap(allTokens, true)
+}
+
+export function useStableTokens(): { [address: string]: Token } {
+  const stableList = useStableTokenList()
+  return useTokensFromMap(stableList, false)
 }
 
 export function useAllInactiveTokens(): { [address: string]: Token } {
@@ -133,7 +159,7 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
 // otherwise returns the token
 export function useToken(tokenAddress?: string): Token | undefined | null {
   const { chainId } = useActiveWeb3React()
-  const tokens = useAllTokens()
+  const tokens = useSwappableTokens()
 
   const address = isAddress(tokenAddress)
 

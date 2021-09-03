@@ -14,7 +14,7 @@ import ERC_20_INTERFACE from '../../constants/abis/erc20'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
 import { UNISWAP_V2_PAIR_INTERFACE } from '../../constants/abis/uniswap-v2-pair'
-import { USD_POOL_ADDRESSES } from '../../constants/StablePools'
+import { STATIC_POOL_INFO, USD_POOL_ADDRESSES } from '../../constants/StablePools'
 import { useActiveWeb3React } from '../../hooks'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import {
@@ -72,19 +72,6 @@ export interface StakingInfo {
   readonly dollarRewardPerYear: TokenAmount | undefined
   readonly rewardToken: Token | undefined
   readonly dualRewards: boolean
-}
-
-export interface StablePoolInfo {
-  readonly name: string
-  readonly poolAddress?: string
-  readonly stakingToken?: Token
-  readonly lpToken?: Token
-  readonly tokens: readonly Token[]
-  readonly amountDeposited?: TokenAmount
-  readonly apr?: TokenAmount
-  readonly totalStakedAmount: TokenAmount
-  readonly stakedAmount: TokenAmount
-  readonly totalVolume?: TokenAmount
 }
 
 export const usePairStakingInfo = (pairToFilterBy?: Pair | null): StakingInfo | undefined => {
@@ -179,7 +166,32 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
   }
 }
 
-export function useStableSwapInfo(pairToFilterBy?: Pair | null): readonly StablePoolInfo[] {
+export function useTokensTradeable(tokenIn: Token | null | undefined): readonly [{ [address: string]: Token }] {
+  const tradeable: { [address: string]: Token } = {}
+  const pools = STATIC_POOL_INFO
+  const { chainId } = useActiveWeb3React()
+
+  if (!tokenIn) return [{}]
+  // }
+  // pools[chainId]
+  //   .map(({ tokens }) => tokens)
+  //   .filter((ele) => ele.includes(tokenIn.address))
+  //   .flatMap((tokens) => tokens)
+  //   .forEach(( token )=> {
+  //     if (token !== tokenIn.address) tradeable[token] = token
+  //   }))
+
+  pools[chainId]
+    .filter(({ tokens }) => tokens.map(({ address }) => address).includes(tokenIn.address))
+    .flatMap(({ tokens }) => tokens)
+    .forEach((token) => {
+      if (token !== tokenIn) tradeable[token.address] = token
+    })
+
+  return [tradeable]
+}
+
+export function useStableSwapInfo(): readonly StablePoolInfo[] {
   const { chainId } = useActiveWeb3React()
   const tokens = useAllTokens()
   const celoAddress =

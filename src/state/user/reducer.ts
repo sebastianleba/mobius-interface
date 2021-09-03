@@ -10,6 +10,7 @@ import {
   removeSerializedToken,
   SerializedPair,
   SerializedToken,
+  setUseUbeswap,
   setValoraAccount,
   toggleURLWarning,
   updateMatchesDarkMode,
@@ -44,6 +45,8 @@ export interface UserState {
 
   // deadline set by user in minutes, used in all txns
   userDeadline: number
+
+  useUbeswap?: boolean
 
   tokens: {
     [chainId: number]: {
@@ -87,6 +90,7 @@ export const initialState: UserState = {
   timestamp: currentTimestamp(),
   URLWarningVisible: true,
   valoraAccount: null,
+  useUbeswap: false,
 }
 
 export default createReducer(initialState, (builder) =>
@@ -175,5 +179,8 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(clearValoraAccount, (state) => {
       state.valoraAccount = null
+    })
+    .addCase(setUseUbeswap, (state, { payload }) => {
+      state.useUbeswap = payload.useUbeswap
     })
 )

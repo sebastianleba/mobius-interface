@@ -3,9 +3,7 @@ import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
-import HamburgerMenu from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -165,8 +163,8 @@ const Title = styled(NavLink)`
 
 const MobiusIcon = styled.div`
   transition: transform 0.3s ease;
-  margin-right: 0.5rem;
-  margin-top: 0.25rem;
+  margin-right: 0.1rem;
+  margin-top: 0.35rem;
   // :hover {
   //   transform: rotate(-5deg);
   // }
@@ -290,38 +288,24 @@ export default function Header() {
           </MobiusIcon>
           Mobius
         </Title>
-        {isMobile ? (
-          <HamburgerMenu
-            isOpen={toggleMenu}
-            menuClicked={() => setToggleMenu(!toggleMenu)}
-            width={18}
-            height={15}
-            strokeWidth={1}
-            rotate={0}
-            color="black"
-            borderRadius={0}
-            animationDuration={0.5}
-          />
-        ) : (
-          <HeaderLinks>
-            <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-              {t('swap')}
-            </StyledNavLink>
-            <StyledNavLink
-              id={`pool-nav-link`}
-              to={'/pool'}
-              isActive={(match, { pathname }) =>
-                Boolean(match) ||
-                pathname.startsWith('/add') ||
-                pathname.startsWith('/remove') ||
-                pathname.startsWith('/create') ||
-                pathname.startsWith('/find')
-              }
-            >
-              Pool
-            </StyledNavLink>
-          </HeaderLinks>
-        )}
+        <HeaderLinks>
+          <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
+            {t('swap')}
+          </StyledNavLink>
+          <StyledNavLink
+            id={`pool-nav-link`}
+            to={'/pool'}
+            isActive={(match, { pathname }) =>
+              Boolean(match) ||
+              pathname.startsWith('/add') ||
+              pathname.startsWith('/remove') ||
+              pathname.startsWith('/create') ||
+              pathname.startsWith('/find')
+            }
+          >
+            Pool
+          </StyledNavLink>
+        </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>
@@ -361,10 +345,15 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
+        <StyledMenuButton onClick={() => window.open('https://bridge-celo.web.app/', '_blank')}>
+          {darkMode ? '🌉' : '🌁'}
+        </StyledMenuButton>
+
         <HeaderElementWrap>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
+
           {/* <Menu /> */}
         </HeaderElementWrap>
       </HeaderControls>

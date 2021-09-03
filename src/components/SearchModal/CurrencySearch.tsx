@@ -4,7 +4,6 @@ import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
 import useToggle from 'hooks/useToggle'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Edit } from 'react-feather'
 import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -13,15 +12,15 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useAllTokens, useFoundOnInactiveList, useIsUserAddedToken, useToken } from '../../hooks/Tokens'
-import { ButtonText, CloseIcon, IconWrapper, TYPE } from '../../theme'
+import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
+import { useTokensTradeable } from '../../state/stake/hooks'
+import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
-import Row, { RowBetween, RowFixed } from '../Row'
+import Row, { RowBetween } from '../Row'
 import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { filterTokens } from './filtering'
-import ImportRow from './ImportRow'
 import { useTokenComparator } from './sorting'
 import { PaddedColumn, SearchInput, Separator } from './styleds'
 
@@ -74,13 +73,15 @@ export function CurrencySearch({
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [invertSearchOrder] = useState<boolean>(false)
 
-  const allTokens = useAllTokens()
+  const allTokens = useSwappableTokens()
   // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
 
   // if they input an address, use it
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
-  const searchTokenIsAdded = useIsUserAddedToken(searchToken)
+  const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  let tokensToSelect = allTokens
+  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
 
   useEffect(() => {
     if (isAddressSearch) {
@@ -92,16 +93,17 @@ export function CurrencySearch({
     }
   }, [isAddressSearch])
 
-  const showETH: boolean = useMemo(() => {
-    const s = searchQuery.toLowerCase().trim()
-    return s === '' || s === 'e' || s === 'et' || s === 'eth'
-  }, [searchQuery])
+  // const showETH: boolean = useMemo(() => {
+  //   const s = searchQuery.toLowerCase().trim()
+  //   return s === '' || s === 'e' || s === 'et' || s === 'eth'
+  // }, [searchQuery])
+  const showETH = false
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
   const filteredTokens: Token[] = useMemo(() => {
-    return filterTokens(Object.values(allTokens), searchQuery)
-  }, [allTokens, searchQuery])
+    return filterTokens(Object.values(tokensToSelect), searchQuery)
+  }, [tokensToSelect, searchQuery])
 
   const filteredSortedTokens: Token[] = useMemo(() => {
     const sorted = filteredTokens.sort(tokenComparator)
@@ -217,11 +219,7 @@ export function CurrencySearch({
         )}
       </PaddedColumn>
       <Separator />
-      {searchToken && !searchTokenIsAdded ? (
-        <Column style={{ padding: '20px 0', height: '100%' }}>
-          <ImportRow token={searchToken} showImportView={showImportView} setImportToken={setImportToken} />
-        </Column>
-      ) : filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
+      {filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
         <div style={{ flex: '1' }}>
           <AutoSizer disableWidth>
             {({ height }) => (
@@ -244,11 +242,11 @@ export function CurrencySearch({
       ) : (
         <Column style={{ padding: '20px', height: '100%' }}>
           <TYPE.main color={theme.text3} textAlign="center" mb="20px">
-            No results found in active lists.
+            No results found in active pools.
           </TYPE.main>
           {inactiveTokens &&
             inactiveTokens.length > 0 &&
-            !(searchToken && !searchTokenIsAdded) &&
+            !searchToken &&
             searchQuery.length > 1 &&
             filteredSortedTokens?.length === 0 && (
               // expand button in line with no results
@@ -270,7 +268,7 @@ export function CurrencySearch({
 
       {inactiveTokens &&
         inactiveTokens.length > 0 &&
-        !(searchToken && !searchTokenIsAdded) &&
+        !searchToken &&
         (searchQuery.length > 1 || showExpanded) &&
         (filteredSortedTokens?.length !== 0 || showExpanded) && (
           // button fixed to bottom
@@ -287,7 +285,12 @@ export function CurrencySearch({
             </ButtonLight>
           </Row>
         )}
-      <Footer>
+    </ContentWrapper>
+  )
+}
+
+/*
+<Footer>
         <Row justify="center">
           <ButtonText onClick={showManageView} color={theme.blue1} className="list-token-manage-button">
             <RowFixed>
@@ -299,6 +302,4 @@ export function CurrencySearch({
           </ButtonText>
         </Row>
       </Footer>
-    </ContentWrapper>
-  )
-}
+      */

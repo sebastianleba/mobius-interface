@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import sortByListPriority from 'utils/listSort'
 
+import getStableTokens from '../../constants/tokens'
 import { AppState } from '../index'
 import { UNSUPPORTED_LIST_URLS } from './../../constants/lists'
 
@@ -33,6 +34,14 @@ export const StableTokens: TokenList = {
       decimals: 18,
       logoURI: 'https://bit.ly/3AMrCyD',
     },
+    {
+      address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+      name: 'Celo Dollar',
+      symbol: 'cUSD',
+      chainId: ChainId.ALFAJORES,
+      decimals: 18,
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+    },
   ],
   version: {
     major: 1,
@@ -41,32 +50,32 @@ export const StableTokens: TokenList = {
   },
 }
 
-DEFAULT_TOKEN_LIST.tokens = DEFAULT_TOKEN_LIST.tokens.concat([
-  {
-    address: '0x695218A22c805Bab9C6941546CF5395F169Ad871',
-    name: 'USD Coin',
-    symbol: 'cUSDC',
-    chainId: ChainId.MAINNET,
-    decimals: 18,
-    logoURI: 'https://bit.ly/3CwGimW',
-  },
-  {
-    address: '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
-    name: 'Tether',
-    symbol: 'cUSDT',
-    chainId: ChainId.MAINNET,
-    decimals: 18,
-    logoURI: 'https://bit.ly/3AMrCyD',
-  },
-  // {
-  //   address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
-  //   name: 'Celo Dollar',
-  //   symbol: 'cUSD',
-  //   chainId: ChainId.MAINNET,
-  //   decimals: 18,
-  //   logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
-  // },
-])
+// DEFAULT_TOKEN_LIST.tokens = DEFAULT_TOKEN_LIST.tokens.concat([
+//   {
+//     address: '0x695218A22c805Bab9C6941546CF5395F169Ad871',
+//     name: 'USD Coin',
+//     symbol: 'cUSDC',
+//     chainId: ChainId.MAINNET,
+//     decimals: 18,
+//     logoURI: 'https://bit.ly/3CwGimW',
+//   },
+//   {
+//     address: '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
+//     name: 'Tether',
+//     symbol: 'cUSDT',
+//     chainId: ChainId.MAINNET,
+//     decimals: 18,
+//     logoURI: 'https://bit.ly/3AMrCyD',
+//   },
+// {
+//   address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
+//   name: 'Celo Dollar',
+//   symbol: 'cUSD',
+//   chainId: ChainId.MAINNET,
+//   decimals: 18,
+//   logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+// },
+// ])
 
 /**
  * Token instances created from token info.
@@ -210,6 +219,11 @@ export function useCombinedInactiveList(): TokenAddressMap {
 // used to hide warnings on import for default tokens
 export function useDefaultTokenList(): TokenAddressMap {
   return listToTokenMap(DEFAULT_TOKEN_LIST)
+}
+
+export function useStableTokenList(): TokenAddressMap {
+  const stableTokens = getStableTokens()
+  return listToTokenMap(stableTokens)
 }
 
 // list of tokens not supported on interface, used to show warnings and prevent swaps and adds
