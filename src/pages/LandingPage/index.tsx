@@ -126,7 +126,7 @@ export const ComingSoon = styled.a`
 // }
 
 export default function LandingPage() {
-  const launchTime = new Date(Date.UTC(2021, 8, 3, 21))
+  const launchTime = new Date(Date.UTC(2021, 8, 3, 20))
   const now = new Date()
   const isLive = now >= launchTime
 
@@ -146,7 +146,7 @@ export default function LandingPage() {
           <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
             Open Mobius
           </StyledMenuButton>
-          <ComingSoon href="https://bridge-celo.web.app/" target="_blank">
+          <ComingSoon href="https://bridge.moss.earth/" target="_blank">
             Bridge Assets
           </ComingSoon>
         </>

@@ -57,7 +57,7 @@ const Marginer = styled.div`
 const localStorageKey = 'valoraRedirect'
 
 export default function App() {
-  const launchTime = new Date(Date.UTC(2021, 8, 3, 21))
+  const launchTime = new Date(Date.UTC(2021, 8, 3, 20))
   const now = new Date()
   const isLive = now >= launchTime
   const location = useLocation()
