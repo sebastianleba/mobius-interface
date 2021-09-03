@@ -1,4 +1,4 @@
-import { JSBI } from '@ubeswap/sdk'
+import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
@@ -36,18 +36,19 @@ export function UpdatePools(): null {
       const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply({ gasLimit: 350000 }))
       const lpOwned = JSBI.BigInt(!account ? '0' : await lpToken.balanceOf(account))
 
-      console.log({
-        balances,
-        amp,
-        virtualPrice,
-        aPrecise,
-        lpTotalSupply,
-      })
+      const fees = await Promise.all(
+        poolInfo.tokens.map(async (_, i) => JSBI.BigInt((await contract.getAdminBalance(i)).toString()))
+      )
+
+      const feesGenerated = new TokenAmount(
+        poolInfo.tokens[0],
+        fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
+      )
 
       dispatch(
         initPool({
           name: poolInfo.name,
-          pool: { ...poolInfo, virtualPrice, balances, amp, lpTotalSupply, lpOwned, aPrecise },
+          pool: { ...poolInfo, virtualPrice, balances, amp, lpTotalSupply, lpOwned, aPrecise, feesGenerated },
         })
       )
     }

@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { Token } from '@ubeswap/sdk'
+import { Token, TokenAmount } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
@@ -12,6 +12,7 @@ export type StableSwapVariable = {
   lpOwned: JSBI
   virtualPrice: JSBI
   aPrecise: JSBI
+  feesGenerated: TokenAmount
 }
 
 export type StableSwapMathConstants = {

@@ -145,7 +145,7 @@ export default function LandingPage() {
             Open Mobius
           </StyledMenuButton>
           <ComingSoon href="https://bridge-celo.web.app/" target="_blank">
-            Bridge Assets <br /> (Coming Soon)
+            Bridge Assets
           </ComingSoon>
         </>
       ) : (

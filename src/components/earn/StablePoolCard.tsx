@@ -114,8 +114,17 @@ interface Props {
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { account } = useActiveWeb3React()
-  const { tokens, peggedTo, virtualPrice, priceOfStaked, balances, totalStakedAmount, stakedAmount, pegComesAfter } =
-    poolInfo
+  const {
+    tokens,
+    peggedTo,
+    virtualPrice,
+    priceOfStaked,
+    balances,
+    totalStakedAmount,
+    stakedAmount,
+    pegComesAfter,
+    feesGenerated,
+  } = poolInfo
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -175,9 +184,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
         </TYPE.black>
-        {apy && apy.greaterThan('0') ? (
+        {feesGenerated ? (
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-            {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+            Fees Generated: {peggedTo}
+            {feesGenerated.denominator.toString() !== '0'
+              ? `${feesGenerated.toFixed(0, { groupSeparator: ',' })}`
+              : '-'}{' '}
           </TYPE.subHeader>
         ) : (
           <TYPE.black fontWeight={600} fontSize={[14, 18]}>

@@ -26,6 +26,7 @@ export interface StablePoolInfo {
   readonly priceOfStaked: TokenAmount
   readonly balances: TokenAmount[]
   readonly pegComesAfter: boolean | undefined
+  readonly feesGenerated: TokenAmount
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -67,6 +68,7 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
       priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
       balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
       pegComesAfter: pool.pegComesAfter,
+      feesGenerated: pool.feesGenerated,
     }
   })
 }
