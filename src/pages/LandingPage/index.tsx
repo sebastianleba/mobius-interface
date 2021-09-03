@@ -126,7 +126,9 @@ export const ComingSoon = styled.a`
 // }
 
 export default function LandingPage() {
-  const isLive = true
+  const launchTime = new Date(Date.UTC(2021, 8, 3, 21))
+  const now = new Date()
+  const isLive = now >= launchTime
 
   return (
     <Container>
@@ -149,7 +151,7 @@ export default function LandingPage() {
           </ComingSoon>
         </>
       ) : (
-        <StyledCountdown date={new Date('2021-08-25')} />
+        <StyledCountdown date={launchTime} />
       )}
 
       <Footer>
