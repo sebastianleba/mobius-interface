@@ -31,7 +31,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e',
             decimals: 18,
-            symbol: 'bUSDC',
+            symbol: 'cUSDC',
             name: 'US Dollar Coin',
             logoURI: 'https://bit.ly/3CwGimW',
           },
@@ -44,7 +44,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         '0x635aec36c4b61bac5eB1C3EEe191147d006F8a21',
         18,
         'MobLP',
-        'Mobius cUSD/bUSDC LP'
+        'Mobius cUSD/cUSDC LP'
       ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
