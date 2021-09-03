@@ -158,7 +158,7 @@ export default function LandingPage() {
         <ExternalLink href="https://github.com/mobiusAMM" target="_blank">
           <img src={github} width="100%" />
         </ExternalLink>
-        <ExternalLink href="https://discord.gg/YwzFuc2a" target="_blank" style={{ background: 'none' }}>
+        <ExternalLink href="https://discord.gg/YVJycuqk" target="_blank" style={{ background: 'none' }}>
           <img src={discord} width="100%" />
         </ExternalLink>
         <ExternalLink href="https://twitter.com/MobiusMoney" target="_blank">
