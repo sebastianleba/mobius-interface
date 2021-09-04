@@ -139,6 +139,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
   const backgroundGradient = null //generateGradient(tokens.slice())
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
@@ -227,6 +228,20 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 />
               </RowFixed>
             </RowBetween>
+            <RowBetween>
+              <TYPE.black>Total volume</TYPE.black>
+              <RowFixed>
+                <TYPE.black>
+                  {virtualPrice
+                    ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(0, {
+                        groupSeparator: ',',
+                      })} ${pegComesAfter ? peggedTo : ''}`
+                    : '-'}
+                </TYPE.black>
+                <div style={{ width: '26px' }} />
+              </RowFixed>
+            </RowBetween>
+
             {false && apy.greaterThan('0') && (
               <RowBetween>
                 <RowFixed>
