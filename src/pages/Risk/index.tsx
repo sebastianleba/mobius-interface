@@ -129,7 +129,7 @@ export const ComingSoon = styled.a`
 export default function RiskPage() {
   return (
     <Container>
-      <TYPE.subHeader fontWeight={800} fontSize={[16, 24]}>
+      <TYPE.subHeader fontStyle="italic" fontSize={[16, 20]}>
         Providing liquidity to Mobius is highly risky. Before using the protocol, we highly recommend{' '}
         <a href="https://github.com/mobiusAMM/mobiusV1" target="_blank" rel="noreferrer">
           reading the code
@@ -142,7 +142,7 @@ export default function RiskPage() {
         Audits
       </TYPE.largeHeader>
       <br />
-      <TYPE.body fontWeight={600} fontSize={[16, 22]}>
+      <TYPE.body fontSize={[16, 22]}>
         Mobius is a fork of{' '}
         <a href="https://nerve.fi/" target="_blank" rel="noreferrer">
           Nerve.
@@ -176,7 +176,7 @@ export default function RiskPage() {
         Admin keys
       </TYPE.largeHeader>
       <br />
-      <TYPE.body fontWeight={600} fontSize={[16, 22]}>
+      <TYPE.body fontSize={[16, 22]}>
         Mobius admin keys are controlled by a 3/4 multisig. The signers are Dylan Mooers, Kyle Scott, Robert Leifke, and
         Eric Cuellar. This multisig has capabilities to pause new deposits and trades in case of technical emergencies.
         Users will always be able to withdraw their funds regardless of new deposits being paused. The multisig can also
@@ -188,7 +188,7 @@ export default function RiskPage() {
         Permanent loss of a peg
       </TYPE.largeHeader>
       <br />
-      <TYPE.body fontWeight={600} fontSize={[16, 22]}>
+      <TYPE.body fontSize={[16, 22]}>
         If one of the assets in a pool significantly depegs, it will effectively mean that pool liquidity providers will
         be left holding only that asset.
       </TYPE.body>
