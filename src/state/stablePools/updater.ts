@@ -46,7 +46,7 @@ export function UpdatePools(): null {
         fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
       )
       let stakingInfo = {}
-      if (poolInfo.mobiusStripIndex !== undefined) {
+      if (poolInfo.mobiusStripIndex !== undefined && account) {
         const lpStaked = await mobiusStrip?.getAmountStaked(poolInfo.mobiusStripIndex, account)
         console.log({ lpStaked: lpStaked.toString() })
         const allocationPoints = JSBI.BigInt((await mobiusStrip.poolInfo(poolInfo.mobiusStripIndex))[1].toString())

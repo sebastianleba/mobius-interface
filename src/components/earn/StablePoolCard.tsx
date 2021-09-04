@@ -317,15 +317,17 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         >
           Withdraw
         </DepositWithdrawBtn>
-        <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
-          <DepositWithdrawBtn
-            background={backgroundColorStart}
-            backgroundHover={backgroundColorEnd}
-            style={{ width: '100%' }}
-          >
-            Farm
-          </DepositWithdrawBtn>
-        </StyledInternalLink>
+        {poolInfo.mobiusStripIndex !== undefined && (
+          <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
+            <DepositWithdrawBtn
+              background={backgroundColorStart}
+              backgroundHover={backgroundColorEnd}
+              style={{ width: '100%' }}
+            >
+              Farm
+            </DepositWithdrawBtn>
+          </StyledInternalLink>
+        )}
       </div>
     </Wrapper>
   )
