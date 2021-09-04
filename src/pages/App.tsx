@@ -13,6 +13,7 @@ import { UpdatePools } from '../state/stablePools/updater'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import Earn from './Earn'
+import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
 import RiskPage from './Risk'
 import Swap from './Swap'
@@ -112,6 +113,7 @@ export default function App() {
                     <Route exact strict path="/pool" component={Earn} />
                     <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
                     <Route exact strict path="/risk" component={RiskPage} />
+                    <Route exact strict path="/farm/:poolName" component={Manage} />
                     {/* <Route component={RedirectPathToSwapOnly} /> */}
                   </>
                 )}

@@ -1,14 +1,13 @@
 import { Fraction, JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useActiveWeb3React } from 'hooks'
-import { useStakingPoolValue } from 'pages/Earn/useStakingPoolValue'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { useColor } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
-import { TYPE } from '../../theme'
+import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
@@ -144,15 +143,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
   // get the USD value of staked WETH
-  const {
-    valueCUSD: valueOfTotalStakedAmountInCUSD,
-    userValueCUSD,
-    userAmountTokenA,
-    userAmountTokenB,
-  } = useStakingPoolValue(poolInfo)
   const apyFraction = poolInfo.apr || undefined
   const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
-  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0'))
+  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -324,6 +317,15 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         >
           Withdraw
         </DepositWithdrawBtn>
+        <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
+          <DepositWithdrawBtn
+            background={backgroundColorStart}
+            backgroundHover={backgroundColorEnd}
+            style={{ width: '100%' }}
+          >
+            Farm
+          </DepositWithdrawBtn>
+        </StyledInternalLink>
       </div>
     </Wrapper>
   )

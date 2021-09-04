@@ -1,14 +1,17 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { Pair, TokenAmount } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
+import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
+import { useMobi } from 'hooks/Tokens'
 import React, { useCallback, useState } from 'react'
+import { StablePoolInfo } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { usePairContract, useStakingContract } from '../../hooks/useContract'
+import { useMobiusStripContract, usePairContract } from '../../hooks/useContract'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
-import { StakingInfo, useDerivedStakeInfo } from '../../state/stake/hooks'
+import { useDerivedStakeInfo } from '../../state/stake/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
@@ -37,33 +40,34 @@ const ContentWrapper = styled(AutoColumn)`
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
-  stakingInfo: StakingInfo
+  stakingInfo: StablePoolInfo
   userLiquidityUnstaked: TokenAmount | undefined
 }
 
 export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiquidityUnstaked }: StakingModalProps) {
-  const { library } = useActiveWeb3React()
+  const { chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
+  const mobi = useMobi()
 
   // track and parse user input
   const [typedValue, setTypedValue] = useState('')
-  const { parsedAmount, error } = useDerivedStakeInfo(typedValue, stakingInfo.stakingToken, userLiquidityUnstaked)
+  const { parsedAmount, error } = useDerivedStakeInfo(typedValue, stakingInfo.lpToken, userLiquidityUnstaked)
   const parsedAmountWrapped = parsedAmount
 
-  let hypotheticalUbeRewardRate: TokenAmount = new TokenAmount(stakingInfo.ubeRewardRate.token, '0')
-  let hypotheticalRewardRate: TokenAmount = new TokenAmount(stakingInfo.rewardRate.token, '0')
-  if (parsedAmountWrapped?.greaterThan('0')) {
-    hypotheticalUbeRewardRate = stakingInfo.getHypotheticalRewardRate(
-      stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
-      stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
-      stakingInfo.totalUBERewardRate
-    )
-    hypotheticalRewardRate = stakingInfo.getHypotheticalRewardRate(
-      stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
-      stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
-      stakingInfo.totalRewardRate
-    )
-  }
+  const hypotheticalMobiRewardRate: TokenAmount = new TokenAmount(mobi, '0')
+  const hypotheticalRewardRate: TokenAmount = new TokenAmount(mobi, '0')
+  // if (parsedAmountWrapped?.greaterThan('0')) {
+  //   hypotheticalMobiRewardRate = stakingInfo.getHypotheticalRewardRate(
+  //     stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
+  //     stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
+  //     stakingInfo.totalUBERewardRate
+  //   )
+  //   hypotheticalRewardRate = stakingInfo.getHypotheticalRewardRate(
+  //     stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
+  //     stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
+  //     stakingInfo.totalRewardRate
+  //   )
+  // }
 
   // state for pending and submitted txn views
   const [attempting, setAttempting] = useState<boolean>(false)
@@ -80,16 +84,16 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
 
   // approval data for stake
   const deadline = useTransactionDeadline()
-  const [approval, approveCallback] = useApproveCallback(parsedAmount, stakingInfo.stakingRewardAddress)
+  const [approval, approveCallback] = useApproveCallback(parsedAmount, MOBIUS_STRIP_ADDRESS[chainId])
 
-  const stakingContract = useStakingContract(stakingInfo.stakingRewardAddress)
+  const stakingContract = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
 
   async function onStake() {
     setAttempting(true)
     if (stakingContract && parsedAmount && deadline) {
       if (approval === ApprovalState.APPROVED) {
         await stakingContract
-          .stake(`0x${parsedAmount.raw.toString(16)}`, { gasLimit: 350000 })
+          .deposit(stakingInfo.mobiusStripIndex, parsedAmount.raw.toString(), { gasLimit: 350000 })
           .then((response: TransactionResponse) => {
             addTransaction(response, {
               summary: `Stake deposited liquidity`,
@@ -144,26 +148,18 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
             id="stake-liquidity-token"
           />
 
-          <HypotheticalRewardRate dim={!hypotheticalUbeRewardRate.greaterThan('0')}>
+          <HypotheticalRewardRate dim={!hypotheticalMobiRewardRate.greaterThan('0')}>
             <div>
               <TYPE.black fontWeight={600}>Weekly Rewards</TYPE.black>
             </div>
 
             <div>
               <TYPE.black>
-                {hypotheticalUbeRewardRate
+                {hypotheticalMobiRewardRate
                   .multiply((60 * 60 * 24 * 7).toString())
                   .toSignificant(4, { groupSeparator: ',' })}{' '}
-                UBE / week
+                MOBI / week
               </TYPE.black>
-              {stakingInfo?.dualRewards && (
-                <TYPE.black>
-                  {hypotheticalRewardRate
-                    .multiply((60 * 60 * 24 * 7).toString())
-                    .toSignificant(4, { groupSeparator: ',' })}{' '}
-                  {stakingInfo?.rewardToken?.symbol} / week
-                </TYPE.black>
-              )}
             </div>
           </HypotheticalRewardRate>
 

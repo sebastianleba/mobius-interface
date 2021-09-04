@@ -5,6 +5,12 @@ import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { initPool, updateVariableData } from './actions'
 
+export type StableStakingInfo = {
+  userStaked: JSBI
+  totalMobiRate: JSBI
+  pendingMobi: JSBI
+}
+
 export type StableSwapVariable = {
   balances: JSBI[]
   amp: JSBI
@@ -13,6 +19,7 @@ export type StableSwapVariable = {
   virtualPrice: JSBI
   aPrecise: JSBI
   feesGenerated: TokenAmount
+  staking?: StableStakingInfo
 }
 
 export type StableSwapMathConstants = {
@@ -34,6 +41,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   lpToken: Token
   peggedTo: string
   pegComesAfter: boolean | undefined
+  mobiusStripIndex?: number | undefined | null
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable

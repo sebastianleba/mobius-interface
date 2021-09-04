@@ -1,7 +1,6 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { useActiveWeb3React } from 'hooks'
-import { useSwappableTokens } from 'hooks/Tokens'
 import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -27,6 +26,9 @@ export interface StablePoolInfo {
   readonly balances: TokenAmount[]
   readonly pegComesAfter: boolean | undefined
   readonly feesGenerated: TokenAmount
+  readonly mobiRate: JSBI | undefined
+  readonly pendingMobi: JSBI | undefined
+  readonly mobiusStripIndex: number | undefined
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -50,27 +52,37 @@ export function usePools(): readonly StableSwapPool[] {
 const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
   new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
 
+const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
+  name: pool.name,
+  poolAddress: pool.address,
+  lpToken: pool.lpToken,
+  tokens: pool.tokens,
+  amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+  stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
+  apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
+  peggedTo: pool.peggedTo,
+  virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
+  priceOfStaked: tokenAmountScaled(
+    pool.lpToken,
+    JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
+  ),
+  balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
+  pegComesAfter: pool.pegComesAfter,
+  feesGenerated: pool.feesGenerated,
+  mobiRate: pool.staking?.totalMobiRate,
+  pendingMobi: pool.staking?.pendingMobi,
+  mobiusStripIndex: pool.mobiusStripIndex ?? undefined,
+})
+
+export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
+  return pool ? getPoolInfo(pool) : undefined
+}
+
 export function useStablePoolInfo(): readonly StablePoolInfo[] {
   const pools = usePools()
-  const tokens = useSwappableTokens()
-  return pools.map((pool) => {
-    return {
-      name: pool.name,
-      poolAddress: pool.address,
-      lpToken: pool.lpToken,
-      tokens: pool.tokenAddresses.map((address) => tokens[address]),
-      amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
-      totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
-      stakedAmount: new TokenAmount(pool.lpToken, pool.lpOwned),
-      apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
-      peggedTo: pool.peggedTo,
-      virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
-      priceOfStaked: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpOwned)),
-      balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
-      pegComesAfter: pool.pegComesAfter,
-      feesGenerated: pool.feesGenerated,
-    }
-  })
+  return pools.map((pool) => getPoolInfo(pool))
 }
 
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
