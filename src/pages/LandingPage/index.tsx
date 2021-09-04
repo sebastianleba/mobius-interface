@@ -126,7 +126,9 @@ export const ComingSoon = styled.a`
 // }
 
 export default function LandingPage() {
-  const isLive = true
+  const launchTime = new Date(Date.UTC(2021, 8, 3, 20))
+  const now = new Date()
+  const isLive = now >= launchTime
 
   return (
     <Container>
@@ -144,19 +146,19 @@ export default function LandingPage() {
           <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
             Open Mobius
           </StyledMenuButton>
-          <ComingSoon href="https://bridge-celo.web.app/" target="_blank">
+          <ComingSoon href="https://bridge.moss.earth/" target="_blank">
             Bridge Assets
           </ComingSoon>
         </>
       ) : (
-        <StyledCountdown date={new Date('2021-08-25')} />
+        <StyledCountdown date={launchTime} />
       )}
 
       <Footer>
         <ExternalLink href="https://github.com/mobiusAMM" target="_blank">
           <img src={github} width="100%" />
         </ExternalLink>
-        <ExternalLink href="https://discord.gg/YwzFuc2a" target="_blank" style={{ background: 'none' }}>
+        <ExternalLink href="https://discord.gg/YVJycuqk" target="_blank" style={{ background: 'none' }}>
           <img src={discord} width="100%" />
         </ExternalLink>
         <ExternalLink href="https://twitter.com/MobiusMoney" target="_blank">
