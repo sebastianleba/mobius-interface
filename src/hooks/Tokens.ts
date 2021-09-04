@@ -4,7 +4,7 @@ import { currencyEquals, Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
-import { STATIC_POOL_INFO } from '../constants/StablePools'
+import { MOBI_TOKEN, STATIC_POOL_INFO } from '../constants/StablePools'
 import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useUserAddedTokens } from '../state/user/hooks'
@@ -210,4 +210,9 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
 export function useCurrency(currencyId: string | undefined): Token | null | undefined {
   const token = useToken(currencyId)
   return token
+}
+
+export function useMobi(): Token | undefined {
+  const { chainId } = useActiveWeb3React()
+  return MOBI_TOKEN[chainId]
 }

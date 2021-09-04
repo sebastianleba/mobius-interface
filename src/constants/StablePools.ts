@@ -9,6 +9,20 @@ export type StablePoolInfo = {
   name: string
 }
 
+const mobiToken = (chainId: number, address: string) => new Token(chainId, address, 18, 'MOBI', 'Mobius')
+
+export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0x20707684E796c7cb04CBB1a3bDB6AB40A02f2D12',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
+  [ChainId.MAINNET]: undefined,
+  [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x5F0200CA03196D5b817E2044a0Bb0D837e0A7823'),
+  [ChainId.BAKLAVA]: undefined,
+}
+
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
@@ -165,6 +179,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      mobiusStripIndex: 0,
     },
   ],
   [ChainId.BAKLAVA]: [],

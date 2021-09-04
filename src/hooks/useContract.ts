@@ -6,13 +6,14 @@ import { useMemo } from 'react'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import LP from '../constants/abis/LPToken.json'
+import MOBIUS_STRIP from '../constants/abis/MobiusStrip.json'
 import DUAL_REWARDS_ABI from '../constants/abis/moola/MoolaStakingRewards.json'
 import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import STABLE_SWAP from '../constants/abis/Swap.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { Erc20, MoolaStakingRewards, PoolManager, StakingRewards, Swap } from '../generated'
+import { Erc20, MobiusStrip, MoolaStakingRewards, PoolManager, StakingRewards, Swap } from '../generated'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
 
@@ -47,6 +48,10 @@ export function useENSResolverContract(address: string | undefined, withSignerIf
 
 export function useBytes32TokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Contract | null {
   return useContract(tokenAddress, ERC20_BYTES32_ABI, withSignerIfPossible)
+}
+
+export function useMobiusStripContract(address?: string, withSignerIfPossible?: boolean): MobiusStrip | null {
+  return useContract(address, MOBIUS_STRIP.abi, withSignerIfPossible) as MobiusStrip
 }
 
 export function usePairContract(pairAddress?: string, withSignerIfPossible?: boolean): Contract | null {

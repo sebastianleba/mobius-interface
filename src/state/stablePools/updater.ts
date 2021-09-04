@@ -2,10 +2,10 @@ import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { STATIC_POOL_INFO } from '../../constants/StablePools'
+import { MOBIUS_STRIP_ADDRESS, STATIC_POOL_INFO } from '../../constants/StablePools'
 import { Erc20, Swap } from '../../generated'
 import { useActiveWeb3React } from '../../hooks'
-import { useLpTokenContract, useStableSwapContract } from '../../hooks/useContract'
+import { useLpTokenContract, useMobiusStripContract, useStableSwapContract } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import { AppDispatch } from '../index'
 import { initPool } from './actions'
@@ -18,6 +18,7 @@ export function UpdatePools(): null {
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
   const poolContract = useStableSwapContract(pools[0].address)
   const lpTokenContract = useLpTokenContract(pools[0].lpToken.address)
+  const mobiusStrip = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
 
   // automatically update lists if versions are minor/patch
   useEffect(() => {
@@ -26,7 +27,7 @@ export function UpdatePools(): null {
       contract: Swap | undefined,
       lpToken: Erc20 | undefined
     ) => {
-      if (!contract || !lpToken) return
+      if (!contract || !lpToken || !mobiusStrip) return
       const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
       const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
       //const swapFee = JSBI.BigInt(await contract.getSwapFee({ gasLimit: 350000 }))
@@ -44,11 +45,36 @@ export function UpdatePools(): null {
         poolInfo.tokens[0],
         fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
       )
+      let stakingInfo = {}
+      if (poolInfo.mobiusStripIndex !== undefined && account) {
+        const lpStaked = await mobiusStrip?.getAmountStaked(poolInfo.mobiusStripIndex, account)
+        console.log({ lpStaked: lpStaked.toString() })
+        const allocationPoints = JSBI.BigInt((await mobiusStrip.poolInfo(poolInfo.mobiusStripIndex))[1].toString())
+        const totalMobiRate = JSBI.BigInt((await mobiusStrip.mobiPerBlock()).toString())
+        const pendingMobi = JSBI.BigInt((await mobiusStrip.pendingMobi(poolInfo.mobiusStripIndex, account)).toString())
+        stakingInfo = {
+          staking: {
+            userStaked: JSBI.BigInt(lpStaked.toString()),
+            totalMobiRate: JSBI.divide(totalMobiRate, allocationPoints),
+            pendingMobi,
+          },
+        }
+      }
 
       dispatch(
         initPool({
           name: poolInfo.name,
-          pool: { ...poolInfo, virtualPrice, balances, amp, lpTotalSupply, lpOwned, aPrecise, feesGenerated },
+          pool: {
+            ...poolInfo,
+            ...stakingInfo,
+            virtualPrice,
+            balances,
+            amp,
+            lpTotalSupply,
+            lpOwned,
+            aPrecise,
+            feesGenerated,
+          },
         })
       )
     }
