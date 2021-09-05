@@ -119,7 +119,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     virtualPrice,
     priceOfStaked,
     balances,
-    totalStakedAmount,
+    totalDeposited,
     stakedAmount,
     pegComesAfter,
     feesGenerated,
@@ -129,7 +129,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const [openManage, setOpenManage] = useState(false)
 
   const userBalances = balances.map((amount) => {
-    const fraction = new Fraction(stakedAmount.raw, totalStakedAmount.raw)
+    const fraction = new Fraction(stakedAmount.raw, totalDeposited.raw)
     const ratio = fraction.multiply(amount.raw)
     return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
   })

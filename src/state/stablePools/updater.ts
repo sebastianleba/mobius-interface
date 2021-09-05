@@ -11,6 +11,8 @@ import { AppDispatch } from '../index'
 import { initPool } from './actions'
 import { StableSwapConstants } from './reducer'
 
+const SECONDS_PER_BLOCK = JSBI.BigInt('5')
+
 export function UpdatePools(): null {
   const { library, chainId, account } = useActiveWeb3React()
   const blockNumber = useCurrentBlockTimestamp()
@@ -50,12 +52,18 @@ export function UpdatePools(): null {
         const lpStaked = await mobiusStrip?.getAmountStaked(poolInfo.mobiusStripIndex, account)
         console.log({ lpStaked: lpStaked.toString() })
         const allocationPoints = JSBI.BigInt((await mobiusStrip.poolInfo(poolInfo.mobiusStripIndex))[1].toString())
+        const totalAllocationPoints = JSBI.BigInt((await mobiusStrip.totalAllocPoint()).toString())
         const totalMobiRate = JSBI.BigInt((await mobiusStrip.mobiPerBlock()).toString())
         const pendingMobi = JSBI.BigInt((await mobiusStrip.pendingMobi(poolInfo.mobiusStripIndex, account)).toString())
+
+        console.log(JSBI.divide(allocationPoints, totalAllocationPoints).toString())
+        console.log(totalMobiRate.toString())
+
+        const totalMobiPerBlock = JSBI.multiply(totalMobiRate, JSBI.divide(allocationPoints, totalAllocationPoints))
         stakingInfo = {
           staking: {
             userStaked: JSBI.BigInt(lpStaked.toString()),
-            totalMobiRate: JSBI.divide(totalMobiRate, allocationPoints),
+            totalMobiRate: JSBI.divide(totalMobiPerBlock, SECONDS_PER_BLOCK),
             pendingMobi,
           },
         }

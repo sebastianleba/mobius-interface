@@ -1,9 +1,11 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
 import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useTokenBalance } from 'state/wallet/hooks'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
@@ -16,8 +18,9 @@ export interface StablePoolInfo {
   readonly lpToken?: Token
   readonly tokens: readonly Token[]
   readonly amountDeposited?: TokenAmount
+  readonly totalDeposited: TokenAmount
   readonly apr?: TokenAmount
-  readonly totalStakedAmount: TokenAmount
+  readonly totalStakedAmount?: TokenAmount
   readonly stakedAmount: TokenAmount
   readonly totalVolume?: TokenAmount
   readonly peggedTo: string
@@ -58,7 +61,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   lpToken: pool.lpToken,
   tokens: pool.tokens,
   amountDeposited: new TokenAmount(pool.lpToken, pool.lpOwned),
-  totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+  totalDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
   stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
   apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
   peggedTo: pool.peggedTo,
@@ -76,8 +79,10 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
+  const { chainId } = useActiveWeb3React()
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  return pool ? getPoolInfo(pool) : undefined
+  const totalStakedAmount = useTokenBalance(MOBIUS_STRIP_ADDRESS[chainId], pool.lpToken)
+  return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
 }
 
 export function useStablePoolInfo(): readonly StablePoolInfo[] {

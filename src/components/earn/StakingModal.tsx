@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { Pair, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Pair, Token, TokenAmount } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
 import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useMobi } from 'hooks/Tokens'
@@ -44,6 +44,9 @@ interface StakingModalProps {
   userLiquidityUnstaked: TokenAmount | undefined
 }
 
+const calcNewRewardRate = (totalMobiRate: JSBI, totalStaked: JSBI, stakedByUser: JSBI, token: Token) =>
+  new TokenAmount(token, JSBI.multiply(totalMobiRate, JSBI.divide(stakedByUser, totalStaked)))
+
 export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiquidityUnstaked }: StakingModalProps) {
   const { chainId, library } = useActiveWeb3React()
   const addTransaction = useTransactionAdder()
@@ -54,8 +57,20 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
   const { parsedAmount, error } = useDerivedStakeInfo(typedValue, stakingInfo.lpToken, userLiquidityUnstaked)
   const parsedAmountWrapped = parsedAmount
 
-  const hypotheticalMobiRewardRate: TokenAmount = new TokenAmount(mobi, '0')
+  let hypotheticalMobiRewardRate: TokenAmount = new TokenAmount(mobi, '0')
   const hypotheticalRewardRate: TokenAmount = new TokenAmount(mobi, '0')
+  if (parsedAmountWrapped?.greaterThan('0')) {
+    if (stakingInfo.totalStakedAmount && stakingInfo.totalStakedAmount.equalTo('0')) {
+      hypotheticalMobiRewardRate = new TokenAmount(mobi, stakingInfo.mobiRate)
+    } else {
+      hypotheticalMobiRewardRate = calcNewRewardRate(
+        stakingInfo.mobiRate,
+        JSBI.add(stakingInfo.totalStakedAmount?.raw, parsedAmountWrapped.raw),
+        JSBI.add(stakingInfo.stakedAmount.raw, parsedAmountWrapped.raw),
+        mobi
+      )
+    }
+  }
   // if (parsedAmountWrapped?.greaterThan('0')) {
   //   hypotheticalMobiRewardRate = stakingInfo.getHypotheticalRewardRate(
   //     stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
@@ -140,7 +155,7 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
             onUserInput={onUserInput}
             onMax={handleMax}
             showMaxButton={!atMaxAmount}
-            currency={stakingInfo.totalStakedAmount.token}
+            currency={stakingInfo.totalDeposited.token}
             pair={dummyPair}
             label={''}
             disableCurrencySelect={true}

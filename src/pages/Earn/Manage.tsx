@@ -96,12 +96,19 @@ export default function Manage({
 
   // get currencies and pair
   const stakingInfo = useStablePoolInfoByName(poolName)
-  console.log({ stakingInfo })
+
   const { totalStaked, userStaked } = useStakingPoolValue(stakingInfo)
 
-  const { balances, stakedAmount } = stakingInfo
+  const { balances, stakedAmount, totalStakedAmount } = stakingInfo
 
   const earnedMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? JSBI.BigInt('0'))
+  let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
+  if (totalStakedAmount && totalStakedAmount.greaterThan('0')) {
+    userMobiRate = new TokenAmount(
+      mobi,
+      JSBI.multiply(stakingInfo?.mobiRate, JSBI.divide(userStaked?.raw, totalStakedAmount?.raw))
+    )
+  }
   const totalMobiRate = new TokenAmount(mobi, stakingInfo.mobiRate ?? JSBI.BigInt('0'))
 
   const userBalances = balances.map((amount) => {
@@ -164,13 +171,13 @@ export default function Manage({
           <AutoColumn gap="sm">
             <TYPE.body style={{ margin: 0 }}>Total deposits</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
-              {totalStaked
+              {totalStakedAmount
                 ? `${stakingInfo.peggedTo}${
-                    totalStaked.lessThan('1')
+                    totalStakedAmount.lessThan('1')
                       ? totalStaked.toFixed(2, {
                           groupSeparator: ',',
                         })
-                      : totalStaked.toFixed(0, {
+                      : totalStakedAmount.toFixed(0, {
                           groupSeparator: ',',
                         })
                   }`
@@ -315,7 +322,7 @@ export default function Manage({
                     ⚡
                   </span>
                   {stakingInfo
-                    ? earnedMobi?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                    ? userMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
                     : '0'}
                   {' MOBI / week'}
                 </TYPE.black>
