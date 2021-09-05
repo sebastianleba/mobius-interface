@@ -48,21 +48,21 @@ export function UpdatePools(): null {
         fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
       )
       let stakingInfo = {}
-      if (poolInfo.mobiusStripIndex !== undefined && account) {
-        const lpStaked = await mobiusStrip?.getAmountStaked(poolInfo.mobiusStripIndex, account)
-        console.log({ lpStaked: lpStaked.toString() })
+      if (poolInfo.mobiusStripIndex !== undefined) {
+        const lpStaked = account
+          ? JSBI.BigInt((await mobiusStrip?.getAmountStaked(poolInfo.mobiusStripIndex, account)).toString())
+          : undefined
         const allocationPoints = JSBI.BigInt((await mobiusStrip.poolInfo(poolInfo.mobiusStripIndex))[1].toString())
         const totalAllocationPoints = JSBI.BigInt((await mobiusStrip.totalAllocPoint()).toString())
         const totalMobiRate = JSBI.BigInt((await mobiusStrip.mobiPerBlock()).toString())
-        const pendingMobi = JSBI.BigInt((await mobiusStrip.pendingMobi(poolInfo.mobiusStripIndex, account)).toString())
-
-        console.log(JSBI.divide(allocationPoints, totalAllocationPoints).toString())
-        console.log(totalMobiRate.toString())
+        const pendingMobi = account
+          ? JSBI.BigInt((await mobiusStrip.pendingMobi(poolInfo.mobiusStripIndex, account)).toString())
+          : undefined
 
         const totalMobiPerBlock = JSBI.multiply(totalMobiRate, JSBI.divide(allocationPoints, totalAllocationPoints))
         stakingInfo = {
           staking: {
-            userStaked: JSBI.BigInt(lpStaked.toString()),
+            userStaked: lpStaked,
             totalMobiRate: JSBI.divide(totalMobiPerBlock, SECONDS_PER_BLOCK),
             pendingMobi,
           },

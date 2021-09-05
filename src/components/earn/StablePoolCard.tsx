@@ -1,10 +1,14 @@
 import { Fraction, JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
+import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
+import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 
+import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
@@ -112,7 +116,7 @@ interface Props {
 }
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
-  const { account } = useActiveWeb3React()
+  const { account, chainId } = useActiveWeb3React()
   const {
     tokens,
     peggedTo,
@@ -123,29 +127,25 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     stakedAmount,
     pegComesAfter,
     feesGenerated,
+    mobiRate,
   } = poolInfo
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
+  const mobi = useMobi()
+  const totalStakedAmount = useTokenBalance(MOBIUS_STRIP_ADDRESS[chainId], mobi)
+  const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
+  let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
+  if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
+    userMobiRate = new TokenAmount(mobi, JSBI.multiply(mobiRate, JSBI.divide(stakedAmount.raw, totalStakedAmount.raw)))
+  }
+  const rewardPerYear = totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR)
 
-  const userBalances = balances.map((amount) => {
-    const fraction = new Fraction(stakedAmount.raw, totalDeposited.raw)
-    const ratio = fraction.multiply(amount.raw)
-    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
-  })
-
-  // get the color of the token
-  const backgroundColorStart = useColor(tokens[0])
-  let backgroundColorEnd = useColor(tokens[tokens.length - 1])
-  const backgroundGradient = null //generateGradient(tokens.slice())
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
-
-  if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
-
-  // get the USD value of staked WETH
-  const apyFraction = poolInfo.apr || undefined
+  const apyFraction =
+    mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
+      ? rewardPerYear?.divide(totalStakedAmount)
+      : undefined
   const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
-  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -163,6 +163,41 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     console.error('Weekly apy overflow', e)
   }
 
+  const userBalances = balances.map((amount) => {
+    const fraction = new Fraction(stakedAmount.raw, totalDeposited.raw)
+    const ratio = fraction.multiply(amount.raw)
+    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
+  })
+
+  // get the color of the token
+  const backgroundColorStart = useColor(tokens[0])
+  let backgroundColorEnd = useColor(tokens[tokens.length - 1])
+  const backgroundGradient = null //generateGradient(tokens.slice())
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
+
+  if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
+
+  // get the USD value of staked WETH
+  // const apyFraction = poolInfo.apr || undefined
+  // const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
+  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
+
+  // const dpy = apy
+  //   ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
+  //   : undefined
+
+  // let weeklyAPY: React.ReactNode | undefined = <>🤯</>
+  // try {
+  //   weeklyAPY = apy
+  //     ? new Percent(
+  //         Math.floor(parseFloat(apy.divide('52').add('1').toFixed(10)) ** 52 * 1_000_000).toFixed(0),
+  //         '1000000'
+  //       ).toFixed(0, { groupSeparator: ',' })
+  //     : undefined
+  // } catch (e) {
+  //   console.error('Weekly apy overflow', e)
+  // }
+
   return (
     <Wrapper
       showBackground={true}
@@ -178,7 +213,21 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <TYPE.black fontWeight={600} fontSize={[18, 24]}>
           {poolInfo.name}
         </TYPE.black>
-        {feesGenerated ? (
+        {apy ? (
+          <RowFixed>
+            <LightQuestionHelper
+              text={
+                <>
+                  Yield/day: {dpy?.toSignificant(4)}%<br />
+                  APY (weekly compounded): {weeklyAPY}%
+                </>
+              }
+            />
+            <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
+              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+            </TYPE.subHeader>
+          </RowFixed>
+        ) : feesGenerated ? (
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             Fees Generated: {peggedTo}
             {feesGenerated.denominator.toString() !== '0'
@@ -221,6 +270,25 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 />
               </RowFixed>
             </RowBetween>
+            {mobiRate && (
+              <RowBetween>
+                <TYPE.black>Pool rate</TYPE.black>
+                <RowFixed>
+                  <TYPE.black>
+                    {totalMobiRate
+                      ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
+                      : '0'}
+                    {' MOBI / week'}
+                  </TYPE.black>
+                  <QuestionHelper
+                    text={balances
+                      .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                      .join(', ')}
+                  />
+                </RowFixed>
+              </RowBetween>
+            )}
+
             <RowBetween>
               <TYPE.black>Total volume</TYPE.black>
               <RowFixed>
@@ -258,6 +326,21 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           {isStaking && (
             <>
               <BottomSection showBackground={true}>
+                {mobiRate && (
+                  <RowBetween>
+                    <TYPE.black fontWeight={500}>Your rate</TYPE.black>
+                    <TYPE.black fontSize={16} fontWeight={500}>
+                      <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
+                        ⚡
+                      </span>
+                      {mobiRate
+                        ? userMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ??
+                          '-'
+                        : '0'}
+                      {' MOBI / week'}
+                    </TYPE.black>
+                  </RowBetween>
+                )}
                 {isStaking && (
                   <RowBetween>
                     <TYPE.black fontWeight={500}>
