@@ -54,7 +54,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       ],
       address: '0x0ff04189Ef135b6541E56f7C638489De92E9c778',
       lpToken: new Token(
-        ChainId.ALFAJORES,
+        ChainId.MAINNET,
         '0x635aec36c4b61bac5eB1C3EEe191147d006F8a21',
         18,
         'MobLP',
