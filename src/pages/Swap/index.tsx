@@ -314,7 +314,7 @@ export default function Swap() {
               onUserInput={handleTypeOutput}
               label={independentField === Field.INPUT && trade ? `To${isEstimate ? ' (estimated)' : ''}` : 'To'}
               showMaxButton={false}
-              currency={currencies[Field.OUTPUT]}
+              currency={currencies[Field.INPUT]}
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
