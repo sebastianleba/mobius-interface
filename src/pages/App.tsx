@@ -14,8 +14,9 @@ import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import Earn from './Earn'
 import LandingPage from './LandingPage'
+import RiskPage from './Risk'
 import Swap from './Swap'
-import { RedirectPathToSwapOnly, RedirectToSwap } from './Swap/redirects'
+import { RedirectToSwap } from './Swap/redirects'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -57,7 +58,7 @@ const Marginer = styled.div`
 const localStorageKey = 'valoraRedirect'
 
 export default function App() {
-  const launchTime = new Date(Date.UTC(2021, 8, 3, 21))
+  const launchTime = new Date(Date.UTC(2021, 8, 3, 20))
   const now = new Date()
   const isLive = now >= launchTime
   const location = useLocation()
@@ -110,7 +111,8 @@ export default function App() {
                     <Route exact strict path="/swap" component={Swap} />
                     <Route exact strict path="/pool" component={Earn} />
                     <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-                    <Route component={RedirectPathToSwapOnly} />
+                    <Route exact strict path="/risk" component={RiskPage} />
+                    {/* <Route component={RedirectPathToSwapOnly} /> */}
                   </>
                 )}
               </Switch>

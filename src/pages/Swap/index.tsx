@@ -316,7 +316,7 @@ export default function Swap() {
               showMaxButton={false}
               currency={currencies[Field.OUTPUT]}
               onCurrencySelect={handleOutputSelect}
-              otherCurrency={currencies[Field.INPUT]}
+              otherCurrency={currencies[Field.OUTPUT]}
               id="swap-currency-output"
             />
 
