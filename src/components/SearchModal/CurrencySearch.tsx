@@ -80,6 +80,7 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  console.log(otherSelectedCurrency)
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
 
