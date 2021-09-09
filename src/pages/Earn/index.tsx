@@ -2,6 +2,7 @@ import { ErrorBoundary } from '@sentry/react'
 import { JSBI } from '@ubeswap/sdk'
 import { partition } from 'lodash'
 import React, { useMemo } from 'react'
+import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
 
 import { AutoColumn } from '../../components/Column'
@@ -139,7 +140,7 @@ export default function Earn() {
   //       </DataRow>
 
   return (
-    <PageWrapper gap="lg" justify="center">
+    <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}
 
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>

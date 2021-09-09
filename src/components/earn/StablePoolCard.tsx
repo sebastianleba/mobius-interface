@@ -128,12 +128,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
-
-  const userBalances = balances.map((amount) => {
-    const fraction = new Fraction(stakedAmount.raw, totalStakedAmount.raw)
-    const ratio = fraction.multiply(amount.raw)
-    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
-  })
+  let userBalances: TokenAmount[] = []
+  if (totalStakedAmount && totalStakedAmount.greaterThan('0')) {
+    userBalances = balances.map((amount) => {
+      const fraction = new Fraction(stakedAmount.raw, totalStakedAmount.raw)
+      const ratio = fraction.multiply(amount.raw)
+      return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
+    })
+  }
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
