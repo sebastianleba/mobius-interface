@@ -174,7 +174,7 @@ export default function Manage({
               {totalStakedAmount
                 ? `${stakingInfo.peggedTo}${
                     totalStakedAmount.lessThan('1')
-                      ? totalStaked.toFixed(2, {
+                      ? totalStakedAmount.toFixed(2, {
                           groupSeparator: ',',
                         })
                       : totalStakedAmount.toFixed(0, {
