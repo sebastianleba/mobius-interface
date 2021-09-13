@@ -1,7 +1,6 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { JSBI, Pair, Token, TokenAmount } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
-import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useMobi } from 'hooks/Tokens'
 import React, { useCallback, useState } from 'react'
 import { StablePoolInfo } from 'state/stablePools/hooks'
@@ -9,7 +8,7 @@ import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { useMobiusStripContract, usePairContract } from '../../hooks/useContract'
+import { useLiquidityGaugeContract, usePairContract } from '../../hooks/useContract'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
 import { useDerivedStakeInfo } from '../../state/stake/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
@@ -99,22 +98,23 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
 
   // approval data for stake
   const deadline = useTransactionDeadline()
-  const [approval, approveCallback] = useApproveCallback(parsedAmount, MOBIUS_STRIP_ADDRESS[chainId])
+  const [approval, approveCallback] = useApproveCallback(parsedAmount, stakingInfo.gaugeAddress)
 
-  const stakingContract = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
+  const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
+  const depositFunction = stakingContract?.['deposit(uint256)']
 
   async function onStake() {
     setAttempting(true)
     if (stakingContract && parsedAmount && deadline) {
       if (approval === ApprovalState.APPROVED) {
-        await stakingContract
-          .deposit(stakingInfo.mobiusStripIndex, parsedAmount.raw.toString(), { gasLimit: 350000 })
-          .then((response: TransactionResponse) => {
+        await depositFunction(parsedAmount.raw.toString(), { gasLimit: 350000 }).then(
+          (response: TransactionResponse) => {
             addTransaction(response, {
               summary: `Stake deposited liquidity`,
             })
             setHash(response.hash)
-          })
+          }
+        )
       } else {
         setAttempting(false)
         throw new Error('Attempting to stake without approval or a signature. Please contact support.')

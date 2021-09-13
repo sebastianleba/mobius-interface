@@ -1,13 +1,12 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount } from '@ubeswap/sdk'
-import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useMobi } from 'hooks/Tokens'
 import React, { useState } from 'react'
 import { StablePoolInfo } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useMobiusStripContract } from '../../hooks/useContract'
+import { useLiquidityGaugeContract } from '../../hooks/useContract'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
@@ -42,16 +41,17 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
     onDismiss()
   }
 
-  const stakingContract = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
+  const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
+  stakingContract?.['withdraw(uint256,bool)']
   const mobi = useMobi()
-  const { stakedAmount, mobiusStripIndex } = stakingInfo
+  const { stakedAmount } = stakingInfo
   const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi)
+  const withdrawFunction = stakingContract?.['withdraw(uint256,bool)']
 
   async function onWithdraw() {
     if (stakingContract && stakingInfo?.stakedAmount) {
       setAttempting(true)
-      await stakingContract
-        .withdraw(mobiusStripIndex, stakedAmount.raw.toString(), { gasLimit: 3000000 })
+      await withdrawFunction(stakedAmount.raw.toString(), true, { gasLimit: 3000000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Withdraw deposited liquidity`,

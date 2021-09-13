@@ -1,6 +1,5 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
-import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
 import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useState } from 'react'
@@ -31,7 +30,7 @@ export interface StablePoolInfo {
   readonly feesGenerated: TokenAmount
   readonly mobiRate: JSBI | undefined
   readonly pendingMobi: JSBI | undefined
-  readonly mobiusStripIndex: number | undefined
+  readonly gaugeAddress?: string
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -75,13 +74,13 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   feesGenerated: pool.feesGenerated,
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
-  mobiusStripIndex: pool.mobiusStripIndex ?? undefined,
+  gaugeAddress: pool.gaugeAddress,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const { chainId } = useActiveWeb3React()
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  const totalStakedAmount = useTokenBalance(MOBIUS_STRIP_ADDRESS[chainId], pool.lpToken)
+  const totalStakedAmount = useTokenBalance(pool.gaugeAddress, pool.lpToken)
   return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
 }
 

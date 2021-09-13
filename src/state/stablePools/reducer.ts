@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { Token, TokenAmount } from '@ubeswap/sdk'
+import { Fraction, Token, TokenAmount } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
@@ -41,7 +41,8 @@ export type StableSwapConstants = StableSwapMathConstants & {
   lpToken: Token
   peggedTo: string
   pegComesAfter: boolean | undefined
-  mobiusStripIndex?: number | undefined | null
+  gaugeAddress?: string
+  relativeGaugeWeight?: Fraction
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable

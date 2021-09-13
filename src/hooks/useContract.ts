@@ -1,11 +1,17 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
+import { ChainId } from '@ubeswap/sdk'
+import { MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
+import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
+import GAUGE_CONTROLLER from '../constants/abis/GaugeController.json'
+import LIQUIDITY_GAUGE_V3 from '../constants/abis/LiquidityGaugeV3.json'
 import LP from '../constants/abis/LPToken.json'
+import MINTER from '../constants/abis/Minter.json'
 import MOBIUS_STRIP from '../constants/abis/MobiusStrip.json'
 import DUAL_REWARDS_ABI from '../constants/abis/moola/MoolaStakingRewards.json'
 import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
@@ -13,9 +19,21 @@ import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import STABLE_SWAP from '../constants/abis/Swap.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
-import { Erc20, MobiusStrip, MoolaStakingRewards, PoolManager, StakingRewards, Swap } from '../generated'
+import {
+  Erc20,
+  ERC20MOBI,
+  GaugeController,
+  LiquidityGaugeV3,
+  Minter,
+  MobiusStrip,
+  MoolaStakingRewards,
+  PoolManager,
+  StakingRewards,
+  Swap,
+} from '../generated'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
+import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
@@ -40,6 +58,27 @@ export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: b
 export function useENSRegistrarContract(withSignerIfPossible?: boolean): Contract | null {
   // TODO(igm): find CELO equivalent of ENS
   return null
+}
+
+export function useLiquidityGaugeContract(address?: string, withSignerIfPossible?: boolean): LiquidityGaugeV3 | null {
+  return useContract(address, LIQUIDITY_GAUGE_V3.abi, withSignerIfPossible) as LiquidityGaugeV3
+}
+
+export function useMobiContract(address?: string, withSignerIfPossible?: boolean): ERC20MOBI | null {
+  const mobi = useMobi()
+  return useContract(address ?? mobi?.address, ERC20_MOBI.abi, withSignerIfPossible) as ERC20MOBI
+}
+
+export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
+  const { chainId } = useActiveWeb3React()
+
+  return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainId], MINTER.abi, withSignerIfPossible) as Minter
+}
+
+export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
+  const { chainId } = useActiveWeb3React()
+  const fallBackAddress = chainId === ChainId.MAINNET ? '' : '0xc8900166F7a9A6ac3Bf137DFD7E5d08c1b25553C'
+  return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 
 export function useENSResolverContract(address: string | undefined, withSignerIfPossible?: boolean): Contract | null {

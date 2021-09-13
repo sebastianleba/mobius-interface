@@ -1,13 +1,12 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount } from '@ubeswap/sdk'
-import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useMobi } from 'hooks/Tokens'
 import React, { useState } from 'react'
 import { StablePoolInfo } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useMobiusStripContract } from '../../hooks/useContract'
+import { useLiquidityGaugeContract, useMobiMinterContract } from '../../hooks/useContract'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
@@ -43,13 +42,14 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
     onDismiss()
   }
 
-  const stakingContract = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
+  const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
+  const minter = useMobiMinterContract()
 
   async function onClaimReward() {
     if (stakingContract && stakingInfo?.stakedAmount) {
       setAttempting(true)
-      await stakingContract
-        .withdraw(stakingInfo.mobiusStripIndex, 0, { gasLimit: 350000 })
+      await minter
+        .mint(stakingInfo.gaugeAddress, { gasLimit: 350000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Claim accumulated MOBI rewards`,

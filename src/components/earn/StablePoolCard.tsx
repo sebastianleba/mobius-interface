@@ -400,7 +400,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         >
           Withdraw
         </DepositWithdrawBtn>
-        {poolInfo.mobiusStripIndex !== undefined && (
+        {poolInfo.gaugeAddress !== undefined && (
           <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
             <DepositWithdrawBtn
               background={backgroundColorStart}
