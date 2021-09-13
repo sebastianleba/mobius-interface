@@ -5,7 +5,14 @@ import { useDispatch } from 'react-redux'
 import { MOBIUS_STRIP_ADDRESS, STATIC_POOL_INFO } from '../../constants/StablePools'
 import { Erc20, Swap } from '../../generated'
 import { useActiveWeb3React } from '../../hooks'
-import { useLpTokenContract, useMobiusStripContract, useStableSwapContract } from '../../hooks/useContract'
+import {
+  useGaugeControllerContract,
+  useLiquidityGaugeContract,
+  useLpTokenContract,
+  useMobiContract,
+  useMobiusStripContract,
+  useStableSwapContract,
+} from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import { AppDispatch } from '../index'
 import { initPool } from './actions'
@@ -21,6 +28,9 @@ export function UpdatePools(): null {
   const poolContract = useStableSwapContract(pools[0].address)
   const lpTokenContract = useLpTokenContract(pools[0].lpToken.address)
   const mobiusStrip = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
+  let gauge = useLiquidityGaugeContract('0xC0350e1f0531c43d00Ef22571781acA25360E672')
+  const mobiContract = useMobiContract()
+  const gaugeController = useGaugeControllerContract()
 
   // automatically update lists if versions are minor/patch
   useEffect(() => {
@@ -48,18 +58,27 @@ export function UpdatePools(): null {
         fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
       )
       let stakingInfo = {}
-      if (poolInfo.mobiusStripIndex !== undefined) {
-        const lpStaked = account
-          ? JSBI.BigInt((await mobiusStrip?.getAmountStaked(poolInfo.mobiusStripIndex, account)).toString())
-          : undefined
-        const allocationPoints = JSBI.BigInt((await mobiusStrip.poolInfo(poolInfo.mobiusStripIndex))[1].toString())
-        const totalAllocationPoints = JSBI.BigInt((await mobiusStrip.totalAllocPoint()).toString())
-        const totalMobiRate = JSBI.BigInt((await mobiusStrip.mobiPerBlock()).toString())
+      if (poolInfo.gaugeAddress && poolInfo.relativeGaugeWeight) {
+        gauge = gauge?.attach(poolInfo.gaugeAddress) ?? gauge
+        const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
+        const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
+        const weight = JSBI.BigInt(
+          (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
+        )
         const pendingMobi = account
-          ? JSBI.BigInt((await mobiusStrip.pendingMobi(poolInfo.mobiusStripIndex, account)).toString())
+          ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
           : undefined
 
-        const totalMobiPerBlock = JSBI.multiply(totalMobiRate, JSBI.divide(allocationPoints, totalAllocationPoints))
+        const totalMobiPerBlock = JSBI.divide(
+          JSBI.multiply(totalMobiRate, weight),
+          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+        )
+        // console.log({
+        //   totalMobiRate: totalMobiRate.toString(),
+        //   totalMobiPerBlock: totalMobiPerBlock.toString(),
+        //   weight,
+        //   val: JSBI.divide(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).toString(),
+        // })
         stakingInfo = {
           staking: {
             userStaked: lpStaked,
