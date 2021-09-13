@@ -1,6 +1,5 @@
 import { Fraction, JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
-import { MOBIUS_STRIP_ADDRESS } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
@@ -133,11 +132,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
   const mobi = useMobi()
-  const totalStakedAmount = useTokenBalance(MOBIUS_STRIP_ADDRESS[chainId], mobi)
+  const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
   if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
-    userMobiRate = new TokenAmount(mobi, JSBI.multiply(mobiRate, JSBI.divide(stakedAmount.raw, totalStakedAmount.raw)))
+    userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(mobiRate, stakedAmount.raw), totalStakedAmount.raw))
   }
   const rewardPerYear = totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR)
 
