@@ -82,7 +82,7 @@ export function UpdatePools(): null {
         stakingInfo = {
           staking: {
             userStaked: lpStaked,
-            totalMobiRate: JSBI.divide(totalMobiPerBlock, SECONDS_PER_BLOCK),
+            totalMobiRate: totalMobiPerBlock,
             pendingMobi,
           },
         }

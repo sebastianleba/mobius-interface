@@ -103,11 +103,13 @@ export default function Manage({
 
   const earnedMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
+  console.log({ bool: totalStakedAmount.greaterThan('0') })
   if (totalStakedAmount && totalStakedAmount.greaterThan('0')) {
     userMobiRate = new TokenAmount(
       mobi,
-      JSBI.multiply(stakingInfo?.mobiRate, JSBI.divide(userStaked?.raw, totalStakedAmount?.raw))
+      JSBI.divide(JSBI.multiply(stakingInfo?.mobiRate, stakedAmount?.raw), totalStakedAmount?.raw)
     )
+    console.log({ userMobiRate, mobiRate: stakingInfo?.mobiRate, stakedAmount, totalStakedAmount })
   }
   const totalMobiRate = new TokenAmount(mobi, stakingInfo.mobiRate ?? JSBI.BigInt('0'))
 
