@@ -12,11 +12,8 @@ export interface ClaimInfo {
 }
 
 export function useClaimInfo(): ClaimInfo {
-  const claim = useSelector<AppState, Claim>((state) => {
-    state.claim
-  })
+  const claim = useSelector<AppState, Claim>((state) => state.claim.claim)
 
-  console.log(claim)
   if (claim == null) {
     return {
       allocatedAmount: JSBI.BigInt(0),

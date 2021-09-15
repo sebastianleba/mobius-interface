@@ -1,8 +1,11 @@
+import { TransactionResponse } from '@ethersproject/providers'
 import { darken } from 'polished'
 import React from 'react'
 import styled from 'styled-components'
 
+import { useVestingContract } from '../../hooks/useContract'
 import { ClaimInfo } from '../../state/claim/hooks'
+import { useTransactionAdder } from '../../state/transactions/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -121,6 +124,25 @@ export const ClaimCard: React.FC<Props> = ({ info }: Props) => {
   const backgroundColorEnd = '#212429'
   const backgroundGradient = null //generateGradient(tokens.slice())
   const { allocatedAmount, claimedAmount, unclaimedAmount } = info
+  const claimContract = useVestingContract()
+  const addTransaction = useTransactionAdder()
+
+  async function onClaim() {
+    if (claimContract && unclaimedAmount) {
+      await claimContract
+        .claim()
+        .then((response: TransactionResponse) => {
+          addTransaction(response, {
+            summary: `Claim ${unclaimedAmount} MOBI`,
+          })
+          // setHash(response.hash)
+        })
+        .catch((error: any) => {
+          // setAttempting(false)
+          console.log(error)
+        })
+    }
+  }
 
   return (
     <PageWrapper>
@@ -191,7 +213,12 @@ export const ClaimCard: React.FC<Props> = ({ info }: Props) => {
               </RowBetween>
             </StatContainer>
           </div>
-          <StyledButton background={backgroundColorStart} backgroundHover={backgroundColorEnd}>
+          <StyledButton
+            onClick={onClaim}
+            disabled={false}
+            background={backgroundColorStart}
+            backgroundHover={backgroundColorEnd}
+          >
             Claim
           </StyledButton>
         </InfoContainer>
