@@ -305,6 +305,9 @@ export default function Header() {
           >
             Pool
           </StyledNavLink>
+          <StyledNavLink id="bridge-nav-link" to="/optics">
+            Bridge
+          </StyledNavLink>
           <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
             Risks
           </StyledNavLink>

@@ -1,4 +1,4 @@
-import { cUSD, Token } from '@ubeswap/sdk'
+import { ChainId, cUSD, Token } from '@ubeswap/sdk'
 import { ButtonLight } from 'components/Button'
 import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
@@ -11,7 +11,8 @@ import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import { useBridgeableTokens } from '../../hooks/optics'
 import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
@@ -65,6 +66,7 @@ export function CurrencySearch({
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { chainId } = useActiveWeb3React()
+  const actualChainId = useWeb3ChainId()
   const theme = useTheme()
 
   // refs for fixed size lists
@@ -80,9 +82,12 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  const bridgeableTokens = useBridgeableTokens()
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-
+  if (actualChainId !== ChainId.MAINNET && actualChainId !== ChainId.ALFAJORES) {
+    tokensToSelect = bridgeableTokens
+  }
   useEffect(() => {
     if (isAddressSearch) {
       ReactGA.event({
