@@ -308,6 +308,9 @@ export default function Header() {
           <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
             Risks
           </StyledNavLink>
+          <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+            Claim MOBI
+          </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>

@@ -12,6 +12,7 @@ import Web3ReactManager from '../components/Web3ReactManager'
 import { UpdatePools } from '../state/stablePools/updater'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
+import Claim from './Claim'
 import Earn from './Earn'
 import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
@@ -113,6 +114,7 @@ export default function App() {
                     <Route exact strict path="/pool" component={Earn} />
                     <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
                     <Route exact strict path="/risk" component={RiskPage} />
+                    <Route exact strict path="/claim" component={Claim} />
                     <Route exact strict path="/farm/:poolName" component={Manage} />
                     {/* <Route component={RedirectPathToSwapOnly} /> */}
                   </>
