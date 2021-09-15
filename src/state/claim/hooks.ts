@@ -26,7 +26,7 @@ export function useClaimInfo(): ClaimInfo {
   }
   return {
     allocatedAmount: claim.allocatedAmount,
-    claimedAmount: claim.claimAmount,
+    claimedAmount: claim.claimedAmount,
     unclaimedAmount: claim.unclaimedAmount,
   }
 }

@@ -30,7 +30,7 @@ export function UpdateClaim(): null {
         update({
           claim: {
             allocatedAmount: initialLocked,
-            claimAmount: claimed,
+            claimedAmount: claimed,
             unclaimedAmount: unclaimed,
           },
         })
