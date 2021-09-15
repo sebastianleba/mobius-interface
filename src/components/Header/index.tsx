@@ -309,7 +309,7 @@ export default function Header() {
             Risks
           </StyledNavLink>
           <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-            Claim MOBI
+            Airdrop
           </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>

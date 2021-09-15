@@ -135,3 +135,8 @@ export function useDualStakingContract(
 ): MoolaStakingRewards | null {
   return useContract(stakingAddress, DUAL_REWARDS_ABI, withSignerIfPossible) as MoolaStakingRewards | null
 }
+
+export function useVestingContract(withSignerIfPossible?: boolean): null {
+  // return useContract("")
+  return null
+}

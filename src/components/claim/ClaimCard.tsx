@@ -2,7 +2,7 @@ import { darken } from 'polished'
 import React from 'react'
 import styled from 'styled-components'
 
-import { StablePoolInfo } from '../../state/stablePools/hooks'
+import { ClaimInfo } from '../../state/claim/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -112,14 +112,15 @@ const DepositWithdrawBtn = styled(StyledButton)`
 `
 
 interface Props {
-  poolInfo: StablePoolInfo
+  info: ClaimInfo
 }
 
-export const ClaimCard: React.FC<Props> = () => {
+export const ClaimCard: React.FC<Props> = ({ info }: Props) => {
   // get the color of the token
   const backgroundColorStart = '#212429'
   const backgroundColorEnd = '#212429'
   const backgroundGradient = null //generateGradient(tokens.slice())
+  const { allocatedAmount, claimedAmount, unclaimedAmount } = info
 
   return (
     <PageWrapper>
@@ -158,18 +159,11 @@ export const ClaimCard: React.FC<Props> = () => {
             Claim $MOBI
           </TYPE.black>
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-            Mobi Price: $100,000,000
+            Full vested by 9/25/2021
           </TYPE.subHeader>
         </TopSection>
         <SubHeader>
-          <RowBetween>
-            {/* <CurrencyPoolLogo tokens={tokens.slice()} size={24} />
-          <PoolInfo style={{ marginLeft: '8px' }}>
-            <TYPE.black fontWeight={600} fontSize={[14, 24]}>
-              {tokens.map((t) => t.symbol).join(' / ')}
-            </TYPE.black>
-          </PoolInfo> */}
-          </RowBetween>
+          <RowBetween></RowBetween>
         </SubHeader>
         <InfoContainer>
           <div style={{ flex: 3 }}>
@@ -177,21 +171,21 @@ export const ClaimCard: React.FC<Props> = () => {
               <RowBetween>
                 <TYPE.black>Total allocated amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>100.34</TYPE.black>
+                  <TYPE.black>{allocatedAmount.toString()}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
               <RowBetween>
                 <TYPE.black>Claimed amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>56.44</TYPE.black>
+                  <TYPE.black>{claimedAmount.toString()}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
               <RowBetween>
                 <TYPE.black>Unclaimed vested amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>20.43</TYPE.black>
+                  <TYPE.black>{unclaimedAmount.toString()}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
@@ -205,13 +199,3 @@ export const ClaimCard: React.FC<Props> = () => {
     </PageWrapper>
   )
 }
-
-const PoolInfo = styled.div`
-  .apr {
-    margin-top: 4px;
-    display: none;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-  display: block;
-  `}
-  }
-`
