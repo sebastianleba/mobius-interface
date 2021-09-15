@@ -15,6 +15,15 @@ export function useClaimInfo(): ClaimInfo {
   const claim = useSelector<AppState, Claim>((state) => {
     state.claim
   })
+
+  console.log(claim)
+  if (claim == null) {
+    return {
+      allocatedAmount: JSBI.BigInt(0),
+      claimedAmount: JSBI.BigInt(0),
+      unclaimedAmount: JSBI.BigInt(0),
+    }
+  }
   return {
     allocatedAmount: claim.allocatedAmount,
     claimedAmount: claim.claimAmount,

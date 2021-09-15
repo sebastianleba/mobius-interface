@@ -5,7 +5,7 @@ import { update } from './actions'
 
 export type Claim = {
   allocatedAmount: JSBI
-  claimAmount: JSBI
+  claimedAmount: JSBI
   unclaimedAmount: JSBI
 }
 
@@ -16,7 +16,7 @@ export interface ClaimState {
 const initialState: ClaimState = {
   claim: {
     allocatedAmount: JSBI.BigInt(0),
-    claimAmount: JSBI.BigInt(0),
+    claimedAmount: JSBI.BigInt(0),
     unclaimedAmount: JSBI.BigInt(0),
   },
 }

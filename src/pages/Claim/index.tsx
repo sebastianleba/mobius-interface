@@ -58,7 +58,7 @@ export default function Earn() {
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
           <ErrorBoundary key={'000'}>
-            <ClaimCard claimInfo={claim} />
+            <ClaimCard info={claim} />
           </ErrorBoundary>
         </PoolSection>
       </AutoColumn>

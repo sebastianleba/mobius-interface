@@ -171,21 +171,21 @@ export const ClaimCard: React.FC<Props> = ({ info }: Props) => {
               <RowBetween>
                 <TYPE.black>Total allocated amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>{allocatedAmount.toString()}</TYPE.black>
+                  <TYPE.black>{allocatedAmount ? allocatedAmount.toString() : '--'}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
               <RowBetween>
                 <TYPE.black>Claimed amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>{claimedAmount.toString()}</TYPE.black>
+                  <TYPE.black>{claimedAmount ? claimedAmount.toString() : '--'}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
               <RowBetween>
                 <TYPE.black>Unclaimed vested amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>{unclaimedAmount.toString()}</TYPE.black>
+                  <TYPE.black>{unclaimedAmount ? unclaimedAmount.toString() : '--'}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>

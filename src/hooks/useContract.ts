@@ -18,6 +18,7 @@ import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import STABLE_SWAP from '../constants/abis/Swap.json'
+import VESTING_ABI from '../constants/abis/VestingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
   Erc20,
@@ -30,6 +31,7 @@ import {
   PoolManager,
   StakingRewards,
   Swap,
+  VestingEscrow,
 } from '../generated'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
@@ -136,7 +138,10 @@ export function useDualStakingContract(
   return useContract(stakingAddress, DUAL_REWARDS_ABI, withSignerIfPossible) as MoolaStakingRewards | null
 }
 
-export function useVestingContract(withSignerIfPossible?: boolean): null {
-  // return useContract("")
-  return null
+export function useVestingContract(withSignerIfPossible?: boolean): VestingEscrow | null {
+  return useContract(
+    '0xf062e30a44202b1c09fAf2e87B385ead3F42d231',
+    VESTING_ABI.abi,
+    withSignerIfPossible
+  ) as VestingEscrow | null
 }
