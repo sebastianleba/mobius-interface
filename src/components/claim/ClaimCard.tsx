@@ -5,6 +5,7 @@ import { darken } from 'polished'
 import React from 'react'
 import { VestType } from 'state/claim/reducer'
 import styled from 'styled-components'
+import { humanFriendlyWei } from 'utils/eth'
 
 import { useVestingContract } from '../../hooks/useContract'
 import { ClaimInfo } from '../../state/claim/hooks'
@@ -124,7 +125,7 @@ interface Props {
 
 export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
   // get the color of the token
-  const backgroundColorStart = '#212429'
+  const backgroundColorStart = '#35D07F'
   const backgroundColorEnd = '#212429'
   const backgroundGradient = null //generateGradient(tokens.slice())
   const { allocatedAmount, claimedAmount, unclaimedAmount } = info
@@ -138,7 +139,7 @@ export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
       await claimContract?.['claim()']()
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Claim ${unclaimedAmount} MOBI`,
+            summary: `Claim ${humanFriendlyWei(unclaimedAmount.toString())} MOBI`,
           })
           // setHash(response.hash)
         })
@@ -198,21 +199,21 @@ export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
               <RowBetween>
                 <TYPE.black>Total allocated amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>{allocatedAmount ? allocatedAmount.toString() : '--'}</TYPE.black>
+                  <TYPE.black>{allocatedAmount ? humanFriendlyWei(allocatedAmount.toString()) : '--'}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
               <RowBetween>
                 <TYPE.black>Claimed amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>{claimedAmount ? claimedAmount.toString() : '--'}</TYPE.black>
+                  <TYPE.black>{claimedAmount ? humanFriendlyWei(claimedAmount.toString()) : '--'}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>
               <RowBetween>
                 <TYPE.black>Unclaimed vested amount</TYPE.black>
                 <RowFixed>
-                  <TYPE.black>{unclaimedAmount ? unclaimedAmount.toString() : '--'}</TYPE.black>
+                  <TYPE.black>{unclaimedAmount ? humanFriendlyWei(unclaimedAmount.toString()) : '--'}</TYPE.black>
                   <div style={{ width: '26px' }} />
                 </RowFixed>
               </RowBetween>

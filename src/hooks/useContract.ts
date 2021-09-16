@@ -140,7 +140,7 @@ export function useDualStakingContract(
 
 export function useVestingContract(address?: string, withSignerIfPossible?: boolean): VestingEscrow | null {
   return useContract(
-    address ?? '0xf062e30a44202b1c09fAf2e87B385ead3F42d231',
+    address ?? '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
     VESTING_ABI.abi,
     withSignerIfPossible
   ) as VestingEscrow | null

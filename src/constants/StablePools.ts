@@ -229,13 +229,13 @@ export const USD_POOL_ADDRESSES: AddressMap = {
 
 export const LP_VEST_ADDRESSES: AddressMap = {
   [ChainId.MAINNET]: '',
-  [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const FOUNDER_VEST_ADDRESSES: AddressMap = {
   [ChainId.MAINNET]: '',
-  [ChainId.ALFAJORES]: '0xf54AfF7C0722f39d3bbd6B1FE9E90E853630F9AF',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
