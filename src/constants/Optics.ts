@@ -40,7 +40,7 @@ export const CELO_OPTICS: OpticsDomainInfo = {
   logoUri: '',
   chainId: 42220,
   bridgeRouter: '0xf244eA81F715F343040569398A4E7978De656bf6',
-  domain: 1886350457,
+  domain: 1667591279,
 }
 
 export const OpticsMainnetDomains = [ETH_OPTICS, POLYGON_OPTICS, CELO_OPTICS]
