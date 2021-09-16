@@ -240,12 +240,9 @@ export default function Optics() {
       id={`Bridge-intput-${baseChain?.chainId}`}
       showMaxButton={!selectedToken?.equalTo(tokenBalance?.raw || '0')}
     />,
-    <AddressInputPanel
-      id="recipient"
-      value={recipientAddress ?? ''}
-      onChange={(val) => setRecipientAddress(val)}
-      key="bridge-recipient"
-    />,
+    <div key="bridge-recipient" id="recipient" style={{ marginTop: '1rem' }}>
+      <AddressInputPanel value={recipientAddress ?? ''} onChange={(val) => setRecipientAddress(val)} />
+    </div>,
     <ButtonConfirmed
       key="bridge-confirm"
       onClick={approveCallback}
