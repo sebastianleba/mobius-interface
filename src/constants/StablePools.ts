@@ -223,3 +223,21 @@ export const USD_POOL_ADDRESSES = {
   [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
   [ChainId.BAKLAVA]: null,
 }
+
+export const LP_VEST_ADDRESSES = {
+  [ChainId.MAINNET]: null,
+  [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
+  [ChainId.BAKLAVA]: null,
+}
+
+export const FOUNDER_VEST_ADDRESSES = {
+  [ChainId.MAINNET]: null,
+  [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
+  [ChainId.BAKLAVA]: null,
+}
+
+export const INVESTOR_VEST_ADDRESSES = {
+  [ChainId.MAINNET]: null,
+  [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
+  [ChainId.BAKLAVA]: null,
+}
