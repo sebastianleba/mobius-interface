@@ -15,9 +15,5 @@ export const useBridgeableTokens = (): { [address: string]: Token } => {
   const tokenList: Token[] = BridgeableTokens[chainId] as any as Token[]
   const tokenMap: { [address: string]: Token } = {}
   tokenList.forEach((token) => (tokenMap[token.address] = token))
-  console.log({
-    tokenList,
-    tokenMap,
-  })
   return tokenMap
 }

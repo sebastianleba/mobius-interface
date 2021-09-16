@@ -1,10 +1,14 @@
 import { Token, TokenAmount } from '@ubeswap/sdk'
+import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
 import { useEffect, useMemo, useState } from 'react'
+import { useBlockNumber } from 'state/application/hooks'
 
 import { useTokenContract } from '../hooks/useContract'
 
 export function useTokenAllowance(token?: Token, owner?: string, spender?: string): TokenAmount | undefined {
   const contract = useTokenContract(token?.address, false)
+  const time = useCurrentBlockTimestamp()
+  const block = useBlockNumber()
 
   const inputs = useMemo(() => [owner, spender], [owner, spender])
   const [allowance, setAllowance] = useState<string>('')
@@ -14,7 +18,7 @@ export function useTokenAllowance(token?: Token, owner?: string, spender?: strin
       setAllowance(newAllowance?.toString() ?? '0')
     }
     getAllowance()
-  }, [token, allowance])
+  }, [token, allowance, block, time])
   // const allowance = useSingleCallResult(contract, 'allowance', inputs).result
 
   return useMemo(

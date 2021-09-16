@@ -3,6 +3,7 @@ import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -308,9 +309,11 @@ export default function Header() {
           <StyledNavLink id="bridge-nav-link" to="/optics">
             Bridge
           </StyledNavLink>
-          <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-            Risks
-          </StyledNavLink>
+          {!isMobile && (
+            <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+              Risks
+            </StyledNavLink>
+          )}
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>

@@ -4,7 +4,7 @@ import { MultiChainIds } from './Optics'
 
 export { Alfajores, Mainnet } from '@celo-tools/use-contractkit'
 
-type NetworkInfo = Network & {
+export type NetworkInfo = Network & {
   nativeCurrency: {
     name: string
     symbol: string

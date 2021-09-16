@@ -1,11 +1,15 @@
+import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { TokenAmount } from '@ubeswap/sdk'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { OpticsDomainInfo } from 'constants/Optics'
+import { ethers } from 'ethers'
 import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
+import { useBridgeRouterContract } from 'hooks/useContract'
 import React, { useCallback, useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
-import { useTokenBalance } from 'state/wallet/hooks'
+import { useTransactionAdder } from 'state/transactions/hooks'
+import { useTokenBalanceSingle } from 'state/wallet/hooks'
 import styled from 'styled-components'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
@@ -46,28 +50,34 @@ export default function Optics() {
   const [targetChain, setTargetChain] = useState<OpticsDomainInfo>()
   const [recipientAddress, setRecipientAddress] = useState<string>('')
   const [step, setStep] = useState<number>(0)
-  // const bridgeContract
-
-  // async function onClaimReward() {
-  //   if (stakingContract && stakingInfo?.stakedAmount) {
-  //     setAttempting(true)
-  //     await minter
-  //       .mint(stakingInfo.gaugeAddress, { gasLimit: 350000 })
-  //       .then((response: TransactionResponse) => {
-  //         addTransaction(response, {
-  //           summary: `Claim accumulated MOBI rewards`,
-  //         })
-  //         setHash(response.hash)
-  //       })
-  //       .catch((error: any) => {
-  //         setAttempting(false)
-  //         console.log(error)
-  //       })
-  //   }
-  // }
+  const [attemping, setAttempting] = useState<boolean>(false)
+  const [hash, setHash] = useState<string>()
+  const addTransaction = useTransactionAdder()
+  const bridgeContract = useBridgeRouterContract(baseChain?.bridgeRouter)
+  async function onSend() {
+    if (bridgeContract && step === 5) {
+      const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
+      setAttempting(true)
+      await bridgeContract
+        .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {
+          gasLimit: 350000,
+        })
+        .then((response: TransactionResponse) => {
+          addTransaction(response, {
+            summary: `Bridged ${selectedToken?.token.symbol} to ${targetChain?.name}`,
+          })
+          setAttempting(false)
+          setHash(response.hash)
+        })
+        .catch((error: any) => {
+          setAttempting(false)
+          console.log(error)
+        })
+    }
+  }
 
   const baseChainInfo: NetworkInfo = networkInfo[baseChain?.chainId]
-  const tokenBalance = useTokenBalance(account, selectedToken?.token)
+  const tokenBalance = useTokenBalanceSingle(account, selectedToken?.token)
 
   const instructions = [
     'Select blockchains',
@@ -107,6 +117,11 @@ export default function Optics() {
       case 3:
         if (recipientAddress && recipientAddress.match(/0x[a-fA-F0-9]{40}/)) {
           setStep(4)
+        }
+        break
+      case 4:
+        if (approval === ApprovalState.APPROVED) {
+          setStep(5)
         }
         break
     }
@@ -250,13 +265,31 @@ export default function Optics() {
         'Approve ' + selectedToken?.token?.symbol
       )}
     </ButtonConfirmed>,
+    <ButtonConfirmed
+      key="bridge-send"
+      onClick={onSend}
+      disabled={attemping}
+      width="100%"
+      altDisabledStyle={attemping} // show solid button while waiting
+      confirmed={!!hash}
+      marginTop="1rem"
+    >
+      {attemping ? (
+        <AutoRow gap="6px" justify="center">
+          Sending <Loader stroke="white" />
+        </AutoRow>
+      ) : hash ? (
+        'Sent! Expect to receive your tokens within 4 hours'
+      ) : (
+        'Send ' + selectedToken?.token?.symbol
+      )}
+    </ButtonConfirmed>,
   ]
 
   return (
     <>
       <SwapPoolTabs active={'optics'} />
       <AppBodyNoBackground>
-        {/* <SwapHeader title={actionLabel} /> */}
         <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
           {actionSteps.slice(0, step + 1).map((action, i) => (
             <div key={`action-${i}`} style={{ opacity: step !== i ? 0.9 : 1 }}>
@@ -267,11 +300,6 @@ export default function Optics() {
           {listOfSteps}
         </Wrapper>
       </AppBodyNoBackground>
-      {/* {!swapIsUnsupported ? (
-        <AdvancedSwapDetailsDropdown trade={trade} />
-      ) : (
-        <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )} */}
     </>
   )
 }
