@@ -135,8 +135,7 @@ export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
 
   async function onClaim() {
     if (claimContract && unclaimedAmount) {
-      await claimContract
-        .claim()
+      await claimContract?.['claim()']()
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Claim ${unclaimedAmount} MOBI`,
