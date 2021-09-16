@@ -1,6 +1,9 @@
 import { TransactionResponse } from '@ethersproject/providers'
+import { VestingAddresses } from 'constants/StablePools'
+import { useActiveWeb3React } from 'hooks'
 import { darken } from 'polished'
 import React from 'react'
+import { VestType } from 'state/claim/reducer'
 import styled from 'styled-components'
 
 import { useVestingContract } from '../../hooks/useContract'
@@ -116,15 +119,18 @@ const DepositWithdrawBtn = styled(StyledButton)`
 
 interface Props {
   info: ClaimInfo
+  type: VestType
 }
 
-export const ClaimCard: React.FC<Props> = ({ info }: Props) => {
+export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
   // get the color of the token
   const backgroundColorStart = '#212429'
   const backgroundColorEnd = '#212429'
   const backgroundGradient = null //generateGradient(tokens.slice())
   const { allocatedAmount, claimedAmount, unclaimedAmount } = info
-  const claimContract = useVestingContract()
+  const { chainId } = useActiveWeb3React()
+  const vestAddress = VestingAddresses[type][chainId]
+  const claimContract = useVestingContract(vestAddress)
   const addTransaction = useTransactionAdder()
 
   async function onClaim() {

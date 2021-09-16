@@ -138,9 +138,9 @@ export function useDualStakingContract(
   return useContract(stakingAddress, DUAL_REWARDS_ABI, withSignerIfPossible) as MoolaStakingRewards | null
 }
 
-export function useVestingContract(withSignerIfPossible?: boolean): VestingEscrow | null {
+export function useVestingContract(address?: string, withSignerIfPossible?: boolean): VestingEscrow | null {
   return useContract(
-    '0xf062e30a44202b1c09fAf2e87B385ead3F42d231',
+    address ?? '0xf062e30a44202b1c09fAf2e87B385ead3F42d231',
     VESTING_ABI.abi,
     withSignerIfPossible
   ) as VestingEscrow | null

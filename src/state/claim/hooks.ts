@@ -3,7 +3,7 @@ import { JSBI } from '@ubeswap/sdk'
 import { useSelector } from 'react-redux'
 
 import { AppState } from '..'
-import { Claim } from './reducer'
+import { Claim, VestType } from './reducer'
 
 export interface ClaimInfo {
   readonly allocatedAmount: JSBI
@@ -11,8 +11,8 @@ export interface ClaimInfo {
   readonly unclaimedAmount: JSBI
 }
 
-export function useClaimInfo(): ClaimInfo {
-  const claim = useSelector<AppState, Claim>((state) => state.claim.claim)
+export function useClaimInfo(type = VestType.LP): ClaimInfo {
+  const claim = useSelector<AppState, Claim>((state) => state.claim[type])
 
   if (claim == null) {
     return {

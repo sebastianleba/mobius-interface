@@ -9,12 +9,32 @@ export type Claim = {
   unclaimedAmount: JSBI
 }
 
-export interface ClaimState {
-  claim: Claim
+export enum VestType {
+  LP,
+  FOUNDER,
+  INVESTOR,
+  ADVISOR,
 }
 
+export type ClaimState = { [type in VestType]: Claim }
+
 const initialState: ClaimState = {
-  claim: {
+  [VestType.LP]: {
+    allocatedAmount: JSBI.BigInt(0),
+    claimedAmount: JSBI.BigInt(0),
+    unclaimedAmount: JSBI.BigInt(0),
+  },
+  [VestType.FOUNDER]: {
+    allocatedAmount: JSBI.BigInt(0),
+    claimedAmount: JSBI.BigInt(0),
+    unclaimedAmount: JSBI.BigInt(0),
+  },
+  [VestType.INVESTOR]: {
+    allocatedAmount: JSBI.BigInt(0),
+    claimedAmount: JSBI.BigInt(0),
+    unclaimedAmount: JSBI.BigInt(0),
+  },
+  [VestType.ADVISOR]: {
     allocatedAmount: JSBI.BigInt(0),
     claimedAmount: JSBI.BigInt(0),
     unclaimedAmount: JSBI.BigInt(0),
@@ -22,10 +42,10 @@ const initialState: ClaimState = {
 }
 
 export default createReducer<ClaimState>(initialState, (builder) =>
-  builder.addCase(update, (state, { payload: { claim } }) => {
+  builder.addCase(update, (state, { payload: { type, claim } }) => {
     return {
       ...state,
-      claim: claim,
+      [type]: claim,
     }
   })
 )

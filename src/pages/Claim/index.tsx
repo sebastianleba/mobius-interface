@@ -1,6 +1,8 @@
 import { ErrorBoundary } from '@sentry/react'
 import React from 'react'
+import { useLocation } from 'react-router'
 import { useClaimInfo } from 'state/claim/hooks'
+import { VestType } from 'state/claim/reducer'
 import styled from 'styled-components'
 
 import { ClaimCard } from '../../components/claim/ClaimCard'
@@ -51,14 +53,23 @@ flex-direction: column;
 // )}
 
 export default function Earn() {
-  const claim = useClaimInfo()
+  const { pathname } = useLocation()
+  const type = pathname.includes('founder')
+    ? VestType.FOUNDER
+    : pathname.includes('investor')
+    ? VestType.INVESTOR
+    : pathname.includes('Advisor')
+    ? VestType.ADVISOR
+    : VestType.LP
+  console.log({ type })
+  const claim = useClaimInfo(type)
 
   return (
     <PageWrapper gap="lg" justify="center">
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
           <ErrorBoundary key={'000'}>
-            <ClaimCard info={claim} />
+            <ClaimCard info={claim} type={type} />
           </ErrorBoundary>
         </PoolSection>
       </AutoColumn>

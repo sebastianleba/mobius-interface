@@ -1,4 +1,5 @@
 import { ChainId, Fraction, JSBI, Token } from '@ubeswap/sdk'
+import { VestType } from 'state/claim/reducer'
 import { WrappedTokenInfo } from 'state/lists/hooks'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
@@ -218,26 +219,41 @@ export const EURO_POOL: StablePoolInfo = {
 export const STABLE_POOLS = [STAKED_CELO_POOL, USD_POOL, EURO_POOL]
 
 //todo: replace Mainnet and Baklava Pool Addresses
-export const USD_POOL_ADDRESSES = {
-  [ChainId.MAINNET]: null,
+type AddressMap = { [K in ChainId]: string }
+
+export const USD_POOL_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
   [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  [ChainId.BAKLAVA]: null,
+  [ChainId.BAKLAVA]: '',
 }
 
-export const LP_VEST_ADDRESSES = {
-  [ChainId.MAINNET]: null,
+export const LP_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
   [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  [ChainId.BAKLAVA]: null,
+  [ChainId.BAKLAVA]: '',
 }
 
-export const FOUNDER_VEST_ADDRESSES = {
-  [ChainId.MAINNET]: null,
-  [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  [ChainId.BAKLAVA]: null,
+export const FOUNDER_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0xf54AfF7C0722f39d3bbd6B1FE9E90E853630F9AF',
+  [ChainId.BAKLAVA]: '',
 }
 
-export const INVESTOR_VEST_ADDRESSES = {
-  [ChainId.MAINNET]: null,
-  [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  [ChainId.BAKLAVA]: null,
+export const INVESTOR_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0xe24F370c038F17549E65a01A9C8Fcd521D7f4f34',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const ADVISOR_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0x83F11a0b0dDc8A6731373Bc92779a866eA7C4692',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const VestingAddresses: { [type in VestType]: AddressMap } = {
+  [VestType.FOUNDER]: FOUNDER_VEST_ADDRESSES,
+  [VestType.ADVISOR]: ADVISOR_VEST_ADDRESSES,
+  [VestType.INVESTOR]: INVESTOR_VEST_ADDRESSES,
+  [VestType.LP]: LP_VEST_ADDRESSES,
 }
