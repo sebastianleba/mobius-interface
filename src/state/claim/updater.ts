@@ -24,14 +24,13 @@ export function UpdateClaim(): null {
         vesting,
         type,
       })
-      if (!vesting) return
-      const initialLocked = JSBI.BigInt(await vesting.initial_locked(account))
-      const unclaimed = JSBI.BigInt(await vesting.balanceOf(account))
+      if (!vesting || !account) return
+      const initialLocked = JSBI.BigInt(await vesting?.['initial_locked'](account))
+      const unclaimed = JSBI.BigInt(await vesting?.['balanceOf'](account))
       const claimed = JSBI.subtract(
-        JSBI.subtract(initialLocked, JSBI.BigInt(await vesting.lockedOf(account))),
+        JSBI.subtract(initialLocked, JSBI.BigInt(await vesting?.['lockedOf'](account))),
         unclaimed
       )
-
       console.log({
         type,
         allocatedAmount: initialLocked,
