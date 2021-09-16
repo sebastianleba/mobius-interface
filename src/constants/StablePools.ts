@@ -241,13 +241,13 @@ export const FOUNDER_VEST_ADDRESSES: AddressMap = {
 
 export const INVESTOR_VEST_ADDRESSES: AddressMap = {
   [ChainId.MAINNET]: '',
-  [ChainId.ALFAJORES]: '0xe24F370c038F17549E65a01A9C8Fcd521D7f4f34',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const ADVISOR_VEST_ADDRESSES: AddressMap = {
   [ChainId.MAINNET]: '',
-  [ChainId.ALFAJORES]: '0x83F11a0b0dDc8A6731373Bc92779a866eA7C4692',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
