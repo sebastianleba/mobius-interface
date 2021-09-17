@@ -1,12 +1,13 @@
-import { Fraction, JSBI, TokenAmount } from '@ubeswap/sdk'
+import { Fraction, JSBI, Price, TokenAmount } from '@ubeswap/sdk'
 import CurrencyPoolLogo from 'components/CurrencyPoolLogo'
 import QuestionHelper from 'components/QuestionHelper'
-import { MOBI_TOKEN } from 'constants/StablePools'
+import { useMobi } from 'hooks/Tokens'
 import React, { useCallback, useState } from 'react'
-import { Link, RouteComponentProps, useLocation } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 import { useStablePoolInfoByName } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
@@ -85,21 +86,27 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
+const quote = (price: Price, amount: TokenAmount) => {
+  const fraction = new Fraction(price.denominator, price.numerator)
+  return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
+}
+
+const useQuote = (price: Price) => (amount: TokenAmount) => quote(price, amount)
+
 export default function Manage({
   match: {
     params: { poolName },
   },
 }: RouteComponentProps<{ poolName: string }>) {
   const { account, chainId } = useActiveWeb3React()
-  const mobi = MOBI_TOKEN[chainId]
-  const location = useLocation()
+  const mobi = useMobi()
 
   // get currencies and pair
   const stakingInfo = useStablePoolInfoByName(poolName)
 
   const { totalStaked, userStaked } = useStakingPoolValue(stakingInfo)
 
-  const { balances, stakedAmount, totalStakedAmount } = stakingInfo
+  const { balances, stakedAmount, totalStakedAmount, tokens } = stakingInfo
 
   const earnedMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -119,6 +126,11 @@ export default function Manage({
     }
     return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
   })
+
+  const price1 = useCUSDPrice(tokens[0])
+  const price2 = useCUSDPrice(tokens[1])
+  const price = price1 ?? price2
+  const priceOf = useQuote(price)
 
   // const [, stakingTokenPair] = usePair(tokenA, tokenB)
   // const singleStakingInfo = usePairStakingInfo(stakingTokenPair)
@@ -173,7 +185,7 @@ export default function Manage({
             <TYPE.body fontSize={24} fontWeight={500}>
               {totalStakedAmount
                 ? `${stakingInfo.peggedTo}${
-                    totalStakedAmount.lessThan('1')
+                    priceOf(totalStakedAmount).lessThan('1')
                       ? totalStakedAmount.toFixed(2, {
                           groupSeparator: ',',
                         })
@@ -258,11 +270,6 @@ export default function Manage({
                   </TYPE.white>
                   <RowFixed>
                     <TYPE.white>MOBI-LP {stakingInfo.tokens.map(({ symbol }) => symbol).join('-')}</TYPE.white>
-                    {/* {stakingInfo && (
-                      <PairLinkIcon
-                        href={`https://info.ubeswap.org/pair/${stakingInfo.stakingToken.address.toLowerCase()}`}
-                      />
-                    )} */}
                   </RowFixed>
                 </RowBetween>
                 {stakingInfo?.stakedAmount && stakingInfo.stakedAmount.greaterThan('0') && (
@@ -271,7 +278,7 @@ export default function Manage({
                       <TYPE.white>
                         Current value:{' '}
                         {userStaked
-                          ? `${stakingInfo.peggedTo}${userStaked.toFixed(2, {
+                          ? `${stakingInfo.peggedTo}${priceOf(userStaked).toFixed(2, {
                               separator: ',',
                             })}`
                           : '--'}

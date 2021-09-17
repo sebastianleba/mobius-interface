@@ -1,4 +1,5 @@
 import { ChainId, Fraction, JSBI, Token } from '@ubeswap/sdk'
+import { VestType } from 'state/claim/reducer'
 import { WrappedTokenInfo } from 'state/lists/hooks'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
@@ -19,12 +20,12 @@ export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
 
 export const MOBIUS_MINTER_ADDRESS: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '',
-  [ChainId.ALFAJORES]: '0xad27574aF1d91ad9cB2a776c7BD6f0FB059EFe32',
+  [ChainId.ALFAJORES]: '0xa9f324CdB134f0b24094DCC80Fb720181e992437',
   [ChainId.BAKLAVA]: '',
 }
 
 export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
-  [ChainId.MAINNET]: undefined,
+  [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
   [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
   [ChainId.BAKLAVA]: undefined,
 }
@@ -124,7 +125,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: 'CELO',
       pegComesAfter: true,
-      gaugeAddress: '0xb372c360Ab87A803CBB156eE6d62579545Bf3858',
+      gaugeAddress: '0x1a567D4F6870Cd3eC1aD82f3CF8fF0EbCCbBfEcF',
       relativeGaugeWeight: new Fraction('1', '10'),
     },
     {
@@ -187,7 +188,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      gaugeAddress: '0x828e1Be170EcFF099Fd86396f76659359aBB2b4C',
+      gaugeAddress: '0x97Ae8F2962B8e6951CaF1868f31bD3DfD4093489',
       relativeGaugeWeight: new Fraction('9', '10'),
     },
   ],
@@ -218,8 +219,41 @@ export const EURO_POOL: StablePoolInfo = {
 export const STABLE_POOLS = [STAKED_CELO_POOL, USD_POOL, EURO_POOL]
 
 //todo: replace Mainnet and Baklava Pool Addresses
-export const USD_POOL_ADDRESSES = {
-  [ChainId.MAINNET]: null,
+type AddressMap = { [K in ChainId]: string }
+
+export const USD_POOL_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
   [ChainId.ALFAJORES]: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  [ChainId.BAKLAVA]: null,
+  [ChainId.BAKLAVA]: '',
+}
+
+export const LP_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const FOUNDER_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const INVESTOR_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const ADVISOR_VEST_ADDRESSES: AddressMap = {
+  [ChainId.MAINNET]: '',
+  [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const VestingAddresses: { [type in VestType]: AddressMap } = {
+  [VestType.FOUNDER]: FOUNDER_VEST_ADDRESSES,
+  [VestType.ADVISOR]: ADVISOR_VEST_ADDRESSES,
+  [VestType.INVESTOR]: INVESTOR_VEST_ADDRESSES,
+  [VestType.LP]: LP_VEST_ADDRESSES,
 }

@@ -16,7 +16,6 @@ export function useTokenBalanceSingle(address?: string, token?: Token | undefine
     const update = async () => {
       const amt = await tokenContract?.balanceOf(address)
       const balance = JSBI.BigInt(amt?.toString() || '0')
-      console.log({ amt, balance, address })
       setTokenBalance(new TokenAmount(token, balance))
     }
     token && update()

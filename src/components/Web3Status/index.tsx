@@ -125,8 +125,6 @@ function Web3StatusInner() {
 
   const bridgeOnly = chainId && chainId !== 0 && chainId !== ChainId.ALFAJORES && chainId !== ChainId.MAINNET
 
-  console.log({ bridgeOnly })
-
   const allTransactions = useAllTransactions()
 
   const sortedRecentTransactions = useMemo(() => {

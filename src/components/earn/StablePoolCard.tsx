@@ -1,4 +1,4 @@
-import { Fraction, JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
+import { Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
@@ -6,6 +6,7 @@ import { darken } from 'polished'
 import React, { useState } from 'react'
 import { useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor } from '../../hooks/useColor'
@@ -114,6 +115,13 @@ interface Props {
   poolInfo: StablePoolInfo
 }
 
+const quote = (price: Price, amount: TokenAmount) => {
+  const fraction = new Fraction(price.denominator, price.numerator)
+  return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
+}
+
+const useQuote = (price: Price) => (amount: TokenAmount) => quote(price, amount)
+
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { account, chainId } = useActiveWeb3React()
   const {
@@ -131,6 +139,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
+
+  const price1 = useCUSDPrice(tokens[0])
+  const price2 = useCUSDPrice(tokens[1])
+  const price = price1 ?? price2
+  const priceOf = useQuote(price)
+
   const mobi = useMobi()
   const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
@@ -230,7 +244,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             Fees Generated: {peggedTo}
             {feesGenerated.denominator.toString() !== '0'
-              ? `${feesGenerated.toFixed(2, { groupSeparator: ',' })}`
+              ? `${priceOf(feesGenerated).toFixed(2, { groupSeparator: ',' })}`
               : '-'}{' '}
           </TYPE.subHeader>
         ) : (
@@ -257,7 +271,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {virtualPrice
-                    ? `${!pegComesAfter ? peggedTo : ''}${virtualPrice.toFixed(0, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(virtualPrice).toFixed(0, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
@@ -279,11 +293,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                       : '0'}
                     {' MOBI / week'}
                   </TYPE.black>
-                  <QuestionHelper
-                    text={balances
-                      .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
-                      .join(', ')}
-                  />
                 </RowFixed>
               </RowBetween>
             )}
@@ -293,7 +302,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {virtualPrice
-                    ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(0, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(0, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
@@ -349,7 +358,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         {!pegComesAfter && peggedTo}
-                        {priceOfStaked.toFixed(0, { groupSeparator: ',' })}
+                        {priceOf(priceOfStaked).toFixed(0, { groupSeparator: ',' })}
                         {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper

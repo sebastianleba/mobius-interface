@@ -314,6 +314,9 @@ export default function Header() {
               Risks
             </StyledNavLink>
           )}
+          <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+            Airdrop
+          </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>

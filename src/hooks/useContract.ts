@@ -19,6 +19,7 @@ import POOL_MANAGER_ABI from '../constants/abis/pool-manager.json'
 import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import STABLE_SWAP from '../constants/abis/Swap.json'
+import VESTING_ABI from '../constants/abis/VestingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
   BridgeRouter,
@@ -32,6 +33,7 @@ import {
   PoolManager,
   StakingRewards,
   Swap,
+  VestingEscrow,
 } from '../generated'
 import { getContract } from '../utils'
 import { useActiveWeb3React } from './index'
@@ -83,7 +85,7 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
   const { chainId } = useActiveWeb3React()
-  const fallBackAddress = chainId === ChainId.MAINNET ? '' : '0xc8900166F7a9A6ac3Bf137DFD7E5d08c1b25553C'
+  const fallBackAddress = chainId === ChainId.MAINNET ? '' : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 
@@ -140,4 +142,12 @@ export function useDualStakingContract(
   withSignerIfPossible?: boolean
 ): MoolaStakingRewards | null {
   return useContract(stakingAddress, DUAL_REWARDS_ABI, withSignerIfPossible) as MoolaStakingRewards | null
+}
+
+export function useVestingContract(address?: string, withSignerIfPossible?: boolean): VestingEscrow | null {
+  return useContract(
+    address ?? '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
+    VESTING_ABI.abi,
+    withSignerIfPossible
+  ) as VestingEscrow | null
 }

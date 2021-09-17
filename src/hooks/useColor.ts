@@ -86,7 +86,6 @@ async function getColorFromUriPath(uri: string): Promise<string | null> {
 export function generateGradient(tokens: Token[]) {
   const prevColor = ''
   let colors = tokens.map((t) => useColor(t))
-  console.log(colors)
   const numColors = colors.length + 1
   const increment = 100 / numColors
   colors = colors.map((color, i) => `${color} ${i * increment}%`)

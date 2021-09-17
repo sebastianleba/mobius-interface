@@ -2,7 +2,7 @@ import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { MOBIUS_STRIP_ADDRESS, STATIC_POOL_INFO } from '../../constants/StablePools'
+import { STATIC_POOL_INFO } from '../../constants/StablePools'
 import { Erc20, Swap } from '../../generated'
 import { useActiveWeb3React } from '../../hooks'
 import {
@@ -10,7 +10,6 @@ import {
   useLiquidityGaugeContract,
   useLpTokenContract,
   useMobiContract,
-  useMobiusStripContract,
   useStableSwapContract,
 } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
@@ -27,7 +26,6 @@ export function UpdatePools(): null {
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
   const poolContract = useStableSwapContract(pools[0].address)
   const lpTokenContract = useLpTokenContract(pools[0].lpToken.address)
-  const mobiusStrip = useMobiusStripContract(MOBIUS_STRIP_ADDRESS[chainId])
   let gauge = useLiquidityGaugeContract('0xC0350e1f0531c43d00Ef22571781acA25360E672')
   const mobiContract = useMobiContract()
   const gaugeController = useGaugeControllerContract()
@@ -39,7 +37,7 @@ export function UpdatePools(): null {
       contract: Swap | undefined,
       lpToken: Erc20 | undefined
     ) => {
-      if (!contract || !lpToken || !mobiusStrip) return
+      if (!contract || !lpToken) return
       try {
         const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
         const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
