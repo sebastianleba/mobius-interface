@@ -10,7 +10,7 @@ import { useTheme } from 'styled-components'
 import uriToHttp from 'utils/uriToHttp'
 import { hex } from 'wcag-contrast'
 
-const ethColor = '#a5fcf6'
+const ethColor = '#5ca6ce'
 const celoColor = '#FBCC5C'
 const polygonColor = '#8247e5'
 
