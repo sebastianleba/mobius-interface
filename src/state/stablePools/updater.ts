@@ -32,6 +32,7 @@ export function UpdatePools(): null {
 
   // automatically update lists if versions are minor/patch
   useEffect(() => {
+    console.log('Updating')
     const updatePool = async (
       poolInfo: StableSwapConstants,
       contract: Swap | undefined,
@@ -112,7 +113,7 @@ export function UpdatePools(): null {
       //const swapContract = getContract(pool.address, SWAP.abi, library) as any
       updatePool(pool, poolContract?.attach(pool.address), lpTokenContract?.attach(pool.lpToken.address))
     })
-  }, [pools, library, blockNumber])
+  }, [pools, library, blockNumber, dispatch, lpTokenContract, mobiContract, gaugeController])
 
   return null
 }

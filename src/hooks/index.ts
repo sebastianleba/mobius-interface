@@ -22,7 +22,7 @@ export function useWeb3ChainId(): number {
   const contextNetwork = useWeb3ReactCore<Web3Provider>(NetworkContextName)
 
   useEffect(() => {
-    setChainId(parseInt(window.ethereum?.networkVersion))
+    setChainId(parseInt(window.ethereum?.networkVersion ?? -1))
   }, [context, contextNetwork])
   return chainId
 }

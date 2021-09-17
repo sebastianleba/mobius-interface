@@ -85,7 +85,12 @@ export function CurrencySearch({
   const bridgeableTokens = useBridgeableTokens()
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-  if (actualChainId !== ChainId.MAINNET && actualChainId !== ChainId.ALFAJORES) {
+  if (
+    (!actualChainId || actualChainId !== -1) &&
+    actualChainId !== ChainId.MAINNET &&
+    actualChainId !== ChainId.ALFAJORES
+  ) {
+    console.log('Im passing')
     tokensToSelect = bridgeableTokens
   }
   useEffect(() => {
