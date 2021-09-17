@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { JSBI, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
 import styled from 'styled-components'
@@ -11,7 +11,6 @@ import useTransactionDeadline from '../../hooks/useTransactionDeadline'
 import { StablePoolInfo, useExpectedTokens } from '../../state/stablePools/hooks'
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
-import { useCurrencyBalance, useTokenBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -34,9 +33,11 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, lpToken } = poolInfo
-  const lpBalance = useTokenBalance(account, lpToken)
+  const lpBalance = poolInfo.amountDeposited
   const [approving, setApproving] = useState(false)
-  const [selectedAmount, setSelectedAmount] = useState<TokenAmount>(new TokenAmount(lpToken, JSBI.BigInt('0')))
+  const [input, setInput] = useState<string>('0')
+  const selectedAmount = tryParseAmount(input, lpToken) || new TokenAmount(lpToken, '0')
+  // const [selectedAmount, setSelectedAmount] = useState<TokenAmount>(new TokenAmount(lpToken, JSBI.BigInt('0')))
 
   const deadline = useTransactionDeadline()
 
@@ -76,7 +77,7 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
 
   return (
     <>
-      <CurrencyRow tokenAmount={selectedAmount} setTokenAmount={(val: TokenAmount) => setSelectedAmount(val)} />
+      <CurrencyRow val={input} token={lpToken} balance={lpBalance} setTokenAmount={setInput} />
       {selectedAmount.greaterThan(JSBI.BigInt('0')) && (
         <div>
           <TYPE.mediumHeader style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
@@ -86,8 +87,9 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
             <>
               <CurrencyRow
                 key={'expected-' + tokenAmount.token.address}
-                tokenAmount={tokenAmount}
-                setTokenAmount={(val: TokenAmount) => null}
+                token={tokenAmount.currency}
+                val={tokenAmount.toExact()}
+                setTokenAmount={(val: string) => null}
                 readOnly={true}
               />
               {i !== expectedTokens.length - 1 && (
@@ -120,9 +122,11 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
 }
 
 type CurrencyRowProps = {
-  tokenAmount: TokenAmount
-  setTokenAmount: (tokenAmount: TokenAmount) => void
+  val: string
+  token: Token
+  setTokenAmount: (tokenAmount: string) => void
   readOnly: boolean | undefined
+  balance?: TokenAmount
 }
 
 const InputRowLeft = styled.div``
@@ -172,15 +176,11 @@ const BalanceText = styled(TYPE.subHeader)`
   cursor: pointer;
 `
 
-const CurrencyRow = ({ tokenAmount, setTokenAmount, readOnly }: CurrencyRowProps) => {
+const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
-  const currency = tokenAmount.currency
-  const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
+  const currency = token
+  const tokenBalance = balance
   const TEN = JSBI.BigInt('10')
-  const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))
-
-  const scaledDown = (num: JSBI) => JSBI.divide(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
-  const scaleUp = (num: JSBI) => JSBI.multiply(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
 
   const mainRow = (
     <InputRow>
@@ -200,10 +200,9 @@ const CurrencyRow = ({ tokenAmount, setTokenAmount, readOnly }: CurrencyRowProps
         <NumericalInput
           className="token-amount-input"
           disabled={readOnly}
-          value={scaledDown(tokenAmount.raw)}
+          value={val}
           onUserInput={(val) => {
-            const amount = tryParseAmount(val, currency)
-            setTokenAmount(amount || ZERO_TOK)
+            setTokenAmount(val)
           }}
         />
       </InputDiv>
@@ -211,7 +210,7 @@ const CurrencyRow = ({ tokenAmount, setTokenAmount, readOnly }: CurrencyRowProps
   )
   const balanceRow = !readOnly && (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <BalanceText onClick={() => setTokenAmount(tokenBalance || ZERO_TOK)}>
+      <BalanceText onClick={() => setTokenAmount(tokenBalance?.exact() || '0')}>
         Balance: {tokenBalance?.toFixed(2)}
       </BalanceText>
     </div>
