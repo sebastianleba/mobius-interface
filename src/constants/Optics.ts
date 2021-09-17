@@ -40,7 +40,7 @@ export const POLYGON_OPTICS: OpticsDomainInfo = {
 }
 
 export const CELO_OPTICS: OpticsDomainInfo = {
-  name: 'Celo Mainnet',
+  name: 'Celo',
   logoUri: celoLogo,
   chainId: 42220,
   bridgeRouter: '0xf244eA81F715F343040569398A4E7978De656bf6',
