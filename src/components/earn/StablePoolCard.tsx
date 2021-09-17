@@ -117,7 +117,7 @@ interface Props {
 
 const quote = (amount: TokenAmount, price?: Price) => {
   if (!price) {
-    return new TokenAmount(price.quoteCurrency, amount.raw)
+    return amount
   }
   const fraction = new Fraction(price.denominator, price.numerator)
   return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
