@@ -21,7 +21,8 @@ export type OpticsDomainInfo = {
 
 export const ETH_OPTICS: OpticsDomainInfo = {
   name: 'Ethereum',
-  logoUri: 'https://etherscan.io/images/svg/brands/ethereum-1.svg',
+  logoUri:
+    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
   chainId: 1,
   bridgeRouter: '0x6a39909e805A3eaDd2b61fFf61147796ca6aBB47',
   domain: 6648936,
@@ -29,7 +30,8 @@ export const ETH_OPTICS: OpticsDomainInfo = {
 
 export const POLYGON_OPTICS: OpticsDomainInfo = {
   name: 'Polygon',
-  logoUri: 'https://polygonscan.com/images/svg/brands/polygon.svg',
+  logoUri:
+    'https://raw.githubusercontent.com/mobiusAMM/mobius-interface/staging/src/assets/images/polygon-chain-logo.png',
   chainId: 137,
   bridgeRouter: '0xf244eA81F715F343040569398A4E7978De656bf6',
   domain: 1886350457,
@@ -37,7 +39,7 @@ export const POLYGON_OPTICS: OpticsDomainInfo = {
 
 export const CELO_OPTICS: OpticsDomainInfo = {
   name: 'Celo Mainnet',
-  logoUri: 'https://explorer.celo.org/images/celo_logo-b3e959fc8694588896dcc6c5db738356.svg?vsn=d',
+  logoUri: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
   chainId: 42220,
   bridgeRouter: '0xf244eA81F715F343040569398A4E7978De656bf6',
   domain: 1667591279,
