@@ -260,14 +260,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {virtualPrice
-                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(virtualPrice).toFixed(0, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(virtualPrice).toFixed(1, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
                 </TYPE.black>
                 <QuestionHelper
                   text={balances
-                    .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                    .map((balance) => `${balance?.toFixed(1, { groupSeparator: ',' })} ${balance.token.symbol}`)
                     .join(', ')}
                 />
               </RowFixed>
@@ -291,7 +291,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {virtualPrice
-                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(0, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(1, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
@@ -347,12 +347,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         {!pegComesAfter && peggedTo}
-                        {priceOf(priceOfStaked).toFixed(0, { groupSeparator: ',' })}
+                        {priceOf(priceOfStaked).toFixed(1, { groupSeparator: ',' })}
                         {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
                         text={userBalances
-                          .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                          .map((balance) => `${balance?.toFixed(1, { groupSeparator: ',' })} ${balance.token.symbol}`)
                           .join(', ')}
                       />
                     </RowFixed>
