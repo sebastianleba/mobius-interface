@@ -1,32 +1,32 @@
-import { cUSD, JSBI } from '@ubeswap/sdk'
+import { Fraction, JSBI, Price, TokenAmount } from '@ubeswap/sdk'
+import CurrencyPoolLogo from 'components/CurrencyPoolLogo'
 import QuestionHelper from 'components/QuestionHelper'
+import { useMobi } from 'hooks/Tokens'
 import React, { useCallback, useState } from 'react'
-import { Link, RouteComponentProps, useLocation } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
+import { useStablePoolInfoByName } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
-import DoubleCurrencyLogo from '../../components/DoubleLogo'
 import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
 import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
 import { RowBetween, RowFixed } from '../../components/Row'
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO } from '../../constants'
-import { usePair } from '../../data/Reserves'
 import { useActiveWeb3React } from '../../hooks'
-import { useCurrency } from '../../hooks/Tokens'
 import { useColor } from '../../hooks/useColor'
 import usePrevious from '../../hooks/usePrevious'
 import { useWalletModalToggle } from '../../state/application/hooks'
-import { usePairDualStakingInfo, usePairStakingInfo } from '../../state/stake/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLinkIcon, TYPE } from '../../theme'
-import { currencyId } from '../../utils/currencyId'
 import { useStakingPoolValue } from './useStakingPoolValue'
 
 const PageWrapper = styled(AutoColumn)`
+  margin-top: 3rem;
   max-width: 640px;
   width: 100%;
 `
@@ -86,26 +86,61 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
+const quote = (price: Price, amount: TokenAmount) => {
+  const fraction = new Fraction(price.denominator, price.numerator)
+  return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
+}
+
+const useQuote = (price: Price) => (amount: TokenAmount) => quote(price, amount)
+
 export default function Manage({
   match: {
-    params: { currencyIdA, currencyIdB },
+    params: { poolName },
   },
-}: RouteComponentProps<{ currencyIdA: string; currencyIdB: string }>) {
+}: RouteComponentProps<{ poolName: string }>) {
   const { account, chainId } = useActiveWeb3React()
-  const location = useLocation()
+  const mobi = useMobi()
 
   // get currencies and pair
-  const [tokenA, tokenB] = [useCurrency(currencyIdA) ?? undefined, useCurrency(currencyIdB) ?? undefined]
+  const stakingInfo = useStablePoolInfoByName(poolName)
 
-  const [, stakingTokenPair] = usePair(tokenA, tokenB)
-  const singleStakingInfo = usePairStakingInfo(stakingTokenPair)
-  const dualStakingInfo = usePairDualStakingInfo(singleStakingInfo)
-  const isDualFarm = location.pathname.includes('dualfarm')
+  const { totalStaked, userStaked } = useStakingPoolValue(stakingInfo)
 
-  const stakingInfo = isDualFarm ? dualStakingInfo : singleStakingInfo
+  const { balances, stakedAmount, totalStakedAmount, tokens } = stakingInfo
+
+  const earnedMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? JSBI.BigInt('0'))
+  let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
+  if (totalStakedAmount && totalStakedAmount.greaterThan('0')) {
+    userMobiRate = new TokenAmount(
+      mobi,
+      JSBI.divide(JSBI.multiply(stakingInfo?.mobiRate, stakedAmount?.raw), totalStakedAmount?.raw)
+    )
+  }
+  const totalMobiRate = new TokenAmount(mobi, stakingInfo.mobiRate ?? JSBI.BigInt('0'))
+
+  const userBalances = balances.map((amount) => {
+    const fraction = new Fraction(stakedAmount.raw, totalStaked?.raw || JSBI.BigInt('0'))
+    const ratio = fraction.multiply(amount.raw)
+    if (JSBI.equal(ratio.denominator, JSBI.BigInt('0'))) {
+      return new TokenAmount(amount.currency, JSBI.BigInt('0'))
+    }
+    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
+  })
+
+  const price1 = useCUSDPrice(tokens[0])
+  const price2 = useCUSDPrice(tokens[1])
+  const price = price1 ?? price2
+  const priceOf = useQuote(price)
+
+  // const [, stakingTokenPair] = usePair(tokenA, tokenB)
+  // const singleStakingInfo = usePairStakingInfo(stakingTokenPair)
+  // const dualStakingInfo = usePairDualStakingInfo(singleStakingInfo)
+  // const isDualFarm = location.pathname.includes('dualfarm')
+
+  //const stakingInfo = isDualFarm ? dualStakingInfo : singleStakingInfo
 
   // detect existing unstaked LP position to show add button if none found
-  const userLiquidityUnstaked = useTokenBalance(account ?? undefined, stakingInfo?.stakedAmount?.token)
+  const userLiquidityUnstaked = useTokenBalance(account ?? undefined, stakingInfo?.lpToken)
   const showAddLiquidityButton = Boolean(stakingInfo?.stakedAmount?.equalTo('0') && userLiquidityUnstaked?.equalTo('0'))
 
   // toggle for staking modal and unstaking modal
@@ -116,20 +151,14 @@ export default function Manage({
   // fade cards if nothing staked or nothing earned yet
   const disableTop = !stakingInfo?.stakedAmount || stakingInfo.stakedAmount.equalTo(JSBI.BigInt(0))
 
-  const token = tokenA === cUSD[chainId] ? tokenB : tokenA
+  const token = stakingInfo.tokens[0]
   const backgroundColor = useColor(token ?? undefined)
 
   // get CUSD value of staked LP tokens
-  const {
-    valueCUSD: valueOfTotalStakedAmountInCUSD,
-    userValueCUSD,
-    userAmountTokenA,
-    userAmountTokenB,
-  } = useStakingPoolValue(stakingInfo)
 
-  const ubeCountUpAmount = stakingInfo?.earnedAmountUbe?.toFixed(6) ?? '0'
-  const ubeCountUpAmountPrevious = usePrevious(ubeCountUpAmount) ?? '0'
-  const countUpAmount = stakingInfo?.earnedAmount?.toFixed(6) ?? '0'
+  const mobiCountUpAmount = earnedMobi?.toFixed(6) ?? '0'
+  const mobiCountUpAmountPrevious = usePrevious(mobiCountUpAmount) ?? '0'
+  const countUpAmount = earnedMobi?.toFixed(6) ?? '0'
   const countUpAmountPrevious = usePrevious(countUpAmount) ?? '0'
 
   const toggleWalletModal = useWalletModalToggle()
@@ -145,10 +174,8 @@ export default function Manage({
   return (
     <PageWrapper gap="lg" justify="center">
       <RowBetween style={{ gap: '24px' }}>
-        <TYPE.mediumHeader style={{ margin: 0 }}>
-          {tokenA?.symbol}-{tokenB?.symbol} Liquidity Mining
-        </TYPE.mediumHeader>
-        <DoubleCurrencyLogo currency0={tokenA ?? undefined} currency1={tokenB ?? undefined} size={24} />
+        <TYPE.mediumHeader style={{ margin: 0 }}>{stakingInfo.name} Liquidity Mining</TYPE.mediumHeader>
+        <CurrencyPoolLogo tokens={stakingInfo.tokens.slice()} size={24} />
       </RowBetween>
 
       <DataRow style={{ gap: '24px' }}>
@@ -156,13 +183,13 @@ export default function Manage({
           <AutoColumn gap="sm">
             <TYPE.body style={{ margin: 0 }}>Total deposits</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
-              {valueOfTotalStakedAmountInCUSD
-                ? `$${
-                    valueOfTotalStakedAmountInCUSD.lessThan('1')
-                      ? valueOfTotalStakedAmountInCUSD.toFixed(2, {
+              {totalStakedAmount
+                ? `${stakingInfo.peggedTo}${
+                    priceOf(totalStakedAmount).lessThan('1')
+                      ? totalStakedAmount.toFixed(2, {
                           groupSeparator: ',',
                         })
-                      : valueOfTotalStakedAmountInCUSD.toFixed(0, {
+                      : totalStakedAmount.toFixed(0, {
                           groupSeparator: ',',
                         })
                   }`
@@ -174,11 +201,10 @@ export default function Manage({
           <AutoColumn gap="sm">
             <TYPE.body style={{ margin: 0 }}>Pool Rate</TYPE.body>
             <TYPE.body fontSize={24} fontWeight={500}>
-              {stakingInfo?.active
-                ? stakingInfo?.ubeRewardRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ??
-                  '-'
+              {stakingInfo
+                ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
                 : '0'}
-              {' UBE / week'}
+              {' MOBI / week'}
             </TYPE.body>
           </AutoColumn>
         </PoolData>
@@ -191,21 +217,15 @@ export default function Manage({
           <CardSection>
             <AutoColumn gap="md">
               <RowBetween>
-                <TYPE.white fontWeight={600}>Step 1. Get UBE-LP Liquidity tokens</TYPE.white>
+                <TYPE.white fontWeight={600}>Step 1. Get MOBI-LP Liquidity tokens</TYPE.white>
               </RowBetween>
               <RowBetween style={{ marginBottom: '1rem' }}>
                 <TYPE.white fontSize={14}>
-                  {`UBE-LP tokens are required. Once you've added liquidity to the ${tokenA?.symbol}-${tokenB?.symbol} pool you can stake your liquidity tokens on this page.`}
+                  {`Mobi-LP tokens are required. Once you've added liquidity to the ${stakingInfo.name} pool you can stake your liquidity tokens on this page.`}
                 </TYPE.white>
               </RowBetween>
-              <ButtonPrimary
-                padding="8px"
-                borderRadius="8px"
-                width={'fit-content'}
-                as={Link}
-                to={`/add/${tokenA && currencyId(tokenA)}/${tokenB && currencyId(tokenB)}`}
-              >
-                {`Add ${tokenA?.symbol}-${tokenB?.symbol} liquidity`}
+              <ButtonPrimary padding="8px" borderRadius="8px" width={'fit-content'} as={Link} to={`/pool`}>
+                {`Add liquidity`}
               </ButtonPrimary>
             </AutoColumn>
           </CardSection>
@@ -249,14 +269,7 @@ export default function Manage({
                     {stakingInfo?.stakedAmount?.toSignificant(6) ?? '-'}
                   </TYPE.white>
                   <RowFixed>
-                    <TYPE.white>
-                      UBE-LP {tokenA?.symbol}-{tokenB?.symbol}
-                    </TYPE.white>
-                    {stakingInfo && (
-                      <PairLinkIcon
-                        href={`https://info.ubeswap.org/pair/${stakingInfo.stakingToken.address.toLowerCase()}`}
-                      />
-                    )}
+                    <TYPE.white>MOBI-LP {stakingInfo.tokens.map(({ symbol }) => symbol).join('-')}</TYPE.white>
                   </RowFixed>
                 </RowBetween>
                 {stakingInfo?.stakedAmount && stakingInfo.stakedAmount.greaterThan('0') && (
@@ -264,16 +277,16 @@ export default function Manage({
                     <RowFixed>
                       <TYPE.white>
                         Current value:{' '}
-                        {userValueCUSD
-                          ? `$${userValueCUSD.toFixed(2, {
+                        {userStaked
+                          ? `${stakingInfo.peggedTo}${priceOf(userStaked).toFixed(2, {
                               separator: ',',
                             })}`
                           : '--'}
                       </TYPE.white>
                       <QuestionHelper
-                        text={`${userAmountTokenA?.toFixed(0, { groupSeparator: ',' })} ${
-                          userAmountTokenA?.token.symbol
-                        }, ${userAmountTokenB?.toFixed(0, { groupSeparator: ',' })} ${userAmountTokenB?.token.symbol}`}
+                        text={userBalances
+                          .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                          .join(', ')}
                       />
                     </RowFixed>
                   </RowBetween>
@@ -288,8 +301,7 @@ export default function Manage({
                 <div>
                   <TYPE.black>Your unclaimed rewards</TYPE.black>
                 </div>
-                {((stakingInfo?.earnedAmount && JSBI.notEqual(BIG_INT_ZERO, stakingInfo?.earnedAmount?.raw)) ||
-                  (stakingInfo?.earnedAmountUbe && JSBI.notEqual(BIG_INT_ZERO, stakingInfo?.earnedAmountUbe?.raw))) && (
+                {stakingInfo?.pendingMobi && JSBI.notEqual(BIG_INT_ZERO, stakingInfo?.pendingMobi) && (
                   <ButtonEmpty
                     padding="8px"
                     borderRadius="8px"
@@ -303,11 +315,11 @@ export default function Manage({
               <RowBetween style={{ alignItems: 'baseline' }}>
                 <TYPE.largeHeader fontSize={36} fontWeight={600}>
                   <CountUp
-                    key={ubeCountUpAmount}
+                    key={mobiCountUpAmount}
                     isCounting
                     decimalPlaces={4}
-                    start={parseFloat(ubeCountUpAmountPrevious)}
-                    end={parseFloat(ubeCountUpAmount)}
+                    start={parseFloat(mobiCountUpAmountPrevious)}
+                    end={parseFloat(mobiCountUpAmount)}
                     thousandsSeparator={','}
                     duration={1}
                   />
@@ -316,15 +328,13 @@ export default function Manage({
                   <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
                     ⚡
                   </span>
-                  {stakingInfo?.active
-                    ? stakingInfo?.ubeRewardRate
-                        ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                        ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                  {stakingInfo
+                    ? userMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
                     : '0'}
-                  {' UBE / week'}
+                  {' MOBI / week'}
                 </TYPE.black>
               </RowBetween>
-              {isDualFarm && (
+              {/* {isDualFarm && (
                 <RowBetween style={{ alignItems: 'baseline' }}>
                   <TYPE.largeHeader fontSize={36} fontWeight={600}>
                     <CountUp
@@ -349,7 +359,7 @@ export default function Manage({
                     {` ${dualStakingInfo?.rewardToken?.symbol} / week`}
                   </TYPE.black>
                 </RowBetween>
-              )}
+              )} */}
             </AutoColumn>
           </StyledBottomCard>
         </BottomSection>
@@ -357,14 +367,14 @@ export default function Manage({
           <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px' }}>
             ⭐️
           </span>
-          When you withdraw, the contract will automagically claim UBE on your behalf!
+          When you withdraw, the contract will automagically claim MOBI on your behalf!
         </TYPE.main>
 
         {!showAddLiquidityButton && (
           <DataRow style={{ marginBottom: '1rem' }}>
-            {stakingInfo && stakingInfo.active && (
+            {stakingInfo && (
               <ButtonPrimary padding="8px" borderRadius="8px" width="160px" onClick={handleDepositClick}>
-                {stakingInfo?.stakedAmount?.greaterThan(JSBI.BigInt(0)) ? 'Deposit' : 'Deposit UBE-LP Tokens'}
+                {stakingInfo?.stakedAmount?.greaterThan(JSBI.BigInt(0)) ? 'Deposit' : 'Deposit MOBI-LP Tokens'}
               </ButtonPrimary>
             )}
 
@@ -380,15 +390,15 @@ export default function Manage({
                 </ButtonPrimary>
               </>
             )}
-            {stakingInfo && !stakingInfo.active && (
+            {/* {stakingInfo && !stakingInfo.active && (
               <TYPE.main style={{ textAlign: 'center' }} fontSize={14}>
                 Staking Rewards inactive for this pair.
               </TYPE.main>
-            )}
+            )} */}
           </DataRow>
         )}
-        {!userLiquidityUnstaked ? null : userLiquidityUnstaked.equalTo('0') ? null : !stakingInfo?.active ? null : (
-          <TYPE.main>{userLiquidityUnstaked.toSignificant(6)} UBE LP tokens available</TYPE.main>
+        {!userLiquidityUnstaked ? null : userLiquidityUnstaked.equalTo('0') ? null : !stakingInfo ? null : (
+          <TYPE.main>{userLiquidityUnstaked.toSignificant(6)} MOBI LP tokens available</TYPE.main>
         )}
       </PositionInfo>
     </PageWrapper>

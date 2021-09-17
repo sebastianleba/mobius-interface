@@ -2,6 +2,7 @@ import { Web3Provider } from '@ethersproject/providers'
 import { InjectedConnector as CEWConnector } from '@ubeswap/injected-connector'
 import { ChainId, parseNetwork } from '@ubeswap/sdk'
 import { InjectedConnector } from '@web3-react/injected-connector'
+import { DevNetworks, MainnetNetworks } from 'constants/NetworkInfo'
 
 import { LedgerConnector } from './ledger/LedgerConnector'
 import { NetworkConnector } from './NetworkConnector'
@@ -16,6 +17,8 @@ const networkChainIDFromHostname: ChainId = window.location.hostname.includes('a
 export const NETWORK_CHAIN_ID: ChainId = process.env.REACT_APP_CHAIN_ID
   ? parseNetwork(parseInt(process.env.REACT_APP_CHAIN_ID))
   : networkChainIDFromHostname
+
+const supportedNetworks = NETWORK_CHAIN_ID === ChainId.ALFAJORES ? DevNetworks : MainnetNetworks
 
 const chainIdToName = (chainId: ChainId): string => {
   switch (chainId) {
@@ -43,12 +46,14 @@ export function getNetworkLibrary(): Web3Provider {
   return (networkLibrary = networkLibrary ?? new Web3Provider(network.provider as any))
 }
 
+const supportedChainIds = supportedNetworks.map((n) => n.chainId)
+
 export const injected = new InjectedConnector({
-  supportedChainIds: [NETWORK_CHAIN_ID],
+  supportedChainIds,
 })
 
 export const celoExtensionWallet = new CEWConnector({
-  supportedChainIds: [NETWORK_CHAIN_ID],
+  supportedChainIds,
 })
 
 export const ledger = new LedgerConnector()
