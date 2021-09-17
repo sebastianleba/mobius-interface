@@ -5,6 +5,7 @@ import { darken } from 'polished'
 import React, { useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
+import Hamburger from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -14,9 +15,11 @@ import { ExternalLink } from 'theme/components'
 
 import Logo from '../../assets/svg/mobius.svg'
 import { useActiveWeb3React } from '../../hooks'
+import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../state/user/hooks'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
+import HamburgerModal from './HamburgerModal'
 import UbeBalanceContent from './UbeBalanceContent'
 
 const HeaderFrame = styled.div`
@@ -268,7 +271,7 @@ export const StyledMenuButton = styled.button`
 export default function Header() {
   const { account, chainId } = useActiveWeb3React()
   const { t } = useTranslation()
-
+  const theme = useTheme()
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
   const [darkMode, toggleDarkMode] = useDarkModeManager()
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
@@ -279,6 +282,7 @@ export default function Header() {
 
   return (
     <HeaderFrame>
+      <HamburgerModal isOpen={toggleMenu} onDismiss={() => setToggleMenu(false)} />
       <Modal isOpen={showUbeBalanceModal} onDismiss={() => setShowUbeBalanceModal(false)}>
         <UbeBalanceContent setShowUbeBalanceModal={setShowUbeBalanceModal} />
       </Modal>
@@ -290,33 +294,47 @@ export default function Header() {
           Mobius
         </Title>
         <HeaderLinks>
-          <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-            {t('swap')}
-          </StyledNavLink>
-          <StyledNavLink
-            id={`pool-nav-link`}
-            to={'/pool'}
-            isActive={(match, { pathname }) =>
-              Boolean(match) ||
-              pathname.startsWith('/add') ||
-              pathname.startsWith('/remove') ||
-              pathname.startsWith('/create') ||
-              pathname.startsWith('/find')
-            }
-          >
-            Pool
-          </StyledNavLink>
-          <StyledNavLink id="bridge-nav-link" to="/optics">
-            Bridge
-          </StyledNavLink>
-          {!isMobile && (
-            <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-              Risks
-            </StyledNavLink>
+          {isMobile ? (
+            <Hamburger
+              isOpen={toggleMenu}
+              menuClicked={() => setToggleMenu(!toggleMenu)}
+              width={18}
+              height={15}
+              strokeWidth={1}
+              rotate={0}
+              color={theme.text1}
+              borderRadius={0}
+              animationDuration={0.5}
+            />
+          ) : (
+            <>
+              <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
+                {t('swap')}
+              </StyledNavLink>
+              <StyledNavLink
+                id={`pool-nav-link`}
+                to={'/pool'}
+                isActive={(match, { pathname }) =>
+                  Boolean(match) ||
+                  pathname.startsWith('/add') ||
+                  pathname.startsWith('/remove') ||
+                  pathname.startsWith('/create') ||
+                  pathname.startsWith('/find')
+                }
+              >
+                Pool
+              </StyledNavLink>
+              <StyledNavLink id="bridge-nav-link" to="/optics">
+                Bridge
+              </StyledNavLink>
+              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+                Risks
+              </StyledNavLink>
+              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+                Airdrop
+              </StyledNavLink>
+            </>
           )}
-          <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-            Airdrop
-          </StyledNavLink>
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
