@@ -79,12 +79,14 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const { chainId } = useActiveWeb3React()
+  console.log('useStablePoolInfoByName')
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
   const totalStakedAmount = useTokenBalance(pool.gaugeAddress, pool.lpToken)
   return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
 }
 
 export function useStablePoolInfo(): readonly StablePoolInfo[] {
+  console.log('useStablePoolInfo')
   const pools = usePools()
   return pools.map((pool) => getPoolInfo(pool))
 }
@@ -98,10 +100,15 @@ export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): 
   )
   useEffect(() => {
     const updateData = async () => {
-      const newTokenAmounts = await contract?.calculateRemoveLiquidity(account, lpAmount.raw.toString())
-      setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt(newTokenAmounts[i].toString()))))
+      try {
+        const newTokenAmounts = await contract?.calculateRemoveLiquidity(account, lpAmount.raw.toString())
+        setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt(newTokenAmounts[i].toString()))))
+      } catch (e) {
+        console.error(e)
+        setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt('0'))))
+      }
     }
-    updateData()
+    lpAmount && lpAmount.raw && updateData()
   }, [account, pool, lpAmount])
   return expectedOut
 }
@@ -112,15 +119,23 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
   const [expectedOut, setExpectedOut] = useState(new TokenAmount(pool.lpToken, JSBI.BigInt('0')))
   useEffect(() => {
     const updateData = async () => {
-      const newExpected = await contract?.calculateTokenAmount(
-        account,
-        tokenAmounts.map((t) => BigInt(t.raw.toString())),
-        isDeposit,
-        { gasLimit: 350000 }
-      )
-      setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
+      try {
+        const newExpected = await contract?.calculateTokenAmount(
+          account,
+          tokenAmounts.map((t) => BigInt(t.raw.toString())),
+          isDeposit,
+          { gasLimit: 350000 }
+        )
+        setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
+      } catch (e) {
+        console.error(e)
+      }
     }
 
+    const validInputs = tokenAmounts.reduce((accum, cur) => accum && !!cur && !!cur.raw, true)
+    if (!validInputs) {
+      return
+    }
     if (!pool.totalDeposited || pool.totalDeposited.equalTo('0')) {
       const expectedOut = tokenAmounts.reduce((accum, cur) => JSBI.add(accum, cur.raw), JSBI.BigInt('0'))
       setExpectedOut(new TokenAmount(pool.lpToken, expectedOut))
