@@ -14,16 +14,18 @@ import styled from 'styled-components'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonPrimary } from '../../components/Button'
+import { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
-import { AutoRow, RowFixed } from '../../components/Row'
+import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
 import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
-import { TYPE } from '../../theme'
+import { ExternalLink, TYPE } from '../../theme'
 import { AppBodyNoBackground } from '../AppBody'
 
 const InstructionButton = styled(ButtonPrimary)`
@@ -34,6 +36,12 @@ const InstructionButton = styled(ButtonPrimary)`
 
 const WalletButton = styled(ButtonPrimary)`
   margin-top: 2rem;
+  margin-bottom: 2rem;
+`
+
+const VoteCard = styled(DataCard)`
+  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #27ae60 0%, #222 100%);
+  overflow: hidden;
   margin-bottom: 2rem;
 `
 
@@ -287,6 +295,27 @@ export default function Optics() {
       <SwapPoolTabs active={'optics'} />
       <AppBodyNoBackground>
         <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
+          <VoteCard>
+            <CardNoise />
+            <CardSection>
+              <AutoColumn gap="md">
+                <RowBetween>
+                  <TYPE.white fontWeight={600}>Optics Bridge</TYPE.white>
+                </RowBetween>
+                <RowBetween>
+                  <TYPE.white fontSize={14}>{`Interface for the recently released Optics Bridge`}</TYPE.white>
+                </RowBetween>
+                <ExternalLink
+                  style={{ color: 'white', textDecoration: 'underline' }}
+                  target="_blank"
+                  href="https://medium.com/celoorg/optics-is-here-42aa610675ce"
+                >
+                  <TYPE.white fontSize={14}>Read more about the Optics Bridge</TYPE.white>
+                </ExternalLink>
+              </AutoColumn>
+            </CardSection>
+            <CardNoise />
+          </VoteCard>
           {actionSteps.slice(0, step + 1).map((action, i) => (
             <div key={`action-${i}`} style={{ opacity: step !== i ? 0.9 : 1 }}>
               {action}
