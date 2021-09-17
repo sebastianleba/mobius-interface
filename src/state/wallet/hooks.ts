@@ -1,6 +1,7 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { UBE } from 'constants/tokens'
 import { useEffect, useMemo, useState } from 'react'
+import { useBlockNumber } from 'state/application/hooks'
 
 import ERC20_INTERFACE from '../../constants/abis/erc20'
 import { useActiveWeb3React } from '../../hooks'
@@ -12,14 +13,15 @@ import { useMultipleContractSingleData } from '../multicall/hooks'
 export function useTokenBalanceSingle(address?: string, token?: Token | undefined): TokenAmount | undefined {
   const tokenContract = useTokenContract(token?.address ?? undefined)
   const [tokenBalance, setTokenBalance] = useState<TokenAmount>()
+  const block = useBlockNumber()
   useEffect(() => {
     const update = async () => {
       const amt = await tokenContract?.balanceOf(address)
       const balance = JSBI.BigInt(amt?.toString() || '0')
       setTokenBalance(new TokenAmount(token, balance))
     }
-    token && update()
-  }, [address, token])
+    token && address && update()
+  }, [address, token, block])
   return token ? tokenBalance : undefined
 }
 

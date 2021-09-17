@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Token } from '@ubeswap/sdk'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { OpticsDomainInfo } from 'constants/Optics'
@@ -44,8 +44,9 @@ export default function Optics() {
   const chainId = useWeb3ChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
-
-  const [selectedToken, setSelectedToken] = useState<TokenAmount>()
+  const [val, setVal] = useState<string>()
+  const [baseToken, setBaseToken] = useState<Token>()
+  const selectedToken = tryParseAmount(val, baseToken)
   const [baseChain, setBaseChain] = useState<OpticsDomainInfo>()
   const [targetChain, setTargetChain] = useState<OpticsDomainInfo>()
   const [recipientAddress, setRecipientAddress] = useState<string>('')
@@ -64,7 +65,7 @@ export default function Optics() {
         })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Bridged ${selectedToken?.token.symbol} to ${targetChain?.name}`,
+            summary: `Bridged ${baseToken.symbol} to ${targetChain?.name}`,
           })
           setAttempting(false)
           setHash(response.hash)
@@ -77,7 +78,7 @@ export default function Optics() {
   }
 
   const baseChainInfo: NetworkInfo = networkInfo[baseChain?.chainId]
-  const tokenBalance = useTokenBalanceSingle(account, selectedToken?.token)
+  const tokenBalance = useTokenBalanceSingle(account ?? undefined, baseToken)
 
   const instructions = [
     'Select blockchains',
@@ -173,11 +174,6 @@ export default function Optics() {
     }
   }, [attemptingTxn, swapErrorMessage, tradeToConfirm, txHash])
 
-  const handleInputSelect = useCallback((inputCurrency) => {
-    setApprovalSubmitted(false) // reset 2 step UI for approvals
-    //onCurrencySelection(Field.INPUT, inputCurrency)
-  }, [])
-
   const listOfSteps = instructions.map((instruction, i) => (
     <RowFixed key={`instruction-${i}`} marginBottom="0.5rem" opacity={i === step ? 1 : 0.6}>
       <InstructionButton disabled={i > step} onClick={() => i < step && setStep(i)} marginRight="1rem">
@@ -229,14 +225,13 @@ export default function Optics() {
     <CurrencyInputPanel
       key="bridge-token-input"
       label="Token"
-      value={selectedToken?.toFixed(2)}
+      value={val || '0.00'}
       onUserInput={(value: string) => {
-        const parsedAmount = tryParseAmount(value, selectedToken?.token)
-        setSelectedToken(parsedAmount)
+        setVal(value)
       }}
-      onMax={() => setSelectedToken(tokenBalance)}
-      onCurrencySelect={(currency) => setSelectedToken(new TokenAmount(currency, '0'))}
-      currency={selectedToken?.token}
+      onMax={() => setVal(tokenBalance?.raw.toString())}
+      onCurrencySelect={(currency) => setBaseToken(currency, '0')}
+      currency={baseToken}
       id={`Bridge-intput-${baseChain?.chainId}`}
       showMaxButton={!selectedToken?.equalTo(tokenBalance?.raw || '0')}
     />,
@@ -265,13 +260,17 @@ export default function Optics() {
     <ButtonConfirmed
       key="bridge-send"
       onClick={onSend}
-      disabled={attemping}
+      disabled={
+        attemping || JSBI.greaterThan(selectedToken?.raw || JSBI.BigInt('1'), tokenBalance?.raw || JSBI.BigInt('0'))
+      }
       width="100%"
       altDisabledStyle={attemping} // show solid button while waiting
       confirmed={!!hash}
       marginTop="1rem"
     >
-      {attemping ? (
+      {JSBI.greaterThan(selectedToken?.raw || JSBI.BigInt('1'), tokenBalance?.raw || JSBI.BigInt('0')) ? (
+        'Insufficient Funds'
+      ) : attemping ? (
         <AutoRow gap="6px" justify="center">
           Sending <Loader stroke="white" />
         </AutoRow>
