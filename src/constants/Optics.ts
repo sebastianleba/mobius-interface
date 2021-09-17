@@ -96,6 +96,18 @@ export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
       },
       []
     ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'WBTC',
+        name: 'Wrapped BTC',
+        address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        chainId: MultiChainIds.ETHEREUM,
+        logoURI:
+          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
+        decimals: 8,
+      },
+      []
+    ),
   ],
   [MultiChainIds.POLYGON]: [
     new WrappedTokenInfo(
