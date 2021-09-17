@@ -3,6 +3,7 @@ import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -305,9 +306,14 @@ export default function Header() {
           >
             Pool
           </StyledNavLink>
-          <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-            Risks
+          <StyledNavLink id="bridge-nav-link" to="/optics">
+            Bridge
           </StyledNavLink>
+          {!isMobile && (
+            <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+              Risks
+            </StyledNavLink>
+          )}
           <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
             Airdrop
           </StyledNavLink>

@@ -2,7 +2,6 @@ import { DappKitResponseStatus } from '@celo/utils'
 import { ErrorBoundary } from '@sentry/react'
 import React, { Suspense } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
-import { UpdateClaim } from 'state/claim/updater'
 import styled from 'styled-components'
 
 import Header from '../components/Header'
@@ -17,6 +16,7 @@ import Claim from './Claim'
 import Earn from './Earn'
 import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
+import Optics from './Optics'
 import RiskPage from './Risk'
 import Swap from './Swap'
 import { RedirectToSwap } from './Swap/redirects'
@@ -85,7 +85,7 @@ export default function App() {
   }, [location])
 
   UpdatePools()
-  UpdateClaim()
+  // UpdateClaim()
 
   return (
     <Suspense fallback={null}>
@@ -118,6 +118,7 @@ export default function App() {
                     <Route exact strict path="/risk" component={RiskPage} />
                     <Route path="/claim" component={Claim} />
                     <Route exact strict path="/farm/:poolName" component={Manage} />
+                    <Route exact strict path="/optics" component={Optics} />
                     {/* <Route component={RedirectPathToSwapOnly} /> */}
                   </>
                 )}

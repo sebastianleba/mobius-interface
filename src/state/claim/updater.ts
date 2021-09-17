@@ -20,10 +20,6 @@ export function UpdateClaim(): null {
   // automatically update lists if versions are minor/patch
   useEffect(() => {
     const updateClaim = async (vesting: VestingEscrow | undefined, type: VestType) => {
-      console.log({
-        vesting,
-        type,
-      })
       if (!vesting || !account) return
       const initialLocked = JSBI.BigInt(await vesting?.['initial_locked'](account))
       const unclaimed = JSBI.BigInt(await vesting?.['balanceOf'](account))
@@ -31,13 +27,6 @@ export function UpdateClaim(): null {
         JSBI.subtract(initialLocked, JSBI.BigInt(await vesting?.['lockedOf'](account))),
         unclaimed
       )
-      console.log({
-        type,
-        allocatedAmount: initialLocked,
-        claimedAmount: claimed,
-        unclaimedAmount: unclaimed,
-      })
-
       dispatch(
         update({
           type,
@@ -50,10 +39,6 @@ export function UpdateClaim(): null {
       )
     }
     Object.entries(VestingAddresses).forEach(([type, addresses]) => {
-      console.log({
-        type,
-        address: addresses[chainId],
-      })
       const vestingContract = claimContract?.attach(addresses[chainId])
       updateClaim(vestingContract, parseInt(type))
     })

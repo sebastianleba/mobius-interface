@@ -1,12 +1,48 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { UBE } from 'constants/tokens'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import ERC20_INTERFACE from '../../constants/abis/erc20'
 import { useActiveWeb3React } from '../../hooks'
 import { useAllTokens } from '../../hooks/Tokens'
+import { useTokenContract } from '../../hooks/useContract'
 import { isAddress } from '../../utils'
 import { useMultipleContractSingleData } from '../multicall/hooks'
+
+export function useTokenBalanceSingle(address?: string, token?: Token | undefined): TokenAmount | undefined {
+  const tokenContract = useTokenContract(token?.address ?? undefined)
+  const [tokenBalance, setTokenBalance] = useState<TokenAmount>()
+  useEffect(() => {
+    const update = async () => {
+      const amt = await tokenContract?.balanceOf(address)
+      const balance = JSBI.BigInt(amt?.toString() || '0')
+      setTokenBalance(new TokenAmount(token, balance))
+    }
+    token && update()
+  }, [address, token])
+  return token ? tokenBalance : undefined
+}
+
+export function useTokenBalanceDirect(
+  address?: string,
+  tokens?: (Token | undefined)[]
+): [{ [tokenAddress: string]: TokenAmount | undefined }, boolean] {
+  const tokenContract = useTokenContract(tokens.length > 0 ? tokens[0].address : undefined)
+  const [tokenBalances, setTokenBalances] = useState<{ [tokenAddress: string]: TokenAmount | undefined }>()
+  const loading = false
+  useEffect(() => {
+    const updateToken = async (token: Token) => {
+      const contract = tokenContract?.attach(token.address)
+      const balance = JSBI.BigInt((await contract?.balanceOf(address))?.toString() || '0')
+      setTokenBalances({
+        ...tokenBalances,
+        [token.address]: new TokenAmount(token, balance),
+      })
+    }
+    tokens?.filter((t) => !!t).forEach((t) => updateToken(t))
+  }, [address, tokens])
+  return tokenBalances ? [tokenBalances, loading] : [{}, loading]
+}
 
 /**
  * Returns a map of token addresses to their eventually consistent token balances for a single account.

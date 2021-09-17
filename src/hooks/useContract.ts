@@ -5,6 +5,7 @@ import { MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
+import BRIDGE_ROUTER from '../constants/abis/BridgeRouter.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
@@ -21,6 +22,7 @@ import STABLE_SWAP from '../constants/abis/Swap.json'
 import VESTING_ABI from '../constants/abis/VestingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
+  BridgeRouter,
   Erc20,
   ERC20MOBI,
   GaugeController,
@@ -66,6 +68,10 @@ export function useLiquidityGaugeContract(address?: string, withSignerIfPossible
   return useContract(address, LIQUIDITY_GAUGE_V3.abi, withSignerIfPossible) as LiquidityGaugeV3
 }
 
+export function useBridgeRouterContract(address?: string, withSignerIfPossible?: boolean): BridgeRouter | null {
+  return useContract(address, BRIDGE_ROUTER.abi, withSignerIfPossible) as BridgeRouter
+}
+
 export function useMobiContract(address?: string, withSignerIfPossible?: boolean): ERC20MOBI | null {
   const mobi = useMobi()
   return useContract(address ?? mobi?.address, ERC20_MOBI.abi, withSignerIfPossible) as ERC20MOBI
@@ -79,7 +85,7 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
   const { chainId } = useActiveWeb3React()
-  const fallBackAddress = chainId === ChainId.MAINNET ? '' : '0xc8900166F7a9A6ac3Bf137DFD7E5d08c1b25553C'
+  const fallBackAddress = chainId === ChainId.MAINNET ? '' : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 
