@@ -175,12 +175,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } catch (e) {
     console.error('Weekly apy overflow', e)
   }
-
-  const userBalances = balances.map((amount) => {
-    const fraction = new Fraction(stakedAmount.raw, totalDeposited.raw)
-    const ratio = fraction.multiply(amount.raw)
-    return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
-  })
+  let userBalances: TokenAmount[] = []
+  if (totalDeposited.greaterThan('0')) {
+    userBalances = balances.map((amount) => {
+      const fraction = new Fraction(stakedAmount.raw, totalDeposited.raw)
+      const ratio = fraction.multiply(amount.raw)
+      return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
+    })
+  }
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -194,22 +196,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // const apyFraction = poolInfo.apr || undefined
   // const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
   const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
-
-  // const dpy = apy
-  //   ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
-  //   : undefined
-
-  // let weeklyAPY: React.ReactNode | undefined = <>🤯</>
-  // try {
-  //   weeklyAPY = apy
-  //     ? new Percent(
-  //         Math.floor(parseFloat(apy.divide('52').add('1').toFixed(10)) ** 52 * 1_000_000).toFixed(0),
-  //         '1000000'
-  //       ).toFixed(0, { groupSeparator: ',' })
-  //     : undefined
-  // } catch (e) {
-  //   console.error('Weekly apy overflow', e)
-  // }
 
   return (
     <Wrapper

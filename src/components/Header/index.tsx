@@ -357,7 +357,7 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => window.open('https://bridge-celo.web.app/', '_blank')}>
+        <StyledMenuButton onClick={() => window.open('https://bridge.moss.earth/', '_blank')}>
           {darkMode ? '🌉' : '🌁'}
         </StyledMenuButton>
 

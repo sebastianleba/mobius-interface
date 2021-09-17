@@ -33,7 +33,7 @@ export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
-      name: 'USD Pool',
+      name: 'USDC Pool',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
       tokens: [
         new WrappedTokenInfo(
@@ -66,6 +66,52 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         18,
         'MobLP',
         'Mobius cUSD/cUSDC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+    },
+    {
+      name: 'USDT Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D',
+            decimals: 18,
+            symbol: 'cUSDT',
+            name: 'Tether',
+            logoURI: 'https://bit.ly/3AMrCyD',
+          },
+          []
+        ),
+      ],
+      address: '0xdBF27fD2a702Cc02ac7aCF0aea376db780D53247',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0xC7a4c6EF4A16Dc24634Cc2A951bA5Fec4398f7e0',
+        18,
+        'MobLP',
+        'Mobius cUSD/cUSDT LP'
       ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
