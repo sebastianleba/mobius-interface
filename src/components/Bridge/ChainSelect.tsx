@@ -8,6 +8,7 @@ import styled, { css, keyframes } from 'styled-components'
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import { useActiveWeb3React } from '../../hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
+import { TYPE } from '../../theme'
 import { RowBetween } from '../Row'
 import NetworkSelectModal from './NetworkSelectModal'
 
@@ -85,6 +86,7 @@ const NetworkSelect = styled.button<{
   ${({ theme }) => theme.mediaWidth.upToSmall`
     padding: 0 0.5rem;
   `}
+  padding: 1rem;
 
   :focus,
   :hover {
@@ -203,9 +205,16 @@ export function ChainSelect({ selectedNetwork, setSelectedNetwork, otherSelected
           setModalOpen(true)
         }}
       >
-        <RowBetween>
+        <RowBetween style={{ padding: '1rem' }}>
           {!!selectedNetwork && <NetworkLogo network={selectedNetwork} style={{ marginRight: 'auto' }} />}
-          {selectedNetwork ? selectedNetwork.name : 'Select a chain'} <StyledDropDown selected={!!selectedNetwork} />
+          {selectedNetwork ? (
+            <TYPE.mediumHeader flex={1} marginRight="auto">
+              {selectedNetwork.name}{' '}
+            </TYPE.mediumHeader>
+          ) : (
+            'Select a chain'
+          )}{' '}
+          <StyledDropDown selected={!!selectedNetwork} />
         </RowBetween>
       </NetworkSelect>
     </>
