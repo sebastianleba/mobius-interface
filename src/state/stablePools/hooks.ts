@@ -121,7 +121,7 @@ export function useExpectedLpTokens(pool: StablePoolInfo, tokenAmounts: TokenAmo
       setExpectedOut(new TokenAmount(pool.lpToken, JSBI.BigInt(newExpected?.toString() || '0')))
     }
 
-    if (pool.totalStakedAmount.equalTo('0')) {
+    if (!pool.totalDeposited || pool.totalDeposited.equalTo('0')) {
       const expectedOut = tokenAmounts.reduce((accum, cur) => JSBI.add(accum, cur.raw), JSBI.BigInt('0'))
       setExpectedOut(new TokenAmount(pool.lpToken, expectedOut))
     } else {

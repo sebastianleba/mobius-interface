@@ -33,8 +33,8 @@ export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
-      name: 'USDC Pool',
-      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
+      name: 'USDC (Optics Bridge) Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7'],
       tokens: [
         new WrappedTokenInfo(
           {
@@ -50,22 +50,114 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e',
-            decimals: 18,
+            address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
+            decimals: 6,
             symbol: 'cUSDC',
-            name: 'US Dollar Coin',
+            name: 'US Dollar Coin (Optics Bridge)',
             logoURI: 'https://bit.ly/3CwGimW',
           },
           []
         ),
       ],
-      address: '0x0ff04189Ef135b6541E56f7C638489De92E9c778',
+      address: '0xA5037661989789d0310aC2B796fa78F1B01F195D',
       lpToken: new Token(
         ChainId.MAINNET,
-        '0x635aec36c4b61bac5eB1C3EEe191147d006F8a21',
+        '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4',
         18,
         'MobLP',
-        'Mobius cUSD/cUSDC LP'
+        'Mobius cUSD/cUSDC(O) LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
+      peggedTo: '$',
+      pegComesAfter: false,
+    },
+    {
+      name: 'BTC Pool',
+      tokenAddresses: ['0xd629eb00deced2a080b7ec630ef6ac117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xd629eb00deced2a080b7ec630ef6ac117e614f1b',
+            decimals: 18,
+            symbol: 'cBTC',
+            name: 'Wrapped Bitcoin',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cBTC.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
+            decimals: 8,
+            symbol: 'wBTC(O)',
+            name: 'Wrapped Bitcoin (Optics Bride)',
+            logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
+          },
+          []
+        ),
+      ],
+      address: '0x19260b9b573569dDB105780176547875fE9fedA3',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x8cD0E2F11ed2E896a8307280dEEEE15B27e46BbE',
+        18,
+        'MobLP',
+        'Mobius cBTC/wBTC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('8')],
+      peggedTo: '$',
+      pegComesAfter: false,
+    },
+    {
+      name: 'ETH Pool',
+      tokenAddresses: ['0x2def4285787d58a2f811af24755a8150622f4361', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x2def4285787d58a2f811af24755a8150622f4361',
+            decimals: 18,
+            symbol: 'cETH',
+            name: 'Wrapped Ethereum',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cETH.svg',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4',
+            decimals: 18,
+            symbol: 'wETH',
+            name: 'Wrapped Ether (Optics Bridge)',
+            logoURI: 'https://etherscan.io/token/images/weth_28.png',
+          },
+          []
+        ),
+      ],
+      address: '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x846b784Ab5302155542c1B3952B54305F220fd84',
+        18,
+        'MobLP',
+        'Mobius cETH/wETH LP'
       ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
@@ -79,7 +171,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: false,
     },
     {
-      name: 'USDT Pool',
+      name: 'USDT (Moss Bridge) Pool',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D'],
       tokens: [
         new WrappedTokenInfo(
@@ -98,8 +190,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D',
             decimals: 18,
-            symbol: 'cUSDT',
-            name: 'Tether',
+            symbol: 'cUSDTm',
+            name: 'Tether (Moss Bridge)',
             logoURI: 'https://bit.ly/3AMrCyD',
           },
           []
@@ -112,6 +204,52 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         18,
         'MobLP',
         'Mobius cUSD/cUSDT LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+    },
+    {
+      name: 'USDC (Moss Bridge) Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e',
+            decimals: 18,
+            symbol: 'cUSDCm',
+            name: 'US Dollar Coin (Moss Bridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x0ff04189Ef135b6541E56f7C638489De92E9c778',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x635aec36c4b61bac5eB1C3EEe191147d006F8a21',
+        18,
+        'MobLP',
+        'Mobius cUSD/cUSDC LP'
       ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
