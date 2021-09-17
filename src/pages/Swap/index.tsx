@@ -443,7 +443,7 @@ export default function Swap() {
                 <Text fontSize={20} fontWeight={500} color={isValid && actionLabel && (isDarkMode ? 'black' : 'white')}>
                   {swapInputError
                     ? swapInputError
-                    : priceImpactSeverity > 3 && !isExpertMode
+                    : priceImpactSeverity > 3 && isExpertMode
                     ? `Price Impact Too High`
                     : `${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
                 </Text>

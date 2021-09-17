@@ -24,6 +24,8 @@ import QuestionHelper from '../QuestionHelper'
 import { RowBetween, RowFixed } from '../Row'
 import Toggle from '../Toggle'
 
+const TEN = JSBI.BigInt('10')
+
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
   padding: 1rem;
@@ -140,7 +142,20 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
                 tokenAmount={selectedAmounts[i]}
                 setTokenAmount={(val: TokenAmount) => {
                   if (useEqualAmount) {
-                    setSelectedAmounts(poolInfo.tokens.map((token) => new TokenAmount(token, val.raw)))
+                    const decimals = val.token.decimals
+                    setSelectedAmounts(
+                      poolInfo.tokens.map((token) => {
+                        let scaledAmount = val.raw
+                        const d1 = JSBI.BigInt(decimals)
+                        const d2 = JSBI.BigInt(token.decimals)
+                        if (token.decimals < decimals) {
+                          scaledAmount = JSBI.divide(val.raw, JSBI.exponentiate(TEN, JSBI.subtract(d1, d2)))
+                        } else if (token.decimals > decimals) {
+                          scaledAmount = JSBI.multiply(val.raw, JSBI.exponentiate(TEN, JSBI.subtract(d2, d1)))
+                        }
+                        return new TokenAmount(token, scaledAmount)
+                      })
+                    )
                   } else {
                     setSelectedAmounts([
                       ...selectedAmounts.slice(0, i),

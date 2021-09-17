@@ -115,12 +115,15 @@ interface Props {
   poolInfo: StablePoolInfo
 }
 
-const quote = (price: Price, amount: TokenAmount) => {
+const quote = (amount: TokenAmount, price?: Price) => {
+  if (!price) {
+    return amount
+  }
   const fraction = new Fraction(price.denominator, price.numerator)
   return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
 }
 
-const useQuote = (price: Price) => (amount: TokenAmount) => quote(price, amount)
+const useQuote = (price?: Price) => (amount: TokenAmount) => quote(amount, price)
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { account, chainId } = useActiveWeb3React()
