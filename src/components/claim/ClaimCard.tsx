@@ -161,7 +161,7 @@ export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
             </RowBetween>
             <RowBetween>
               <TYPE.white fontSize={14}>
-                {`To reward our early users for adding liqudity to Mobius pools, we have decided to retroactively reward these users with the MOBI token. These tokens are linearly vesting over a two week period.`}
+                {`To reward our early users for adding liqudity to Mobius pools, we have decided to retroactively reward these users with the MOBI token. These tokens are linearly vesting over a one week period.`}
               </TYPE.white>
             </RowBetween>
             <ExternalLink
