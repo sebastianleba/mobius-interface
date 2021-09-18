@@ -8,7 +8,7 @@ import checkedLogo from '../../assets/svg/mobius.svg'
 import { useActiveWeb3React } from '../../hooks'
 import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
 import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
-import { useCurrencyBalance } from '../../state/wallet/hooks'
+import { useTokenBalanceSingle } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import { isTokenOnList } from '../../utils'
 import Column from '../Column'
@@ -100,8 +100,7 @@ function CurrencyRow({
   const selectedTokenList = useCombinedActiveList()
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
   const customAdded = useIsUserAddedToken(currency)
-  // Changed
-  const balance = useCurrencyBalance(account ?? undefined, currency)
+  const balance = useTokenBalanceSingle(account ?? undefined, currency)
   if (isSelected || otherSelected)
     currency = {
       ...currency,
