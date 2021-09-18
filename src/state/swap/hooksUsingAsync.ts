@@ -81,8 +81,7 @@ export function tryParseAmount(value?: string, currency?: Token): TokenAmount | 
     return undefined
   }
   try {
-    const typedValue = value //value.startsWith('0.') ? '0' : value
-    const typedValueParsed = parseUnits(typedValue, currency.decimals).toString()
+    const typedValueParsed = parseUnits(value, currency.decimals).toString()
     if (typedValueParsed !== '0') {
       return new TokenAmount(currency as Token, JSBI.BigInt(typedValueParsed))
     }

@@ -1,12 +1,10 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { TokenAmount } from '@ubeswap/sdk'
-import { useMobi } from 'hooks/Tokens'
 import React, { useState } from 'react'
-import { StablePoolInfo } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useLiquidityGaugeContract } from '../../hooks/useContract'
+import { useStakingContract } from '../../hooks/useContract'
+import { StakingInfo } from '../../state/stake/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
@@ -24,11 +22,11 @@ const ContentWrapper = styled(AutoColumn)`
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
-  stakingInfo: StablePoolInfo
+  stakingInfo: StakingInfo
 }
 
 export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
-  const { account, chainId } = useActiveWeb3React()
+  const { account } = useActiveWeb3React()
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
@@ -41,17 +39,13 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
     onDismiss()
   }
 
-  const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
-  stakingContract?.['withdraw(uint256,bool)']
-  const mobi = useMobi()
-  const { stakedAmount } = stakingInfo
-  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi)
-  const withdrawFunction = stakingContract?.['withdraw(uint256,bool)']
+  const stakingContract = useStakingContract(stakingInfo.stakingRewardAddress)
 
   async function onWithdraw() {
     if (stakingContract && stakingInfo?.stakedAmount) {
       setAttempting(true)
-      await withdrawFunction(stakedAmount.raw.toString(), true, { gasLimit: 3000000 })
+      await stakingContract
+        .exit({ gasLimit: 3000000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Withdraw deposited liquidity`,
@@ -89,24 +83,24 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
               <TYPE.body>Deposited liquidity:</TYPE.body>
             </AutoColumn>
           )}
-          {pendingMobi && (
+          {stakingInfo?.earnedAmountUbe && (
             <AutoColumn justify="center" gap="md">
               <TYPE.body fontWeight={600} fontSize={36}>
-                {<FormattedCurrencyAmount currencyAmount={pendingMobi} />}
+                {<FormattedCurrencyAmount currencyAmount={stakingInfo?.earnedAmountUbe} />}
               </TYPE.body>
-              <TYPE.body>Unclaimed MOBI</TYPE.body>
+              <TYPE.body>Unclaimed UBE</TYPE.body>
             </AutoColumn>
           )}
-          {/* {stakingInfo?.dualRewards && stakingInfo?.earnedAmount && (
+          {stakingInfo?.dualRewards && stakingInfo?.earnedAmount && (
             <AutoColumn justify="center" gap="md">
               <TYPE.body fontWeight={600} fontSize={36}>
                 {<FormattedCurrencyAmount currencyAmount={stakingInfo?.earnedAmount} />}
               </TYPE.body>
               <TYPE.body>Unclaimed {stakingInfo?.rewardToken?.symbol}</TYPE.body>
             </AutoColumn>
-          )} */}
+          )}
           <TYPE.subHeader style={{ textAlign: 'center' }}>
-            When you withdraw, your MOBI is claimed and your liquidity is removed from the mining pool.
+            When you withdraw, your UBE is claimed and your liquidity is removed from the mining pool.
           </TYPE.subHeader>
           <ButtonError disabled={!!error} error={!!error && !!stakingInfo?.stakedAmount} onClick={onWithdraw}>
             {error ?? 'Withdraw & Claim'}
@@ -116,8 +110,8 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Withdrawing {stakingInfo?.stakedAmount?.toSignificant(4)} MOBI-LP</TYPE.body>
-            <TYPE.body fontSize={20}>Claiming {pendingMobi.toSignificant(4)} MOBI</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrawing {stakingInfo?.stakedAmount?.toSignificant(4)} UBE-LP</TYPE.body>
+            <TYPE.body fontSize={20}>Claiming {stakingInfo?.earnedAmount?.toSignificant(4)} UBE</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -125,8 +119,8 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
         <SubmittedView onDismiss={wrappedOndismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Withdrew MOBI-LP!</TYPE.body>
-            <TYPE.body fontSize={20}>Claimed MOBI!</TYPE.body>
+            <TYPE.body fontSize={20}>Withdrew UBE-LP!</TYPE.body>
+            <TYPE.body fontSize={20}>Claimed UBE!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

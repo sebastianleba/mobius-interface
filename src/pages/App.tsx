@@ -12,11 +12,8 @@ import Web3ReactManager from '../components/Web3ReactManager'
 import { UpdatePools } from '../state/stablePools/updater'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
-import Claim from './Claim'
 import Earn from './Earn'
-import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
-import Optics from './Optics'
 import RiskPage from './Risk'
 import Swap from './Swap'
 import { RedirectToSwap } from './Swap/redirects'
@@ -85,7 +82,6 @@ export default function App() {
   }, [location])
 
   UpdatePools()
-  // UpdateClaim()
 
   return (
     <Suspense fallback={null}>
@@ -116,9 +112,6 @@ export default function App() {
                     <Route exact strict path="/pool" component={Earn} />
                     <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
                     <Route exact strict path="/risk" component={RiskPage} />
-                    <Route path="/claim" component={Claim} />
-                    <Route exact strict path="/farm/:poolName" component={Manage} />
-                    <Route exact strict path="/optics" component={Optics} />
                     {/* <Route component={RedirectPathToSwapOnly} /> */}
                   </>
                 )}

@@ -9,7 +9,13 @@ import chunkArray from '../../utils/chunkArray'
 import { CancelledError, retry, RetryableError } from '../../utils/retry'
 import { useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
-import { Call, fetchingMulticallResults, parseCallKey, updateMulticallResults } from './actions'
+import {
+  Call,
+  errorFetchingMulticallResults,
+  fetchingMulticallResults,
+  parseCallKey,
+  updateMulticallResults,
+} from './actions'
 
 // chunk calls so we do not exceed the gas limit
 const CALL_CHUNK_SIZE = 500
@@ -33,7 +39,7 @@ async function fetchChunk(
     )
   } catch (error) {
     console.debug('Failed to fetch chunk inside retry', error)
-    // throw error
+    throw error
   }
   if (resultsBlockNumber.toNumber() < minBlockNumber) {
     console.debug(`Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`)
@@ -186,13 +192,13 @@ export default function Updater(): null {
               return
             }
             console.error('Failed to fetch multicall chunk', chunk, chainId, error)
-            // dispatch(
-            //   errorFetchingMulticallResults({
-            //     calls: chunk,
-            //     chainId,
-            //     fetchingBlockNumber: latestBlockNumber,
-            //   })
-            // )
+            dispatch(
+              errorFetchingMulticallResults({
+                calls: chunk,
+                chainId,
+                fetchingBlockNumber: latestBlockNumber,
+              })
+            )
           })
         return cancel
       }),

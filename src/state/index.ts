@@ -3,7 +3,6 @@ import { load, save } from 'redux-localstorage-simple'
 
 import application from './application/reducer'
 import burn from './burn/reducer'
-import claim from './claim/reducer'
 import { updateVersion } from './global/actions'
 import lists from './lists/reducer'
 import mint from './mint/reducer'
@@ -26,7 +25,6 @@ const store = configureStore({
     multicall,
     lists,
     stablePools,
-    claim,
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_KEYS })],
   preloadedState: load({ states: PERSISTED_KEYS }),

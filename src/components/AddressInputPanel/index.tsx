@@ -1,10 +1,9 @@
 import { getBlockscoutLink } from '@ubeswap/sdk'
-import { networkInfo } from 'constants/NetworkInfo'
 import useENS from 'hooks/useENS'
 import React, { useCallback, useContext } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import { useActiveWeb3React } from '../../hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
 import { RowBetween } from '../Row'
@@ -80,12 +79,8 @@ export default function AddressInputPanel({
 }) {
   const { chainId } = useActiveWeb3React()
   const theme = useContext(ThemeContext)
-  const { address, loading, name } = useENS(value)
 
-  const otherChainId = useWeb3ChainId()
-  const { explorer } = networkInfo[otherChainId]
-  const explorerLink =
-    chainId === otherChainId ? getBlockscoutLink(chainId, name ?? address, 'address') : `${explorer}address/${address}`
+  const { address, loading, name } = useENS(value)
 
   const handleInput = useCallback(
     (event) => {
@@ -108,7 +103,10 @@ export default function AddressInputPanel({
                 Recipient
               </TYPE.black>
               {address && chainId && (
-                <ExternalLink href={explorerLink} style={{ fontSize: '14px' }}>
+                <ExternalLink
+                  href={getBlockscoutLink(chainId, name ?? address, 'address')}
+                  style={{ fontSize: '14px' }}
+                >
                   (View on Celo Explorer)
                 </ExternalLink>
               )}
