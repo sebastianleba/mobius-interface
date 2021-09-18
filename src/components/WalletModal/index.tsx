@@ -1,3 +1,4 @@
+import { ChainId } from '@ubeswap/sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
 import { ValoraConnector } from 'connectors/valora/ValoraConnector'
@@ -130,7 +131,9 @@ export default function WalletModal({
   ENSName?: string
 }) {
   // important that these are destructed from the account-specific web3-react context
-  const { active, account, connector, activate, error } = useWeb3React()
+  const { active, account, connector, activate, error, chainId } = useWeb3React()
+
+  const bridgeOnly = chainId && chainId !== 0 && chainId !== ChainId.ALFAJORES && chainId !== ChainId.MAINNET
 
   const [walletView, setWalletView] = useState(WALLET_VIEWS.ACCOUNT)
 

@@ -54,13 +54,6 @@ export const useCirculatingSupply = (): TokenAmount | undefined => {
   if (!lockedBalancesSum || !released || !noncirculatingSupply) {
     return undefined
   }
-
-  console.log({
-    lockedBalancesSum,
-    released,
-    noncirculatingSupply,
-  })
-
   return ube
     ? new TokenAmount(
         ube,

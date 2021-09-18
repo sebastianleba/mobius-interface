@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react'
+import { ChainId } from '@ubeswap/sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
 import { ValoraConnector } from 'connectors/valora/ValoraConnector'
@@ -119,8 +120,10 @@ function StatusIcon({ connector }: { connector: AbstractConnector }) {
 
 function Web3StatusInner() {
   const { t } = useTranslation()
-  const { account, connector, error } = useWeb3React()
+  const { account, connector, error, chainId } = useWeb3React()
   const { summary } = useAccountSummary(account ?? undefined)
+
+  const bridgeOnly = chainId && chainId !== 0 && chainId !== ChainId.ALFAJORES && chainId !== ChainId.MAINNET
 
   const allTransactions = useAllTransactions()
 
@@ -157,6 +160,13 @@ function Web3StatusInner() {
       <Web3StatusError onClick={toggleWalletModal}>
         <NetworkIcon />
         <Text>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error'}</Text>
+      </Web3StatusError>
+    )
+  } else if (bridgeOnly) {
+    return (
+      <Web3StatusError onClick={toggleWalletModal}>
+        <NetworkIcon />
+        <Text>This network should only be selected while on the Bridge tab</Text>
       </Web3StatusError>
     )
   } else {

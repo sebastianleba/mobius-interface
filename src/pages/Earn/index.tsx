@@ -2,6 +2,7 @@ import { ErrorBoundary } from '@sentry/react'
 import { JSBI } from '@ubeswap/sdk'
 import { partition } from 'lodash'
 import React, { useMemo } from 'react'
+import Countdown from 'react-countdown'
 import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
 
@@ -15,6 +16,11 @@ import { useStablePoolInfo } from '../../state/stablePools/hooks'
 import { MOO_LP1, MOO_LP2, POOF_DUAL_LP, StakingInfo, useStakingInfo } from '../../state/stake/hooks'
 import { TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
+
+const StyledCountdown = styled(Countdown)`
+  font-size: 3rem;
+  text-align: center;
+`
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -62,6 +68,9 @@ flex-direction: column;
 export default function Earn() {
   // staking info for connected account
   const stakingInfos = useStakingInfo()
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
+  const now = new Date()
+  const isLive = now >= launchTime
 
   // toggle copy if rewards are inactive
   const stakingRewardsExist = true
@@ -142,7 +151,10 @@ export default function Earn() {
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}
-
+      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
+        <TYPE.largeHeader>Farming Launches Soon!</TYPE.largeHeader>
+        <StyledCountdown date={launchTime} />
+      </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
           {sortedStablePools && sortedStablePools?.length === 0 ? (

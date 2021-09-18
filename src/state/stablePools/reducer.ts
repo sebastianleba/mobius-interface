@@ -1,9 +1,15 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { Token, TokenAmount } from '@ubeswap/sdk'
+import { Fraction, Token, TokenAmount } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { initPool, updateVariableData } from './actions'
+
+export type StableStakingInfo = {
+  userStaked: JSBI
+  totalMobiRate: JSBI
+  pendingMobi: JSBI
+}
 
 export type StableSwapVariable = {
   balances: JSBI[]
@@ -13,6 +19,7 @@ export type StableSwapVariable = {
   virtualPrice: JSBI
   aPrecise: JSBI
   feesGenerated: TokenAmount
+  staking?: StableStakingInfo
 }
 
 export type StableSwapMathConstants = {
@@ -34,6 +41,9 @@ export type StableSwapConstants = StableSwapMathConstants & {
   lpToken: Token
   peggedTo: string
   pegComesAfter: boolean | undefined
+  displayDecimals: number
+  gaugeAddress?: string
+  relativeGaugeWeight?: Fraction
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
