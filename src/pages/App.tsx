@@ -9,7 +9,6 @@ import Polling from '../components/Header/Polling'
 import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
-import { UpdatePools } from '../state/stablePools/updater'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import Claim from './Claim'
@@ -84,7 +83,6 @@ export default function App() {
     }
   }, [location])
 
-  UpdatePools()
   // UpdateClaim()
 
   return (

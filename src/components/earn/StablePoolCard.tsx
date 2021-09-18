@@ -150,7 +150,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOf = useQuote(price)
 
   const mobi = useMobi()
-  const userLP = useTokenBalance(account ? account : '', poolInfo.lpToken)
+  const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
   const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -180,16 +180,17 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } catch (e) {
     console.error('Weekly apy overflow', e)
   }
+  console.log('hi')
   let userBalances: TokenAmount[] = []
   //TODO: fix here
   if (totalDeposited.greaterThan('0')) {
     userBalances = balances.map((amount) => {
-      if (userLP) console.log('steak', userLP.toExact())
       const fraction = new Fraction(userLP ? userLP.raw : JSBI.BigInt(0), totalDeposited.raw)
       const ratio = fraction.multiply(amount.raw)
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
+  const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -354,9 +355,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         {!pegComesAfter && peggedTo}
-                        {userBalances
-                          .map((x) => Number(x.toFixed(displayDecimals)))
-                          .reduce((prev, cur) => prev + cur, 0)}
+                        {balance}
                         {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
