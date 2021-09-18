@@ -1,5 +1,6 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
+import { useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { OpticsDomainInfo } from 'constants/Optics'
@@ -21,7 +22,7 @@ import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
@@ -50,7 +51,8 @@ export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
   const { account } = useActiveWeb3React()
-  const chainId = useWeb3ChainId()
+  const { chainId } = useWeb3React()
+  //const chainId = useWeb3ChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
   const [val, setVal] = useState<string>()
