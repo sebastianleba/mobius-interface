@@ -68,7 +68,7 @@ flex-direction: column;
 export default function Earn() {
   // staking info for connected account
   const stakingInfos = useStakingInfo()
-  const launchTime = new Date(Date.UTC(2021, 8, 18, 2))
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = now >= launchTime
 
