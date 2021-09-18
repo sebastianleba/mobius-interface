@@ -17,6 +17,17 @@ export function useActiveWeb3React(): Web3ReactContextInterface<Web3Provider> & 
   }
 }
 
+export function useWeb3ChainId(): number {
+  const [chainId, setChainId] = useState<number>(parseInt(window.ethereum?.networkVersion))
+  const context = useWeb3ReactCore<Web3Provider>()
+  const contextNetwork = useWeb3ReactCore<Web3Provider>(NetworkContextName)
+
+  useEffect(() => {
+    setChainId(parseInt(window.ethereum?.networkVersion ?? -1))
+  }, [context, contextNetwork])
+  return chainId
+}
+
 export function useEagerConnect() {
   const { activate, active } = useWeb3ReactCore() // specifically using useWeb3ReactCore because of what this hook does
   const [tried, setTried] = useState(false)

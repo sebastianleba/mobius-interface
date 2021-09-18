@@ -79,7 +79,7 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
 
   return (
     <ContractKitProvider
-      networks={NETWORK_CHAIN_ID === ChainId.ALFAJORES ? [Alfajores] : [Mainnet]}
+      networks={NETWORK_CHAIN_ID === ChainId.ALFAJORES ? [Alfajores] : [Mainnet]} //MainnetNetworks}
       dappName="Mobius"
       dappDescription="Mobius is a cross-chain stableswap DeFi exchange on Celo."
       dappUrl="https://mobius.money"

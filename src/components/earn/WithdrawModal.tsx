@@ -6,9 +6,7 @@ import { CloseIcon, TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
-import QuestionHelper from '../QuestionHelper'
-import { RowBetween, RowFixed } from '../Row'
-import Toggle from '../Toggle'
+import { RowBetween } from '../Row'
 import WithdrawLP from './WithdrawLP'
 import WithdrawTokens from './WithdrawTokens'
 
@@ -43,7 +41,7 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
             <TYPE.largeHeader>Withdraw from {poolInfo.name}</TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          <RowBetween>
+          {/* <RowBetween>
             <RowFixed>
               <TYPE.subHeader fontWeight={400} fontSize={14}>
                 By Token Amount
@@ -51,7 +49,7 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
               <QuestionHelper text="Withdraw by specific token amounts rather than LP tokens." />
             </RowFixed>
             <Toggle id="toggle-equal-amount-button" isActive={byToken} toggle={() => setByToken(!byToken)} />
-          </RowBetween>
+          </RowBetween> */}
           {byToken ? (
             <WithdrawTokens poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
           ) : (

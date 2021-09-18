@@ -146,9 +146,9 @@ export default function LandingPage() {
           <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
             Open Mobius
           </StyledMenuButton>
-          <ComingSoon href="https://bridge.moss.earth/" target="_blank">
+          <StyledMenuButton id={`home-nav-link`} to={'/optics'}>
             Bridge Assets
-          </ComingSoon>
+          </StyledMenuButton>
         </>
       ) : (
         <StyledCountdown date={launchTime} />
