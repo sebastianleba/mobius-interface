@@ -24,6 +24,7 @@ export interface StablePoolInfo {
   readonly stakedAmount: TokenAmount
   readonly totalVolume?: TokenAmount
   readonly peggedTo: string
+  readonly displayDecimals: number
   readonly virtualPrice: TokenAmount
   readonly priceOfStaked: TokenAmount
   readonly balances: TokenAmount[]
@@ -76,6 +77,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
+  displayDecimals: pool.displayDecimals,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
