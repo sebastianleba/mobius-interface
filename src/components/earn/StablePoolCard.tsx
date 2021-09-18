@@ -140,7 +140,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
   } = poolInfo
-  console.log('t', totalDeposited.toExact())
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -185,13 +184,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   //TODO: fix here
   if (totalDeposited.greaterThan('0')) {
     userBalances = balances.map((amount) => {
-      console.log(amount.toExact())
       if (userLP) console.log('steak', userLP.toExact())
-      console.log('tota', totalDeposited.toExact())
       const fraction = new Fraction(userLP ? userLP.raw : JSBI.BigInt(0), totalDeposited.raw)
-      console.log('frac', fraction.toFixed(18))
       const ratio = fraction.multiply(amount.raw)
-      console.log('he', JSBI.divide(ratio.numerator, ratio.denominator).toString())
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
@@ -208,7 +203,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // const apyFraction = poolInfo.apr || undefined
   // const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
   const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
-  console.log(displayDecimals, 's')
   return (
     <Wrapper
       showBackground={true}
@@ -269,7 +263,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <TYPE.black>Total deposited</TYPE.black>
               <RowFixed>
                 <TYPE.black>
-                  {console.log('pee4', totalDeposited.toFixed(displayDecimals))}
                   {totalDeposited
                     ? `${!pegComesAfter ? peggedTo : ''}${totalDeposited.toFixed(displayDecimals, {
                         groupSeparator: ',',
