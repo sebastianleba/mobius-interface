@@ -190,6 +190,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     })
   }
   const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
+  const totalBalance = balances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -203,6 +204,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // const apyFraction = poolInfo.apr || undefined
   // const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
   const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
+
+  const formatNumber = (num: string) => {
+    return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  }
   return (
     <Wrapper
       showBackground={true}
@@ -264,9 +269,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {totalDeposited
-                    ? `${!pegComesAfter ? peggedTo : ''}${totalDeposited.toFixed(displayDecimals, {
-                        groupSeparator: ',',
-                      })} ${pegComesAfter ? peggedTo : ''}`
+                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalBalance.toFixed(displayDecimals))} ${
+                        pegComesAfter ? peggedTo : ''
+                      }`
                     : '-'}
                 </TYPE.black>
                 <QuestionHelper
@@ -354,7 +359,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         {!pegComesAfter && peggedTo}
-                        {balance}
+                        {balance.toFixed(displayDecimals)}
                         {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
