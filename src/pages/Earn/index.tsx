@@ -147,7 +147,6 @@ export default function Earn() {
   // <DataRow style={{ alignItems: 'baseline' }}>
   //         <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Coming Soon!</TYPE.mediumHeader>
   //       </DataRow>
-  console.log('hello')
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}

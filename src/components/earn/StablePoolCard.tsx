@@ -180,7 +180,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } catch (e) {
     console.error('Weekly apy overflow', e)
   }
-  console.log('hi')
   let userBalances: TokenAmount[] = []
   //TODO: fix here
   if (totalDeposited.greaterThan('0')) {
