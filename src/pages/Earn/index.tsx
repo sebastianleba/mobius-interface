@@ -68,7 +68,7 @@ flex-direction: column;
 export default function Earn() {
   // staking info for connected account
   const stakingInfos = useStakingInfo()
-  const launchTime = new Date(Date.UTC(2021, 8, 18, 2))
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = now >= launchTime
 
@@ -152,7 +152,7 @@ export default function Earn() {
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
-        <TYPE.largeHeader>Farming Launches Today!</TYPE.largeHeader>
+        <TYPE.largeHeader>Farming Launches Soon!</TYPE.largeHeader>
         <StyledCountdown date={launchTime} />
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>

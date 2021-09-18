@@ -185,7 +185,6 @@ export function ChainSelect({ selectedNetwork, setSelectedNetwork, otherSelected
   const { account } = useActiveWeb3React()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
-  console.log(networkColors[selectedNetwork?.chainId as MultiChainIds])
   return (
     <>
       <NetworkSelectModal
