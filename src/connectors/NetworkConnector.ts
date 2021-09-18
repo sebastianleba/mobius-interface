@@ -1,7 +1,9 @@
 import { ContractKit, newKit } from '@celo/contractkit'
-import { CHAIN_INFO, ChainId } from '@ubeswap/sdk'
+import { ChainId } from '@ubeswap/sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import { ConnectorUpdate } from '@web3-react/types'
+import { networkInfo } from 'constants/NetworkInfo'
+import { MultiChainIds } from 'constants/Optics'
 import invariant from 'tiny-invariant'
 
 import { NETWORK_CHAIN_ID } from '.'
@@ -33,7 +35,7 @@ interface BatchItem {
 
 export class MiniRpcProvider implements AsyncSendable {
   public readonly isMetaMask: false = false
-  public readonly chainId: ChainId
+  public readonly chainId: MultiChainIds
   public readonly url: string
   public readonly host: string
   public readonly path: string
@@ -44,9 +46,9 @@ export class MiniRpcProvider implements AsyncSendable {
   private batchTimeoutId: ReturnType<typeof setTimeout> | null = null
   private batch: BatchItem[] = []
 
-  constructor(chainId: ChainId, batchWaitTimeMs?: number) {
+  constructor(chainId: MultiChainIds, batchWaitTimeMs?: number) {
     this.chainId = chainId
-    const url = (this.url = CHAIN_INFO[chainId].fornoURL)
+    const url = (this.url = networkInfo[chainId].rpcUrl)
     const parsed = new URL(url)
     this.host = parsed.host
     this.path = parsed.pathname
@@ -149,18 +151,22 @@ export class MiniRpcProvider implements AsyncSendable {
 }
 
 export class NetworkConnector extends AbstractConnector {
-  private readonly providers: { [chainId in ChainId]: MiniRpcProvider }
+  private readonly providers: { [chainId in MultiChainIds]: MiniRpcProvider }
   currentChainId: ChainId
 
   constructor({ defaultChainId }: NetworkConnectorArguments) {
     invariant(defaultChainId, 'defaultChainId is a required argument')
-    super({ supportedChainIds: Object.keys(CHAIN_INFO).map((k): number => Number(k)) })
+    super({ supportedChainIds: Object.keys(MultiChainIds).map((k): number => Number(k)) })
 
     this.currentChainId = defaultChainId ?? NETWORK_CHAIN_ID
     this.providers = {
-      [ChainId.MAINNET]: new MiniRpcProvider(ChainId.MAINNET),
-      [ChainId.ALFAJORES]: new MiniRpcProvider(ChainId.ALFAJORES),
-      [ChainId.BAKLAVA]: new MiniRpcProvider(ChainId.BAKLAVA),
+      [MultiChainIds.CELO]: new MiniRpcProvider(MultiChainIds.CELO),
+      [MultiChainIds.ALFAJORES]: new MiniRpcProvider(MultiChainIds.ALFAJORES),
+      [MultiChainIds.BAKLAVA]: new MiniRpcProvider(MultiChainIds.BAKLAVA),
+      [MultiChainIds.ETHEREUM]: new MiniRpcProvider(MultiChainIds.ETHEREUM),
+      [MultiChainIds.POLYGON]: new MiniRpcProvider(MultiChainIds.POLYGON),
+      [MultiChainIds.RINKEBY]: new MiniRpcProvider(MultiChainIds.RINKEBY),
+      [MultiChainIds.KOVAN]: new MiniRpcProvider(MultiChainIds.KOVAN),
     }
   }
 

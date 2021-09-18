@@ -1,6 +1,7 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
 import { ChainId } from '@ubeswap/sdk'
+import { useWeb3React } from '@web3-react/core'
 import { MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
@@ -41,7 +42,7 @@ import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account } = useActiveWeb3React()
+  const { library, account } = useWeb3React()
 
   return useMemo(() => {
     if (!address || !ABI || !library) return null

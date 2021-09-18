@@ -22,7 +22,6 @@ import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
-import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
@@ -49,7 +48,9 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const { account } = useActiveWeb3React()
+  const test = useWeb3React()
+  console.log(test)
+  const { account } = test
   const { chainId } = useWeb3React()
   //const chainId = useWeb3ChainId()
   const tokens = useBridgeableTokens()

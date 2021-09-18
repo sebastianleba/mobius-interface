@@ -6,7 +6,7 @@ import { useActiveWeb3React } from '../../hooks'
 import { useMulticallContract } from '../../hooks/useContract'
 import useDebounce from '../../hooks/useDebounce'
 import chunkArray from '../../utils/chunkArray'
-import { CancelledError, retry, RetryableError } from '../../utils/retry'
+import { CancelledError, retry } from '../../utils/retry'
 import { useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
 import { Call, fetchingMulticallResults, parseCallKey, updateMulticallResults } from './actions'
@@ -31,15 +31,16 @@ async function fetchChunk(
     ;[resultsBlockNumber, returnData] = await multicallContract.aggregate(
       chunk.map((obj) => [obj.address, obj.callData])
     )
+    console.log({ resultsBlockNumber, returnData })
   } catch (error) {
     console.debug('Failed to fetch chunk inside retry', error)
     // throw error
   }
-  if (resultsBlockNumber.toNumber() < minBlockNumber) {
-    console.debug(`Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`)
-    throw new RetryableError('Fetched for old block number')
-  }
-  return { results: returnData, blockNumber: resultsBlockNumber.toNumber() }
+  // if (resultsBlockNumber.toNumber() < minBlockNumber) {
+  //   console.debug(`Fetched results for old block number: ${resultsBlockNumber.toString()} vs. ${minBlockNumber}`)
+  //   throw new RetryableError('Fetched for old block number')
+  // }
+  return { results: returnData, blockNumber: resultsBlockNumber }
 }
 
 /**

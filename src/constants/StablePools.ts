@@ -386,6 +386,79 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.BAKLAVA]: [],
 }
 
+export const TOKENS: { [chain in ChainId]: { [address: string]: Token } } = {
+  [ChainId.MAINNET]: {
+    ['0x765DE816845861e75A25fCA122bb6898B8B1282a']: new WrappedTokenInfo(
+      {
+        chainId: ChainId.MAINNET,
+        address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+        decimals: 18,
+        symbol: 'cUSD',
+        name: 'Celo Dollar',
+        logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+      },
+      []
+    ),
+    ['0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7']: new WrappedTokenInfo(
+      {
+        chainId: ChainId.MAINNET,
+        address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
+        decimals: 6,
+        symbol: 'cUSDC',
+        name: 'US Dollar Coin (Optics Bridge)',
+        logoURI: 'https://bit.ly/3CwGimW',
+      },
+      []
+    ),
+    ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b']: new WrappedTokenInfo(
+      {
+        chainId: ChainId.MAINNET,
+        address: '0xD629eb00dEced2a080B7EC630eF6aC117e614f1b',
+        decimals: 18,
+        symbol: 'cBTC',
+        name: 'Wrapped Bitcoin',
+        logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cBTC.png',
+      },
+      []
+    ),
+    ['0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE']: new WrappedTokenInfo(
+      {
+        chainId: ChainId.MAINNET,
+        address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
+        decimals: 8,
+        symbol: 'wBTC(O)',
+        name: 'Wrapped Bitcoin (Optics Bride)',
+        logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
+      },
+      []
+    ),
+    ['0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D']: new WrappedTokenInfo(
+      {
+        chainId: ChainId.MAINNET,
+        address: '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D',
+        decimals: 18,
+        symbol: 'cUSDTm',
+        name: 'Tether (Moss Bridge)',
+        logoURI: 'https://bit.ly/3AMrCyD',
+      },
+      []
+    ),
+    ['0x93DB49bE12B864019dA9Cb147ba75cDC0506190e']: new WrappedTokenInfo(
+      {
+        chainId: ChainId.MAINNET,
+        address: '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e',
+        decimals: 18,
+        symbol: 'cUSDCm',
+        name: 'US Dollar Coin (Moss Bridge)',
+        logoURI: 'https://bit.ly/3CwGimW',
+      },
+      []
+    ),
+  },
+  [ChainId.ALFAJORES]: {},
+  [ChainId.BAKLAVA]: {},
+}
+
 export const STAKED_CELO_POOL: StablePoolInfo = {
   name: 'Staked CELO Pool',
   poolAddress: '0x000',
