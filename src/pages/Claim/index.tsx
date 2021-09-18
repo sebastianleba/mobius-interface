@@ -35,23 +35,6 @@ flex-direction: column;
 `};
 `
 
-// {stakedPools.length > 0 && (
-//   <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
-//     <DataRow style={{ alignItems: 'baseline' }}>
-//       <TYPE.mediumHeader style={{ marginTop: '0.5rem' }}>Your Pools</TYPE.mediumHeader>
-//       <div>{/* TODO(igm): show TVL here */}</div>
-//     </DataRow>
-
-//     <PoolSection>
-//       {stakedPools.map((pool) => (
-//         <ErrorBoundary key={pool.stakingRewardAddress}>
-//           <PoolCard stakingInfo={pool} />
-//         </ErrorBoundary>
-//       ))}
-//     </PoolSection>
-//   </AutoColumn>
-// )}
-
 export default function Earn() {
   const { pathname } = useLocation()
   const type = pathname.includes('founder')
