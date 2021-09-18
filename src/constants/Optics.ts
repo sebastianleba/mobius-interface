@@ -76,7 +76,42 @@ export const RINKEBY_OPTICS: OpticsDomainInfo = {
 export const OpticsDevDomains = [ALFAJORES_OPTICS, KOVAN_OPTICS, RINKEBY_OPTICS]
 
 export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
-  [MultiChainIds.CELO]: [],
+  [MultiChainIds.CELO]: [
+    new WrappedTokenInfo(
+      {
+        symbol: 'USDC',
+        name: 'US Dollar Coin',
+        address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
+        chainId: MultiChainIds.CELO,
+        logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
+        decimals: 6,
+      },
+      []
+    ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'wETH',
+        name: 'Wrapped Ether',
+        address: '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4',
+        chainId: MultiChainIds.CELO,
+        logoURI: 'https://etherscan.io/token/images/weth_28.png',
+        decimals: 18,
+      },
+      []
+    ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'WBTC',
+        name: 'Wrapped BTC',
+        address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
+        chainId: MultiChainIds.CELO,
+        logoURI:
+          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
+        decimals: 8,
+      },
+      []
+    ),
+  ],
   [MultiChainIds.ETHEREUM]: [
     new WrappedTokenInfo(
       {
