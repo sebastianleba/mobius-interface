@@ -107,9 +107,9 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
     error = error ?? 'Enter an amount'
   }
 
-  if (insufficientFunds) {
-    error = 'Insufficient Funds'
-  }
+  // if (insufficientFunds) {
+  //   error = 'Insufficient Funds'
+  // }
 
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
@@ -144,7 +144,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
                     setInput([...input.slice(0, i), val, ...input.slice(i + 1)])
                   }
                 }}
-                setUsingInsufficientFunds={setInsufficientFunds}
+                // setUsingInsufficientFunds={setInsufficientFunds}
               />
               {i !== selectedAmounts.length - 1 && (
                 <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>
@@ -255,7 +255,7 @@ const BalanceText = styled(TYPE.subHeader)`
 
 const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
-  const currency = token
+  const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')
   const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))
