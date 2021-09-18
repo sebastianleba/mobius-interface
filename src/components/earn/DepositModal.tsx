@@ -1,7 +1,7 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import CurrencyLogo from 'components/CurrencyLogo'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
@@ -68,23 +68,6 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const deadline = useTransactionDeadline()
 
   const expectedLPTokens = useExpectedLpTokens(poolInfo, selectedAmounts)
-
-  useEffect(() => {
-    console.log({ selectedAmounts })
-  }, [selectedAmounts])
-  useEffect(() => {
-    console.log({ amounts })
-  }, [amounts])
-
-  // useEffect(() => {
-  //   console.log(amounts)
-  //   setSelectedAmounts(
-  //     poolInfo.tokens.map((t, i) => {
-  //       const parsed = tryParseAmount(amounts[i], t)
-  //       return parsed ?? new TokenAmount(t, '0')
-  //     })
-  //   )
-  // }, [amounts])
 
   const handleUserInput = (i: number) => (val: string) => {
     let newTokenAmount: TokenAmount[]
