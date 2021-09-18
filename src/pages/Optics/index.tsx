@@ -69,6 +69,7 @@ export default function Optics() {
   async function onSend() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
+      console.log(selectedToken?.raw.toString())
       setAttempting(true)
       await bridgeContract
         .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {
@@ -240,7 +241,7 @@ export default function Optics() {
       onUserInput={(value: string) => {
         setVal(value)
       }}
-      onMax={() => setVal(tokenBalance?.raw.toString())}
+      onMax={() => setVal(tokenBalance?.toExact())}
       onCurrencySelect={(currency) => setBaseToken(currency, '0')}
       currency={baseToken}
       id={`Bridge-intput-${baseChain?.chainId}`}
@@ -307,7 +308,7 @@ export default function Optics() {
               <RowBetween>
                 <TYPE.white
                   fontSize={14}
-                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in beta.`}</TYPE.white>
+                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in alpha.`}</TYPE.white>
               </RowBetween>
               <ExternalLink
                 style={{ color: 'white', textDecoration: 'underline' }}
