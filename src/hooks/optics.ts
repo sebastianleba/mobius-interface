@@ -14,7 +14,6 @@ export const useBridgeableTokens = (): { [address: string]: Token } => {
   const chainId = useWeb3ChainId()
   const tokenList: Token[] = BridgeableTokens[chainId] as any as Token[]
   if (!chainId || chainId === -1) return null
-  console.log('chain', chainId)
   const tokenMap: { [address: string]: Token } = {}
   if (!tokenMap!) return null
   tokenList.forEach((token) => (tokenMap[token.address] = token))

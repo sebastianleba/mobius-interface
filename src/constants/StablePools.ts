@@ -77,6 +77,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
     },
     {
       name: 'BTC Pool',
@@ -122,7 +123,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('8')],
       peggedTo: '₿',
-      pegComesAfter: false,
+      pegComesAfter: true,
+      displayDecimals: 3,
     },
     {
       name: 'ETH Pool',
@@ -169,6 +171,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: 'Ξ',
       pegComesAfter: true,
+      displayDecimals: 2,
     },
     {
       name: 'USDT (Moss Bridge) Pool',
@@ -215,6 +218,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
     },
     {
       name: 'USDC (Moss Bridge) Pool',
@@ -261,6 +265,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
     },
   ],
   [ChainId.ALFAJORES]: [
@@ -311,6 +316,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: true,
       gaugeAddress: '0x1a567D4F6870Cd3eC1aD82f3CF8fF0EbCCbBfEcF',
       relativeGaugeWeight: new Fraction('1', '10'),
+      displayDecimals: 0,
     },
     {
       name: 'USD Pool',
@@ -372,6 +378,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
       gaugeAddress: '0x97Ae8F2962B8e6951CaF1868f31bD3DfD4093489',
       relativeGaugeWeight: new Fraction('9', '10'),
     },
