@@ -206,7 +206,7 @@ export default function Optics() {
       <div style={{ height: '2rem' }} key="separator" />
     ) : (
       <WalletButton
-        key="wallet-button"
+        key="wallet-button-asdsad"
         onClick={async () => {
           try {
             await window.ethereum?.request({
@@ -328,7 +328,7 @@ export default function Optics() {
         )}
         <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
           {actionSteps.slice(0, step + 1).map((action, i) => (
-            <div key={`action-${i}`} style={{ opacity: step !== i ? 0.9 : 1 }}>
+            <div key={`action-${i}-asdas`} style={{ opacity: step !== i ? 0.9 : 1 }}>
               {action}
             </div>
           ))}

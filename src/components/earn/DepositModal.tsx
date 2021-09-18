@@ -13,7 +13,7 @@ import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hoo
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { useUserTransactionTTL } from '../../state/user/hooks'
-import { useTokenBalanceDirect, useTokenBalanceSingle } from '../../state/wallet/hooks'
+import { useCurrencyBalance, useTokenBalanceDirect } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -179,7 +179,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             <div style={{ display: 'flex' }}>
               {toApprove.map((i) => (
                 <ApprovalButton
-                  key={i}
+                  key={`Approval-modal-${i}`}
                   disabled={approving}
                   onClick={async () => {
                     setApproving(true)
@@ -276,7 +276,7 @@ const BalanceText = styled(TYPE.subHeader)`
 const CurrencyRow = ({ tokenAmount, token, setTokenAmount }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
   const currency = token
-  const tokenBalance = useTokenBalanceSingle(account ?? undefined, currency ?? undefined)
+  const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')
   const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))
 

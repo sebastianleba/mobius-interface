@@ -35,7 +35,7 @@ const chainIdToName = (chainId: ChainId): string => {
 
 export const NETWORK_CHAIN_NAME: string = chainIdToName(NETWORK_CHAIN_ID)
 
-console.log('Loading Ubeswap interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
+console.log('Loading Mobius interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
 
 export const network = new NetworkConnector({
   defaultChainId: NETWORK_CHAIN_ID,
@@ -53,7 +53,7 @@ export const injected = new InjectedConnector({
 })
 
 export const celoExtensionWallet = new CEWConnector({
-  supportedChainIds,
+  supportedChainIds: [NETWORK_CHAIN_ID],
 })
 
 export const ledger = new LedgerConnector()

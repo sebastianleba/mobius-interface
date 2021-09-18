@@ -109,7 +109,7 @@ export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): 
       }
     }
     lpAmount && lpAmount.raw && updateData()
-  }, [account, pool, lpAmount, contract, tokens])
+  }, [account, lpAmount])
   return expectedOut
 }
 

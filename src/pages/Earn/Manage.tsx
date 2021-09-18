@@ -315,7 +315,7 @@ export default function Manage({
               <RowBetween style={{ alignItems: 'baseline' }}>
                 <TYPE.largeHeader fontSize={36} fontWeight={600}>
                   <CountUp
-                    key={mobiCountUpAmount}
+                    key={`${mobiCountUpAmount}-countup`}
                     isCounting
                     decimalPlaces={4}
                     start={parseFloat(mobiCountUpAmountPrevious)}
