@@ -123,7 +123,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('8')],
       peggedTo: '₿',
-      pegComesAfter: false,
+      pegComesAfter: true,
       displayDecimals: 3,
     },
     {
