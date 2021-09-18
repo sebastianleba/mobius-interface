@@ -1,6 +1,7 @@
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useBlockNumber } from 'state/application/hooks'
 
 import { STATIC_POOL_INFO } from '../../constants/StablePools'
 import { Erc20, Swap } from '../../generated'
@@ -12,16 +13,15 @@ import {
   useMobiContract,
   useStableSwapContract,
 } from '../../hooks/useContract'
-import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import { AppDispatch } from '../index'
 import { initPool } from './actions'
 import { StableSwapConstants } from './reducer'
 
 const SECONDS_PER_BLOCK = JSBI.BigInt('5')
 
-export function UpdatePools(): null {
+export default function UpdatePools(): null {
   const { library, chainId, account } = useActiveWeb3React()
-  const blockNumber = useCurrentBlockTimestamp()
+  const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
   const poolContract = useStableSwapContract(pools[0].address)
@@ -112,7 +112,7 @@ export function UpdatePools(): null {
       //const swapContract = getContract(pool.address, SWAP.abi, library) as any
       updatePool(pool, poolContract?.attach(pool.address), lpTokenContract?.attach(pool.lpToken.address))
     })
-  }, [pools, library, blockNumber])
+  }, [blockNumber, library])
 
   return null
 }

@@ -1,5 +1,6 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Token } from '@ubeswap/sdk'
+import { useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { OpticsDomainInfo } from 'constants/Optics'
@@ -14,16 +15,18 @@ import styled from 'styled-components'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonPrimary } from '../../components/Button'
+import { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
-import { AutoRow, RowFixed } from '../../components/Row'
+import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import { useActiveWeb3React } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
-import { TYPE } from '../../theme'
+import { ExternalLink, TYPE } from '../../theme'
 import { AppBodyNoBackground } from '../AppBody'
 
 const InstructionButton = styled(ButtonPrimary)`
@@ -37,15 +40,23 @@ const WalletButton = styled(ButtonPrimary)`
   margin-bottom: 2rem;
 `
 
+const VoteCard = styled(DataCard)`
+  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #27ae60 0%, #222 100%);
+  overflow: hidden;
+  margin-top: 2rem;
+`
+
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
   const { account } = useActiveWeb3React()
-  const chainId = useWeb3ChainId()
+  const { chainId } = useWeb3React()
+  //const chainId = useWeb3ChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
-
-  const [selectedToken, setSelectedToken] = useState<TokenAmount>()
+  const [val, setVal] = useState<string>()
+  const [baseToken, setBaseToken] = useState<Token>()
+  const selectedToken = tryParseAmount(val, baseToken)
   const [baseChain, setBaseChain] = useState<OpticsDomainInfo>()
   const [targetChain, setTargetChain] = useState<OpticsDomainInfo>()
   const [recipientAddress, setRecipientAddress] = useState<string>('')
@@ -64,7 +75,7 @@ export default function Optics() {
         })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Bridged ${selectedToken?.token.symbol} to ${targetChain?.name}`,
+            summary: `Bridged ${baseToken.symbol} to ${targetChain?.name}`,
           })
           setAttempting(false)
           setHash(response.hash)
@@ -77,7 +88,7 @@ export default function Optics() {
   }
 
   const baseChainInfo: NetworkInfo = networkInfo[baseChain?.chainId]
-  const tokenBalance = useTokenBalanceSingle(account, selectedToken?.token)
+  const tokenBalance = useTokenBalanceSingle(account ?? undefined, baseToken)
 
   const instructions = [
     'Select blockchains',
@@ -173,11 +184,6 @@ export default function Optics() {
     }
   }, [attemptingTxn, swapErrorMessage, tradeToConfirm, txHash])
 
-  const handleInputSelect = useCallback((inputCurrency) => {
-    setApprovalSubmitted(false) // reset 2 step UI for approvals
-    //onCurrencySelection(Field.INPUT, inputCurrency)
-  }, [])
-
   const listOfSteps = instructions.map((instruction, i) => (
     <RowFixed key={`instruction-${i}`} marginBottom="0.5rem" opacity={i === step ? 1 : 0.6}>
       <InstructionButton disabled={i > step} onClick={() => i < step && setStep(i)} marginRight="1rem">
@@ -200,7 +206,7 @@ export default function Optics() {
       <div style={{ height: '2rem' }} key="separator" />
     ) : (
       <WalletButton
-        key="wallet-button"
+        key="wallet-button-asdsad"
         onClick={async () => {
           try {
             await window.ethereum?.request({
@@ -229,14 +235,13 @@ export default function Optics() {
     <CurrencyInputPanel
       key="bridge-token-input"
       label="Token"
-      value={selectedToken?.toFixed(2)}
+      value={val || '0.00'}
       onUserInput={(value: string) => {
-        const parsedAmount = tryParseAmount(value, selectedToken?.token)
-        setSelectedToken(parsedAmount)
+        setVal(value)
       }}
-      onMax={() => setSelectedToken(tokenBalance)}
-      onCurrencySelect={(currency) => setSelectedToken(new TokenAmount(currency, '0'))}
-      currency={selectedToken?.token}
+      onMax={() => setVal(tokenBalance?.raw.toString())}
+      onCurrencySelect={(currency) => setBaseToken(currency, '0')}
+      currency={baseToken}
       id={`Bridge-intput-${baseChain?.chainId}`}
       showMaxButton={!selectedToken?.equalTo(tokenBalance?.raw || '0')}
     />,
@@ -265,13 +270,17 @@ export default function Optics() {
     <ButtonConfirmed
       key="bridge-send"
       onClick={onSend}
-      disabled={attemping}
+      disabled={
+        attemping || JSBI.greaterThan(selectedToken?.raw || JSBI.BigInt('1'), tokenBalance?.raw || JSBI.BigInt('0'))
+      }
       width="100%"
       altDisabledStyle={attemping} // show solid button while waiting
       confirmed={!!hash}
       marginTop="1rem"
     >
-      {attemping ? (
+      {JSBI.greaterThan(selectedToken?.raw || JSBI.BigInt('1'), tokenBalance?.raw || JSBI.BigInt('0')) ? (
+        'Insufficient Funds'
+      ) : attemping ? (
         <AutoRow gap="6px" justify="center">
           Sending <Loader stroke="white" />
         </AutoRow>
@@ -287,9 +296,39 @@ export default function Optics() {
     <>
       <SwapPoolTabs active={'optics'} />
       <AppBodyNoBackground>
+        <VoteCard>
+          <CardNoise />
+          <CardSection>
+            <AutoColumn gap="md">
+              <RowBetween>
+                <TYPE.white fontWeight={600}>Optics Bridge</TYPE.white>
+              </RowBetween>
+              <RowBetween>
+                <TYPE.white
+                  fontSize={14}
+                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in beta.`}</TYPE.white>
+              </RowBetween>
+              <ExternalLink
+                style={{ color: 'white', textDecoration: 'underline' }}
+                target="_blank"
+                href="https://medium.com/celoorg/optics-is-here-42aa610675ce"
+              >
+                <TYPE.white fontSize={14}>Read more about the Optics Bridge</TYPE.white>
+              </ExternalLink>
+            </AutoColumn>
+          </CardSection>
+          <CardNoise />
+        </VoteCard>
+        {isMobile && (
+          <RowBetween>
+            <TYPE.red
+              fontSize={14}
+            >{`Bridge interface is currently only available on desktop for Metamask users. Mobile availability coming soon.`}</TYPE.red>
+          </RowBetween>
+        )}
         <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
           {actionSteps.slice(0, step + 1).map((action, i) => (
-            <div key={`action-${i}`} style={{ opacity: step !== i ? 0.9 : 1 }}>
+            <div key={`action-${i}-asdas`} style={{ opacity: step !== i ? 0.9 : 1 }}>
               {action}
             </div>
           ))}

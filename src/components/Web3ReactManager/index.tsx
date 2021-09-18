@@ -1,8 +1,7 @@
-import { ContractKitProvider } from '@celo-tools/use-contractkit'
+import { Alfajores, ContractKitProvider, Mainnet } from '@celo-tools/use-contractkit'
 import { ChainId } from '@ubeswap/sdk'
 import { useWeb3React } from '@web3-react/core'
 import { useValora } from 'connectors/valora/useValora'
-import { DevNetworks, MainnetNetworks } from 'constants/NetworkInfo'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
@@ -80,7 +79,7 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
 
   return (
     <ContractKitProvider
-      networks={NETWORK_CHAIN_ID === ChainId.ALFAJORES ? DevNetworks : MainnetNetworks}
+      networks={NETWORK_CHAIN_ID === ChainId.ALFAJORES ? [Alfajores] : [Mainnet]} //MainnetNetworks}
       dappName="Mobius"
       dappDescription="Mobius is a cross-chain stableswap DeFi exchange on Celo."
       dappUrl="https://mobius.money"

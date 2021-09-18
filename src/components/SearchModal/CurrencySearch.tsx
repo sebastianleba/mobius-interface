@@ -1,4 +1,4 @@
-import { ChainId, cUSD, Token } from '@ubeswap/sdk'
+import { cUSD, Token } from '@ubeswap/sdk'
 import { ButtonLight } from 'components/Button'
 import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
@@ -6,6 +6,7 @@ import useToggle from 'hooks/useToggle'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
@@ -74,6 +75,7 @@ export function CurrencySearch({
 
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [invertSearchOrder] = useState<boolean>(false)
+  const location = useLocation()
 
   const allTokens = useSwappableTokens()
   // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
@@ -85,7 +87,7 @@ export function CurrencySearch({
   const bridgeableTokens = useBridgeableTokens()
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-  if (actualChainId !== ChainId.MAINNET && actualChainId !== ChainId.ALFAJORES) {
+  if (location.pathname.includes('optics')) {
     tokensToSelect = bridgeableTokens
   }
   useEffect(() => {

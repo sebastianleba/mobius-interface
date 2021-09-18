@@ -84,8 +84,7 @@ export default function AddressInputPanel({
 
   const otherChainId = useWeb3ChainId()
   const { explorer } = networkInfo[otherChainId]
-  const explorerLink =
-    chainId === otherChainId ? getBlockscoutLink(chainId, name ?? address, 'address') : `${explorer}address/${address}`
+  const explorerLink = getBlockscoutLink(chainId, name ?? address, 'address')
 
   const handleInput = useCallback(
     (event) => {

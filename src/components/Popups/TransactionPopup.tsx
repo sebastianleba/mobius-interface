@@ -29,8 +29,7 @@ export default function TransactionPopup({
   const theme = useContext(ThemeContext)
   const otherChainId = useWeb3ChainId()
   const { explorer } = networkInfo[chainId as MultiChainIds]
-  const explorerLink =
-    chainId === otherChainId ? getBlockscoutLink(chainId, hash, 'transaction') : `${explorer}tx/${hash}`
+  const explorerLink = getBlockscoutLink(chainId, hash, 'transaction')
 
   return (
     <RowNoFlex>

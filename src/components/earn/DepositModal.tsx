@@ -58,7 +58,6 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [ttl] = useUserTransactionTTL()
   const blockTimeStamp = useCurrentBlockTimestamp()
   const deadline = useTransactionDeadline()
-  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
 
   const [expectedLPTokens, selectedAmounts] = useExpectedLpTokens(poolInfo, tokens, input)
   const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
@@ -81,11 +80,12 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
 
   const stakingContract = useStableSwapContract(poolInfo.poolAddress)
   async function onDeposit() {
-    if (stakingContract && poolInfo?.stakedAmount) {
+    const allValid = selectedAmounts.reduce((accum, cur) => accum && !!cur && !!cur.raw, true)
+    if (stakingContract && poolInfo?.stakedAmount && allValid) {
       setAttempting(true)
-      const amounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
+      const tokenAmounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
       await stakingContract
-        .addLiquidity(amounts, withSlippage.toString(), deadline)
+        .addLiquidity(tokenAmounts, withSlippage.toString(), deadline)
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Deposit Liquidity into ${poolInfo.name}`,
@@ -158,7 +158,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             <div style={{ display: 'flex' }}>
               {toApprove.map((i) => (
                 <ApprovalButton
-                  key={i}
+                  key={`Approval-modal-${i}`}
                   disabled={approving}
                   onClick={async () => {
                     setApproving(true)
@@ -255,7 +255,7 @@ const BalanceText = styled(TYPE.subHeader)`
 
 const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
-  const currency = tokenAmount.currency
+  const currency = token
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')
   const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))

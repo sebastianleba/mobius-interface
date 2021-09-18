@@ -1,6 +1,10 @@
 import { Token } from '@ubeswap/sdk'
 import { WrappedTokenInfo } from 'state/lists/hooks'
 
+import celoLogo from '../assets/images/celo-chain-logo.png'
+import ethLogo from '../assets/images/ethereum-chain-logo.png'
+import polygonLogo from '../assets/images/polygon-chain-logo.png'
+
 export enum MultiChainIds {
   ETHEREUM = 1,
   POLYGON = 137,
@@ -21,7 +25,7 @@ export type OpticsDomainInfo = {
 
 export const ETH_OPTICS: OpticsDomainInfo = {
   name: 'Ethereum',
-  logoUri: 'https://etherscan.io/images/svg/brands/ethereum-1.svg',
+  logoUri: ethLogo,
   chainId: 1,
   bridgeRouter: '0x6a39909e805A3eaDd2b61fFf61147796ca6aBB47',
   domain: 6648936,
@@ -29,15 +33,15 @@ export const ETH_OPTICS: OpticsDomainInfo = {
 
 export const POLYGON_OPTICS: OpticsDomainInfo = {
   name: 'Polygon',
-  logoUri: 'https://polygonscan.com/images/svg/brands/polygon.svg',
+  logoUri: polygonLogo,
   chainId: 137,
   bridgeRouter: '0xf244eA81F715F343040569398A4E7978De656bf6',
   domain: 1886350457,
 }
 
 export const CELO_OPTICS: OpticsDomainInfo = {
-  name: 'Celo Mainnet',
-  logoUri: 'https://explorer.celo.org/images/celo_logo-b3e959fc8694588896dcc6c5db738356.svg?vsn=d',
+  name: 'Celo',
+  logoUri: celoLogo,
   chainId: 42220,
   bridgeRouter: '0xf244eA81F715F343040569398A4E7978De656bf6',
   domain: 1667591279,
@@ -47,7 +51,7 @@ export const OpticsMainnetDomains = [ETH_OPTICS, POLYGON_OPTICS, CELO_OPTICS]
 
 export const ALFAJORES_OPTICS: OpticsDomainInfo = {
   name: 'Celo Alfajores',
-  logoUri: '',
+  logoUri: celoLogo,
   chainId: 44787,
   bridgeRouter: '0xd6930Ee55C141E5Bb4079d5963cF64320956bb3E',
   domain: 1000,
@@ -55,7 +59,7 @@ export const ALFAJORES_OPTICS: OpticsDomainInfo = {
 
 export const KOVAN_OPTICS: OpticsDomainInfo = {
   name: 'Ethereum Kovan',
-  logoUri: 'https://etherscan.io/images/svg/brands/ethereum-1.svg',
+  logoUri: ethLogo,
   chainId: 42,
   bridgeRouter: '0x359089D34687bDbFD019fCC5093fFC21bE9905f5',
   domain: 3000,
@@ -63,7 +67,7 @@ export const KOVAN_OPTICS: OpticsDomainInfo = {
 
 export const RINKEBY_OPTICS: OpticsDomainInfo = {
   name: 'Ethereum Rinkeby',
-  logoUri: 'https://etherscan.io/images/svg/brands/ethereum-1.svg',
+  logoUri: ethLogo,
   chainId: 4,
   bridgeRouter: '0x8FbEA25D0bFDbff68F2B920df180e9498E9c856A',
   domain: 2000,
@@ -72,7 +76,42 @@ export const RINKEBY_OPTICS: OpticsDomainInfo = {
 export const OpticsDevDomains = [ALFAJORES_OPTICS, KOVAN_OPTICS, RINKEBY_OPTICS]
 
 export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
-  [MultiChainIds.CELO]: [],
+  [MultiChainIds.CELO]: [
+    new WrappedTokenInfo(
+      {
+        symbol: 'USDC',
+        name: 'US Dollar Coin',
+        address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
+        chainId: MultiChainIds.CELO,
+        logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
+        decimals: 6,
+      },
+      []
+    ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'wETH',
+        name: 'Wrapped Ether',
+        address: '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4',
+        chainId: MultiChainIds.CELO,
+        logoURI: 'https://etherscan.io/token/images/weth_28.png',
+        decimals: 18,
+      },
+      []
+    ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'WBTC',
+        name: 'Wrapped BTC',
+        address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
+        chainId: MultiChainIds.CELO,
+        logoURI:
+          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
+        decimals: 8,
+      },
+      []
+    ),
+  ],
   [MultiChainIds.ETHEREUM]: [
     new WrappedTokenInfo(
       {
@@ -93,6 +132,18 @@ export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
         chainId: MultiChainIds.ETHEREUM,
         logoURI: 'https://etherscan.io/token/images/weth_28.png',
         decimals: 18,
+      },
+      []
+    ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'WBTC',
+        name: 'Wrapped BTC',
+        address: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+        chainId: MultiChainIds.ETHEREUM,
+        logoURI:
+          'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png',
+        decimals: 8,
       },
       []
     ),

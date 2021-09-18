@@ -24,6 +24,7 @@ export interface StablePoolInfo {
   readonly stakedAmount: TokenAmount
   readonly totalVolume?: TokenAmount
   readonly peggedTo: string
+  readonly displayDecimals: number
   readonly virtualPrice: TokenAmount
   readonly priceOfStaked: TokenAmount
   readonly balances: TokenAmount[]
@@ -76,10 +77,10 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
+  displayDecimals: pool.displayDecimals,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
-  const { chainId } = useActiveWeb3React()
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
   const totalStakedAmount = useTokenBalance(pool.gaugeAddress, pool.lpToken)
   return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
@@ -99,11 +100,16 @@ export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): 
   )
   useEffect(() => {
     const updateData = async () => {
-      const newTokenAmounts = await contract?.calculateRemoveLiquidity(account, lpAmount.raw.toString())
-      setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt(newTokenAmounts[i].toString()))))
+      try {
+        const newTokenAmounts = await contract?.calculateRemoveLiquidity(account, lpAmount.raw.toString())
+        setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt(newTokenAmounts[i].toString()))))
+      } catch (e) {
+        console.error(e)
+        setExpectedOut(tokens.map((token, i) => new TokenAmount(token, JSBI.BigInt('0'))))
+      }
     }
-    updateData()
-  }, [account, pool, lpAmount])
+    lpAmount && lpAmount.raw && updateData()
+  }, [account, lpAmount])
   return expectedOut
 }
 

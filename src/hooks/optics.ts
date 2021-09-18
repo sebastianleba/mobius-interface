@@ -13,8 +13,9 @@ export const useNetworkDomains = (): OpticsDomainInfo[] => {
 export const useBridgeableTokens = (): { [address: string]: Token } => {
   const chainId = useWeb3ChainId()
   const tokenList: Token[] = BridgeableTokens[chainId] as any as Token[]
-  if (!chainId) return null
+  if (!chainId || chainId === -1) return null
   const tokenMap: { [address: string]: Token } = {}
+  if (!tokenMap!) return null
   tokenList.forEach((token) => (tokenMap[token.address] = token))
   return tokenMap
 }

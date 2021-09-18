@@ -77,15 +77,16 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
     },
     {
       name: 'BTC Pool',
-      tokenAddresses: ['0xd629eb00deced2a080b7ec630ef6ac117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
+      tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
       tokens: [
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0xd629eb00deced2a080b7ec630ef6ac117e614f1b',
+            address: '0xD629eb00dEced2a080B7EC630eF6aC117e614f1b',
             decimals: 18,
             symbol: 'cBTC',
             name: 'Wrapped Bitcoin',
@@ -121,17 +122,18 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('8')],
-      peggedTo: '$',
-      pegComesAfter: false,
+      peggedTo: '₿',
+      pegComesAfter: true,
+      displayDecimals: 3,
     },
     {
       name: 'ETH Pool',
-      tokenAddresses: ['0x2def4285787d58a2f811af24755a8150622f4361', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
+      tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4'],
       tokens: [
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0x2def4285787d58a2f811af24755a8150622f4361',
+            address: '0x2DEf4285787d58a2f811AF24755A8150622f4361',
             decimals: 18,
             symbol: 'cETH',
             name: 'Wrapped Ethereum',
@@ -167,8 +169,9 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
-      peggedTo: '$',
-      pegComesAfter: false,
+      peggedTo: 'Ξ',
+      pegComesAfter: true,
+      displayDecimals: 2,
     },
     {
       name: 'USDT (Moss Bridge) Pool',
@@ -215,6 +218,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
     },
     {
       name: 'USDC (Moss Bridge) Pool',
@@ -261,6 +265,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
     },
   ],
   [ChainId.ALFAJORES]: [
@@ -311,6 +316,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: true,
       gaugeAddress: '0x1a567D4F6870Cd3eC1aD82f3CF8fF0EbCCbBfEcF',
       relativeGaugeWeight: new Fraction('1', '10'),
+      displayDecimals: 0,
     },
     {
       name: 'USD Pool',
@@ -372,6 +378,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
+      displayDecimals: 0,
       gaugeAddress: '0x97Ae8F2962B8e6951CaF1868f31bD3DfD4093489',
       relativeGaugeWeight: new Fraction('9', '10'),
     },

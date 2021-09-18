@@ -330,9 +330,9 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+              {/* <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
                 Airdrop
-              </StyledNavLink>
+              </StyledNavLink> */}
             </>
           )}
         </HeaderLinks>
