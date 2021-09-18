@@ -6,11 +6,7 @@ import { CloseIcon, TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
-import QuestionHelper from '../QuestionHelper'
-import { RowBetween, RowFixed } from '../Row'
-import Toggle from '../Toggle'
-import WithdrawLP from './WithdrawLP'
-import WithdrawTokens from './WithdrawTokens'
+import { RowBetween } from '../Row'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -43,7 +39,7 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
             <TYPE.largeHeader>Withdraw from {poolInfo.name}</TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          <RowBetween>
+          {/* <RowBetween>
             <RowFixed>
               <TYPE.subHeader fontWeight={400} fontSize={14}>
                 By Token Amount
@@ -56,7 +52,7 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
             <WithdrawTokens poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
           ) : (
             <WithdrawLP poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
-          )}
+          )} */}
         </ContentWrapper>
       )}
       {attempting && !hash && (
