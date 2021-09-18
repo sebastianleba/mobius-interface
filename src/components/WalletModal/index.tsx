@@ -338,7 +338,6 @@ export default function WalletModal({
       )
     })
   }
-  console.log({ error })
 
   function getModalContent() {
     if (error) {

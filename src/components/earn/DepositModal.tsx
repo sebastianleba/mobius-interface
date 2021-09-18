@@ -53,11 +53,9 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [approving, setApproving] = useState(false)
   const [amounts, setAmounts] = useState<string[]>(new Array(poolInfo.tokens.length).fill('0'))
   const [tokenBalances] = useTokenBalanceDirect(account, tokens.slice())
-
-  const selectedAmounts = poolInfo.tokens.map((t, i) => {
-    const parsed = tryParseAmount(amounts[i], t)
-    return parsed
-  })
+  const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
+    tokens.map((token) => new TokenAmount(token, '0'))
+  )
   const insufficientFunds = selectedAmounts.reduce((accum, amount) => {
     !!accum || !!amount?.greaterThan(tokenBalances[amount.address]?.raw ?? '0') || true
   }, false)
@@ -70,6 +68,22 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const deadline = useTransactionDeadline()
 
   const expectedLPTokens = useExpectedLpTokens(poolInfo, selectedAmounts)
+
+  const handleUserInput = (i: number) => (val: string) => {
+    let newTokenAmount: TokenAmount[]
+    let newAmount: string[]
+    if (useEqualAmount) {
+      newTokenAmount = tokens.map((t) => tryParseAmount(val, t) || new TokenAmount(t, '0'))
+      newAmount = new Array(tokens.length).fill(val)
+    } else {
+      const parsed = tryParseAmount(val, tokens[i]) || new TokenAmount(tokens[i], '0')
+      newTokenAmount = [...selectedAmounts.slice(0, i), parsed, ...selectedAmounts.slice(i + 1)]
+      newAmount = [...amounts.slice(0, i), val, ...amounts.slice(i + 1)]
+    }
+    setSelectedAmounts(newTokenAmount)
+    setAmounts(newAmount)
+  }
+
   const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
   const approvals = [
     useApproveCallback(selectedAmounts[0], poolInfo.poolAddress),
@@ -151,13 +165,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
               <CurrencyRow
                 tokenAmount={amounts ? amounts[i] : '0.00'}
                 token={token}
-                setTokenAmount={(val: string) => {
-                  if (useEqualAmount) {
-                    setAmounts(amounts?.map((a) => (a ? val : val)))
-                  } else {
-                    setAmounts([...amounts.slice(0, i), val, ...amounts.slice(i + 1, selectedAmounts.length)])
-                  }
-                }}
+                setTokenAmount={handleUserInput(i)}
               />
               {i !== selectedAmounts.length - 1 && (
                 <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>

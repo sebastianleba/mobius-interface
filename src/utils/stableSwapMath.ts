@@ -237,6 +237,24 @@ export class StableSwapMath {
     return amounts
   }
 
+  calculateTokenAmount(amounts: JSBI[], deposit: boolean) {
+    const a = this.aPrecise
+    const d0 = this.getD(this.calc_xp(), a)
+    const balances1 = this.balances.map((bal, i) =>
+      deposit ? JSBI.add(bal, amounts[i]) : JSBI.subtract(bal, amounts[i])
+    )
+    const d1 = this.getD(this.calc_xp_mem(balances1), a)
+    const totalSupply = this.lpTotalSupply
+    if (deposit) {
+      return JSBI.divide(JSBI.multiply(JSBI.subtract(d1, d0), totalSupply), d0)
+    } else {
+      return JSBI.divide(
+        JSBI.multiply(JSBI.divide(JSBI.multiply(JSBI.subtract(d0, d1), totalSupply), d0), this.FEE_DENOMINATOR),
+        this.FEE_DENOMINATOR
+      )
+    }
+  }
+
   get_dx(i: number, j: number, dy: JSBI, xp: JSBI[]): JSBI {
     const y: JSBI = JSBI.subtract(
       xp[j],
