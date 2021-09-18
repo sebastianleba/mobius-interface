@@ -83,8 +83,6 @@ export default function App() {
     }
   }, [location])
 
-  // UpdateClaim()
-
   return (
     <Suspense fallback={null}>
       <Route component={DarkModeQueryParamReader} />

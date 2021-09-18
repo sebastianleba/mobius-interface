@@ -57,7 +57,7 @@ export default function UpdatePools(): null {
           fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
         )
         let stakingInfo = {}
-        if (poolInfo.gaugeAddress && poolInfo.relativeGaugeWeight) {
+        if (poolInfo.gaugeAddress) {
           gauge = gauge?.attach(poolInfo.gaugeAddress) ?? gauge
           const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
           const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())

@@ -7,7 +7,7 @@ import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
-import { UpdateClaim } from 'state/claim/updater'
+import UpdateClaim from 'state/claim/updater'
 import UpdatePools from 'state/stablePools/updater'
 
 import { NetworkContextName } from './constants'
