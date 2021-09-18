@@ -9,7 +9,7 @@ import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import { useActiveWeb3React } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useIsDarkMode } from '../../state/user/hooks'
-import { useCurrencyBalance } from '../../state/wallet/hooks'
+import { useTokenBalanceSingle } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import CurrencyLogo from '../CurrencyLogo'
 import DoubleCurrencyLogo from '../DoubleLogo'
@@ -218,9 +218,10 @@ export default function CurrencyInputPanel({
 
   const [modalOpen, setModalOpen] = useState(false)
   const { account } = useActiveWeb3React()
-  // Changed
-  const selectedCurrencyBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
+  const selectedCurrencyBalance = useTokenBalanceSingle(account ?? undefined, currency ?? undefined)
   const theme = useTheme()
+
+  console.log(otherCurrency)
 
   const handleDismissSearch = useCallback(() => {
     setModalOpen(false)
