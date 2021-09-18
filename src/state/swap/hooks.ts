@@ -294,6 +294,9 @@ function calcInputOutput(
   }
   const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
   const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
+  console.log('input', input)
+  console.log('output', output)
+  console.log('math', math.DECIMALS, math.PRECISION)
 
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
