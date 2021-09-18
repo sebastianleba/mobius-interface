@@ -91,9 +91,9 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
           Risks
         </StyledNavLink>
-        {/* <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+        <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
           Airdrop
-        </StyledNavLink> */}
+        </StyledNavLink>
       </LinkContainer>
     </CustomModal>
   )
