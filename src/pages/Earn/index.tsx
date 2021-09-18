@@ -152,7 +152,7 @@ export default function Earn() {
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
-        <TYPE.largeHeader>Farming Launches Today!</TYPE.largeHeader>
+        <TYPE.largeHeader>Farming Launches Soon!</TYPE.largeHeader>
         <StyledCountdown date={launchTime} />
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
