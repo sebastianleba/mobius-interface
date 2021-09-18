@@ -1,6 +1,8 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
+import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
+import { LedgerConnector } from 'connectors/ledger/LedgerConnector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { OpticsDomainInfo } from 'constants/Optics'
 import { ethers } from 'ethers'
@@ -8,6 +10,7 @@ import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
 import { useBridgeRouterContract } from 'hooks/useContract'
 import React, { useCallback, useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
+import { useWalletModalToggle } from 'state/application/hooks'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useTokenBalanceSingle } from 'state/wallet/hooks'
 import styled from 'styled-components'
@@ -21,10 +24,9 @@ import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
-import { useIsDarkMode } from '../../state/user/hooks'
+import { useIsDarkMode, useSetAltChainId } from '../../state/user/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { AppBodyNoBackground } from '../AppBody'
 
@@ -49,8 +51,8 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const { account } = useActiveWeb3React()
-  const chainId = useWeb3ChainId()
+  const { active, account, connector, activate, error, chainId } = useWeb3React()
+  //const chainId = useWeb3ChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
   const [val, setVal] = useState<string>()
@@ -63,7 +65,10 @@ export default function Optics() {
   const [attemping, setAttempting] = useState<boolean>(false)
   const [hash, setHash] = useState<string>()
   const addTransaction = useTransactionAdder()
+  const [ledgerConnectOpen, setLedgerConnectOpen] = useState<boolean>(false)
   const bridgeContract = useBridgeRouterContract(baseChain?.bridgeRouter)
+  const [setAltChainId] = useSetAltChainId()
+  const toggleWalletModal = useWalletModalToggle()
   async function onSend() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
@@ -85,6 +90,10 @@ export default function Optics() {
         })
     }
   }
+
+  useEffect(() => {
+    setAltChainId(baseChain?.chainId)
+  }, [baseChain?.chainId])
 
   const baseChainInfo: NetworkInfo = networkInfo[baseChain?.chainId]
   const tokenBalance = useTokenBalanceSingle(account ?? undefined, baseToken)
@@ -115,7 +124,7 @@ export default function Optics() {
         }
         break
       case 1:
-        if (chainId === baseChain?.chainId) {
+        if ((!chainId && account) || chainId === baseChain?.chainId) {
           setStep(2)
         }
         break
@@ -175,6 +184,51 @@ export default function Optics() {
     approval === ApprovalState.PENDING ||
     (approvalSubmitted && approval === ApprovalState.APPROVED)
 
+  const tryActivation = async (connector: AbstractConnector | undefined) => {
+    connector &&
+      (await activate(connector, undefined, true).catch((error: any) => {
+        console.log('[Activation error]', error)
+        if (error instanceof UnsupportedChainIdError) {
+          activate(connector) // a little janky...can't use setError because the connector isn't set
+        } else {
+          console.error(error)
+        }
+      }))
+    setLedgerConnectOpen(false)
+  }
+
+  const metaMaskSwitchNetwork = async () => {
+    try {
+      await window.ethereum?.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
+      })
+    } catch (switchError) {
+      await window.ethereum?.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: '0x' + baseChainInfo.chainId.toString(16),
+            chainName: baseChainInfo.name,
+            nativeCurrency: baseChainInfo.nativeCurrency,
+            rpcUrls: [baseChainInfo.rpcUrl],
+            blockExplorerUrls: [baseChainInfo.explorer],
+          },
+        ],
+      })
+    }
+  }
+
+  const ledgerSwitchNetwork = async () => {
+    const ledger = connector as LedgerConnector
+    ledger.setChainId(baseChain?.chainId)
+    try {
+      await ledger.activate()
+    } catch (e) {
+      console.error(`Error switching networks on ledger`, error)
+    }
+  }
+
   const handleConfirmDismiss = useCallback(() => {
     setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
     // if there was a tx hash, we want to clear the input
@@ -207,25 +261,15 @@ export default function Optics() {
       <WalletButton
         key="wallet-button"
         onClick={async () => {
-          try {
-            await window.ethereum?.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
-            })
-          } catch (switchError) {
-            await window.ethereum?.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: '0x' + baseChainInfo.chainId.toString(16),
-                  chainName: baseChainInfo.name,
-                  nativeCurrency: baseChainInfo.nativeCurrency,
-                  rpcUrls: [baseChainInfo.rpcUrl],
-                  blockExplorerUrls: [baseChainInfo.explorer],
-                },
-              ],
-            })
-          }
+          if (connector instanceof LedgerConnector) {
+            const ledger = connector as LedgerConnector
+            ledger.close().then(() => toggleWalletModal())
+          } else {
+            //if (connector instanceof InjectedConnector) {
+            metaMaskSwitchNetwork()
+          } //else {
+          //   console.log('Connect wallet')
+          // }
         }}
       >
         Connect Wallet

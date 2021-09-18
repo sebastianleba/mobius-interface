@@ -1,4 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
+import { MultiChainIds } from 'constants/Optics'
 
 import { DEFAULT_DEADLINE_FROM_NOW, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { updateVersion } from '../global/actions'
@@ -10,6 +11,7 @@ import {
   removeSerializedToken,
   SerializedPair,
   SerializedToken,
+  setAltChainId,
   setUseUbeswap,
   setValoraAccount,
   toggleURLWarning,
@@ -47,6 +49,8 @@ export interface UserState {
   userDeadline: number
 
   useUbeswap?: boolean
+
+  altChainId?: MultiChainIds
 
   tokens: {
     [chainId: number]: {
@@ -109,6 +113,9 @@ export default createReducer(initialState, (builder) =>
       }
 
       state.lastUpdateVersionTimestamp = currentTimestamp()
+    })
+    .addCase(setAltChainId, (state, { payload: { altChainId } }) => {
+      state.altChainId = altChainId
     })
     .addCase(updateUserDarkMode, (state, action) => {
       state.userDarkMode = action.payload.userDarkMode

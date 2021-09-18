@@ -1,5 +1,6 @@
 import { Pair, Token } from '@ubeswap/sdk'
 import { IValoraAccount } from 'connectors/valora/valoraUtils'
+import { MultiChainIds } from 'constants/Optics'
 import flatMap from 'lodash.flatmap'
 import { useCallback, useMemo } from 'react'
 import ReactGA from 'react-ga'
@@ -16,6 +17,7 @@ import {
   removeSerializedToken,
   SerializedPair,
   SerializedToken,
+  setAltChainId,
   setUseUbeswap,
   setValoraAccount,
   toggleURLWarning,
@@ -47,6 +49,21 @@ function deserializeToken(serializedToken: SerializedToken): Token {
     serializedToken.symbol,
     serializedToken.name
   )
+}
+
+export const useAltChainId = (): MultiChainIds => {
+  const { chainId } = useActiveWeb3React()
+  const altChainId = useSelector<AppState, MultiChainIds>((state) => state.user.altChainId ?? chainId)
+  return altChainId
+}
+
+export const useSetAltChainId = (): [(id: MultiChainIds) => void] => {
+  const dispatch = useDispatch<AppDispatch>()
+  return [
+    (id: MultiChainIds) => {
+      dispatch(setAltChainId({ altChainId: id }))
+    },
+  ]
 }
 
 export const useValoraAccount = (): {

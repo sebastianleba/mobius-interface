@@ -5,7 +5,7 @@ import { ValoraConnector } from 'connectors/valora/ValoraConnector'
 import React, { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import ReactGA from 'react-ga'
-import { useValoraAccount } from 'state/user/hooks'
+import { useAltChainId, useValoraAccount } from 'state/user/hooks'
 import styled from 'styled-components'
 
 import CeloLogo from '../../assets/images/celo_logo.png'
@@ -145,6 +145,7 @@ export default function WalletModal({
 
   const walletModalOpen = useModalOpen(ApplicationModal.WALLET)
   const toggleWalletModal = useWalletModalToggle()
+  const targetChainId = useAltChainId()
 
   const previousAccount = usePrevious(account)
 
@@ -405,7 +406,7 @@ export default function WalletModal({
               tryActivation={tryActivation}
             />
           ) : walletView === WALLET_VIEWS.LEDGER ? (
-            <LedgerWalletSelector tryActivation={tryActivation} />
+            <LedgerWalletSelector tryActivation={tryActivation} chainId={targetChainId} />
           ) : (
             <OptionGrid>{getOptions()}</OptionGrid>
           )}

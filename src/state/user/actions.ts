@@ -1,4 +1,5 @@
 import { createAction } from '@reduxjs/toolkit'
+import { MultiChainIds } from 'constants/Optics'
 
 export interface SerializedToken {
   chainId: number
@@ -38,3 +39,4 @@ export const toggleURLWarning = createAction<void>('app/toggleURLWarning')
 export const setValoraAccount = createAction<{ address: string; phoneNumber: string }>('user/setValoraAccount')
 export const clearValoraAccount = createAction<void>('user/clearValoraAccount')
 export const setUseUbeswap = createAction<{ useUbeswap: boolean }>('user/setUseUbeswap')
+export const setAltChainId = createAction<{ altChainId: MultiChainIds }>('setAltChainId')

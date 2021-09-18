@@ -1,5 +1,6 @@
 import { AbstractConnector } from '@web3-react/abstract-connector'
 import Loader from 'components/Loader'
+import { MultiChainIds } from 'constants/Optics'
 import { darken } from 'polished'
 import React, { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
@@ -10,23 +11,25 @@ import { LedgerAddress } from './LedgerAddress'
 
 interface Props {
   tryActivation: (connector: AbstractConnector | undefined) => Promise<void>
+  chainId?: MultiChainIds
 }
 
 const ADDRESSES_PER_PAGE = 5
 
-export const LedgerWalletSelector: React.FC<Props> = ({ tryActivation }: Props) => {
+export const LedgerWalletSelector: React.FC<Props> = ({ tryActivation, chainId }: Props) => {
   const [addresses, setAddresses] = useState<readonly string[] | null>(null)
   const [kit, setKit] = useState<LedgerKit | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState<number>(0)
 
+  console.log(chainId)
   const connectToLedger = useCallback(async () => {
     setError(null)
     const idxs = Array(ADDRESSES_PER_PAGE)
       .fill(null)
       .map((_, i) => page * ADDRESSES_PER_PAGE + i)
     try {
-      const ledgerKit = await LedgerKit.init(NETWORK_CHAIN_ID, idxs)
+      const ledgerKit = await LedgerKit.init(chainId ?? NETWORK_CHAIN_ID, idxs)
       setAddresses(ledgerKit.wallet.getAccounts())
       setKit(ledgerKit)
     } catch (e) {

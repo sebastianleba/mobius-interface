@@ -28,7 +28,7 @@ export const Ethereum: NetworkInfo = {
 export const Polygon: NetworkInfo = {
   name: 'Polygon',
   chainId: 137,
-  rpcUrl: `https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`,
+  rpcUrl: `https://polygon-rpc.com/`,
   explorer: 'https://polygonscan.com/',
   graphQl: '',
   nativeCurrency: {
