@@ -19,13 +19,13 @@ export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
 }
 
 export const MOBIUS_MINTER_ADDRESS: { [K in ChainId]: string } = {
-  [ChainId.MAINNET]: '',
+  [ChainId.MAINNET]: '0xF94847bF134d72a6C5BFA4aE34Dd3930696B0600',
   [ChainId.ALFAJORES]: '0xa9f324CdB134f0b24094DCC80Fb720181e992437',
   [ChainId.BAKLAVA]: '',
 }
 
 export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
-  [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
+  [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0xf0f4DF0cDE2C8cB8660ed022d7a22488F723e702'),
   [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
   [ChainId.BAKLAVA]: undefined,
 }
@@ -78,6 +78,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
+      gaugeAddress: '0xaD18fda9B6eBD42d8bADE94fe55144A79b2E8EDb',
     },
     {
       name: 'BTC Pool',
@@ -125,6 +126,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '₿',
       pegComesAfter: true,
       displayDecimals: 3,
+      gaugeAddress: '0x4462ee6661FdD5B3e22E2D2105c300C74D0736D8',
     },
     {
       name: 'ETH Pool',
@@ -172,6 +174,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: 'Ξ',
       pegComesAfter: true,
       displayDecimals: 2,
+      gaugeAddress: '0x721f77738857f9913dA0A72B6Cd30102A084141A',
     },
     {
       name: 'USDT (Moss Bridge) Pool',
@@ -219,6 +222,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
+      gaugeAddress: '0x8a7Ea00b6B7B191F8c425E1d803eFbb5070F6266',
     },
     {
       name: 'USDC (Moss Bridge) Pool',
@@ -266,6 +270,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
+      gaugeAddress: '0xaA8dD9a084dAD36c8a816bCaF66D852E7BdDDbC4',
     },
   ],
   [ChainId.ALFAJORES]: [
@@ -492,25 +497,25 @@ export const USD_POOL_ADDRESSES: AddressMap = {
 }
 
 export const LP_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '',
+  [ChainId.MAINNET]: '0x7B7A47CC6f7d6EB9635792553A6E314898e3EFEB',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const FOUNDER_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '',
+  [ChainId.MAINNET]: '0xaAB4a154EE836fcDaa706da7BE3Cd36d116dcF84',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const INVESTOR_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '',
+  [ChainId.MAINNET]: '0xd40773280aBCD4F049AFEbBDE9779363Ba184540',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const ADVISOR_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '',
+  [ChainId.MAINNET]: '0x25d43677DF8062Fd28dfd2Cfa31D0E1a2A56eF58',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
