@@ -152,7 +152,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             </div>
           ))}
           <TYPE.mediumHeader style={{ textAlign: 'center' }}>
-            Expected Lp Tokens Received: {expectedLPTokens.toFixed(2)}
+            Expected Lp Tokens Received: {expectedLPTokens.toFixed(4)}
           </TYPE.mediumHeader>
           {toApprove.length > 0 && expectedLPTokens.greaterThan(JSBI.BigInt('0')) && (
             <div style={{ display: 'flex' }}>

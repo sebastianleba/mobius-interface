@@ -20,7 +20,23 @@ export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
   realizedLPFee: TokenAmount | undefined | null
 } {
   if (!trade) return {}
-  const priceImpact = new Percent(JSBI.subtract(trade?.input.raw, trade?.output.raw), trade?.output.raw)
+  //todo: issue here
+
+  let inAmount: JSBI = trade.input.raw
+  let outAmount: JSBI = trade.output.raw
+  if (trade.input.token.decimals > trade.output.token.decimals) {
+    outAmount = JSBI.multiply(
+      outAmount,
+      JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(trade.input.token.decimals - trade.output.token.decimals))
+    )
+  } else if (trade.input.token.decimals < trade.output.token.decimals) {
+    inAmount = JSBI.multiply(
+      inAmount,
+      JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(trade.output.token.decimals - trade.input.token.decimals))
+    )
+  }
+  console.log(inAmount.toString(), outAmount.toString())
+  const priceImpact = new Percent(JSBI.subtract(inAmount, outAmount), outAmount)
 
   // the amount of the input that accrues to LPs
   const realizedLPFeeAmount = new TokenAmount(trade.input.token, JSBI.BigInt('0'))

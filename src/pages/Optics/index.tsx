@@ -3,7 +3,7 @@ import { JSBI, Token } from '@ubeswap/sdk'
 import { useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
-import { OpticsDomainInfo } from 'constants/Optics'
+import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
 import { ethers } from 'ethers'
 import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
 import { useBridgeRouterContract } from 'hooks/useContract'
@@ -49,7 +49,6 @@ export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
   const test = useWeb3React()
-  console.log(test)
   const { account } = test
   const { chainId } = useWeb3React()
   //const chainId = useWeb3ChainId()
@@ -57,18 +56,21 @@ export default function Optics() {
   const networkConfigs = useNetworkDomains()
   const [val, setVal] = useState<string>()
   const [baseToken, setBaseToken] = useState<Token>()
+  const [explorerURL, setExplorerURL] = useState<string>()
   const selectedToken = tryParseAmount(val, baseToken)
   const [baseChain, setBaseChain] = useState<OpticsDomainInfo>()
   const [targetChain, setTargetChain] = useState<OpticsDomainInfo>()
   const [recipientAddress, setRecipientAddress] = useState<string>('')
   const [step, setStep] = useState<number>(0)
   const [attemping, setAttempting] = useState<boolean>(false)
+  const [sent, setSent] = useState<boolean>(false)
   const [hash, setHash] = useState<string>()
   const addTransaction = useTransactionAdder()
   const bridgeContract = useBridgeRouterContract(baseChain?.bridgeRouter)
   async function onSend() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
+      console.log(selectedToken?.raw.toString())
       setAttempting(true)
       await bridgeContract
         .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {
@@ -79,10 +81,12 @@ export default function Optics() {
             summary: `Bridged ${baseToken.symbol} to ${targetChain?.name}`,
           })
           setAttempting(false)
+          setSent(true)
           setHash(response.hash)
         })
         .catch((error: any) => {
           setAttempting(false)
+          setSent(true)
           console.log(error)
         })
     }
@@ -136,8 +140,23 @@ export default function Optics() {
           setStep(5)
         }
         break
+      case 5:
+        if (sent) {
+          setStep(6)
+        }
+        break
     }
   })
+
+  useEffect(() => {
+    if (chainId === MultiChainIds.CELO) {
+      setExplorerURL('https://explorer.celo.org/tx/')
+    } else if (chainId === MultiChainIds.ETHEREUM) {
+      setExplorerURL('https://etherscan.io/tx/')
+    } else if (chainId === MultiChainIds.POLYGON) {
+      setExplorerURL('https://polygonscan.com/tx/')
+    }
+  }, [chainId])
 
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
@@ -240,7 +259,7 @@ export default function Optics() {
       onUserInput={(value: string) => {
         setVal(value)
       }}
-      onMax={() => setVal(tokenBalance?.raw.toString())}
+      onMax={() => setVal(tokenBalance?.toExact())}
       onCurrencySelect={(currency) => setBaseToken(currency, '0')}
       currency={baseToken}
       id={`Bridge-intput-${baseChain?.chainId}`}
@@ -286,9 +305,22 @@ export default function Optics() {
           Sending <Loader stroke="white" />
         </AutoRow>
       ) : hash ? (
-        'Sent! Expect to receive your tokens within 4 hours'
+        <div>
+          <RowBetween>Sent! Expect to receive your tokens within 4 hours</RowBetween>
+        </div>
       ) : (
         'Send ' + selectedToken?.token?.symbol
+      )}
+    </ButtonConfirmed>,
+    <ButtonConfirmed
+      key="bridge-confrim"
+      disabled={true}
+      width="100%"
+      altDisabledStyle={attemping} // show solid button while waiting
+      marginTop="1rem"
+    >
+      {hash && (
+        <div>{explorerURL && <ExternalLink href={explorerURL.concat(hash)}>(View on Explorer)</ExternalLink>}</div>
       )}
     </ButtonConfirmed>,
   ]
@@ -307,7 +339,7 @@ export default function Optics() {
               <RowBetween>
                 <TYPE.white
                   fontSize={14}
-                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in beta.`}</TYPE.white>
+                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in alpha.`}</TYPE.white>
               </RowBetween>
               <ExternalLink
                 style={{ color: 'white', textDecoration: 'underline' }}
