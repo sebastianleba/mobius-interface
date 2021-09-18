@@ -7,6 +7,8 @@ import { AutoColumn } from '../Column'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { RowBetween } from '../Row'
+import WithdrawLP from './WithdrawLP'
+import WithdrawTokens from './WithdrawTokens'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -47,12 +49,12 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
               <QuestionHelper text="Withdraw by specific token amounts rather than LP tokens." />
             </RowFixed>
             <Toggle id="toggle-equal-amount-button" isActive={byToken} toggle={() => setByToken(!byToken)} />
-          </RowBetween>
+          </RowBetween> */}
           {byToken ? (
             <WithdrawTokens poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
           ) : (
             <WithdrawLP poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
-          )} */}
+          )}
         </ContentWrapper>
       )}
       {attempting && !hash && (
