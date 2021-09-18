@@ -82,7 +82,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  const totalStakedAmount = useTokenBalance(pool.gaugeAddress, pool.lpToken)
+  const totalStakedAmount = useTokenBalance(pool?.gaugeAddress, pool?.lpToken)
   return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
 }
 

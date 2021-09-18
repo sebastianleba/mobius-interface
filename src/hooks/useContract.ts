@@ -88,7 +88,7 @@ export function useGaugeControllerContract(address?: string, withSignerIfPossibl
   const { chainId } = useActiveWeb3React()
   const fallBackAddress =
     chainId === ChainId.MAINNET
-      ? '0x4294a1B95aBc92c050496B6418fC25B8C207D517'
+      ? '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25'
       : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }

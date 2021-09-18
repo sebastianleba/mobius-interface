@@ -67,6 +67,7 @@ export default function UpdatePools(): null {
           const pendingMobi = account
             ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
             : undefined
+          console.log({ pendingMobi })
 
           const totalMobiPerBlock = JSBI.divide(
             JSBI.multiply(totalMobiRate, weight),
@@ -112,7 +113,7 @@ export default function UpdatePools(): null {
       //const swapContract = getContract(pool.address, SWAP.abi, library) as any
       updatePool(pool, poolContract?.attach(pool.address), lpTokenContract?.attach(pool.lpToken.address))
     })
-  }, [blockNumber, library])
+  }, [blockNumber, library, account])
 
   return null
 }

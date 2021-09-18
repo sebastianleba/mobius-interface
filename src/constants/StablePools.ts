@@ -19,13 +19,13 @@ export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
 }
 
 export const MOBIUS_MINTER_ADDRESS: { [K in ChainId]: string } = {
-  [ChainId.MAINNET]: '0xF94847bF134d72a6C5BFA4aE34Dd3930696B0600',
+  [ChainId.MAINNET]: '0x5F0200CA03196D5b817E2044a0Bb0D837e0A7823',
   [ChainId.ALFAJORES]: '0xa9f324CdB134f0b24094DCC80Fb720181e992437',
   [ChainId.BAKLAVA]: '',
 }
 
 export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
-  [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0xf0f4DF0cDE2C8cB8660ed022d7a22488F723e702'),
+  [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0x73a210637f6F6B7005512677Ba6B3C96bb4AA44B'),
   [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
   [ChainId.BAKLAVA]: undefined,
 }
@@ -78,7 +78,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
-      gaugeAddress: '0xaD18fda9B6eBD42d8bADE94fe55144A79b2E8EDb',
+      gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
     },
     {
       name: 'BTC Pool',
@@ -126,7 +126,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '₿',
       pegComesAfter: true,
       displayDecimals: 3,
-      gaugeAddress: '0x4462ee6661FdD5B3e22E2D2105c300C74D0736D8',
+      gaugeAddress: '0x1A8938a37093d34581B21bAd2AE7DC1c19150C05',
     },
     {
       name: 'ETH Pool',
@@ -174,7 +174,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: 'Ξ',
       pegComesAfter: true,
       displayDecimals: 2,
-      gaugeAddress: '0x721f77738857f9913dA0A72B6Cd30102A084141A',
+      gaugeAddress: '0xD38e76E17E66b562B61c149Ca0EE53CEa1145733',
     },
     {
       name: 'USDT (Moss Bridge) Pool',
@@ -222,7 +222,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
-      gaugeAddress: '0x8a7Ea00b6B7B191F8c425E1d803eFbb5070F6266',
+      gaugeAddress: '0xe2d6095685248F38Ae9fef1b360D772b78Ea19D1',
     },
     {
       name: 'USDC (Moss Bridge) Pool',
@@ -270,7 +270,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
-      gaugeAddress: '0xaA8dD9a084dAD36c8a816bCaF66D852E7BdDDbC4',
+      gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
     },
   ],
   [ChainId.ALFAJORES]: [
@@ -497,25 +497,25 @@ export const USD_POOL_ADDRESSES: AddressMap = {
 }
 
 export const LP_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '0x7B7A47CC6f7d6EB9635792553A6E314898e3EFEB',
+  [ChainId.MAINNET]: '0x34deFd314fa23821a87FCbF5393311Bc5B7608C1',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const FOUNDER_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '0xaAB4a154EE836fcDaa706da7BE3Cd36d116dcF84',
+  [ChainId.MAINNET]: '0x34deFd314fa23821a87FCbF5393311Bc5B7608C1',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const INVESTOR_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '0xd40773280aBCD4F049AFEbBDE9779363Ba184540',
+  [ChainId.MAINNET]: '0x5498248EaB20ff314bC465268920B48eed4Cdb7C',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
 
 export const ADVISOR_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '0x25d43677DF8062Fd28dfd2Cfa31D0E1a2A56eF58',
+  [ChainId.MAINNET]: '0x54Bf52862E1Fdf0D43D9B19Abb5ec72acA0a25A6',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }
