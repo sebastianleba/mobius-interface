@@ -41,6 +41,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   lpToken: Token
   peggedTo: string
   pegComesAfter: boolean | undefined
+  displayDecimals: number
   gaugeAddress?: string
   relativeGaugeWeight?: Fraction
 }

@@ -138,7 +138,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     pegComesAfter,
     feesGenerated,
     mobiRate,
+    displayDecimals,
   } = poolInfo
+  console.log('t', totalDeposited.toExact())
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -149,6 +151,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOf = useQuote(price)
 
   const mobi = useMobi()
+  const userLP = useTokenBalance(account ? account : '', poolInfo.lpToken)
   const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -179,10 +182,16 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     console.error('Weekly apy overflow', e)
   }
   let userBalances: TokenAmount[] = []
+  //TODO: fix here
   if (totalDeposited.greaterThan('0')) {
     userBalances = balances.map((amount) => {
-      const fraction = new Fraction(stakedAmount.raw, totalDeposited.raw)
+      console.log(amount.toExact())
+      if (userLP) console.log('steak', userLP.toExact())
+      console.log('tota', totalDeposited.toExact())
+      const fraction = new Fraction(userLP ? userLP.raw : JSBI.BigInt(0), totalDeposited.raw)
+      console.log('frac', fraction.toFixed(18))
       const ratio = fraction.multiply(amount.raw)
+      console.log('he', JSBI.divide(ratio.numerator, ratio.denominator).toString())
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
@@ -199,7 +208,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // const apyFraction = poolInfo.apr || undefined
   // const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
   const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
-
+  console.log(displayDecimals, 's')
   return (
     <Wrapper
       showBackground={true}
@@ -233,7 +242,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             Fees Generated: {peggedTo}
             {feesGenerated.denominator.toString() !== '0'
-              ? `${priceOf(feesGenerated).toFixed(2, { groupSeparator: ',' })}`
+              ? `${priceOf(feesGenerated).toFixed(displayDecimals, { groupSeparator: ',' })}`
               : '-'}{' '}
           </TYPE.subHeader>
         ) : (
@@ -259,15 +268,19 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <TYPE.black>Total deposited</TYPE.black>
               <RowFixed>
                 <TYPE.black>
-                  {virtualPrice
-                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(virtualPrice).toFixed(1, {
+                  {console.log('pee4', totalDeposited.toFixed(displayDecimals))}
+                  {totalDeposited
+                    ? `${!pegComesAfter ? peggedTo : ''}${totalDeposited.toFixed(displayDecimals, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
                 </TYPE.black>
                 <QuestionHelper
                   text={balances
-                    .map((balance) => `${balance?.toFixed(1, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                    .map(
+                      (balance) =>
+                        `${balance?.toFixed(displayDecimals, { groupSeparator: ',' })} ${balance.token.symbol}`
+                    )
                     .join(', ')}
                 />
               </RowFixed>
@@ -291,7 +304,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {virtualPrice
-                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(1, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(displayDecimals, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
@@ -347,12 +360,17 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         {!pegComesAfter && peggedTo}
-                        {priceOf(priceOfStaked).toFixed(1, { groupSeparator: ',' })}
+                        {userBalances
+                          .map((x) => Number(x.toFixed(displayDecimals)))
+                          .reduce((prev, cur) => prev + cur, 0)}
                         {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
                         text={userBalances
-                          .map((balance) => `${balance?.toFixed(1, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                          .map(
+                            (balance) =>
+                              `${balance?.toFixed(displayDecimals, { groupSeparator: ',' })} ${balance.token.symbol}`
+                          )
                           .join(', ')}
                       />
                     </RowFixed>
