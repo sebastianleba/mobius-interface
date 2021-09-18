@@ -58,7 +58,7 @@ export default function Earn() {
     ? VestType.FOUNDER
     : pathname.includes('investor')
     ? VestType.INVESTOR
-    : pathname.includes('Advisor')
+    : pathname.includes('advisor')
     ? VestType.ADVISOR
     : VestType.LP
   const claim = useClaimInfo(type)
