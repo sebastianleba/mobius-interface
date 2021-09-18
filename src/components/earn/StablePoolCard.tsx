@@ -231,10 +231,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           </RowFixed>
         ) : feesGenerated ? (
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-            Fees Generated: {peggedTo}
+            Fees Generated: {pegComesAfter ? '' : peggedTo}
             {feesGenerated.denominator.toString() !== '0'
               ? `${priceOf(feesGenerated).toFixed(2, { groupSeparator: ',' })}`
-              : '-'}{' '}
+              : '-'}
+            {pegComesAfter ? peggedTo : ''}
           </TYPE.subHeader>
         ) : (
           <TYPE.black fontWeight={600} fontSize={[14, 18]}>
