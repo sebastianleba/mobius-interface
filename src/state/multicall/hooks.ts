@@ -253,33 +253,6 @@ export function useSingleCallResult(
   const result = useCallsData(calls, options)[0]
   const latestBlockNumber = useBlockNumber()
 
-  // if (methodName === 'calculateTokenAmount') {
-  //   console.log({
-  //     calls,
-  //     fragment,
-  //     result,
-  //     inputs,
-  //   })
-  // }
-  // useEffect(() => {
-  //   console.log({ calls })
-  // }, [calls])
-  // useEffect(() => {
-  //   console.log({ fragment })
-  // }, [fragment])
-  // useEffect(() => {
-  //   console.log({ result })
-  // }, [result])
-  // useEffect(() => {
-  //   console.log({ inputs })
-  // }, [inputs])
-  // useEffect(() => {
-  //   console.log({ methodName })
-  // }, [methodName])
-  // useEffect(() => {
-  //   console.log({ latestBlockNumber })
-  // }, [latestBlockNumber])
-
   return useMemo(() => {
     return toCallState(result, contract?.interface, fragment, latestBlockNumber)
   }, [result, contract, fragment, latestBlockNumber])

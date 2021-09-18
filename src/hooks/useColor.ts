@@ -1,7 +1,6 @@
 import * as UbeswapDefaultList from '@ubeswap/default-token-list'
 import * as UbeswapExperimentalList from '@ubeswap/default-token-list/ubeswap-experimental.token-list.json'
 import { ChainId, Token } from '@ubeswap/sdk'
-import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
 import { STATIC_POOL_INFO } from 'constants/StablePools'
 import Vibrant from 'node-vibrant'
 import { shade } from 'polished'
@@ -9,22 +8,6 @@ import { useLayoutEffect, useState } from 'react'
 import { useTheme } from 'styled-components'
 import uriToHttp from 'utils/uriToHttp'
 import { hex } from 'wcag-contrast'
-
-const ethColor = '#5ca6ce'
-const celoColor = '#FBCC5C'
-const polygonColor = '#8247e5'
-
-export const networkColors: { [id in MultiChainIds]: string } = {
-  [MultiChainIds.ETHEREUM]: ethColor,
-  [MultiChainIds.CELO]: celoColor,
-  [MultiChainIds.POLYGON]: polygonColor,
-  [MultiChainIds.BAKLAVA]: celoColor,
-  [MultiChainIds.KOVAN]: ethColor,
-  [MultiChainIds.RINKEBY]: ethColor,
-  [MultiChainIds.ALFAJORES]: celoColor,
-}
-
-const getNetworkColor = (network: OpticsDomainInfo) => networkColors[network.chainId] as any as string
 
 const images: Record<string, string> = {}
 
@@ -86,6 +69,7 @@ async function getColorFromUriPath(uri: string): Promise<string | null> {
 export function generateGradient(tokens: Token[]) {
   const prevColor = ''
   let colors = tokens.map((t) => useColor(t))
+  console.log(colors)
   const numColors = colors.length + 1
   const increment = 100 / numColors
   colors = colors.map((color, i) => `${color} ${i * increment}%`)

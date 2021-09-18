@@ -6,14 +6,12 @@ import useToggle from 'hooks/useToggle'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
-import { useLocation } from 'react-router'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
-import { useBridgeableTokens } from '../../hooks/optics'
+import { useActiveWeb3React } from '../../hooks'
 import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
@@ -67,7 +65,6 @@ export function CurrencySearch({
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { chainId } = useActiveWeb3React()
-  const actualChainId = useWeb3ChainId()
   const theme = useTheme()
 
   // refs for fixed size lists
@@ -75,7 +72,6 @@ export function CurrencySearch({
 
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [invertSearchOrder] = useState<boolean>(false)
-  const location = useLocation()
 
   const allTokens = useSwappableTokens()
   // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
@@ -84,12 +80,10 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(searchQuery)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
-  const bridgeableTokens = useBridgeableTokens()
+  console.log(otherSelectedCurrency)
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-  if (location.pathname.includes('optics')) {
-    tokensToSelect = bridgeableTokens
-  }
+
   useEffect(() => {
     if (isAddressSearch) {
       ReactGA.event({

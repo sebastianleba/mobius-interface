@@ -1,12 +1,11 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { TokenAmount } from '@ubeswap/sdk'
-import { useMobi } from 'hooks/Tokens'
 import React, { useState } from 'react'
-import { StablePoolInfo } from 'state/stablePools/hooks'
+import { DualRewardsInfo } from 'state/stake/useDualStakeRewards'
 import styled from 'styled-components'
 
 import { useActiveWeb3React } from '../../hooks'
-import { useLiquidityGaugeContract, useMobiMinterContract } from '../../hooks/useContract'
+import { useStakingContract } from '../../hooks/useContract'
+import { StakingInfo } from '../../state/stake/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError } from '../Button'
@@ -23,13 +22,11 @@ const ContentWrapper = styled(AutoColumn)`
 interface StakingModalProps {
   isOpen: boolean
   onDismiss: () => void
-  stakingInfo: StablePoolInfo
+  stakingInfo: StakingInfo | DualRewardsInfo
 }
 
 export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
-  const { account, chainId } = useActiveWeb3React()
-  const mobi = useMobi()
-  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi)
+  const { account } = useActiveWeb3React()
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
@@ -42,17 +39,16 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
     onDismiss()
   }
 
-  const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
-  const minter = useMobiMinterContract()
+  const stakingContract = useStakingContract(stakingInfo.stakingRewardAddress)
 
   async function onClaimReward() {
     if (stakingContract && stakingInfo?.stakedAmount) {
       setAttempting(true)
-      await minter
-        .mint(stakingInfo.gaugeAddress, { gasLimit: 350000 })
+      await stakingContract
+        .getReward({ gasLimit: 350000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Claim accumulated MOBI rewards`,
+            summary: `Claim accumulated UBE rewards`,
           })
           setHash(response.hash)
         })
@@ -79,16 +75,16 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
             <TYPE.mediumHeader>Claim</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
-          {pendingMobi && (
+          {stakingInfo?.earnedAmountUbe && (
             <AutoColumn justify="center" gap="md">
               <TYPE.body fontWeight={600} fontSize={36}>
-                {pendingMobi.toSignificant(6)} MOBI
+                {stakingInfo?.earnedAmountUbe?.toSignificant(6)} UBE
               </TYPE.body>
-              {/* {stakingInfo?.dualRewards && (
+              {stakingInfo?.dualRewards && (
                 <TYPE.body fontWeight={600} fontSize={36}>
                   {stakingInfo?.earnedAmount?.toSignificant(6)} {stakingInfo?.rewardToken?.symbol}
                 </TYPE.body>
-              )} */}
+              )}
               <TYPE.body>Unclaimed rewards</TYPE.body>
             </AutoColumn>
           )}
@@ -103,7 +99,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOnDismiss}>
           <AutoColumn gap="12px" justify={'center'}>
-            <TYPE.body fontSize={20}>Claiming {pendingMobi.toSignificant(6)} MOBI</TYPE.body>
+            <TYPE.body fontSize={20}>Claiming {stakingInfo?.earnedAmount?.toSignificant(6)} UBE</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -111,7 +107,7 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
         <SubmittedView onDismiss={wrappedOnDismiss} hash={hash}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
-            <TYPE.body fontSize={20}>Claimed MOBI!</TYPE.body>
+            <TYPE.body fontSize={20}>Claimed UBE!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

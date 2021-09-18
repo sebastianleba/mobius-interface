@@ -1,5 +1,5 @@
 import { TransactionResponse } from '@ethersproject/providers'
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
 import styled from 'styled-components'
@@ -13,7 +13,7 @@ import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hoo
 import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { useUserTransactionTTL } from '../../state/user/hooks'
-import { useTokenBalanceDirect, useTokenBalanceSingle } from '../../state/wallet/hooks'
+import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -23,8 +23,6 @@ import { Input as NumericalInput } from '../NumericalInput'
 import QuestionHelper from '../QuestionHelper'
 import { RowBetween, RowFixed } from '../Row'
 import Toggle from '../Toggle'
-
-const TEN = JSBI.BigInt('10')
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -51,39 +49,16 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
-  const [amounts, setAmounts] = useState<string[]>(new Array(poolInfo.tokens.length).fill('0'))
-  const [tokenBalances] = useTokenBalanceDirect(account, tokens.slice())
   const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
-    tokens.map((token) => new TokenAmount(token, '0'))
+    poolInfo.tokens.map((t) => new TokenAmount(t, JSBI.BigInt('0')))
   )
-  const insufficientFunds = selectedAmounts.reduce((accum, amount) => {
-    !!accum || !!amount?.greaterThan(tokenBalances[amount.address]?.raw ?? '0') || true
-  }, false)
-  // const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
-  //   poolInfo.tokens.map((t) => new TokenAmount(t, JSBI.BigInt('0')))
-  // )
   const [useEqualAmount, setUseEqualAmount] = useState<boolean>(false)
   const [ttl] = useUserTransactionTTL()
   const blockTimeStamp = useCurrentBlockTimestamp()
   const deadline = useTransactionDeadline()
+  const [insufficientFunds, setInsufficientFunds] = useState<boolean>(false)
 
   const expectedLPTokens = useExpectedLpTokens(poolInfo, selectedAmounts)
-
-  const handleUserInput = (i: number) => (val: string) => {
-    let newTokenAmount: TokenAmount[]
-    let newAmount: string[]
-    if (useEqualAmount) {
-      newTokenAmount = tokens.map((t) => tryParseAmount(val, t) || new TokenAmount(t, '0'))
-      newAmount = new Array(tokens.length).fill(val)
-    } else {
-      const parsed = tryParseAmount(val, tokens[i]) || new TokenAmount(tokens[i], '0')
-      newTokenAmount = [...selectedAmounts.slice(0, i), parsed, ...selectedAmounts.slice(i + 1)]
-      newAmount = [...amounts.slice(0, i), val, ...amounts.slice(i + 1)]
-    }
-    setSelectedAmounts(newTokenAmount)
-    setAmounts(newAmount)
-  }
-
   const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
   const approvals = [
     useApproveCallback(selectedAmounts[0], poolInfo.poolAddress),
@@ -108,12 +83,11 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
 
   const stakingContract = useStableSwapContract(poolInfo.poolAddress)
   async function onDeposit() {
-    const allValid = selectedAmounts.reduce((accum, cur) => accum && !!cur && !!cur.raw, true)
-    if (stakingContract && poolInfo?.stakedAmount && allValid) {
+    if (stakingContract && poolInfo?.stakedAmount) {
       setAttempting(true)
-      const tokenAmounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
+      const amounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
       await stakingContract
-        .addLiquidity(tokenAmounts, withSlippage.toString(), deadline)
+        .addLiquidity(amounts, withSlippage.toString(), deadline)
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Deposit Liquidity into ${poolInfo.name}`,
@@ -163,9 +137,19 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
           {poolInfo.tokens.map((token, i) => (
             <div key={`deposit-row-${token.symbol}-${i}-${poolInfo.name}`}>
               <CurrencyRow
-                tokenAmount={amounts ? amounts[i] : '0.00'}
-                token={token}
-                setTokenAmount={handleUserInput(i)}
+                tokenAmount={selectedAmounts[i]}
+                setTokenAmount={(val: TokenAmount) => {
+                  if (useEqualAmount) {
+                    setSelectedAmounts(poolInfo.tokens.map((token) => new TokenAmount(token, val.raw)))
+                  } else {
+                    setSelectedAmounts([
+                      ...selectedAmounts.slice(0, i),
+                      val,
+                      ...selectedAmounts.slice(i + 1, selectedAmounts.length),
+                    ])
+                  }
+                }}
+                setUsingInsufficientFunds={setInsufficientFunds}
               />
               {i !== selectedAmounts.length - 1 && (
                 <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>
@@ -221,9 +205,9 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
 }
 
 type CurrencyRowProps = {
-  tokenAmount: string
-  token: Token
-  setTokenAmount: (tokenAmount: string) => void
+  tokenAmount: TokenAmount
+  setTokenAmount: (tokenAmount: TokenAmount) => void
+  setUsingInsufficientFunds: (isInsufficient: boolean) => void
 }
 
 const InputRowLeft = styled.div``
@@ -273,10 +257,10 @@ const BalanceText = styled(TYPE.subHeader)`
   cursor: pointer;
 `
 
-const CurrencyRow = ({ tokenAmount, token, setTokenAmount }: CurrencyRowProps) => {
+const CurrencyRow = ({ tokenAmount, setTokenAmount, setUsingInsufficientFunds }: CurrencyRowProps) => {
   const { account } = useActiveWeb3React()
-  const currency = token
-  const tokenBalance = useTokenBalanceSingle(account ?? undefined, currency ?? undefined)
+  const currency = tokenAmount.currency
+  const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')
   const ZERO_TOK = new TokenAmount(currency, JSBI.BigInt('0'))
 
@@ -300,9 +284,11 @@ const CurrencyRow = ({ tokenAmount, token, setTokenAmount }: CurrencyRowProps) =
       <InputDiv>
         <NumericalInput
           className="token-amount-input"
-          value={tokenAmount}
+          value={scaledDown(tokenAmount.raw)}
           onUserInput={(val) => {
-            setTokenAmount(val || '0')
+            const amount = tryParseAmount(val, currency)
+            setUsingInsufficientFunds(amount?.greaterThan(tokenBalance) || false)
+            setTokenAmount(amount || ZERO_TOK)
           }}
         />
       </InputDiv>
@@ -310,7 +296,7 @@ const CurrencyRow = ({ tokenAmount, token, setTokenAmount }: CurrencyRowProps) =
   )
   const balanceRow = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <BalanceText onClick={() => setTokenAmount(tokenBalance?.toExact() || '0.00')}>
+      <BalanceText onClick={() => setTokenAmount(tokenBalance || ZERO_TOK)}>
         Balance: {tokenBalance?.toFixed(2)}
       </BalanceText>
     </div>
