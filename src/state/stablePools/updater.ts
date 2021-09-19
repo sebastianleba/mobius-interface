@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
 
 import { STATIC_POOL_INFO } from '../../constants/StablePools'
-import { Erc20, Swap } from '../../generated'
+import { Erc20, LiquidityGaugeV3, Swap } from '../../generated'
 import { useActiveWeb3React } from '../../hooks'
 import {
   useGaugeControllerContract,
@@ -26,7 +26,7 @@ export default function UpdatePools(): null {
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
   const poolContract = useStableSwapContract(pools[0].address)
   const lpTokenContract = useLpTokenContract(pools[0].lpToken.address)
-  let gauge = useLiquidityGaugeContract('0x1A8938a37093d34581B21bAd2AE7DC1c19150C05')
+  const gaugeContract = useLiquidityGaugeContract('0x1A8938a37093d34581B21bAd2AE7DC1c19150C05')
   const mobiContract = useMobiContract()
   const gaugeController = useGaugeControllerContract()
 
@@ -35,9 +35,10 @@ export default function UpdatePools(): null {
     const updatePool = async (
       poolInfo: StableSwapConstants,
       contract: Swap | undefined,
-      lpToken: Erc20 | undefined
+      lpToken: Erc20 | undefined,
+      gauge: LiquidityGaugeV3 | undefined
     ) => {
-      if (!contract || !lpToken) return
+      if (!contract || !lpToken || !gauge) return
 
       try {
         const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
@@ -58,59 +59,57 @@ export default function UpdatePools(): null {
           fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
         )
         const stakingInfo = {}
-        if (poolInfo.gaugeAddress) {
-          gauge = (await gauge?.attach(poolInfo.gaugeAddress)) ?? gauge
-          const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
-          const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
-          const weight = JSBI.BigInt(
-            (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
-          )
-          const pendingMobi = account
-            ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
-            : undefined
+        const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
+        const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
+        const weight = JSBI.BigInt(
+          (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
+        )
+        const pendingMobi = account
+          ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
+          : undefined
 
-          const totalMobiPerBlock = JSBI.divide(
-            JSBI.multiply(totalMobiRate, weight),
-            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-          )
+        const totalMobiPerBlock = JSBI.divide(
+          JSBI.multiply(totalMobiRate, weight),
+          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+        )
 
-          dispatch(
-            initPool({
-              address: poolInfo.name,
-              pool: {
-                ...poolInfo,
-                virtualPrice,
-                balances,
-                amp,
-                lpTotalSupply,
-                lpOwned,
-                aPrecise,
-                feesGenerated,
-                staking: {
-                  userStaked: lpStaked,
-                  totalMobiRate: totalMobiPerBlock,
-                  pendingMobi,
-                },
+        dispatch(
+          initPool({
+            address: poolInfo.name,
+            pool: {
+              ...poolInfo,
+              virtualPrice,
+              balances,
+              amp,
+              lpTotalSupply,
+              lpOwned,
+              aPrecise,
+              feesGenerated,
+              staking: {
+                userStaked: lpStaked,
+                totalMobiRate: totalMobiPerBlock,
+                pendingMobi,
               },
-            })
-          )
-        } else {
-          dispatch(
-            initPool({
-              address: poolInfo.name,
-              pool: {
-                ...poolInfo,
-                virtualPrice,
-                balances,
-                amp,
-                lpTotalSupply,
-                lpOwned,
-                aPrecise,
-                feesGenerated,
-              },
-            })
-          )
-        }
+            },
+          })
+        )
+        // } else {
+        //   dispatch(
+        //     initPool({
+        //       address: poolInfo.name,
+        //       pool: {
+        //         ...poolInfo,
+        //         virtualPrice,
+        //         balances,
+        //         amp,
+        //         lpTotalSupply,
+        //         lpOwned,
+        //         aPrecise,
+        //         feesGenerated,
+        //       },
+        //     })
+        //   )
+        // }
       } catch (error) {
         console.error(error)
       }
@@ -118,7 +117,12 @@ export default function UpdatePools(): null {
 
     pools.forEach((pool, i) => {
       //const swapContract = getContract(pool.address, SWAP.abi, library) as any
-      updatePool(pool, poolContract?.attach(pool.address), lpTokenContract?.attach(pool.lpToken.address))
+      updatePool(
+        pool,
+        poolContract?.attach(pool.address),
+        lpTokenContract?.attach(pool.lpToken.address),
+        gaugeContract?.attach(pool.gaugeAddress)
+      )
     })
   }, [blockNumber, library, account, dispatch])
 

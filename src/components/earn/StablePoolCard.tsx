@@ -150,7 +150,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
-  const isLive = now >= launchTime
+  const isLive = true
 
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
@@ -206,7 +206,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
-  const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
+  let balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
+  balance = balance * parseFloat(virtualPrice.toString())
   const totalBalance = balances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
 
   // get the color of the token
@@ -319,7 +320,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <TYPE.black>Total volume</TYPE.black>
               <RowFixed>
                 <TYPE.black>
-                  {virtualPrice
+                  {totalVolume
                     ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(displayDecimals, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`

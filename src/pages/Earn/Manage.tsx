@@ -124,7 +124,7 @@ export default function Manage({
   useEffect(() => {
     const updateMobi = async () => {
       const bigInt = await gaugeContract?.claimable_tokens(account)
-      setEarnedMobi(new TokenAmount(mobi, bigInt.toString()))
+      setEarnedMobi(new TokenAmount(mobi, bigInt?.toString() ?? '0'))
     }
     account && updateMobi()
   }, [gaugeContract, setEarnedMobi, account])

@@ -25,7 +25,7 @@ export interface StablePoolInfo {
   readonly totalVolume?: TokenAmount
   readonly peggedTo: string
   readonly displayDecimals: number
-  readonly virtualPrice: TokenAmount
+  readonly virtualPrice: JSBI
   readonly priceOfStaked: TokenAmount
   readonly balances: TokenAmount[]
   readonly pegComesAfter: boolean | undefined
@@ -66,7 +66,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
   apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
   peggedTo: pool.peggedTo,
-  virtualPrice: tokenAmountScaled(pool.lpToken, JSBI.multiply(pool.virtualPrice, pool.lpTotalSupply)),
+  virtualPrice: JSBI.divide(pool.virtualPrice, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
   priceOfStaked: tokenAmountScaled(
     pool.lpToken,
     JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
@@ -124,15 +124,15 @@ export function useExpectedLpTokens(
     () => tokens.map((t, i) => tryParseAmount(input[i], t) ?? new TokenAmount(t, '0')),
     [input]
   )
+  //console.log(input)
   return useMemo(() => {
-    if (tokenAmounts[0].equalTo('0') || tokenAmounts[1].equalTo('0')) {
-      const nonZero = tokenAmounts[0].equalTo('0') ? tokenAmounts[1] : tokenAmounts[0]
-      return [
-        new TokenAmount(pool.lpToken, JSBI.subtract(nonZero.raw, JSBI.divide(nonZero.raw, JSBI.BigInt('8')))),
-        tokenAmounts,
-      ]
+    // console.log(tokenAmounts)
+    // console.log(pool.amountDeposited)
+    const allZero = tokenAmounts.reduce((accum, cur) => accum && cur.equalTo('0'), true)
+    if (allZero) {
+      return [new TokenAmount(pool.lpToken, '0'), tokenAmounts]
     }
-    if (!pool.amountDeposited || pool.amountDeposited?.equalTo('0')) {
+    if (!pool.amountDeposited) {
       const amount =
         tryParseAmount(
           tokenAmounts.reduce((accum, cur) => (parseInt(accum) + parseInt(cur.toFixed())).toString(), '0'),
@@ -145,8 +145,9 @@ export function useExpectedLpTokens(
         tokenAmounts.map((ta) => ta?.raw || JSBI.BigInt('0')),
         isDeposit
       ) ?? JSBI.BigInt('0')
-    return [new TokenAmount(pool.lpToken, JSBI.subtract(amount, JSBI.divide(amount, JSBI.BigInt('10')))), tokenAmounts]
-  }, [...input])
+    console.log(amount.toString())
+    return [new TokenAmount(pool.lpToken, amount), tokenAmounts]
+  }, [input, mathUtil, tokenAmounts])
 }
 
 export function useMathUtil(pool: StableSwapPool | string): StableSwapMath | undefined {
