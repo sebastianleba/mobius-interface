@@ -58,8 +58,7 @@ export default function UpdatePools(): null {
         )
         const stakingInfo = {}
         if (poolInfo.gaugeAddress) {
-          gauge = await gauge?.attach(poolInfo.gaugeAddress)
-          console.log({ actual: gauge?.address, expected: poolInfo.gaugeAddress, name: poolInfo.name })
+          gauge = (await gauge?.attach(poolInfo.gaugeAddress)) ?? gauge
           const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
           const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
           const weight = JSBI.BigInt(
