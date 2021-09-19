@@ -38,6 +38,7 @@ export default function UpdatePools(): null {
       lpToken: Erc20 | undefined
     ) => {
       if (!contract || !lpToken) return
+
       try {
         const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
         const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
@@ -58,7 +59,7 @@ export default function UpdatePools(): null {
         )
         const stakingInfo = {}
         if (poolInfo.gaugeAddress) {
-          gauge = await gauge?.attach(poolInfo.gaugeAddress)
+          gauge = (await gauge?.attach(poolInfo.gaugeAddress)) ?? gauge
           const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
           const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
           const weight = JSBI.BigInt(
@@ -119,7 +120,7 @@ export default function UpdatePools(): null {
       //const swapContract = getContract(pool.address, SWAP.abi, library) as any
       updatePool(pool, poolContract?.attach(pool.address), lpTokenContract?.attach(pool.lpToken.address))
     })
-  }, [blockNumber, library, account])
+  }, [blockNumber, library, account, dispatch])
 
   return null
 }

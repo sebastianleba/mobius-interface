@@ -148,8 +148,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       ? JSBI.BigInt('3431')
       : JSBI.BigInt('1')
 
-  console.log({ poolInfo, price: lpPrice.toString() })
-
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = now >= launchTime

@@ -35,7 +35,6 @@ export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
       JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(trade.output.token.decimals - trade.input.token.decimals))
     )
   }
-  console.log(inAmount.toString(), outAmount.toString())
   const priceImpact = new Percent(JSBI.subtract(inAmount, outAmount), outAmount)
 
   // the amount of the input that accrues to LPs

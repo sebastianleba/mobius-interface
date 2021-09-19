@@ -294,9 +294,6 @@ function calcInputOutput(
   }
   const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
   const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
-  console.log('input', input)
-  console.log('output', output)
-  console.log('math', math.DECIMALS, math.PRECISION)
 
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
@@ -312,7 +309,6 @@ function calcInputOutput(
   } else {
     details[1] = parsedAmount
     const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    console.log('in', String(requiredIn))
     details[0] = new TokenAmount(input, requiredIn)
     details[2] = new TokenAmount(input, JSBI.BigInt('0'))
   }
