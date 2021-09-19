@@ -140,10 +140,11 @@ export function useExpectedLpTokens(
         ) ?? new TokenAmount(pool.lpToken, '0')
       return [amount, tokenAmounts]
     }
-    const amount = mathUtil?.calculateTokenAmount(
-      tokenAmounts.map((ta) => ta?.raw || JSBI.BigInt('0')),
-      isDeposit
-    )
+    const amount =
+      mathUtil?.calculateTokenAmount(
+        tokenAmounts.map((ta) => ta?.raw || JSBI.BigInt('0')),
+        isDeposit
+      ) ?? JSBI.BigInt('0')
     return [new TokenAmount(pool.lpToken, JSBI.subtract(amount, JSBI.divide(amount, JSBI.BigInt('10')))), tokenAmounts]
   }, [...input])
 }
