@@ -102,7 +102,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
             decimals: 8,
             symbol: 'wBTC(O)',
-            name: 'Wrapped Bitcoin (Optics Bride)',
+            name: 'Wrapped Bitcoin (Optics Bridge)',
             logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
           },
           []
@@ -437,7 +437,7 @@ export const TOKENS: { [chain in ChainId]: { [address: string]: Token } } = {
         address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
         decimals: 8,
         symbol: 'wBTC(O)',
-        name: 'Wrapped Bitcoin (Optics Bride)',
+        name: 'Wrapped Bitcoin (Optics Bridge)',
         logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
       },
       []
