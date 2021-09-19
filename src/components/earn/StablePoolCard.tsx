@@ -4,7 +4,7 @@ import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { useTokenBalance } from 'state/wallet/hooks'
+import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
@@ -157,7 +157,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
-  const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
+  const totalStakedAmount = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
   if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
