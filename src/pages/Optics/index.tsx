@@ -40,7 +40,7 @@ const WalletButton = styled(ButtonPrimary)`
 `
 
 const VoteCard = styled(DataCard)`
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #27ae60 0%, #222 100%);
+  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff033e 0%, #222 100%);
   overflow: hidden;
   margin-top: 2rem;
 `
@@ -338,7 +338,7 @@ export default function Optics() {
               <RowBetween>
                 <TYPE.white
                   fontSize={14}
-                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in alpha.`}</TYPE.white>
+                >{`WARNING: The Optics Bridge is an experimental product that is pre-beta and considered highly risky. USE AT YOUR OWN RISK. Transfers can take several hours, if not days, to process while the product is in its infancy. Currently the Mobius exchange only supports Ethereum assets and not Polygon.`}</TYPE.white>
               </RowBetween>
               <ExternalLink
                 style={{ color: 'white', textDecoration: 'underline' }}
