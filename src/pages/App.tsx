@@ -111,13 +111,13 @@ export default function App() {
                 <Route exact strict path="/pool" component={Earn} />
                 <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
                 <Route exact strict path="/risk" component={RiskPage} />
+                <Route exact strict path="/optics" component={Optics} />
                 {isLive && (
                   <>
                     <Route path="/claim" component={Claim} />
                     <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
                   </>
                 )}
-                <Route exact strict path="/optics" component={Optics} />
                 {/* <Route component={RedirectPathToSwapOnly} /> */}
               </Switch>
             </Web3ReactManager>
