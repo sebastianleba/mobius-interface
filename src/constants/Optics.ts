@@ -80,8 +80,19 @@ export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
     new WrappedTokenInfo(
       {
         symbol: 'USDC',
-        name: 'US Dollar Coin',
+        name: 'US Dollar Coin (ETH)',
         address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
+        chainId: MultiChainIds.CELO,
+        logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
+        decimals: 6,
+      },
+      []
+    ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'USDC',
+        name: 'US Dollar Coin (POLY)',
+        address: '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941',
         chainId: MultiChainIds.CELO,
         logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
         decimals: 6,
