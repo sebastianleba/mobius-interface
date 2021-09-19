@@ -3,6 +3,7 @@ import React from 'react'
 import { useLocation } from 'react-router'
 import { useClaimInfo } from 'state/claim/hooks'
 import { VestType } from 'state/claim/reducer'
+import UpdateClaim from 'state/claim/updater'
 import styled from 'styled-components'
 
 import { ClaimCard } from '../../components/claim/ClaimCard'
@@ -48,6 +49,7 @@ export default function Earn() {
 
   return (
     <PageWrapper gap="lg" justify="center">
+      <UpdateClaim />
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
           <ErrorBoundary key={'000'}>

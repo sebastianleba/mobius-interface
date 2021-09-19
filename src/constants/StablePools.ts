@@ -497,7 +497,7 @@ export const USD_POOL_ADDRESSES: AddressMap = {
 }
 
 export const LP_VEST_ADDRESSES: AddressMap = {
-  [ChainId.MAINNET]: '0x34deFd314fa23821a87FCbF5393311Bc5B7608C1',
+  [ChainId.MAINNET]: '0x74Fc71eF736feeaCfd58aeb2543c5fe4d33aDc14',
   [ChainId.ALFAJORES]: '0x9ff6d45F5900D7aCBdCb6d79fFFf22C9F63dF040',
   [ChainId.BAKLAVA]: '',
 }

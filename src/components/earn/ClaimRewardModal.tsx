@@ -29,7 +29,7 @@ interface StakingModalProps {
 export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
   const { account, chainId } = useActiveWeb3React()
   const mobi = useMobi()
-  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi)
+  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? '0')
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()

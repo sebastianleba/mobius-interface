@@ -26,7 +26,7 @@ export default function UpdatePools(): null {
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
   const poolContract = useStableSwapContract(pools[0].address)
   const lpTokenContract = useLpTokenContract(pools[0].lpToken.address)
-  let gauge = useLiquidityGaugeContract('0xC0350e1f0531c43d00Ef22571781acA25360E672')
+  let gauge = useLiquidityGaugeContract('0x1A8938a37093d34581B21bAd2AE7DC1c19150C05')
   const mobiContract = useMobiContract()
   const gaugeController = useGaugeControllerContract()
 
@@ -56,9 +56,10 @@ export default function UpdatePools(): null {
           poolInfo.tokens[0],
           fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
         )
-        let stakingInfo = {}
+        const stakingInfo = {}
         if (poolInfo.gaugeAddress) {
-          gauge = gauge?.attach(poolInfo.gaugeAddress) ?? gauge
+          gauge = await gauge?.attach(poolInfo.gaugeAddress)
+          console.log({ actual: gauge?.address, expected: poolInfo.gaugeAddress, name: poolInfo.name })
           const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
           const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
           const weight = JSBI.BigInt(
@@ -67,43 +68,49 @@ export default function UpdatePools(): null {
           const pendingMobi = account
             ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
             : undefined
-          console.log({ pendingMobi })
 
           const totalMobiPerBlock = JSBI.divide(
             JSBI.multiply(totalMobiRate, weight),
             JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
           )
-          // console.log({
-          //   totalMobiRate: totalMobiRate.toString(),
-          //   totalMobiPerBlock: totalMobiPerBlock.toString(),
-          //   weight,
-          //   val: JSBI.divide(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).toString(),
-          // })
-          stakingInfo = {
-            staking: {
-              userStaked: lpStaked,
-              totalMobiRate: totalMobiPerBlock,
-              pendingMobi,
-            },
-          }
-        }
 
-        dispatch(
-          initPool({
-            name: poolInfo.name,
-            pool: {
-              ...poolInfo,
-              ...stakingInfo,
-              virtualPrice,
-              balances,
-              amp,
-              lpTotalSupply,
-              lpOwned,
-              aPrecise,
-              feesGenerated,
-            },
-          })
-        )
+          dispatch(
+            initPool({
+              address: poolInfo.address,
+              pool: {
+                ...poolInfo,
+                virtualPrice,
+                balances,
+                amp,
+                lpTotalSupply,
+                lpOwned,
+                aPrecise,
+                feesGenerated,
+                staking: {
+                  userStaked: lpStaked,
+                  totalMobiRate: totalMobiPerBlock,
+                  pendingMobi,
+                },
+              },
+            })
+          )
+        } else {
+          dispatch(
+            initPool({
+              address: poolInfo.address,
+              pool: {
+                ...poolInfo,
+                virtualPrice,
+                balances,
+                amp,
+                lpTotalSupply,
+                lpOwned,
+                aPrecise,
+                feesGenerated,
+              },
+            })
+          )
+        }
       } catch (error) {
         console.error(error)
       }
@@ -117,3 +124,5 @@ export default function UpdatePools(): null {
 
   return null
 }
+
+//export const UpdatePendingMobi

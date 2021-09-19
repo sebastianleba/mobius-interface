@@ -3,9 +3,11 @@ import CurrencyPoolLogo from 'components/CurrencyPoolLogo'
 import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
 import { useMobi } from 'hooks/Tokens'
-import React, { useCallback, useState } from 'react'
+import { useLiquidityGaugeContract } from 'hooks/useContract'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { useStablePoolInfoByName } from 'state/stablePools/hooks'
+import UpdatePools from 'state/stablePools/updater'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
 import useCUSDPrice from 'utils/useCUSDPrice'
@@ -17,11 +19,11 @@ import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_ZERO } from '../../constants'
+import { BIG_INT_SECONDS_IN_WEEK } from '../../constants'
 import { useActiveWeb3React } from '../../hooks'
 import { useColor } from '../../hooks/useColor'
 import usePrevious from '../../hooks/usePrevious'
-import { useWalletModalToggle } from '../../state/application/hooks'
+import { useBlockNumber, useWalletModalToggle } from '../../state/application/hooks'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLinkIcon, TYPE } from '../../theme'
 import { useStakingPoolValue } from './useStakingPoolValue'
@@ -114,7 +116,21 @@ export default function Manage({
     tokens: [],
   }
 
-  const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? JSBI.BigInt('0'))
+  console.log(stakingInfo)
+
+  //const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? JSBI.BigInt('0'))
+  const [earnedMobi, setEarnedMobi] = useState<TokenAmount>()
+  const gaugeContract = useLiquidityGaugeContract(stakingInfo?.gaugeAddress)
+  const blockNumber = useBlockNumber()
+
+  useEffect(() => {
+    const updateMobi = async () => {
+      const bigInt = await gaugeContract?.claimable_tokens(account)
+      setEarnedMobi(new TokenAmount(mobi, bigInt.toString()))
+    }
+    account && updateMobi()
+  }, [gaugeContract, setEarnedMobi, account])
+
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
   if (totalStakedAmount && totalStakedAmount.greaterThan('0')) {
     userMobiRate = new TokenAmount(
@@ -179,6 +195,7 @@ export default function Manage({
 
   return (
     <PageWrapper gap="lg" justify="center">
+      <UpdatePools />
       {!stakingInfo && <Loader />}
       {stakingInfo && (
         <>
@@ -313,7 +330,7 @@ export default function Manage({
                   <div>
                     <TYPE.black>Your unclaimed rewards</TYPE.black>
                   </div>
-                  {stakingInfo?.pendingMobi && JSBI.notEqual(BIG_INT_ZERO, stakingInfo?.pendingMobi) && (
+                  {earnedMobi && (
                     <ButtonEmpty
                       padding="8px"
                       borderRadius="8px"
