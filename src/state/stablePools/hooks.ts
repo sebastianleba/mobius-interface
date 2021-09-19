@@ -125,6 +125,14 @@ export function useExpectedLpTokens(
     [input]
   )
   return useMemo(() => {
+    if (tokenAmounts[0].equalTo('0') || tokenAmounts[1].equalTo('0')) {
+      const nonZero = tokenAmounts[0].equalTo('0') ? tokenAmounts[1] : tokenAmounts[0]
+      console.log(nonZero)
+      return [
+        new TokenAmount(pool.lpToken, JSBI.subtract(nonZero.raw, JSBI.divide(nonZero.raw, JSBI.BigInt('100')))),
+        tokenAmounts,
+      ]
+    }
     if (!pool.amountDeposited || pool.amountDeposited?.equalTo('0')) {
       const amount =
         tryParseAmount(
