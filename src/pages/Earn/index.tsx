@@ -1,11 +1,13 @@
 import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useActiveWeb3React } from 'hooks'
+import { useMobi } from 'hooks/Tokens'
 import { partition } from 'lodash'
 import React, { useMemo } from 'react'
 import Countdown from 'react-countdown'
 import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { AutoColumn } from '../../components/Column'
 import { PoolCard } from '../../components/earn/PoolCard'
@@ -111,6 +113,7 @@ export default function Earn() {
     return JSBI.add(accum, priceDeposited)
   }, JSBI.BigInt('0'))
   const tvlAsTokenAmount = new TokenAmount(cUSD[chainId], tvl)
+  const mobiprice = useCUSDPrice(useMobi())
 
   const inactiveDisplay = inactivePools.length > 0 && (
     <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
@@ -165,6 +168,9 @@ export default function Earn() {
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
         <TYPE.largeHeader>TVL: ${tvlAsTokenAmount.toFixed(0, { groupSeparator: ',' })}</TYPE.largeHeader>
+      </AutoColumn>
+      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
+        {mobiprice && <TYPE.largeHeader>Latest Mobi Price: ${mobiprice.toFixed(3)}</TYPE.largeHeader>}
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
