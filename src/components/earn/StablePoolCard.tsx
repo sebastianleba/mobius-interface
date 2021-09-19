@@ -319,7 +319,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <TYPE.black>Total volume</TYPE.black>
               <RowFixed>
                 <TYPE.black>
-                  {virtualPrice
+                  {totalVolume
                     ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(displayDecimals, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`

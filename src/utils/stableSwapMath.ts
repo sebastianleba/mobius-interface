@@ -237,7 +237,32 @@ export class StableSwapMath {
     return amounts
   }
 
-  calculateTokenAmount(amounts: JSBI[], deposit: boolean) {
+  // calculateWithdrawOneTokenDY(index: number, amount: JSBI): JSBI {
+  //   let xp = this.calc_xp()
+  //   let preciseA = this.aPrecise
+  //   let d0 = this.getD(xp, preciseA)
+  //   let d1 = JSBI.subtract(d0, JSBI.divide(JSBI.multiply(amount, d0), this.lpTotalSupply))
+  //   const newY = this.getYD(preciseA, index, xp, d1)
+  //   const xpReduced: JSBI[] = new Array(xp.length).fill(JSBI.BigInt('0'))
+  //   for (let i = 0; i < this.N_COINS; i++) {
+  //     let xpi = xp[i]
+  //     const toSubtract =
+  //       i === index
+  //         ? JSBI.subtract(JSBI.divide(JSBI.multiply(xpi, d1), d0), newY)
+  //         : JSBI.subtract(xpi, JSBI.divide(JSBI.multiply(xpi, d1), d0))
+  //     xpReduced[i] = JSBI.subtract(xpi, toSubtract)
+  //   }
+  //   let dy = JSBI.subtract(xpRedcued[index], this.getYD(preciseA, index, xpReduced, ))
+  // }
+
+  // calculateWithdrawOneToken(amount: JSBI, index: number): JSBI {
+  //   let dy: JSBI
+  //   let newY: JSBI
+  //   return JSBI.BigInt('0')
+  // }
+
+  calculateTokenAmount(originalAmounts: JSBI[], deposit: boolean) {
+    const amounts = originalAmounts.map((a) => (JSBI.equal(a, ZERO) ? JSBI.BigInt('1') : a))
     const a = this.aPrecise
     const d0 = this.getD(this.calc_xp(), a)
     const balances1 = this.balances.map((bal, i) =>
