@@ -62,7 +62,7 @@ const localStorageKey = 'valoraRedirect'
 export default function App() {
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
-  const isLive = now >= launchTime
+  const isLive = true
   const location = useLocation()
   React.useEffect(() => {
     // Close window if search params from Valora redirect are present (handles Valora connection issue)

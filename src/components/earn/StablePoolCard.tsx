@@ -143,7 +143,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
-  const isLive = now >= launchTime
+  const isLive = true
 
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)

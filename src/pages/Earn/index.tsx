@@ -71,7 +71,7 @@ export default function Earn() {
   const stakingInfos = useStakingInfo()
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
-  const isLive = now >= launchTime
+  const isLive = true
 
   // toggle copy if rewards are inactive
   const stakingRewardsExist = true

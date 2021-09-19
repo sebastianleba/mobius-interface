@@ -64,7 +64,7 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
 
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
-  const isLive = now >= launchTime
+  const isLive = true
 
   return (
     <CustomModal isOpen={isOpen} onDismiss={onDismiss} maxHeight={90}>
