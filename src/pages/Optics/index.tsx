@@ -70,7 +70,6 @@ export default function Optics() {
   async function onSend() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
-      console.log(selectedToken?.raw.toString())
       setAttempting(true)
       await bridgeContract
         .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {

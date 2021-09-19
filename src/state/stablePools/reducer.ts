@@ -23,6 +23,7 @@ export type StableSwapVariable = {
 }
 
 export type StableSwapMathConstants = {
+  totalMobiRate: JSBI
   name: string
   rates: JSBI[]
   lendingPrecision: JSBI

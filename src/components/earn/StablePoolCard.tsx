@@ -4,7 +4,7 @@ import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { useTokenBalance } from 'state/wallet/hooks'
+import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
@@ -141,6 +141,13 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     displayDecimals,
   } = poolInfo
 
+  const lpPrice =
+    poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+      ? JSBI.BigInt('478510000000')
+      : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+      ? JSBI.BigInt('3431')
+      : JSBI.BigInt('1')
+
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = true
@@ -157,13 +164,17 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
-  const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
+  const totalStakedLPs = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
+  const totalStakedAmount = totalStakedLPs
+    ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalStakedLPs?.raw, lpPrice))
+    : undefined
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
+
   if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
     userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(mobiRate, stakedAmount.raw), totalStakedAmount.raw))
   }
-  const rewardPerYear = totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR)
+  const rewardPerYear = priceOfMobi.quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
 
   const apyFraction =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
@@ -419,7 +430,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           Withdraw
         </DepositWithdrawBtn>
         {isLive && poolInfo.gaugeAddress !== undefined && (
-          <StyledInternalLink to={`/farm/${poolInfo.poolAddress}`} style={{ width: '30%' }}>
+          <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
             <DepositWithdrawBtn
               background={backgroundColorStart}
               backgroundHover={backgroundColorEnd}

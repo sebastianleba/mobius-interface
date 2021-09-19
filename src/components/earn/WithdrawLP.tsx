@@ -35,7 +35,7 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
   const { tokens, lpToken } = poolInfo
   const lpBalance = poolInfo.amountDeposited
   const [approving, setApproving] = useState(false)
-  const [input, setInput] = useState<string>('0')
+  const [input, setInput] = useState<string>('')
   const selectedAmount = tryParseAmount(input, lpToken) || new TokenAmount(lpToken, '0')
   // const [selectedAmount, setSelectedAmount] = useState<TokenAmount>(new TokenAmount(lpToken, JSBI.BigInt('0')))
 
@@ -91,6 +91,7 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
                 val={tokenAmount.toExact()}
                 setTokenAmount={(val: string) => null}
                 readOnly={true}
+                balance={lpBalance}
               />
               {i !== expectedTokens.length - 1 && (
                 <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>
@@ -208,10 +209,12 @@ const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: Currency
       </InputDiv>
     </InputRow>
   )
+  const decimalPlacesForBalance = tokenBalance?.greaterThan('1') ? 2 : tokenBalance?.greaterThan('0') ? 10 : 2
+
   const balanceRow = !readOnly && (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <BalanceText onClick={() => setTokenAmount(tokenBalance?.exact() || '0')}>
-        Balance: {tokenBalance?.toFixed(2)}
+      <BalanceText onClick={() => setTokenAmount(tokenBalance?.toExact() || '0')}>
+        Balance: {tokenBalance?.toFixed(decimalPlacesForBalance)}
       </BalanceText>
     </div>
   )

@@ -116,8 +116,6 @@ export default function Manage({
     tokens: [],
   }
 
-  console.log(stakingInfo)
-
   //const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? JSBI.BigInt('0'))
   const [earnedMobi, setEarnedMobi] = useState<TokenAmount>()
   const gaugeContract = useLiquidityGaugeContract(stakingInfo?.gaugeAddress)

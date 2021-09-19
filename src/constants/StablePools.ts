@@ -79,6 +79,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: false,
       displayDecimals: 0,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
     },
     {
       name: 'BTC Pool',
@@ -127,6 +128,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: true,
       displayDecimals: 3,
       gaugeAddress: '0x1A8938a37093d34581B21bAd2AE7DC1c19150C05',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
     },
     {
       name: 'ETH Pool',
@@ -175,6 +177,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: true,
       displayDecimals: 2,
       gaugeAddress: '0xD38e76E17E66b562B61c149Ca0EE53CEa1145733',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
     },
     {
       name: 'USDT (Moss Bridge) Pool',
@@ -223,6 +226,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: false,
       displayDecimals: 0,
       gaugeAddress: '0xe2d6095685248F38Ae9fef1b360D772b78Ea19D1',
+      totalMobiRate: JSBI.BigInt('146712000000000000'),
     },
     {
       name: 'USDC (Moss Bridge) Pool',
@@ -271,6 +275,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: false,
       displayDecimals: 0,
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
     },
   ],
   [ChainId.ALFAJORES]: [

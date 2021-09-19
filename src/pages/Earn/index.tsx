@@ -1,11 +1,13 @@
 import { ErrorBoundary } from '@sentry/react'
-import { JSBI } from '@ubeswap/sdk'
+import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
+import { useActiveWeb3React } from 'hooks'
+import { useMobi } from 'hooks/Tokens'
 import { partition } from 'lodash'
 import React, { useMemo } from 'react'
 import Countdown from 'react-countdown'
 import { isMobile } from 'react-device-detect'
-import UpdatePools from 'state/stablePools/updater'
 import styled from 'styled-components'
+import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { AutoColumn } from '../../components/Column'
 import { PoolCard } from '../../components/earn/PoolCard'
@@ -71,7 +73,8 @@ export default function Earn() {
   const stakingInfos = useStakingInfo()
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
-  const isLive = true
+  const isLive = now >= launchTime
+  const { chainId } = useActiveWeb3React()
 
   // toggle copy if rewards are inactive
   const stakingRewardsExist = true
@@ -99,6 +102,18 @@ export default function Earn() {
 
   const stablePools = useStablePoolInfo()
   const sortedStablePools = stablePools
+  const tvl = stablePools.reduce((accum, poolInfo) => {
+    const lpPrice =
+      poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+        ? JSBI.BigInt('478510000000')
+        : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+        ? JSBI.BigInt('3431')
+        : JSBI.BigInt('1')
+    const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
+    return JSBI.add(accum, priceDeposited)
+  }, JSBI.BigInt('0'))
+  const tvlAsTokenAmount = new TokenAmount(cUSD[chainId], tvl)
+  const mobiprice = useCUSDPrice(useMobi())
 
   const inactiveDisplay = inactivePools.length > 0 && (
     <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
@@ -150,20 +165,12 @@ export default function Earn() {
   //       </DataRow>
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
-      <UpdatePools />
-
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
-        {!isLive ? (
-          <>
-            <TYPE.largeHeader>Farming Launches Soon!</TYPE.largeHeader>
-            <StyledCountdown date={launchTime} />{' '}
-          </>
-        ) : (
-          <TYPE.largeHeader>
-            Happy Farming! Press <b>Manage</b> and then <b>Farm</b> to get started
-          </TYPE.largeHeader>
-        )}
+        <TYPE.largeHeader>TVL: ${tvlAsTokenAmount.toFixed(0, { groupSeparator: ',' })}</TYPE.largeHeader>
+      </AutoColumn>
+      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
+        {mobiprice && <TYPE.largeHeader>Latest Mobi Price: ${mobiprice.toFixed(3)}</TYPE.largeHeader>}
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>

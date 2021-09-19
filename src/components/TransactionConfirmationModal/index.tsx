@@ -69,7 +69,6 @@ function TransactionSubmittedContent({
   chainId: ChainId
 }) {
   const theme = useContext(ThemeContext)
-  console.log('id', chainId)
 
   return (
     <Wrapper>

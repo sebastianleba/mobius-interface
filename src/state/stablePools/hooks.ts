@@ -127,9 +127,8 @@ export function useExpectedLpTokens(
   return useMemo(() => {
     if (tokenAmounts[0].equalTo('0') || tokenAmounts[1].equalTo('0')) {
       const nonZero = tokenAmounts[0].equalTo('0') ? tokenAmounts[1] : tokenAmounts[0]
-      console.log(nonZero)
       return [
-        new TokenAmount(pool.lpToken, JSBI.subtract(nonZero.raw, JSBI.divide(nonZero.raw, JSBI.BigInt('100')))),
+        new TokenAmount(pool.lpToken, JSBI.subtract(nonZero.raw, JSBI.divide(nonZero.raw, JSBI.BigInt('8')))),
         tokenAmounts,
       ]
     }
@@ -141,11 +140,12 @@ export function useExpectedLpTokens(
         ) ?? new TokenAmount(pool.lpToken, '0')
       return [amount, tokenAmounts]
     }
-    const amount = mathUtil?.calculateTokenAmount(
-      tokenAmounts.map((ta) => ta?.raw || JSBI.BigInt('0')),
-      isDeposit
-    )
-    return [new TokenAmount(pool.lpToken, amount), tokenAmounts]
+    const amount =
+      mathUtil?.calculateTokenAmount(
+        tokenAmounts.map((ta) => ta?.raw || JSBI.BigInt('0')),
+        isDeposit
+      ) ?? JSBI.BigInt('0')
+    return [new TokenAmount(pool.lpToken, JSBI.subtract(amount, JSBI.divide(amount, JSBI.BigInt('10')))), tokenAmounts]
   }, [...input])
 }
 
