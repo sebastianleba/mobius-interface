@@ -76,7 +76,7 @@ export default function UpdatePools(): null {
 
           dispatch(
             initPool({
-              address: poolInfo.address,
+              address: poolInfo.name,
               pool: {
                 ...poolInfo,
                 virtualPrice,
@@ -97,7 +97,7 @@ export default function UpdatePools(): null {
         } else {
           dispatch(
             initPool({
-              address: poolInfo.address,
+              address: poolInfo.name,
               pool: {
                 ...poolInfo,
                 virtualPrice,

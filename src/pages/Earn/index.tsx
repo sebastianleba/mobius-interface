@@ -4,7 +4,6 @@ import { partition } from 'lodash'
 import React, { useMemo } from 'react'
 import Countdown from 'react-countdown'
 import { isMobile } from 'react-device-detect'
-import UpdatePools from 'state/stablePools/updater'
 import styled from 'styled-components'
 
 import { AutoColumn } from '../../components/Column'
@@ -150,8 +149,6 @@ export default function Earn() {
   //       </DataRow>
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
-      <UpdatePools />
-
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
         {!isLive ? (

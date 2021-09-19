@@ -163,7 +163,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
     userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(mobiRate, stakedAmount.raw), totalStakedAmount.raw))
   }
-  const rewardPerYear = totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR)
+  const rewardPerYear = priceOfMobi.quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
 
   const apyFraction =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
@@ -419,7 +419,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           Withdraw
         </DepositWithdrawBtn>
         {isLive && poolInfo.gaugeAddress !== undefined && (
-          <StyledInternalLink to={`/farm/${poolInfo.poolAddress}`} style={{ width: '30%' }}>
+          <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
             <DepositWithdrawBtn
               background={backgroundColorStart}
               backgroundHover={backgroundColorEnd}
