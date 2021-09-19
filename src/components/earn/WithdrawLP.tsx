@@ -209,10 +209,12 @@ const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: Currency
       </InputDiv>
     </InputRow>
   )
+  const decimalPlacesForBalance = tokenBalance?.greaterThan('1') ? 2 : tokenBalance?.greaterThan('0') ? 10 : 2
+
   const balanceRow = !readOnly && (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-      <BalanceText onClick={() => setTokenAmount(tokenBalance?.exact() || '0')}>
-        Balance: {tokenBalance?.toFixed(2)}
+      <BalanceText onClick={() => setTokenAmount(tokenBalance?.toExact() || '0')}>
+        Balance: {tokenBalance?.toFixed(decimalPlacesForBalance)}
       </BalanceText>
     </div>
   )

@@ -1,4 +1,4 @@
-import { currencyEquals, Token, TokenAmount } from '@ubeswap/sdk'
+import { currencyEquals, JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import React, { CSSProperties, MutableRefObject, useCallback } from 'react'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
@@ -45,7 +45,15 @@ const Tag = styled.div`
 `
 
 function Balance({ balance }: { balance: TokenAmount }) {
-  return <StyledBalanceText title={balance.toExact()}>{balance.toSignificant(4)}</StyledBalanceText>
+  const decimalPlacesForBalance = balance?.greaterThan(
+    JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(currency.decimals)).toString()
+  )
+    ? 2
+    : balance?.greaterThan('0')
+    ? 10
+    : 2
+
+  return <StyledBalanceText title={balance.toExact()}>{balance.toFixed(decimalPlacesForBalance)}</StyledBalanceText>
 }
 
 const TagContainer = styled.div`
