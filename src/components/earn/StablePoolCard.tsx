@@ -140,6 +140,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
   } = poolInfo
+
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
+  const now = new Date()
+  const isLive = now >= launchTime
+
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -333,7 +338,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             )}
           </StatContainer>
 
-          {isStaking && (
+          {isLive && isStaking && (
             <>
               <BottomSection showBackground={true}>
                 {mobiRate && (
@@ -413,7 +418,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         >
           Withdraw
         </DepositWithdrawBtn>
-        {poolInfo.gaugeAddress !== undefined && (
+        {isLive && poolInfo.gaugeAddress !== undefined && (
           <StyledInternalLink to={`/farm/${poolInfo.poolAddress}`} style={{ width: '30%' }}>
             <DepositWithdrawBtn
               background={backgroundColorStart}

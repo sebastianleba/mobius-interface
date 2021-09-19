@@ -154,8 +154,16 @@ export default function Earn() {
 
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
-        <TYPE.largeHeader>Farming Launches Soon!</TYPE.largeHeader>
-        <StyledCountdown date={launchTime} />
+        {!isLive ? (
+          <>
+            <TYPE.largeHeader>Farming Launches Soon!</TYPE.largeHeader>
+            <StyledCountdown date={launchTime} />{' '}
+          </>
+        ) : (
+          <TYPE.largeHeader>
+            Happy Farming! Press <b>Manage</b> and then <b>Farm</b> to get started
+          </TYPE.largeHeader>
+        )}
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>

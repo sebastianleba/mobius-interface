@@ -61,6 +61,11 @@ const Divider = styled.div`
 
 export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean; onDismiss: () => void }) {
   const { t } = useTranslation()
+
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
+  const now = new Date()
+  const isLive = now >= launchTime
+
   return (
     <CustomModal isOpen={isOpen} onDismiss={onDismiss} maxHeight={90}>
       <LinkContainer>
@@ -91,9 +96,11 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
           Risks
         </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-          Airdrop
-        </StyledNavLink>
+        {isLive && (
+          <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+            Airdrop
+          </StyledNavLink>
+        )}
       </LinkContainer>
     </CustomModal>
   )
