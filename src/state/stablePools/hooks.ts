@@ -146,7 +146,7 @@ export function useExpectedLpTokens(
         isDeposit
       ) ?? JSBI.BigInt('0')
     console.log(amount.toString())
-    return [new TokenAmount(pool.lpToken, JSBI.subtract(amount, JSBI.divide(amount, JSBI.BigInt('100')))), tokenAmounts]
+    return [new TokenAmount(pool.lpToken, amount), tokenAmounts]
   }, [input, mathUtil, tokenAmounts])
 }
 
