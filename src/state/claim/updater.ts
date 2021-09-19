@@ -11,7 +11,7 @@ import { AppDispatch } from '../index'
 import { update } from './actions'
 import { VestType } from './reducer'
 
-export function UpdateClaim(): null {
+export default function UpdateClaim(): null {
   const { library, chainId, account } = useActiveWeb3React()
   const blockNumber = useCurrentBlockTimestamp()
   const dispatch = useDispatch<AppDispatch>()

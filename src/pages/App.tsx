@@ -60,7 +60,7 @@ const Marginer = styled.div`
 const localStorageKey = 'valoraRedirect'
 
 export default function App() {
-  const launchTime = new Date(Date.UTC(2021, 8, 3, 20))
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = now >= launchTime
   const location = useLocation()
@@ -82,8 +82,6 @@ export default function App() {
       }
     }
   }, [location])
-
-  // UpdateClaim()
 
   return (
     <Suspense fallback={null}>
@@ -108,18 +106,19 @@ export default function App() {
             <Web3ReactManager>
               <Switch>
                 <Route exact path="/" component={LandingPage} />
+
+                <Route exact strict path="/swap" component={Swap} />
+                <Route exact strict path="/pool" component={Earn} />
+                <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
+                <Route exact strict path="/risk" component={RiskPage} />
                 {isLive && (
                   <>
-                    <Route exact strict path="/swap" component={Swap} />
-                    <Route exact strict path="/pool" component={Earn} />
-                    <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-                    <Route exact strict path="/risk" component={RiskPage} />
                     <Route path="/claim" component={Claim} />
-                    <Route exact strict path="/farm/:poolName" component={Manage} />
-                    <Route exact strict path="/optics" component={Optics} />
-                    {/* <Route component={RedirectPathToSwapOnly} /> */}
+                    <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
                   </>
                 )}
+                <Route exact strict path="/optics" component={Optics} />
+                {/* <Route component={RedirectPathToSwapOnly} /> */}
               </Switch>
             </Web3ReactManager>
           </ErrorBoundary>

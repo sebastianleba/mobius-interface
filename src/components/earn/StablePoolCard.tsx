@@ -1,4 +1,4 @@
-import { Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
+import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
@@ -140,6 +140,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
   } = poolInfo
+
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
+  const now = new Date()
+  const isLive = now >= launchTime
+
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -150,6 +155,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOf = useQuote(price)
 
   const mobi = useMobi()
+  const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
   const totalStakedAmount = useTokenBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
@@ -332,7 +338,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             )}
           </StatContainer>
 
-          {isStaking && (
+          {isLive && isStaking && (
             <>
               <BottomSection showBackground={true}>
                 {mobiRate && (
@@ -412,8 +418,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         >
           Withdraw
         </DepositWithdrawBtn>
-        {poolInfo.gaugeAddress !== undefined && (
-          <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
+        {isLive && poolInfo.gaugeAddress !== undefined && (
+          <StyledInternalLink to={`/farm/${poolInfo.poolAddress}`} style={{ width: '30%' }}>
             <DepositWithdrawBtn
               background={backgroundColorStart}
               backgroundHover={backgroundColorEnd}

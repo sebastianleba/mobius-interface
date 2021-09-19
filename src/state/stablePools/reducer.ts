@@ -50,7 +50,7 @@ export type StableSwapPool = StableSwapConstants & StableSwapVariable
 
 export interface PoolState {
   readonly pools: {
-    [name: string]: {
+    [address: string]: {
       pool: StableSwapPool
       math: StableSwapMath
     }
@@ -63,13 +63,13 @@ const initialState: PoolState = {
 
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
-    .addCase(initPool, (state, { payload: { name, pool } }) => {
+    .addCase(initPool, (state, { payload: { address, pool } }) => {
       const mathModel = new StableSwapMath(pool)
       return {
         ...state,
         pools: {
           ...state.pools,
-          [name]: {
+          [address]: {
             pool,
             math: mathModel,
           },

@@ -280,6 +280,10 @@ export default function Header() {
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
 
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
+  const now = new Date()
+  const isLive = now >= launchTime
+
   return (
     <HeaderFrame>
       <HamburgerModal isOpen={toggleMenu} onDismiss={() => setToggleMenu(false)} />
@@ -330,9 +334,11 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
-              {/* <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                Airdrop
-              </StyledNavLink> */}
+              {isLive && (
+                <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+                  Airdrop
+                </StyledNavLink>
+              )}
             </>
           )}
         </HeaderLinks>

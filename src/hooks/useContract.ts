@@ -86,7 +86,10 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
   const { chainId } = useActiveWeb3React()
-  const fallBackAddress = chainId === ChainId.MAINNET ? '' : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
+  const fallBackAddress =
+    chainId === ChainId.MAINNET
+      ? '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25'
+      : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 

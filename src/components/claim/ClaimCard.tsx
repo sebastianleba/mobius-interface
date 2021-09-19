@@ -161,13 +161,13 @@ export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
             </RowBetween>
             <RowBetween>
               <TYPE.white fontSize={14}>
-                {`To reward our early users for adding liqudity to Mobius pools, we have decided to retroactively reward these users with the MOBI token. These tokens are linearly vesting over a two week period.`}
+                {`To reward our early users for adding liqudity to Mobius pools, we have decided to retroactively reward these users with the MOBI token. These tokens are linearly vesting over a one week period.`}
               </TYPE.white>
             </RowBetween>
             <ExternalLink
               style={{ color: 'white', textDecoration: 'underline' }}
               target="_blank"
-              href="https://docs.ubeswap.org/tutorial/providing-liquidity"
+              href="https://medium.com/@mobiusmoney/introducing-mobi-the-governance-token-for-the-mobiusdao-7b83dc230295"
             >
               <TYPE.white fontSize={14}>Read more about the Mobius token</TYPE.white>
             </ExternalLink>
@@ -186,9 +186,6 @@ export const ClaimCard: React.FC<Props> = ({ info, type }: Props) => {
           <TYPE.black fontWeight={600} fontSize={[18, 24]}>
             Claim $MOBI
           </TYPE.black>
-          <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-            Full vested by 9/25/2021
-          </TYPE.subHeader>
         </TopSection>
         <SubHeader>
           <RowBetween></RowBetween>

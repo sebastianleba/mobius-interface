@@ -7,7 +7,6 @@ import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
-import UpdatePools from 'state/stablePools/updater'
 
 import { NetworkContextName } from './constants'
 import App from './pages/App'
@@ -52,7 +51,6 @@ function Updaters() {
       <ApplicationUpdater />
       <TransactionUpdater />
       <MulticallUpdater />
-      <UpdatePools />
     </>
   )
 }

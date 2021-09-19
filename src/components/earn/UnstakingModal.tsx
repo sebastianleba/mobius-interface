@@ -45,7 +45,7 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
   stakingContract?.['withdraw(uint256,bool)']
   const mobi = useMobi()
   const { stakedAmount } = stakingInfo
-  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi)
+  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? '0')
   const withdrawFunction = stakingContract?.['withdraw(uint256,bool)']
 
   async function onWithdraw() {

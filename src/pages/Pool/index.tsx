@@ -2,6 +2,7 @@ import { Pair } from '@ubeswap/sdk'
 import React, { useContext, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Text } from 'rebass'
+import UpdatePools from 'state/stablePools/updater'
 import styled, { ThemeContext } from 'styled-components'
 
 import { ButtonPrimary, ButtonSecondary } from '../../components/Button'
@@ -77,6 +78,7 @@ export default function Pool() {
   const { account } = test
 
   // fetch the user's balances of all tracked V2 LP tokens
+  UpdatePools()
   const trackedTokenPairs = useTrackedTokenPairs()
   const tokenPairsWithLiquidityTokens = useMemo(
     () => trackedTokenPairs.map((tokens) => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
