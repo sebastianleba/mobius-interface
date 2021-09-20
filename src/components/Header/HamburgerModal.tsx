@@ -74,7 +74,7 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
           <TYPE.largeHeader onClick={onDismiss}>X</TYPE.largeHeader>
         </RowBetween>
         <Divider />
-        <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
+        <StyledNavLink id={`swap-nav-link`} to={'/swap'} onClick={onDismiss}>
           {t('swap')}
         </StyledNavLink>
         <StyledNavLink
@@ -87,17 +87,18 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
             pathname.startsWith('/create') ||
             pathname.startsWith('/find')
           }
+          onClick={onDismiss}
         >
           Pool
         </StyledNavLink>
-        <StyledNavLink id="bridge-nav-link" to="/optics">
+        <StyledNavLink id="bridge-nav-link" to="/optics" onClick={onDismiss}>
           Bridge
         </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
           Risks
         </StyledNavLink>
         {isLive && (
-          <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+          <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
             Airdrop
           </StyledNavLink>
         )}

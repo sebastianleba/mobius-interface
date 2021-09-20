@@ -12,6 +12,18 @@ export type StablePoolInfo = {
 
 const mobiToken = (chainId: number, address: string) => new Token(chainId, address, 18, 'MOBI', 'Mobius')
 
+export enum Coins {
+  Bitcoin,
+  Ether,
+  USD,
+}
+
+export const PRICE: { [c in Coins]: number } = {
+  [Coins.Bitcoin]: 43774,
+  [Coins.Ether]: 3080,
+  [Coins.USD]: 1,
+}
+
 export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '',
   [ChainId.ALFAJORES]: '0x20707684E796c7cb04CBB1a3bDB6AB40A02f2D12',
@@ -83,7 +95,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 0,
+      displayDecimals: 1,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
     },
@@ -230,7 +242,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 0,
+      displayDecimals: 1,
       gaugeAddress: '0xe2d6095685248F38Ae9fef1b360D772b78Ea19D1',
       totalMobiRate: JSBI.BigInt('146712000000000000'),
     },
@@ -279,7 +291,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 0,
+      displayDecimals: 1,
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
     },

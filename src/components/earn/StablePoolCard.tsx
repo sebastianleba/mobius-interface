@@ -1,11 +1,12 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
+import { Coins, PRICE } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { getDepositValues, getLpPriceUSD } from 'utils/stableSwaps'
+import { getDepositValues } from 'utils/stableSwaps'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
@@ -129,7 +130,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const {
     tokens,
     peggedTo,
-    virtualPrice,
     priceOfStaked,
     balances,
     totalDeposited,
@@ -138,40 +138,52 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     feesGenerated,
     mobiRate,
     displayDecimals,
+    totalStakedAmount: totalStakedLPs,
   } = poolInfo
 
   const isLive = true
-  const lpPrice = getLpPriceUSD(poolInfo?.poolAddress ?? '')
+  // const lpPrice = getLpPriceUSD(poolInfo?.poolAddress ?? '')
 
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
 
-  const price1 = useCUSDPrice(tokens[0])
-  const price2 = useCUSDPrice(tokens[1])
-  const price = price1 ?? price2
-  const priceOf = useQuote(price)
-
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
-  // const totalStakedLPs = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
   const { totalValueStaked, totalValueDeposited } = getDepositValues(poolInfo)
+  const coinPrice =
+    poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+      ? JSBI.BigInt(PRICE[Coins.Bitcoin])
+      : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+      ? JSBI.BigInt(PRICE[Coins.Ether])
+      : JSBI.BigInt(PRICE[Coins.USD])
+  const lpPrice = JSBI.divide(
+    JSBI.multiply(coinPrice, poolInfo.virtualPrice),
+    JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+  )
   const totalStakedAmount = totalValueStaked
-    ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalValueStaked?.raw, lpPrice))
-    : undefined
+    ? new Fraction(
+        JSBI.multiply(totalValueStaked.raw, lpPrice),
+        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+      )
+    : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-  if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
-    userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(mobiRate, stakedAmount.raw), totalStakedAmount.raw))
+  if (mobiRate && totalStakedLPs && totalStakedLPs.greaterThan(JSBI.BigInt(0))) {
+    userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(stakedAmount.raw, mobiRate), totalStakedLPs.raw))
   }
-  const rewardPerYear = priceOfMobi.quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
-
+  const rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
   const apyFraction =
-    mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
-      ? rewardPerYear?.divide(totalStakedAmount)
+    mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
+      ? rewardPerYear.multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).divide(totalStakedAmount)
       : undefined
-  const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
+  const apy = apyFraction
+    ? new Percent(
+        apyFraction.numerator,
+        JSBI.multiply(apyFraction.denominator, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
+      )
+    : undefined
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -189,7 +201,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     console.error('Weekly apy overflow', e)
   }
   let userBalances: TokenAmount[] = []
-  //TODO: fix here
   if (totalDeposited.greaterThan('0')) {
     userBalances = balances.map((amount) => {
       const fraction = new Fraction(userLP ? userLP.raw : JSBI.BigInt(0), totalDeposited.raw)
@@ -198,14 +209,13 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     })
   }
   const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
-  // balance = balance * parseFloat(virtualPrice.toString())
   const totalBalance = balances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
   const backgroundGradient = null //generateGradient(tokens.slice())
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
@@ -234,7 +244,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         </TYPE.black>
         {apy ? (
           <RowFixed>
-            <LightQuestionHelper
+            <QuestionHelper
               text={
                 <>
                   Yield/day: {dpy?.toSignificant(4)}%<br />
@@ -242,15 +252,21 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 </>
               }
             />
-            <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+            <TYPE.subHeader
+              style={{ paddingLeft: '.15rem' }}
+              color={backgroundColorStart}
+              className="apr"
+              fontWeight={800}
+              fontSize={[14, 18]}
+            >
+              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : ' -'} APR
             </TYPE.subHeader>
           </RowFixed>
         ) : feesGenerated ? (
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             Fees Generated: {pegComesAfter ? '' : peggedTo}
             {feesGenerated.denominator.toString() !== '0'
-              ? `${priceOf(feesGenerated).toFixed(displayDecimals, { groupSeparator: ',' })}`
+              ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
               : '-'}
             {pegComesAfter ? peggedTo : ''}
           </TYPE.subHeader>
@@ -312,7 +328,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {totalVolume
-                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(displayDecimals, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(displayDecimals, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
