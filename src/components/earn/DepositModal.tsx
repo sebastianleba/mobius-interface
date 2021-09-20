@@ -43,7 +43,6 @@ interface DepositModalProps {
 
 export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositModalProps) {
   const { library, account } = useActiveWeb3React()
-
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, peggedTo, pegComesAfter } = poolInfo
@@ -60,11 +59,16 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const deadline = useTransactionDeadline()
 
   const [expectedLPTokens, selectedAmounts] = useExpectedLpTokens(poolInfo, tokens, input)
-  const valueOfLP = new TokenAmount(poolInfo.lpToken, JSBI.multiply(expectedLPTokens.raw, poolInfo.virtualPrice))
+  const valueOfLP = new TokenAmount(
+    poolInfo.lpToken,
+    JSBI.divide(
+      JSBI.multiply(expectedLPTokens.raw, poolInfo.virtualPrice),
+      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+    )
+  )
 
   const decimalPlacesForLP = expectedLPTokens?.greaterThan('1') ? 2 : expectedLPTokens?.greaterThan('0') ? 10 : 2
 
-  console.log('expected', expectedLPTokens.raw.toString())
   const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
   const approvals = [
     useApproveCallback(selectedAmounts[0], poolInfo.poolAddress),
