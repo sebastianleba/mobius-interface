@@ -155,7 +155,7 @@ export default function Manage({
   const price = price1 ?? price2
   const priceOf = useQuote(price)
 
-  const decimalPlacesForLP = stakedAmount?.greaterThan('1') ? 6 : stakedAmount?.greaterThan('0') ? 18 : 2
+  const decimalPlacesForLP = stakedAmount?.greaterThan('1') ? 2 : stakedAmount?.greaterThan('0') ? 10 : 2
 
   // const [, stakingTokenPair] = usePair(tokenA, tokenB)
   // const singleStakingInfo = usePairStakingInfo(stakingTokenPair)
@@ -310,14 +310,19 @@ export default function Manage({
                         <TYPE.white>
                           Current value:{' '}
                           {valueOfStaked
-                            ? `${stakingInfo.peggedTo}${priceOf(valueOfStaked).toFixed(2, {
+                            ? `${pegComesAfter ? '' : peggedTo}${valueOfStaked.toFixed(4, {
                                 separator: ',',
-                              })}`
+                              })} ${pegComesAfter ? peggedTo : ''}`
                             : '--'}
                         </TYPE.white>
                         <QuestionHelper
                           text={userBalances
-                            .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                            .map(
+                              (balance) =>
+                                `${balance?.toFixed(decimalPlacesForLP, { groupSeparator: ',' })} ${
+                                  balance.token.symbol
+                                }`
+                            )
                             .join(', ')}
                         />
                       </RowFixed>
