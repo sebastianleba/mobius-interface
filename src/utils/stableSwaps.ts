@@ -34,7 +34,7 @@ export const getDepositValues = (
   const valueOfStaked = scale(stakedAmount)
   const valueOfDeposited = scale(amountDeposited, stakedAmount?.raw)
   const totalValueStaked = scale(totalStakedAmount)
-  const totalValueDeposited = scale(totalDeposited, totalStakedAmount?.raw)
+  const totalValueDeposited = scale(totalDeposited)
   return {
     valueOfStaked,
     valueOfDeposited,
