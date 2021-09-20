@@ -66,7 +66,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
   apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
   peggedTo: pool.peggedTo,
-  virtualPrice: JSBI.divide(pool.virtualPrice, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
+  virtualPrice: pool.virtualPrice,
   priceOfStaked: tokenAmountScaled(
     pool.lpToken,
     JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
