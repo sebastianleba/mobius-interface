@@ -142,8 +142,10 @@ export default function Manage({
   const totalMobiRate = new TokenAmount(mobi, stakingInfo?.mobiRate ?? JSBI.BigInt('0'))
 
   const userBalances = balances.map((amount) => {
-    const fraction = new Fraction(stakedAmount?.raw.toString() ?? '0', totalStaked?.raw || JSBI.BigInt('0'))
+    const fraction = new Fraction(stakedAmount?.raw.toString() ?? '0', totalStakedAmount?.raw || JSBI.BigInt('0'))
     const ratio = fraction.multiply(amount.raw)
+    console.log({ amount: amount.toExact(), fraction, ratio, totalStakedAmount })
+
     if (JSBI.equal(ratio.denominator, JSBI.BigInt('0'))) {
       return new TokenAmount(amount.currency, JSBI.BigInt('0'))
     }
@@ -155,7 +157,7 @@ export default function Manage({
   const price = price1 ?? price2
   const priceOf = useQuote(price)
 
-  const decimalPlacesForLP = stakedAmount?.greaterThan('1') ? 6 : stakedAmount?.greaterThan('0') ? 18 : 2
+  const decimalPlacesForLP = stakedAmount?.greaterThan('1') ? 6 : stakedAmount?.greaterThan('0') ? 12 : 2
 
   // const [, stakingTokenPair] = usePair(tokenA, tokenB)
   // const singleStakingInfo = usePairStakingInfo(stakingTokenPair)
@@ -317,7 +319,12 @@ export default function Manage({
                         </TYPE.white>
                         <QuestionHelper
                           text={userBalances
-                            .map((balance) => `${balance?.toFixed(0, { groupSeparator: ',' })} ${balance.token.symbol}`)
+                            .map(
+                              (balance) =>
+                                `${balance?.toFixed(Math.min(decimalPlacesForLP, balance.token.decimals), {
+                                  groupSeparator: ',',
+                                })} ${balance.token.symbol}`
+                            )
                             .join(', ')}
                         />
                       </RowFixed>
