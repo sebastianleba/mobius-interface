@@ -144,7 +144,6 @@ export default function Manage({
   const userBalances = balances.map((amount) => {
     const fraction = new Fraction(stakedAmount?.raw.toString() ?? '0', totalStakedAmount?.raw || JSBI.BigInt('0'))
     const ratio = fraction.multiply(amount.raw)
-    console.log({ amount: amount.toExact(), fraction, ratio, totalStakedAmount })
 
     if (JSBI.equal(ratio.denominator, JSBI.BigInt('0'))) {
       return new TokenAmount(amount.currency, JSBI.BigInt('0'))

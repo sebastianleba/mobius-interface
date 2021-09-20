@@ -167,7 +167,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   }
   const rewardPerYear = priceOfMobi.quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
 
-  console.log({ mobiRate, totalStakedAmount })
   const apyFraction =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
       ? rewardPerYear?.divide(totalStakedAmount)

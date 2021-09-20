@@ -32,7 +32,6 @@ const lpInterface = new Interface(LP.abi)
 const gaugeInterface = new Interface(GAUGE_V3.abi)
 
 const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
-  console.log(num?.toString())
   return JSBI.BigInt(num?.toString() ?? fallBack)
 }
 
@@ -173,13 +172,6 @@ export default function BatchUpdatePools(): null {
   const lpStaked_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'balanceOf', [
     account ?? undefined,
   ])
-  console.log({
-    ampConstants,
-    balances,
-    virtualPrices,
-    ampPrecises,
-    lpTotalSupplies,
-  })
   const pendingMobi_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'claimable_tokens', [
     account ?? undefined,
   ])
@@ -198,7 +190,6 @@ export default function BatchUpdatePools(): null {
         const amp: JSBI = BigIntToJSBI((ampConstants?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalBalances: JSBI[] =
           balances?.[i]?.result?.[0].map((amt: BigInt): JSBI => {
-            console.log({ amt })
             return BigIntToJSBI(amt)
           }) ?? new Array(poolInfo.tokens.length).fill(JSBI.BigInt('0'))
         const aPrecise: JSBI = BigIntToJSBI((ampPrecises?.[i]?.result?.[0] as BigInt) ?? '1')
