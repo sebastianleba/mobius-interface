@@ -5,7 +5,6 @@ import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { tryParseAmount } from 'state/swap/hooks'
-import { useTokenBalance } from 'state/wallet/hooks'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
@@ -73,17 +72,17 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   ),
   balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
   pegComesAfter: pool.pegComesAfter,
-  feesGenerated: pool.feesGenerated,
+  feesGenerated: new TokenAmount(pool.tokens[0], pool.feesGenerated),
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? '0'),
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  const totalStakedAmount = useTokenBalance(pool?.gaugeAddress, pool?.lpToken)
-  return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
+  return !pool ? undefined : { ...getPoolInfo(pool) }
 }
 
 export function useStablePoolInfo(): readonly StablePoolInfo[] {

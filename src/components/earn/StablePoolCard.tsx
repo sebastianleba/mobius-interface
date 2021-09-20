@@ -140,8 +140,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     displayDecimals,
   } = poolInfo
 
-  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
-  const now = new Date()
   const isLive = true
   const lpPrice = getLpPriceUSD(poolInfo?.poolAddress ?? '')
 
@@ -164,12 +162,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     : undefined
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-
   if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
     userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(mobiRate, stakedAmount.raw), totalStakedAmount.raw))
   }
   const rewardPerYear = priceOfMobi.quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
 
+  console.log({ mobiRate, totalStakedAmount })
   const apyFraction =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
       ? rewardPerYear?.divide(totalStakedAmount)

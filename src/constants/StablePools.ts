@@ -30,6 +30,12 @@ export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
   [ChainId.BAKLAVA]: undefined,
 }
 
+export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
+  [ChainId.MAINNET]: '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25',
+  [ChainId.ALFAJORES]: '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79',
+  [ChainId.BAKLAVA]: '',
+}
+
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
