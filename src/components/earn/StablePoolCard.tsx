@@ -4,8 +4,8 @@ import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
+import { getDepositValues } from 'utils/stableSwaps'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
@@ -163,9 +163,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
-  const totalStakedLPs = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
-  const totalStakedAmount = totalStakedLPs
-    ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalStakedLPs?.raw, lpPrice))
+  const { valueOfDeposited, totalValueDeposited, totalValueStaked } = getDepositValues(poolInfo)
+
+  const totalStakedAmount = totalValueStaked
+    ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalValueStaked?.raw, lpPrice))
     : undefined
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -220,7 +221,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // get the USD value of staked WETH
   // const apyFraction = poolInfo.apr || undefined
   // const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
-  const isStaking = priceOfStaked.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
+  const isStaking = valueOfDeposited.greaterThan(JSBI.BigInt('0')) || poolInfo.stakedAmount.greaterThan('0')
 
   const formatNumber = (num: string) => {
     return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
@@ -285,8 +286,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <TYPE.black>Total deposited</TYPE.black>
               <RowFixed>
                 <TYPE.black>
-                  {totalDeposited
-                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalBalance.toFixed(displayDecimals))} ${
+                  {totalValueDeposited
+                    ? `${!pegComesAfter ? peggedTo : ''}${totalValueDeposited.toFixed(displayDecimals)} ${
                         pegComesAfter ? peggedTo : ''
                       }`
                     : '-'}

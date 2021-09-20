@@ -294,7 +294,7 @@ export default function Manage({
                 <CardNoise />
                 <AutoColumn gap="md">
                   <RowBetween>
-                    <TYPE.white fontWeight={600}>Your liquidity deposits</TYPE.white>
+                    <TYPE.white fontWeight={600}>Your staked liquidity deposits</TYPE.white>
                   </RowBetween>
                   <RowBetween style={{ alignItems: 'baseline' }}>
                     <TYPE.white fontSize={36} fontWeight={600}>
