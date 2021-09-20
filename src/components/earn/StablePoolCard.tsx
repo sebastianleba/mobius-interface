@@ -197,7 +197,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     console.error('Weekly apy overflow', e)
   }
   let userBalances: TokenAmount[] = []
-  //TODO: fix here
   if (totalDeposited.greaterThan('0')) {
     userBalances = balances.map((amount) => {
       const fraction = new Fraction(userLP ? userLP.raw : JSBI.BigInt(0), totalDeposited.raw)
@@ -206,14 +205,13 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     })
   }
   const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
-  // balance = balance * parseFloat(virtualPrice.toString())
   const totalBalance = balances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
   const backgroundGradient = null //generateGradient(tokens.slice())
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
