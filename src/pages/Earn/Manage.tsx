@@ -217,10 +217,10 @@ export default function Manage({
                   {totalValueDeposited
                     ? `${stakingInfo.peggedTo}${
                         totalValueDeposited.lessThan('1')
-                          ? totalValueDeposited.toFixed(2, {
+                          ? totalValueDeposited.toFixed(stakingInfo.displayDecimals, {
                               groupSeparator: ',',
                             })
-                          : totalValueDeposited.toFixed(0, {
+                          : totalValueDeposited.toFixed(stakingInfo.displayDecimals, {
                               groupSeparator: ',',
                             })
                       }`

@@ -140,18 +140,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
   } = poolInfo
-  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
-  const now = new Date()
+
   const isLive = true
 
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
-
-  const price1 = useCUSDPrice(tokens[0])
-  const price2 = useCUSDPrice(tokens[1])
-  const price = price1 ?? price2
-  const priceOf = useQuote(price)
 
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
@@ -172,17 +166,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-  if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan(JSBI.BigInt(0))) {
-    userMobiRate = new TokenAmount(
-      mobi,
-      JSBI.divide(
-        stakedAmount.multiply(mobiRate).divide(totalStakedAmount).numerator,
-        stakedAmount.multiply(mobiRate).divide(totalStakedAmount).denominator
-      )
-    )
+  if (mobiRate && totalStakedLPs && totalStakedLPs.greaterThan(JSBI.BigInt(0))) {
+    userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(stakedAmount.raw, mobiRate), totalStakedLPs.raw))
   }
   const rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
-  console.log(rewardPerYear)
   const apyFraction =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
       ? rewardPerYear.multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).divide(totalStakedAmount)
@@ -339,7 +326,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <RowFixed>
                 <TYPE.black>
                   {totalVolume
-                    ? `${!pegComesAfter ? peggedTo : ''}${priceOf(totalVolume).toFixed(displayDecimals, {
+                    ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(displayDecimals, {
                         groupSeparator: ',',
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
