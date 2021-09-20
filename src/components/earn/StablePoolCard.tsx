@@ -130,7 +130,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const {
     tokens,
     peggedTo,
-    virtualPrice,
     priceOfStaked,
     balances,
     totalDeposited,
@@ -164,22 +163,50 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
   const totalStakedLPs = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
+  // const totalStakedAmount = totalStakedLPs
+  //   ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalStakedLPs?.raw, lpPrice))
+  //   : undefined
+  console.log('total staked lp', totalStakedLPs?.raw.toString())
+  console.log('price of lp', poolInfo.virtualPrice.toString())
   const totalStakedAmount = totalStakedLPs
-    ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalStakedLPs?.raw, lpPrice))
-    : undefined
+    ? new Fraction(
+        JSBI.multiply(totalStakedLPs.raw, poolInfo.virtualPrice),
+        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+      )
+    : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-
-  if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan('0')) {
-    userMobiRate = new TokenAmount(mobi, JSBI.divide(JSBI.multiply(mobiRate, stakedAmount.raw), totalStakedAmount.raw))
+  if (mobiRate && totalStakedAmount && totalStakedAmount.greaterThan(JSBI.BigInt(0))) {
+    userMobiRate = new TokenAmount(
+      mobi,
+      JSBI.divide(
+        JSBI.multiply(
+          stakedAmount.multiply(mobiRate).divide(totalStakedAmount).numerator,
+          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+        ),
+        stakedAmount.multiply(mobiRate).divide(totalStakedAmount).denominator
+      )
+    )
   }
-  const rewardPerYear = priceOfMobi.quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
+  console.log(priceOfMobi.toFixed(0))
+  console.log(totalMobiRate.multiply(BIG_INT_SECONDS_IN_WEEK).toFixed(0))
+  console.log('name', poolInfo.name)
+  console.log('price', priceOfMobi.toFixed(0))
+  console.log('reward per week', totalMobiRate.multiply(BIG_INT_SECONDS_IN_WEEK).toFixed(0))
+  console.log('reward per year', totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR).toFixed(0))
+  console.log('value per year', priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR)).toFixed(0))
+  console.log('value in pool', totalStakedAmount.toFixed(0))
+  const rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
+  //  .quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
 
   const apyFraction =
-    mobiRate && totalStakedAmount && !totalStakedAmount.equalTo('0')
-      ? rewardPerYear?.divide(totalStakedAmount)
+    mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
+      ? rewardPerYear.multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).divide(totalStakedAmount)
       : undefined
   const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
+  console.log('hhd')
+  console.log(apyFraction?.toFixed(0))
+  console.log(apy?.toFixed(0))
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
@@ -242,7 +269,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         </TYPE.black>
         {apy ? (
           <RowFixed>
-            <LightQuestionHelper
+            <QuestionHelper
               text={
                 <>
                   Yield/day: {dpy?.toSignificant(4)}%<br />
@@ -250,8 +277,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 </>
               }
             />
-            <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'} APR
+            <TYPE.subHeader
+              style={{ paddingLeft: '.15rem' }}
+              color={backgroundColorStart}
+              className="apr"
+              fontWeight={800}
+              fontSize={[14, 18]}
+            >
+              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : ' -'} APR
             </TYPE.subHeader>
           </RowFixed>
         ) : feesGenerated ? (
