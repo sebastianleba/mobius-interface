@@ -5,8 +5,8 @@ import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
+import { getDepositValues } from 'utils/stableSwaps'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
@@ -111,7 +111,6 @@ const DepositWithdrawBtn = styled(StyledButton)`
   width: 40%;
   flex: none;
 `
-
 interface Props {
   poolInfo: StablePoolInfo
 }
@@ -139,9 +138,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     feesGenerated,
     mobiRate,
     displayDecimals,
+    totalStakedAmount: totalStakedLPs,
   } = poolInfo
 
   const isLive = true
+  // const lpPrice = getLpPriceUSD(poolInfo?.poolAddress ?? '')
 
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
@@ -150,7 +151,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
-  const totalStakedLPs = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
+  const { totalValueStaked, totalValueDeposited } = getDepositValues(poolInfo)
   const coinPrice =
     poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
       ? JSBI.BigInt(PRICE[Coins.Bitcoin])
@@ -161,8 +162,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     JSBI.multiply(coinPrice, poolInfo.virtualPrice),
     JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
   )
-  const totalStakedAmount = totalStakedLPs
-    ? new Fraction(JSBI.multiply(totalStakedLPs.raw, lpPrice), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
+  const totalStakedAmount = totalValueStaked
+    ? new Fraction(
+        JSBI.multiply(totalValueStaked.raw, lpPrice),
+        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+      )
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -289,8 +293,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <TYPE.black>Total deposited</TYPE.black>
               <RowFixed>
                 <TYPE.black>
-                  {totalDeposited
-                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalBalance.toFixed(displayDecimals))} ${
+                  {totalValueDeposited
+                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalValueDeposited.toFixed(displayDecimals))} ${
                         pegComesAfter ? peggedTo : ''
                       }`
                     : '-'}
