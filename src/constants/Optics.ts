@@ -160,28 +160,28 @@ export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
     ),
   ],
   [MultiChainIds.POLYGON]: [
-    new WrappedTokenInfo(
-      {
-        symbol: 'USDC',
-        name: 'US Dollar Coin',
-        address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-        chainId: MultiChainIds.POLYGON,
-        logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
-        decimals: 6,
-      },
-      []
-    ),
-    new WrappedTokenInfo(
-      {
-        symbol: 'Bridged USDC',
-        name: 'Bridged US Dollar Coin',
-        address: '0xe919f65739c26a42616b7b8eedc6b5524d1e3ac4',
-        chainId: MultiChainIds.POLYGON,
-        logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
-        decimals: 6,
-      },
-      []
-    ),
+    // new WrappedTokenInfo(
+    //   {
+    //     symbol: 'USDC',
+    //     name: 'US Dollar Coin',
+    //     address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+    //     chainId: MultiChainIds.POLYGON,
+    //     logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
+    //     decimals: 6,
+    //   },
+    //   []
+    // ),
+    // new WrappedTokenInfo(
+    //   {
+    //     symbol: 'Bridged USDC',
+    //     name: 'Bridged US Dollar Coin',
+    //     address: '0xe919f65739c26a42616b7b8eedc6b5524d1e3ac4',
+    //     chainId: MultiChainIds.POLYGON,
+    //     logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
+    //     decimals: 6,
+    //   },
+    //   []
+    // ),
   ],
   [MultiChainIds.ALFAJORES]: [],
   [MultiChainIds.BAKLAVA]: [],
