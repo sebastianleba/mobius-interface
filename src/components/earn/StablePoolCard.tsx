@@ -1,5 +1,6 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
+import { Coins, PRICE } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
@@ -139,13 +140,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
   } = poolInfo
-  const lpPrice =
-    poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
-      ? JSBI.BigInt('478510000000')
-      : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
-      ? JSBI.BigInt('3431')
-      : JSBI.BigInt('1')
-
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = true
@@ -166,13 +160,20 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // const totalStakedAmount = totalStakedLPs
   //   ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalStakedLPs?.raw, lpPrice))
   //   : undefined
-  console.log('total staked lp', totalStakedLPs?.raw.toString())
-  console.log('price of lp', poolInfo.virtualPrice.toString())
+  // console.log('total staked lp', totalStakedLPs?.raw.toString())
+  // console.log('price of lp', poolInfo.virtualPrice.toString().mul)
+  const coinPrice =
+    poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+      ? JSBI.BigInt(PRICE[Coins.Bitcoin])
+      : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+      ? JSBI.BigInt(PRICE[Coins.Ether])
+      : JSBI.BigInt(PRICE[Coins.USD])
+  const lpPrice = JSBI.divide(
+    JSBI.multiply(coinPrice, poolInfo.virtualPrice),
+    JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+  )
   const totalStakedAmount = totalStakedLPs
-    ? new Fraction(
-        JSBI.multiply(totalStakedLPs.raw, poolInfo.virtualPrice),
-        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-      )
+    ? new Fraction(JSBI.multiply(totalStakedLPs.raw, lpPrice), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -203,13 +204,18 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
       ? rewardPerYear.multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).divide(totalStakedAmount)
       : undefined
-  const apy = apyFraction ? new Percent(apyFraction.numerator, apyFraction.denominator) : undefined
+  const apy = apyFraction
+    ? new Percent(
+        apyFraction.numerator,
+        JSBI.multiply(apyFraction.denominator, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
+      )
+    : undefined
   console.log('hhd')
   console.log(apyFraction?.toFixed(0))
   console.log(apy?.toFixed(0))
 
   const dpy = apy
-    ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
+    ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000).toFixed(0), '1000')
     : undefined
 
   let weeklyAPY: React.ReactNode | undefined = <>🤯</>
