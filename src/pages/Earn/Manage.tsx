@@ -10,6 +10,7 @@ import { useStablePoolInfoByName } from 'state/stablePools/hooks'
 import UpdatePools from 'state/stablePools/updater'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
+import { getDepositValues } from 'utils/stableSwaps'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
@@ -109,12 +110,14 @@ export default function Manage({
 
   const { totalStaked, userStaked } = useStakingPoolValue(stakingInfo)
 
-  const { balances, stakedAmount, totalStakedAmount, tokens } = stakingInfo ?? {
+  const { balances, stakedAmount, totalStakedAmount, tokens, peggedTo, pegComesAfter } = stakingInfo ?? {
     balances: [],
     stakedAmount: undefined,
     totalStakedAmount: undefined,
     tokens: [],
   }
+
+  const { valueOfStaked, totalValueDeposited } = getDepositValues(stakingInfo)
 
   //const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? JSBI.BigInt('0'))
   const [earnedMobi, setEarnedMobi] = useState<TokenAmount>()
@@ -151,6 +154,8 @@ export default function Manage({
   const price2 = useCUSDPrice(tokens[1])
   const price = price1 ?? price2
   const priceOf = useQuote(price)
+
+  const decimalPlacesForLP = stakedAmount?.greaterThan('1') ? 6 : stakedAmount?.greaterThan('0') ? 18 : 2
 
   // const [, stakingTokenPair] = usePair(tokenA, tokenB)
   // const singleStakingInfo = usePairStakingInfo(stakingTokenPair)
@@ -207,13 +212,13 @@ export default function Manage({
               <AutoColumn gap="sm">
                 <TYPE.body style={{ margin: 0 }}>Total deposits</TYPE.body>
                 <TYPE.body fontSize={24} fontWeight={500}>
-                  {totalStakedAmount
+                  {totalValueDeposited
                     ? `${stakingInfo.peggedTo}${
-                        priceOf(totalStakedAmount).lessThan('1')
-                          ? totalStakedAmount.toFixed(2, {
+                        totalValueDeposited.lessThan('1')
+                          ? totalValueDeposited.toFixed(2, {
                               groupSeparator: ',',
                             })
-                          : totalStakedAmount.toFixed(0, {
+                          : totalValueDeposited.toFixed(0, {
                               groupSeparator: ',',
                             })
                       }`
@@ -293,7 +298,7 @@ export default function Manage({
                   </RowBetween>
                   <RowBetween style={{ alignItems: 'baseline' }}>
                     <TYPE.white fontSize={36} fontWeight={600}>
-                      {stakingInfo?.stakedAmount?.toSignificant(6) ?? '-'}
+                      {stakingInfo?.stakedAmount?.toSignificant(decimalPlacesForLP) ?? '-'}
                     </TYPE.white>
                     <RowFixed>
                       <TYPE.white>MOBI-LP {stakingInfo.tokens.map(({ symbol }) => symbol).join('-')}</TYPE.white>
@@ -304,8 +309,8 @@ export default function Manage({
                       <RowFixed>
                         <TYPE.white>
                           Current value:{' '}
-                          {userStaked
-                            ? `${stakingInfo.peggedTo}${priceOf(userStaked).toFixed(2, {
+                          {valueOfStaked
+                            ? `${stakingInfo.peggedTo}${priceOf(valueOfStaked).toFixed(2, {
                                 separator: ',',
                               })}`
                             : '--'}

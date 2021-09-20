@@ -140,7 +140,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
   } = poolInfo
-
   const lpPrice =
     poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
       ? JSBI.BigInt('478510000000')
