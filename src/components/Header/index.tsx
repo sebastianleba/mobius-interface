@@ -7,7 +7,7 @@ import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
 import Hamburger from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useHistory } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
@@ -279,6 +279,7 @@ export default function Header() {
   const aggregateBalance: TokenAmount | undefined = useAggregateUbeBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
+  const history = useHistory()
 
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
@@ -381,9 +382,7 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => window.open('https://bridge.moss.earth/', '_blank')}>
-          {darkMode ? '🌉' : '🌁'}
-        </StyledMenuButton>
+        <StyledMenuButton onClick={() => history.push('/optics')}>{darkMode ? '🌉' : '🌁'}</StyledMenuButton>
 
         <HeaderElementWrap>
           <StyledMenuButton onClick={() => toggleDarkMode()}>

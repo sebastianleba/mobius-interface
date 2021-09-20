@@ -12,6 +12,18 @@ export type StablePoolInfo = {
 
 const mobiToken = (chainId: number, address: string) => new Token(chainId, address, 18, 'MOBI', 'Mobius')
 
+export enum Coins {
+  Bitcoin,
+  Ether,
+  USD,
+}
+
+export const PRICE: { [c in Coins]: number } = {
+  [Coins.Bitcoin]: 43774,
+  [Coins.Ether]: 3080,
+  [Coins.USD]: 1,
+}
+
 export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '',
   [ChainId.ALFAJORES]: '0x20707684E796c7cb04CBB1a3bDB6AB40A02f2D12',

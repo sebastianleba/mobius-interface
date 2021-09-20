@@ -1,5 +1,6 @@
 import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
+import { Coins, PRICE } from 'constants/StablePools'
 import { useActiveWeb3React } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { partition } from 'lodash'
@@ -102,13 +103,18 @@ export default function Earn() {
 
   const stablePools = useStablePoolInfo()
   const sortedStablePools = stablePools
+
   const tvl = stablePools.reduce((accum, poolInfo) => {
-    const lpPrice =
+    const price =
       poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
-        ? JSBI.BigInt('478510000000')
+        ? JSBI.BigInt(PRICE[Coins.Bitcoin])
         : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
-        ? JSBI.BigInt('3431')
-        : JSBI.BigInt('1')
+        ? JSBI.BigInt(PRICE[Coins.Ether])
+        : JSBI.BigInt(PRICE[Coins.USD])
+    const lpPrice = JSBI.divide(
+      JSBI.multiply(price, poolInfo.virtualPrice),
+      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+    )
     const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
     return JSBI.add(accum, priceDeposited)
   }, JSBI.BigInt('0'))
@@ -167,10 +173,10 @@ export default function Earn() {
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
-        <TYPE.largeHeader>TVL: ${tvlAsTokenAmount.toFixed(0, { groupSeparator: ',' })}</TYPE.largeHeader>
+        <TYPE.tvlHeader>TVL: ${tvlAsTokenAmount.toFixed(0, { groupSeparator: ',' })}</TYPE.tvlHeader>
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
-        {mobiprice && <TYPE.largeHeader>Latest Mobi Price: ${mobiprice.toFixed(3)}</TYPE.largeHeader>}
+        {mobiprice && <TYPE.price opacity={'.8'}>Latest MOBI Price: ${mobiprice.toFixed(3)}</TYPE.price>}
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
