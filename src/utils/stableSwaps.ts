@@ -29,7 +29,7 @@ export const getDepositValues = (
       totalValueStaked: dummyAmount,
     }
   const { totalDeposited, amountDeposited, virtualPrice, stakedAmount, totalStakedAmount, lpToken } = pool
-  const scale = scaleAmount(virtualPrice)
+  const scale = scaleAmount(JSBI.divide(virtualPrice, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))))
 
   const valueOfStaked = scale(stakedAmount)
   const valueOfDeposited = scale(amountDeposited, stakedAmount?.raw)
