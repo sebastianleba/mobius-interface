@@ -157,11 +157,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
   const totalStakedLPs = useCurrencyBalance(poolInfo.gaugeAddress, poolInfo.lpToken)
-  // const totalStakedAmount = totalStakedLPs
-  //   ? new TokenAmount(poolInfo.lpToken, JSBI.multiply(totalStakedLPs?.raw, lpPrice))
-  //   : undefined
-  // console.log('total staked lp', totalStakedLPs?.raw.toString())
-  // console.log('price of lp', poolInfo.virtualPrice.toString().mul)
   const coinPrice =
     poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
       ? JSBI.BigInt(PRICE[Coins.Bitcoin])
@@ -189,14 +184,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       )
     )
   }
-  console.log(priceOfMobi.toFixed(0))
-  console.log(totalMobiRate.multiply(BIG_INT_SECONDS_IN_WEEK).toFixed(0))
-  console.log('name', poolInfo.name)
-  console.log('price', priceOfMobi.toFixed(0))
-  console.log('reward per week', totalMobiRate.multiply(BIG_INT_SECONDS_IN_WEEK).toFixed(0))
-  console.log('reward per year', totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR).toFixed(0))
-  console.log('value per year', priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR)).toFixed(0))
-  console.log('value in pool', totalStakedAmount.toFixed(0))
   const rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
   //  .quote(totalMobiRate).multiply(BIG_INT_SECONDS_IN_YEAR)
 
@@ -210,9 +197,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         JSBI.multiply(apyFraction.denominator, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
       )
     : undefined
-  console.log('hhd')
-  console.log(apyFraction?.toFixed(0))
-  console.log(apy?.toFixed(0))
 
   const dpy = apy
     ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000).toFixed(0), '1000')
@@ -246,7 +230,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
   const backgroundGradient = null //generateGradient(tokens.slice())
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
 
@@ -297,7 +281,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
             Fees Generated: {pegComesAfter ? '' : peggedTo}
             {feesGenerated.denominator.toString() !== '0'
-              ? `${priceOf(feesGenerated).toFixed(displayDecimals, { groupSeparator: ',' })}`
+              ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
               : '-'}
             {pegComesAfter ? peggedTo : ''}
           </TYPE.subHeader>

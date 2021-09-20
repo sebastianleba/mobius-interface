@@ -56,7 +56,12 @@ export default function UpdatePools(): null {
 
         const feesGenerated = new TokenAmount(
           poolInfo.tokens[0],
-          fees.reduce((accum, cur) => JSBI.add(accum, JSBI.multiply(cur, JSBI.BigInt('10'))))
+          fees.reduce((accum, cur, i) =>
+            JSBI.add(
+              accum,
+              JSBI.multiply(cur, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(18 - poolInfo.tokens[i].decimals)))
+            )
+          )
         )
         const stakingInfo = {}
         const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
