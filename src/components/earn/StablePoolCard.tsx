@@ -195,7 +195,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     : undefined
 
   const dpy = apy
-    ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000).toFixed(0), '1000')
+    ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
     : undefined
 
   let weeklyAPY: React.ReactNode | undefined = <>🤯</>
