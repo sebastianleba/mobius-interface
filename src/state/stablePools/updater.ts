@@ -130,3 +130,10 @@ export default function UpdatePools(): null {
 }
 
 //export const UpdatePendingMobi
+
+export function BatchUpdatePools() {
+  const { library, chainId, account } = useActiveWeb3React()
+  const blockNumber = useBlockNumber()
+  const dispatch = useDispatch<AppDispatch>()
+  const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
+}
