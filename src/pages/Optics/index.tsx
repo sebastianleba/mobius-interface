@@ -1,10 +1,10 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
-import { useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
 import { ethers } from 'ethers'
+import { useActiveContractKit } from 'hooks'
 import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
 import { useBridgeRouterContract } from 'hooks/useContract'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -48,9 +48,7 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const test = useWeb3React()
-  const { account } = test
-  const { chainId } = useWeb3React()
+  const { chainId, account } = useActiveContractKit()
   //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()

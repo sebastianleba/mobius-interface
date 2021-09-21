@@ -1,7 +1,6 @@
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 
 export function useActiveContractKit() {
-  //const context = useWeb3ReactCore<Web3Provider>()
   const kit = useContractKit()
   const {
     address: account,

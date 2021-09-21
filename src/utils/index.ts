@@ -4,7 +4,7 @@ import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
-import { IUniswapV2Router02, Swap, UbeswapMoolaRouter } from 'generated/index'
+import { IUniswapV2Router02, UbeswapMoolaRouter } from 'generated/index'
 
 import { ROUTER_ADDRESS, UBESWAP_MOOLA_ROUTER_ADDRESS } from '../constants'
 import IUniswapV2Router02ABI from '../constants/abis/IUniswapV2Router02.json'
@@ -30,9 +30,9 @@ export function shortenAddress(address: string, chars = 4): string {
   return `${parsed.substring(0, chars + 2)}...${parsed.substring(42 - chars)}`
 }
 
-// add 10%
+// add 100%
 export function calculateGasMargin(value: BigNumber): BigNumber {
-  return value.mul(BigNumber.from(10000).add(BigNumber.from(1000))).div(BigNumber.from(10000))
+  return value.mul(BigNumber.from(2))
 }
 
 // converts a basis points value to a sdk percent
@@ -78,14 +78,13 @@ export function getMoolaRouterContract(_: number, library: Web3Provider, account
   return getContract(UBESWAP_MOOLA_ROUTER_ADDRESS, UbeswapMoolaRouterABI, library, account) as UbeswapMoolaRouter
 }
 
-export function getStableSwapContract(address: string, library: Web3Provider, account?: string): Swap {
-  return getContract(address, SWAP.abi, library, account) as Swap
-}
-
 export function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
 export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Token): boolean {
   return Boolean(currency instanceof Token && defaultTokens[currency.chainId]?.[currency.address])
+}
+export function getStableSwapContract(address: string, library: Web3Provider, account?: string): Swap {
+  return getContract(address, SWAP.abi, library, account) as Swap
 }
