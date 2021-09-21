@@ -1,5 +1,5 @@
 import { ChainId } from '@ubeswap/sdk'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { SwapCallbackState, useSwapCallback } from 'hooks/useSwapCallback'
 import { useMemo } from 'react'
 
@@ -19,7 +19,7 @@ export const useTradeCallback = (
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } => {
-  const { library, chainId, account } = useActiveWeb3React()
+  const { library, chainId, account } = useActiveContractKit()
   const doTransaction = useDoTransaction()
 
   const {

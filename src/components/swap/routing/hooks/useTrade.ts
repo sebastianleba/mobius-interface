@@ -5,7 +5,7 @@ import {
   UBESWAP_MOOLA_ROUTER_ADDRESS,
 } from 'constants/index'
 import { PairState, usePairs } from 'data/Reserves'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
 import { useUserDisableSmartRouting, useUserSingleHopOnly } from 'state/user/hooks'
@@ -25,7 +25,7 @@ import { useDirectTradeExactIn, useDirectTradeExactOut } from './directTrades'
  * @returns
  */
 export function useAllCommonPairsWithMoolaDuals(tokenA?: Token, tokenB?: Token): readonly Pair[] {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const bases: readonly Token[] = useMemo(() => (chainId ? BASES_TO_CHECK_TRADES_AGAINST[chainId] : []), [chainId])
 

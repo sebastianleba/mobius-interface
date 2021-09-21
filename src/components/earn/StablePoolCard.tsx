@@ -1,7 +1,7 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
 import { Coins, PRICE } from 'constants/StablePools'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
@@ -126,7 +126,7 @@ const quote = (amount: TokenAmount, price?: Price) => {
 const useQuote = (price?: Price) => (amount: TokenAmount) => quote(amount, price)
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
   const {
     tokens,
     peggedTo,

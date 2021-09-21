@@ -5,7 +5,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import checkedLogo from '../../assets/svg/mobius.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
 import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
 import { useTokenBalanceSingle } from '../../state/wallet/hooks'
@@ -104,7 +104,7 @@ function CurrencyRow({
   otherSelected: boolean
   style: CSSProperties
 }) {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const key = currencyKey(currency)
   const selectedTokenList = useCombinedActiveList()
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)

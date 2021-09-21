@@ -5,7 +5,7 @@ import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { WrappedTokenInfo } from '../../state/lists/hooks'
 import { TYPE } from '../../theme'
 import NetworkLogo from '../NetworkLogo'
@@ -92,7 +92,7 @@ function NetworkRow({
   otherSelected: boolean
   style: CSSProperties
 }) {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   // only show add or remove buttons if not on selected list
   return (

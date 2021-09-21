@@ -10,7 +10,7 @@ import { StableSwapPool } from 'state/stablePools/reducer'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { ROUTER_ADDRESS } from '../../constants'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
@@ -174,7 +174,7 @@ export function useDerivedStableSwapInfo(): {
   v2Trade?: MobiTrade | undefined
   inputError?: string
 } {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
   const ONE = JSBI.BigInt(1)
 
   const {
@@ -322,7 +322,7 @@ export function useMobiusTradeInfo(): {
   v2Trade: MobiusTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const {
     independentField,
@@ -420,7 +420,7 @@ export function useDerivedSwapInfo(): {
   v2Trade: UbeswapTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const {
     independentField,
@@ -568,7 +568,7 @@ export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: ChainId)
 export function useDefaultsFromURLSearch():
   | { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined }
   | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const dispatch = useDispatch<AppDispatch>()
   const parsedQs = useParsedQueryString()
   const [result, setResult] = useState<
