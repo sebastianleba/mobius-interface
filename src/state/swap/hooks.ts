@@ -17,7 +17,7 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
-import { useCurrentPool, useMathUtil } from '../stablePools/hooks'
+import { useCurrentPool, useMathUtil, usePools } from '../stablePools/hooks'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
@@ -335,6 +335,8 @@ export function useMobiusTradeInfo(): {
   const outputCurrency = useCurrency(outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
 
+  const pools = usePools()
+  const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
   const mathUtil = useMathUtil(pool)
 
@@ -377,7 +379,7 @@ export function useMobiusTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount) {
+  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading) {
     return {
       currencies,
       currencyBalances,
