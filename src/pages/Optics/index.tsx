@@ -155,7 +155,7 @@ export default function Optics() {
     } else if (chainId === MultiChainIds.POLYGON) {
       setExplorerURL('https://polygonscan.com/tx/')
     }
-  }, [chainId])
+  }, [chainId, step])
 
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{

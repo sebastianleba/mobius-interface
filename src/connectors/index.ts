@@ -35,7 +35,7 @@ const chainIdToName = (chainId: ChainId): string => {
 
 export const NETWORK_CHAIN_NAME: string = chainIdToName(NETWORK_CHAIN_ID)
 
-console.log('Loading Ubeswap interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
+console.log('Loading Mobi interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
 
 export const network = new NetworkConnector({
   defaultChainId: NETWORK_CHAIN_ID,

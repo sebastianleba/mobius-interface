@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { Fraction, Token, TokenAmount } from '@ubeswap/sdk'
+import { Fraction, Token } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
@@ -7,6 +7,7 @@ import { initPool, updateVariableData } from './actions'
 
 export type StableStakingInfo = {
   userStaked: JSBI
+  totalStakedAmount: JSBI
   totalMobiRate: JSBI
   pendingMobi: JSBI
 }
@@ -18,7 +19,7 @@ export type StableSwapVariable = {
   lpOwned: JSBI
   virtualPrice: JSBI
   aPrecise: JSBI
-  feesGenerated: TokenAmount
+  feesGenerated: JSBI
   staking?: StableStakingInfo
 }
 
