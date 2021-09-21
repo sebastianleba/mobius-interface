@@ -156,7 +156,7 @@ export default function BatchUpdatePools(): null {
   const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
-  const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
+  const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId] ?? []
   const poolAddresses = pools.map(({ address }) => address)
   const lpTokenAddresses = pools.map(({ lpToken: { address } }) => address)
   const gaugeAddresses = pools.map(({ gaugeAddress }) => gaugeAddress)

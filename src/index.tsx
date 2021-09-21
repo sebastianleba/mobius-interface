@@ -3,6 +3,9 @@ import './i18n'
 import { ContractKitProvider } from '@celo-tools/use-contractkit'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
+import { ChainId } from '@ubeswap/sdk'
+import { NETWORK_CHAIN_ID } from 'connectors/index'
+import { DevNetworks, MainnetNetworks } from 'constants/NetworkInfo'
 import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
@@ -22,6 +25,8 @@ import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
 if (window.celo) {
   window.celo.autoRefreshOnNetworkChange = false
 }
+
+const networks = NETWORK_CHAIN_ID === ChainId.MAINNET ? MainnetNetworks : DevNetworks
 
 if (process.env.REACT_APP_SENTRY_DSN) {
   const sentryCfg = {
@@ -58,6 +63,7 @@ ReactDOM.render(
   <StrictMode>
     <FixedGlobalStyle />
     <ContractKitProvider
+      networks={networks}
       dapp={{
         name: 'Mobius',
         description: 'Multi-chain, stable swap exchange',

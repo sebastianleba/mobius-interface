@@ -1,10 +1,11 @@
-import { ChainId, getBlockscoutLink } from '@ubeswap/sdk'
+import { ChainId } from '@ubeswap/sdk'
 import React, { useContext } from 'react'
 import { AlertTriangle, ArrowUpCircle } from 'react-feather'
 import { Text } from 'rebass'
 import styled, { ThemeContext } from 'styled-components'
 
 import Circle from '../../assets/images/blue-loader.svg'
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import { useActiveContractKit } from '../../hooks'
 import { ExternalLink } from '../../theme'
 import { CloseIcon, CustomLightSpinner } from '../../theme/components'
@@ -85,7 +86,7 @@ function TransactionSubmittedContent({
             Transaction Submitted
           </Text>
           {chainId && hash && (
-            <ExternalLink href={getBlockscoutLink(chainId, hash, 'transaction')}>
+            <ExternalLink href={getExplorerLink(chainId, hash, 'transaction')}>
               <Text fontWeight={500} fontSize={14} color={theme.primary1}>
                 View on Celo Explorer
               </Text>

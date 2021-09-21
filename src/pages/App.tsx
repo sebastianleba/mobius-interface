@@ -1,7 +1,10 @@
 import '@celo-tools/use-contractkit/lib/styles.css'
 
 import { DappKitResponseStatus } from '@celo/utils'
+import { useContractKit } from '@celo-tools/use-contractkit'
 import { ErrorBoundary } from '@sentry/react'
+import { ChainId } from '@ubeswap/sdk'
+import { NETWORK, NETWORK_CHAIN_ID } from 'connectors'
 import React, { Suspense } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
@@ -65,6 +68,9 @@ export default function App() {
   const now = new Date()
   const isLive = true
   const location = useLocation()
+  const { network, updateNetwork } = useContractKit()
+  const chainId = network.chainId as unknown as ChainId
+  const wrongNetwork = !location.pathname.includes('optics') && chainId !== NETWORK_CHAIN_ID
   React.useEffect(() => {
     // Close window if search params from Valora redirect are present (handles Valora connection issue)
     if (typeof window !== 'undefined') {
@@ -81,6 +87,9 @@ export default function App() {
           }
         }
       }
+    }
+    if (wrongNetwork) {
+      updateNetwork(NETWORK)
     }
   }, [location])
 
@@ -105,20 +114,20 @@ export default function App() {
           )}
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Switch>
-              <Route exact path="/" component={LandingPage} />
-
-              <Route exact strict path="/swap" component={Swap} />
-              <Route exact strict path="/pool" component={Earn} />
-              <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-              <Route exact strict path="/risk" component={RiskPage} />
               <Route exact strict path="/optics" component={Optics} />
-              {isLive && (
+
+              {!wrongNetwork && (
                 <>
+                  {' '}
+                  <Route exact path="/" component={LandingPage} />
+                  <Route exact strict path="/swap" component={Swap} />
+                  <Route exact strict path="/pool" component={Earn} />
+                  <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
+                  <Route exact strict path="/risk" component={RiskPage} />
                   <Route path="/claim" component={Claim} />
                   <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
                 </>
               )}
-              {/* <Route component={RedirectPathToSwapOnly} /> */}
             </Switch>
           </ErrorBoundary>
           {location.pathname !== '/' && <Marginer />}

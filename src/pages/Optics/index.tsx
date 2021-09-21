@@ -7,7 +7,7 @@ import { ethers } from 'ethers'
 import { useActiveContractKit } from 'hooks'
 import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
 import { useBridgeRouterContract } from 'hooks/useContract'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useTokenBalanceSingle } from 'state/wallet/hooks'
@@ -48,7 +48,7 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const { chainId, account } = useActiveContractKit()
+  const { chainId, account, network, updateNetwork } = useActiveContractKit()
   //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
@@ -183,24 +183,6 @@ export default function Optics() {
     }
   }, [approval, approvalSubmitted])
 
-  // errors
-  const [showInverted, setShowInverted] = useState<boolean>(false)
-
-  // show approve flow when: no error on inputs, not approved or pending, or approved in current session
-  // never show if price impact is above threshold in non expert mode
-  const showApproveFlow =
-    approval === ApprovalState.NOT_APPROVED ||
-    approval === ApprovalState.PENDING ||
-    (approvalSubmitted && approval === ApprovalState.APPROVED)
-
-  const handleConfirmDismiss = useCallback(() => {
-    setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
-    // if there was a tx hash, we want to clear the input
-    if (txHash) {
-      //onUserInput(Field.INPUT, '')
-    }
-  }, [attemptingTxn, swapErrorMessage, tradeToConfirm, txHash])
-
   const listOfSteps = instructions.map((instruction, i) => (
     <RowFixed key={`instruction-${i}`} marginBottom="0.5rem" opacity={i === step ? 1 : 0.6}>
       <InstructionButton disabled={i > step} onClick={() => i < step && setStep(i)} marginRight="1rem">
@@ -226,23 +208,27 @@ export default function Optics() {
         key="wallet-button-asdsad"
         onClick={async () => {
           try {
-            await window.ethereum?.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
-            })
-          } catch (switchError) {
-            await window.ethereum?.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: '0x' + baseChainInfo.chainId.toString(16),
-                  chainName: baseChainInfo.name,
-                  nativeCurrency: baseChainInfo.nativeCurrency,
-                  rpcUrls: [baseChainInfo.rpcUrl],
-                  blockExplorerUrls: [baseChainInfo.explorer],
-                },
-              ],
-            })
+            updateNetwork(networkInfo[baseChainInfo.chainId])
+          } catch (e) {
+            try {
+              await window.ethereum?.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
+              })
+            } catch (switchError) {
+              await window.ethereum?.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                  {
+                    chainId: '0x' + baseChainInfo.chainId.toString(16),
+                    chainName: baseChainInfo.name,
+                    nativeCurrency: baseChainInfo.nativeCurrency,
+                    rpcUrls: [baseChainInfo.rpcUrl],
+                    blockExplorerUrls: [baseChainInfo.explorer],
+                  },
+                ],
+              })
+            }
           }
         }}
       >

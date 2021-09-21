@@ -1,5 +1,5 @@
 import { useContractKit, WalletTypes } from '@celo-tools/use-contractkit'
-import { ChainId, getBlockscoutLink } from '@ubeswap/sdk'
+import { ChainId } from '@ubeswap/sdk'
 import React, { useCallback, useContext } from 'react'
 import { ExternalLink as LinkIcon } from 'react-feather'
 import { useDispatch } from 'react-redux'
@@ -7,6 +7,7 @@ import { useCloseModals } from 'state/application/hooks'
 import styled, { ThemeContext } from 'styled-components'
 
 import { ReactComponent as Close } from '../../assets/images/x.svg'
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import { AppDispatch } from '../../state'
 import { clearAllTransactions } from '../../state/transactions/actions'
 import { ExternalLink, LinkStyledButton, TYPE } from '../../theme'
@@ -300,7 +301,7 @@ export default function AccountDetails({
                           <AddressLink
                             hasENS={!!ENSName}
                             isENS={true}
-                            href={chainId ? getBlockscoutLink(chainId, ENSName, 'address') : ''}
+                            href={chainId ? getExplorerLink(chainId, ENSName, 'address') : ''}
                           >
                             <LinkIcon size={16} />
                             <span style={{ marginLeft: '4px' }}>View on Celo Explorer</span>
@@ -322,7 +323,7 @@ export default function AccountDetails({
                           <AddressLink
                             hasENS={!!ENSName}
                             isENS={false}
-                            href={getBlockscoutLink(chainId, address, 'address')}
+                            href={getExplorerLink(chainId, address, 'address')}
                           >
                             <LinkIcon size={16} />
                             <span style={{ marginLeft: '4px' }}>View on Celo Explorer</span>

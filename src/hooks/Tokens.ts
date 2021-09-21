@@ -5,21 +5,16 @@ import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
 import { MOBI_TOKEN, STATIC_POOL_INFO } from '../constants/StablePools'
-import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { isAddress } from '../utils'
-import {
-  TokenAddressMap,
-  useDefaultTokenList,
-  useStableTokenList,
-  useUnsupportedTokenList,
-} from './../state/lists/hooks'
+import { TokenAddressMap } from './../state/lists/hooks'
 import { useActiveContractKit } from './index'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
 
 // reduce token map into standard address <-> Token mapping, optionally include user added tokens
 function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean): { [address: string]: Token } {
   const { chainId } = useActiveContractKit()
+  console.log(chainId)
 
   return useMemo(() => {
     if (!chainId) return {}
@@ -36,8 +31,7 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
 
 export function useSwappableTokens(): { [address: string]: Token } {
   const { chainId } = useActiveContractKit()
-  const pools = STATIC_POOL_INFO[chainId]
-  const defaultList = useStableTokenList()
+  const pools = STATIC_POOL_INFO[chainId] ?? []
   const swappableTokens: { [address: string]: Token } = {}
 
   pools
@@ -50,42 +44,19 @@ export function useSwappableTokens(): { [address: string]: Token } {
 }
 
 export function useDefaultTokens(): { [address: string]: Token } {
-  const defaultList = useDefaultTokenList()
-  return useTokensFromMap(defaultList, false)
+  return {}
 }
 
 export function useAllTokens(): { [address: string]: Token } {
-  const allTokens = useCombinedActiveList()
-  return useTokensFromMap(allTokens, true)
-}
-
-export function useStableTokens(): { [address: string]: Token } {
-  const stableList = useStableTokenList()
-  return useTokensFromMap(stableList, false)
+  return {}
 }
 
 export function useAllInactiveTokens(): { [address: string]: Token } {
-  // get inactive tokens
-  const inactiveTokensMap = useCombinedInactiveList()
-  const inactiveTokens = useTokensFromMap(inactiveTokensMap, false)
-
-  // filter out any token that are on active list
-  const activeTokensAddresses = Object.keys(useAllTokens())
-  const filteredInactive = activeTokensAddresses
-    ? Object.keys(inactiveTokens).reduce<{ [address: string]: Token }>((newMap, address) => {
-        if (!activeTokensAddresses.includes(address)) {
-          newMap[address] = inactiveTokens[address]
-        }
-        return newMap
-      }, {})
-    : inactiveTokens
-
-  return filteredInactive
+  return {}
 }
 
 export function useUnsupportedTokens(): { [address: string]: Token } {
-  const unsupportedTokensMap = useUnsupportedTokenList()
-  return useTokensFromMap(unsupportedTokensMap, false)
+  return {}
 }
 
 export function useIsTokenActive(token: Token | undefined | null): boolean {

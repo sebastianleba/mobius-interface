@@ -1,4 +1,4 @@
-import { getBlockscoutLink, Token } from '@ubeswap/sdk'
+import { Token } from '@ubeswap/sdk'
 import Row, { RowBetween, RowFixed } from 'components/Row'
 import { useActiveContractKit } from 'hooks'
 import { useToken } from 'hooks/Tokens'
@@ -8,6 +8,7 @@ import styled from 'styled-components'
 import { ButtonText, ExternalLink, ExternalLinkIcon, TrashIcon, TYPE } from 'theme'
 import { isAddress } from 'utils'
 
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import useTheme from '../../hooks/useTheme'
 import Card from '../Card'
 import Column from '../Column'
@@ -78,7 +79,7 @@ export default function ManageTokens({
         <RowBetween key={token.address} width="100%">
           <RowFixed>
             <CurrencyLogo currency={token} size={'20px'} />
-            <ExternalLink href={getBlockscoutLink(chainId, token.address, 'address')}>
+            <ExternalLink href={getExplorerLink(chainId, token.address, 'address')}>
               <TYPE.main ml={'10px'} fontWeight={600}>
                 {token.symbol}
               </TYPE.main>
@@ -86,7 +87,7 @@ export default function ManageTokens({
           </RowFixed>
           <RowFixed>
             <TrashIcon onClick={() => removeToken(chainId, token.address)} />
-            <ExternalLinkIcon href={getBlockscoutLink(chainId, token.address, 'address')} />
+            <ExternalLinkIcon href={getExplorerLink(chainId, token.address, 'address')} />
           </RowFixed>
         </RowBetween>
       ))

@@ -1,8 +1,9 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
-import { ChainId, getBlockscoutLink } from '@ubeswap/sdk'
+import { ChainId } from '@ubeswap/sdk'
 import React, { useCallback, useContext } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import useENS from '../../hooks/useENS'
 import { ExternalLink, TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
@@ -101,10 +102,7 @@ export default function AddressInputPanel({
                 Recipient
               </TYPE.black>
               {address && chainId && (
-                <ExternalLink
-                  href={getBlockscoutLink(chainId, name ?? address, 'address')}
-                  style={{ fontSize: '14px' }}
-                >
+                <ExternalLink href={getExplorerLink(chainId, name ?? address, 'address')} style={{ fontSize: '14px' }}>
                   (View on Celo Explorer)
                 </ExternalLink>
               )}
