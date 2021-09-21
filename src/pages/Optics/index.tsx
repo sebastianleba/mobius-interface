@@ -1,6 +1,7 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
+import { NETWORK } from 'connectors'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
 import { ethers } from 'ethers'
@@ -143,6 +144,7 @@ export default function Optics() {
         }
         break
     }
+    return () => updateNetwork(NETWORK)
   })
 
   useEffect(() => {
