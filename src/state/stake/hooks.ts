@@ -15,7 +15,7 @@ import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
 import { UNISWAP_V2_PAIR_INTERFACE } from '../../constants/abis/uniswap-v2-pair'
 import { STATIC_POOL_INFO, USD_POOL_ADDRESSES } from '../../constants/StablePools'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import {
   NEVER_RELOAD,
@@ -79,7 +79,7 @@ export const usePairStakingInfo = (pairToFilterBy?: Pair | null): StakingInfo | 
 }
 
 export const usePairDualStakingInfo = (stakingInfo: StakingInfo | undefined): DualRewardsInfo | null => {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   let dualStakeAddress = ''
   if (stakingInfo?.poolInfo.stakingToken === POOF_DUAL_LP) {
     dualStakeAddress = POOF_DUAL_POOL
@@ -107,7 +107,7 @@ interface UnclaimedInfo {
 }
 
 export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const ube = chainId ? UBE[chainId] : undefined
   const ubeContract = useTokenContract(ube?.address)
   const poolManagerContract = usePoolManagerContract(chainId !== ChainId.BAKLAVA ? POOL_MANAGER[chainId] : undefined)
@@ -169,7 +169,7 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
 export function useTokensTradeable(tokenIn: Token | null | undefined): readonly [{ [address: string]: Token }] {
   const tradeable: { [address: string]: Token } = {}
   const pools = STATIC_POOL_INFO
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   if (!tokenIn) return [{}]
   // }
@@ -192,7 +192,7 @@ export function useTokensTradeable(tokenIn: Token | null | undefined): readonly 
 }
 
 export function useStableSwapInfo(): readonly StablePoolInfo[] {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const tokens = useAllTokens()
   const celoAddress =
     chainId == ChainId.MAINNET
@@ -272,7 +272,7 @@ export function useStableSwapInfo(): readonly StablePoolInfo[] {
 
 // gets the staking info from the network for the active chain id
 export function useStakingInfo(pairToFilterBy?: Pair | null): readonly StakingInfo[] {
-  const { chainId, account } = useActiveWeb3React()
+  const { chainId, account } = useActiveContractKit()
   const ube = chainId ? UBE[chainId] : undefined
   const ubePrice = useCUSDPrice(ube)
 
@@ -433,7 +433,7 @@ interface IStakingPool {
 }
 
 export function useStakingPools(pairToFilterBy?: Pair | null): readonly IStakingPool[] {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const ube = chainId ? UBE[chainId] : undefined
 
   const poolManagerContract = usePoolManagerContract(chainId !== ChainId.BAKLAVA ? POOL_MANAGER[chainId] : undefined)
@@ -531,7 +531,7 @@ export function useStakingPoolsInfo(
 export function usePairDataFromAddresses(
   pairAddresses: readonly string[]
 ): readonly (readonly [Token, Token] | undefined)[] {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const token0Data = useMultipleContractSingleData(
     pairAddresses,
@@ -623,7 +623,7 @@ export function usePairDataFromAddresses(
 }
 
 export function useTotalUbeEarned(): TokenAmount | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const ube = chainId ? UBE[chainId] : undefined
   const stakingInfos = useStakingInfo()
 
@@ -647,7 +647,7 @@ export function useDerivedStakeInfo(
   parsedAmount?: TokenAmount
   error?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const parsedInput: TokenAmount | undefined = tryParseAmount(typedValue, stakingToken)
 
@@ -678,7 +678,7 @@ export function useDerivedUnstakeInfo(
   parsedAmount?: TokenAmount
   error?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const parsedInput: TokenAmount | undefined = tryParseAmount(typedValue, stakingAmount.token)
 

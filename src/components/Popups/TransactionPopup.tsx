@@ -1,11 +1,11 @@
-import { getBlockscoutLink } from '@ubeswap/sdk'
 import { networkInfo } from 'constants/NetworkInfo'
 import { MultiChainIds } from 'constants/Optics'
 import React, { useContext } from 'react'
 import { AlertCircle, CheckCircle } from 'react-feather'
 import styled, { ThemeContext } from 'styled-components'
 
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import { getExplorerLink } from '../../constants/NetworkInfo'
+import { useActiveContractKit, useChainId } from '../../hooks'
 import { TYPE } from '../../theme'
 import { ExternalLink } from '../../theme/components'
 import { AutoColumn } from '../Column'
@@ -24,12 +24,12 @@ export default function TransactionPopup({
   success?: boolean
   summary?: string
 }) {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const theme = useContext(ThemeContext)
-  const otherChainId = useWeb3ChainId()
+  const otherChainId = useChainId()
   const { explorer } = networkInfo[chainId as MultiChainIds]
-  const explorerLink = getBlockscoutLink(chainId, hash, 'transaction')
+  const explorerLink = getExplorerLink(chainId, hash, 'transaction')
 
   return (
     <RowNoFlex>

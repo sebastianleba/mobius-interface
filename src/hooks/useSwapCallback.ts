@@ -1,6 +1,8 @@
+import { useContractKit, useGetConnectedSigner, useProvider } from '@celo-tools/use-contractkit'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { JSBI, SwapParameters } from '@ubeswap/sdk'
+import { ContractTransaction } from 'ethers'
 import { useMemo } from 'react'
 
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
@@ -8,7 +10,7 @@ import { MobiusTrade } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { calculateGasMargin, getStableSwapContract, isAddress, shortenAddress } from '../utils'
 import isZero from '../utils/isZero'
-import { useActiveWeb3React } from './index'
+import { useActiveContractKit } from './index'
 import useENS from './useENS'
 import useTransactionDeadline from './useTransactionDeadline'
 
@@ -46,7 +48,9 @@ function useSwapCallArguments(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): SwapCall[] {
-  const { account, chainId, library } = useActiveWeb3React()
+  const { address: account, network } = useContractKit()
+  const library = useProvider()
+  const chainId = network.chainId
 
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
@@ -84,7 +88,7 @@ export function useSwapCallback(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } {
-  const { account, chainId, library } = useActiveWeb3React()
+  const { account, chainId, library } = useActiveContractKit()
 
   const swapCalls = useSwapCallArguments(trade, allowedSlippage, recipientAddressOrName)
 
@@ -92,6 +96,7 @@ export function useSwapCallback(
 
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
+  const getConnectedSigner = useGetConnectedSigner()
 
   return useMemo(() => {
     if (!trade || !library || !account || !chainId) {
@@ -163,17 +168,17 @@ export function useSwapCallback(
 
         const {
           call: {
-            contract,
+            contract: disconnectedContract,
             parameters: { methodName, args, value },
           },
           gasEstimate,
         } = successfulEstimation
 
+        const contract = disconnectedContract.connect(await getConnectedSigner())
         return contract[methodName](...args, {
           gasLimit: calculateGasMargin(gasEstimate),
-          ...(value && !isZero(value) ? { value, from: account } : { from: account }),
         })
-          .then((response: any) => {
+          .then((response: ContractTransaction) => {
             const inputSymbol = trade.input.currency.symbol
             const outputSymbol = trade.output.currency.symbol
             const inputAmount = trade.input.toSignificant(6)
@@ -208,5 +213,15 @@ export function useSwapCallback(
       },
       error: null,
     }
-  }, [trade, library, account, chainId, recipient, recipientAddressOrName, swapCalls, addTransaction])
+  }, [
+    trade,
+    library,
+    account,
+    chainId,
+    recipient,
+    recipientAddressOrName,
+    swapCalls,
+    getConnectedSigner,
+    addTransaction,
+  ])
 }

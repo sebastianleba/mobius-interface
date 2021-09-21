@@ -61,6 +61,11 @@ const Divider = styled.div`
 
 export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean; onDismiss: () => void }) {
   const { t } = useTranslation()
+
+  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
+  const now = new Date()
+  const isLive = true
+
   return (
     <CustomModal isOpen={isOpen} onDismiss={onDismiss} maxHeight={90}>
       <LinkContainer>
@@ -69,7 +74,7 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
           <TYPE.largeHeader onClick={onDismiss}>X</TYPE.largeHeader>
         </RowBetween>
         <Divider />
-        <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
+        <StyledNavLink id={`swap-nav-link`} to={'/swap'} onClick={onDismiss}>
           {t('swap')}
         </StyledNavLink>
         <StyledNavLink
@@ -82,18 +87,21 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
             pathname.startsWith('/create') ||
             pathname.startsWith('/find')
           }
+          onClick={onDismiss}
         >
           Pool
         </StyledNavLink>
-        <StyledNavLink id="bridge-nav-link" to="/optics">
+        <StyledNavLink id="bridge-nav-link" to="/optics" onClick={onDismiss}>
           Bridge
         </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
           Risks
         </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-          Airdrop
-        </StyledNavLink>
+        {isLive && (
+          <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
+            Airdrop
+          </StyledNavLink>
+        )}
       </LinkContainer>
     </CustomModal>
   )

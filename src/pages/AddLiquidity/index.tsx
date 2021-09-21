@@ -19,7 +19,7 @@ import Row, { RowBetween, RowFlat } from '../../components/Row'
 import TransactionConfirmationModal, { ConfirmationModalContent } from '../../components/TransactionConfirmationModal'
 import { ROUTER_ADDRESS } from '../../constants'
 import { PairState } from '../../data/Reserves'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
@@ -43,7 +43,7 @@ export default function AddLiquidity({
   },
   history,
 }: RouteComponentProps<{ currencyIdA?: string; currencyIdB?: string }>) {
-  const { account, chainId, library } = useActiveWeb3React()
+  const { account, chainId, library } = useActiveContractKit()
   const theme = useContext(ThemeContext)
 
   const currencyA = useCurrency(currencyIdA)

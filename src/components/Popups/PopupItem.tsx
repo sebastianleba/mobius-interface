@@ -1,7 +1,6 @@
 import React, { useCallback, useContext, useEffect } from 'react'
 import { X } from 'react-feather'
-import { animated } from 'react-spring'
-import { useSpring } from 'react-spring/web'
+import { animated, useSpring } from 'react-spring'
 import styled, { ThemeContext } from 'styled-components'
 
 import { PopupContent } from '../../state/application/actions'
@@ -13,7 +12,6 @@ export const StyledClose = styled(X)`
   position: absolute;
   right: 10px;
   top: 10px;
-
   :hover {
     cursor: pointer;
   }
@@ -28,7 +26,6 @@ export const Popup = styled.div`
   padding: 20px;
   padding-right: 35px;
   overflow: hidden;
-
   ${({ theme }) => theme.mediaWidth.upToSmall`
     min-width: 290px;
     &:not(:last-of-type) {

@@ -1,13 +1,13 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
-import { useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
 import { ethers } from 'ethers'
+import { useActiveContractKit } from 'hooks'
 import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
 import { useBridgeRouterContract } from 'hooks/useContract'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useTokenBalanceSingle } from 'state/wallet/hooks'
@@ -40,7 +40,7 @@ const WalletButton = styled(ButtonPrimary)`
 `
 
 const VoteCard = styled(DataCard)`
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #27ae60 0%, #222 100%);
+  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #ff033e 0%, #222 100%);
   overflow: hidden;
   margin-top: 2rem;
 `
@@ -48,10 +48,8 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const test = useWeb3React()
-  const { account } = test
-  const { chainId } = useWeb3React()
-  //const chainId = useWeb3ChainId()
+  const { chainId, account, network, updateNetwork } = useActiveContractKit()
+  //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
   const [val, setVal] = useState<string>()
@@ -70,7 +68,6 @@ export default function Optics() {
   async function onSend() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
-      console.log(selectedToken?.raw.toString())
       setAttempting(true)
       await bridgeContract
         .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {
@@ -156,7 +153,7 @@ export default function Optics() {
     } else if (chainId === MultiChainIds.POLYGON) {
       setExplorerURL('https://polygonscan.com/tx/')
     }
-  }, [chainId])
+  }, [chainId, step])
 
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
@@ -186,24 +183,6 @@ export default function Optics() {
     }
   }, [approval, approvalSubmitted])
 
-  // errors
-  const [showInverted, setShowInverted] = useState<boolean>(false)
-
-  // show approve flow when: no error on inputs, not approved or pending, or approved in current session
-  // never show if price impact is above threshold in non expert mode
-  const showApproveFlow =
-    approval === ApprovalState.NOT_APPROVED ||
-    approval === ApprovalState.PENDING ||
-    (approvalSubmitted && approval === ApprovalState.APPROVED)
-
-  const handleConfirmDismiss = useCallback(() => {
-    setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
-    // if there was a tx hash, we want to clear the input
-    if (txHash) {
-      //onUserInput(Field.INPUT, '')
-    }
-  }, [attemptingTxn, swapErrorMessage, tradeToConfirm, txHash])
-
   const listOfSteps = instructions.map((instruction, i) => (
     <RowFixed key={`instruction-${i}`} marginBottom="0.5rem" opacity={i === step ? 1 : 0.6}>
       <InstructionButton disabled={i > step} onClick={() => i < step && setStep(i)} marginRight="1rem">
@@ -229,23 +208,27 @@ export default function Optics() {
         key="wallet-button-asdsad"
         onClick={async () => {
           try {
-            await window.ethereum?.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
-            })
-          } catch (switchError) {
-            await window.ethereum?.request({
-              method: 'wallet_addEthereumChain',
-              params: [
-                {
-                  chainId: '0x' + baseChainInfo.chainId.toString(16),
-                  chainName: baseChainInfo.name,
-                  nativeCurrency: baseChainInfo.nativeCurrency,
-                  rpcUrls: [baseChainInfo.rpcUrl],
-                  blockExplorerUrls: [baseChainInfo.explorer],
-                },
-              ],
-            })
+            updateNetwork(networkInfo[baseChainInfo.chainId])
+          } catch (e) {
+            try {
+              await window.ethereum?.request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
+              })
+            } catch (switchError) {
+              await window.ethereum?.request({
+                method: 'wallet_addEthereumChain',
+                params: [
+                  {
+                    chainId: '0x' + baseChainInfo.chainId.toString(16),
+                    chainName: baseChainInfo.name,
+                    nativeCurrency: baseChainInfo.nativeCurrency,
+                    rpcUrls: [baseChainInfo.rpcUrl],
+                    blockExplorerUrls: [baseChainInfo.explorer],
+                  },
+                ],
+              })
+            }
           }
         }}
       >
@@ -339,7 +322,7 @@ export default function Optics() {
               <RowBetween>
                 <TYPE.white
                   fontSize={14}
-                >{`Interface for the recently released Optics Bridge. Currently the Mobius exchange only supports Ethereum assets and not Polygon. Disclaimer: Optics bridge is still in alpha.`}</TYPE.white>
+                >{`WARNING: The Optics Bridge is an experimental product that is pre-beta and considered highly risky. USE AT YOUR OWN RISK. Transfers can take several hours, if not days, to process while the product is in its infancy. Currently the Mobius exchange only supports Ethereum assets and not Polygon.`}</TYPE.white>
               </RowBetween>
               <ExternalLink
                 style={{ color: 'white', textDecoration: 'underline' }}

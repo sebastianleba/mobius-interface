@@ -1,11 +1,12 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { TokenAmount } from '@ubeswap/sdk'
 import { useMobi } from 'hooks/Tokens'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useBlockNumber } from 'state/application/hooks'
 import { StablePoolInfo } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useLiquidityGaugeContract, useMobiMinterContract } from '../../hooks/useContract'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
@@ -27,9 +28,8 @@ interface StakingModalProps {
 }
 
 export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
   const mobi = useMobi()
-  const pendingMobi = new TokenAmount(mobi, stakingInfo.pendingMobi ?? '0')
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
@@ -44,6 +44,18 @@ export default function ClaimRewardModal({ isOpen, onDismiss, stakingInfo }: Sta
 
   const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
   const minter = useMobiMinterContract()
+
+  const [pendingMobi, setEarnedMobi] = useState<TokenAmount>()
+
+  const blockNumber = useBlockNumber()
+
+  useEffect(() => {
+    const updateMobi = async () => {
+      const bigInt = await stakingContract?.claimable_tokens(account)
+      setEarnedMobi(new TokenAmount(mobi, bigInt.toString()))
+    }
+    account && updateMobi()
+  }, [stakingContract, setEarnedMobi, account])
 
   async function onClaimReward() {
     if (stakingContract && stakingInfo?.stakedAmount) {

@@ -1,4 +1,4 @@
-import { getBlockscoutLink, Token } from '@ubeswap/sdk'
+import { Token } from '@ubeswap/sdk'
 import { ButtonPrimary } from 'components/Button'
 import Card from 'components/Card'
 import { AutoColumn } from 'components/Column'
@@ -6,7 +6,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 import ListLogo from 'components/ListLogo'
 import { AutoRow, RowBetween, RowFixed } from 'components/Row'
 import { SectionBreak } from 'components/swap/styleds'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import useTheme from 'hooks/useTheme'
 import { transparentize } from 'polished'
 import React, { useState } from 'react'
@@ -16,6 +16,7 @@ import { useAddUserToken } from 'state/user/hooks'
 import styled from 'styled-components'
 import { CloseIcon, TYPE } from 'theme'
 
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import { ExternalLink } from '../../theme/components'
 import { Checkbox, PaddedColumn } from './styleds'
 
@@ -49,7 +50,7 @@ interface ImportProps {
 export function ImportToken({ tokens, onBack, onDismiss, handleCurrencySelect }: ImportProps) {
   const theme = useTheme()
 
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const [confirmed, setConfirmed] = useState(false)
 
@@ -87,7 +88,7 @@ export function ImportToken({ tokens, onBack, onDismiss, handleCurrencySelect }:
                   <TYPE.darkGray fontWeight={300}>{token.name}</TYPE.darkGray>
                 </AutoRow>
                 {chainId && (
-                  <ExternalLink href={getBlockscoutLink(chainId, token.address, 'address')}>
+                  <ExternalLink href={getExplorerLink(chainId, token.address, 'address')}>
                     <AddressText>{token.address}</AddressText>
                   </ExternalLink>
                 )}

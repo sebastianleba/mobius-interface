@@ -128,7 +128,7 @@ export const ComingSoon = styled.a`
 export default function LandingPage() {
   const launchTime = new Date(Date.UTC(2021, 8, 3, 20))
   const now = new Date()
-  const isLive = now >= launchTime
+  const isLive = true
 
   return (
     <Container>
@@ -158,7 +158,7 @@ export default function LandingPage() {
         <ExternalLink href="https://github.com/mobiusAMM" target="_blank">
           <img src={github} width="100%" />
         </ExternalLink>
-        <ExternalLink href="https://discord.gg/YVJycuqk" target="_blank" style={{ background: 'none' }}>
+        <ExternalLink href="https://discord.gg/e4qYT6cZeM" target="_blank" style={{ background: 'none' }}>
           <img src={discord} width="100%" />
         </ExternalLink>
         <ExternalLink href="https://twitter.com/MobiusMoney" target="_blank">

@@ -1,11 +1,11 @@
-import { currencyEquals, Token, TokenAmount } from '@ubeswap/sdk'
+import { currencyEquals, JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import React, { CSSProperties, MutableRefObject, useCallback } from 'react'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import checkedLogo from '../../assets/svg/mobius.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
 import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
 import { useTokenBalanceSingle } from '../../state/wallet/hooks'
@@ -45,7 +45,16 @@ const Tag = styled.div`
 `
 
 function Balance({ balance }: { balance: TokenAmount }) {
-  return <StyledBalanceText title={balance.toExact()}>{balance.toSignificant(4)}</StyledBalanceText>
+  const max = balance.token.decimals
+  const decimalPlacesForBalance = balance?.greaterThan(
+    JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(balance.token.decimals)).toString()
+  )
+    ? 2
+    : balance?.greaterThan('0')
+    ? Math.min(10, max)
+    : 2
+
+  return <StyledBalanceText title={balance.toExact()}>{balance.toFixed(decimalPlacesForBalance)}</StyledBalanceText>
 }
 
 const TagContainer = styled.div`
@@ -95,7 +104,7 @@ function CurrencyRow({
   otherSelected: boolean
   style: CSSProperties
 }) {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const key = currencyKey(currency)
   const selectedTokenList = useCombinedActiveList()
   const isOnSelectedList = isTokenOnList(selectedTokenList, currency)

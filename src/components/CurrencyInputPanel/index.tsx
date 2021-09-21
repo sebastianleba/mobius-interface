@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next'
 import styled, { css, keyframes } from 'styled-components'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useIsDarkMode } from '../../state/user/hooks'
-import { useTokenBalanceSingle } from '../../state/wallet/hooks'
+import { useCurrencyBalance, useTokenBalanceSingle } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import CurrencyLogo from '../CurrencyLogo'
 import DoubleCurrencyLogo from '../DoubleLogo'
@@ -217,11 +217,11 @@ export default function CurrencyInputPanel({
   const isDarkMode = useIsDarkMode()
 
   const [modalOpen, setModalOpen] = useState(false)
-  const { account } = useActiveWeb3React()
-  const selectedCurrencyBalance = useTokenBalanceSingle(account ?? undefined, currency ?? undefined)
+  const { account } = useActiveContractKit()
+  const tokenBalanceFast = useCurrencyBalance(account ?? undefined, currency ?? undefined)
+  const tokenBalanceSlow = useTokenBalanceSingle(account ?? undefined, currency ?? undefined)
+  const selectedCurrencyBalance = tokenBalanceFast ?? tokenBalanceSlow
   const theme = useTheme()
-
-  console.log(otherCurrency)
 
   const handleDismissSearch = useCallback(() => {
     setModalOpen(false)

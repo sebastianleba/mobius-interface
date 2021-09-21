@@ -1,7 +1,6 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
 import { ChainId } from '@ubeswap/sdk'
-import { useWeb3React } from '@web3-react/core'
 import { MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
@@ -37,12 +36,12 @@ import {
   VestingEscrow,
 } from '../generated'
 import { getContract } from '../utils'
-import { useActiveWeb3React } from './index'
+import { useActiveContractKit } from './index'
 import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account } = useWeb3React()
+  const { library, account, chainId } = useActiveContractKit()
 
   return useMemo(() => {
     if (!address || !ABI || !library) return null
@@ -79,13 +78,13 @@ export function useMobiContract(address?: string, withSignerIfPossible?: boolean
 }
 
 export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainId], MINTER.abi, withSignerIfPossible) as Minter
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const fallBackAddress =
     chainId === ChainId.MAINNET
       ? '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25'
@@ -118,7 +117,7 @@ export function useLpTokenContract(tokenAddress?: string, withSignerIfPossible?:
 }
 
 export function useMulticallContract(): Contract | null {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   return useContract(chainId ? MULTICALL_NETWORKS[chainId] : undefined, MULTICALL_ABI, false)
 }
 

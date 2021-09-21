@@ -4,7 +4,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
@@ -42,11 +42,10 @@ interface DepositModalProps {
 }
 
 export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositModalProps) {
-  const { library, account } = useActiveWeb3React()
-
+  const { library, account } = useActiveContractKit()
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
-  const { tokens } = poolInfo
+  const { tokens, peggedTo, pegComesAfter } = poolInfo
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
@@ -60,6 +59,16 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const deadline = useTransactionDeadline()
 
   const [expectedLPTokens, selectedAmounts] = useExpectedLpTokens(poolInfo, tokens, input)
+  const valueOfLP = new TokenAmount(
+    poolInfo.lpToken,
+    JSBI.divide(
+      JSBI.multiply(expectedLPTokens.raw, poolInfo.virtualPrice),
+      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+    )
+  )
+
+  const decimalPlacesForLP = expectedLPTokens?.greaterThan('1') ? 2 : expectedLPTokens?.greaterThan('0') ? 10 : 2
+
   const withSlippage = JSBI.subtract(expectedLPTokens.raw, JSBI.divide(expectedLPTokens.raw, JSBI.BigInt('10')))
   const approvals = [
     useApproveCallback(selectedAmounts[0], poolInfo.poolAddress),
@@ -152,7 +161,11 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             </div>
           ))}
           <TYPE.mediumHeader style={{ textAlign: 'center' }}>
-            Expected Lp Tokens Received: {expectedLPTokens.toFixed(4)}
+            Expected Lp Tokens Received: {expectedLPTokens.toFixed(decimalPlacesForLP)}
+          </TYPE.mediumHeader>
+          <TYPE.mediumHeader style={{ textAlign: 'center' }}>
+            Equivalent to: {pegComesAfter ? '' : peggedTo}
+            {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
           </TYPE.mediumHeader>
           {toApprove.length > 0 && expectedLPTokens.greaterThan(JSBI.BigInt('0')) && (
             <div style={{ display: 'flex' }}>
@@ -254,7 +267,7 @@ const BalanceText = styled(TYPE.subHeader)`
 `
 
 const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }: CurrencyRowProps) => {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')
