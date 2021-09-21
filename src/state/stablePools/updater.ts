@@ -201,8 +201,14 @@ export default function BatchUpdatePools(): null {
         const lpTotalSupply: JSBI = BigIntToJSBI((lpTotalSupplies?.[i]?.result?.[0] as BigInt) ?? '0')
         const lpOwned: JSBI = BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0')
         const fees: JSBI = JSBI.add(
-          BigIntToJSBI((feesOne?.[i]?.result?.[0] as BigInt) ?? '0'),
-          BigIntToJSBI((feesTwo?.[i]?.result?.[0] as BigInt) ?? '0')
+          JSBI.multiply(
+            BigIntToJSBI((feesOne?.[i]?.result?.[0] as BigInt) ?? '0'),
+            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(18 - poolInfo.tokens[0].decimals))
+          ),
+          JSBI.multiply(
+            BigIntToJSBI((feesTwo?.[i]?.result?.[0] as BigInt) ?? '0'),
+            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(18 - poolInfo.tokens[0].decimals))
+          )
         )
         const lpStaked: JSBI = BigIntToJSBI((lpStaked_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')

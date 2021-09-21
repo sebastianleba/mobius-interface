@@ -158,13 +158,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
       ? JSBI.BigInt(PRICE[Coins.Ether])
       : JSBI.BigInt(PRICE[Coins.USD])
-  const lpPrice = JSBI.divide(
-    JSBI.multiply(coinPrice, poolInfo.virtualPrice),
-    JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-  )
   const totalStakedAmount = totalValueStaked
     ? new Fraction(
-        JSBI.multiply(totalValueStaked.raw, lpPrice),
+        JSBI.multiply(totalValueStaked.raw, coinPrice),
         JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
       )
     : new Fraction(JSBI.BigInt(0))

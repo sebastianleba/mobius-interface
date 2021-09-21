@@ -72,7 +72,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   ),
   balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
   pegComesAfter: pool.pegComesAfter,
-  feesGenerated: new TokenAmount(pool.tokens[0], pool.feesGenerated),
+  feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
