@@ -15,13 +15,13 @@ const makeTokens = (
 
 export const UBE = makeTokens(
   {
-    [ChainId.MAINNET]: '0x00Be915B9dCf56a3CBE739D9B9c202ca692409EC',
+    [ChainId.MAINNET]: '0x73a210637f6F6B7005512677Ba6B3C96bb4AA44B',
     [ChainId.ALFAJORES]: '0x00Be915B9dCf56a3CBE739D9B9c202ca692409EC',
     [ChainId.BAKLAVA]: '0x00Be915B9dCf56a3CBE739D9B9c202ca692409EC',
   },
   18,
-  'UBE',
-  'Ubeswap'
+  'MOBI',
+  'Mobius DAO Token'
 )
 
 export const USD_LP = makeTokens(

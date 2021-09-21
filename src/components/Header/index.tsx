@@ -1,4 +1,5 @@
 import { CELO, TokenAmount } from '@ubeswap/sdk'
+import { CardNoise } from 'components/earn/styled'
 import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
@@ -11,7 +12,9 @@ import { NavLink, useHistory } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
+import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
+import { CountUp } from 'use-count-up'
 
 import Logo from '../../assets/svg/mobius.svg'
 import { useActiveWeb3React } from '../../hooks'
@@ -346,8 +349,8 @@ export default function Header() {
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>
-          {/* {aggregateBalance && (
-            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
+          {aggregateBalance && (
+            <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
                   <HideSmall>
@@ -367,11 +370,11 @@ export default function Header() {
                     </TYPE.white>
                   </HideSmall>
                 )}
-                UBE
+                MOBI
               </UBEAmount>
               <CardNoise />
             </UBEWrapper>
-          )} */}
+          )}
 
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
             {account && userCELOBalance ? (
