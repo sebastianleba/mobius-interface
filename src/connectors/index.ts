@@ -1,12 +1,5 @@
-import { Web3Provider } from '@ethersproject/providers'
-import { InjectedConnector as CEWConnector } from '@ubeswap/injected-connector'
+import { Alfajores, Baklava, Mainnet } from '@celo-tools/use-contractkit'
 import { ChainId, parseNetwork } from '@ubeswap/sdk'
-import { InjectedConnector } from '@web3-react/injected-connector'
-import { DevNetworks, MainnetNetworks } from 'constants/NetworkInfo'
-
-import { LedgerConnector } from './ledger/LedgerConnector'
-import { NetworkConnector } from './NetworkConnector'
-import { ValoraConnector } from './valora/ValoraConnector'
 
 const networkChainIDFromHostname: ChainId = window.location.hostname.includes('alfajores')
   ? ChainId.ALFAJORES
@@ -17,8 +10,6 @@ const networkChainIDFromHostname: ChainId = window.location.hostname.includes('a
 export const NETWORK_CHAIN_ID: ChainId = process.env.REACT_APP_CHAIN_ID
   ? parseNetwork(parseInt(process.env.REACT_APP_CHAIN_ID))
   : networkChainIDFromHostname
-
-const supportedNetworks = NETWORK_CHAIN_ID === ChainId.ALFAJORES ? DevNetworks : MainnetNetworks
 
 const chainIdToName = (chainId: ChainId): string => {
   switch (chainId) {
@@ -35,29 +26,15 @@ const chainIdToName = (chainId: ChainId): string => {
 
 export const NETWORK_CHAIN_NAME: string = chainIdToName(NETWORK_CHAIN_ID)
 
-console.log('Loading Mobi interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)
+export const NETWORK =
+  NETWORK_CHAIN_ID === ChainId.ALFAJORES
+    ? Alfajores
+    : NETWORK_CHAIN_ID === ChainId.MAINNET
+    ? Mainnet
+    : NETWORK_CHAIN_ID === ChainId.BAKLAVA
+    ? Baklava
+    : (() => {
+        throw new Error('Unknown network ' + NETWORK_CHAIN_ID)
+      })()
 
-export const network = new NetworkConnector({
-  defaultChainId: NETWORK_CHAIN_ID,
-})
-
-let networkLibrary: Web3Provider | undefined
-export function getNetworkLibrary(): Web3Provider {
-  return (networkLibrary = networkLibrary ?? new Web3Provider(network.provider as any))
-}
-
-const supportedChainIds = supportedNetworks.map((n) => n.chainId)
-
-export const injected = new InjectedConnector({
-  supportedChainIds,
-})
-
-export const celoExtensionWallet = new CEWConnector({
-  supportedChainIds,
-})
-
-export const ledger = new LedgerConnector()
-
-export const valora = new ValoraConnector({
-  defaultChainId: NETWORK_CHAIN_ID,
-})
+console.log('Loading Mobius interface at', window.location.hostname, networkChainIDFromHostname, NETWORK_CHAIN_ID)

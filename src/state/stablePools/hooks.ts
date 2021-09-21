@@ -1,6 +1,6 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -93,7 +93,7 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
   const contract = useStableSwapContract(pool.poolAddress)
   const { tokens } = pool
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const [expectedOut, setExpectedOut] = useState<TokenAmount[]>(
     tokens.map((token) => new TokenAmount(token, JSBI.BigInt('0')))
   )

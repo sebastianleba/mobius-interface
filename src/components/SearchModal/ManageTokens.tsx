@@ -1,9 +1,9 @@
 import { getBlockscoutLink, Token } from '@ubeswap/sdk'
 import Row, { RowBetween, RowFixed } from 'components/Row'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useToken } from 'hooks/Tokens'
 import React, { RefObject, useCallback, useMemo, useRef, useState } from 'react'
-import { useRemoveUserAddedToken, useUserAddedTokens } from 'state/user/hooks'
+import { useRemoveUserAddedToken } from 'state/user/hooks'
 import styled from 'styled-components'
 import { ButtonText, ExternalLink, ExternalLinkIcon, TrashIcon, TYPE } from 'theme'
 import { isAddress } from 'utils'
@@ -42,7 +42,7 @@ export default function ManageTokens({
   setModalView: (view: CurrencyModalView) => void
   setImportToken: (token: Token) => void
 }) {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
   const theme = useTheme()
@@ -60,7 +60,7 @@ export default function ManageTokens({
   const searchToken = useToken(searchQuery)
 
   // all tokens for local lisr
-  const userAddedTokens: Token[] = useUserAddedTokens()
+  const userAddedTokens: Token[] = []
   const removeToken = useRemoveUserAddedToken()
 
   const handleRemoveAll = useCallback(() => {

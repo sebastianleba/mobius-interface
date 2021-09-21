@@ -1,15 +1,15 @@
 import './i18n'
 
+import { ContractKitProvider } from '@celo-tools/use-contractkit'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
-import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core'
 import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 import UpdatePools from 'state/stablePools/updater'
 
-import { NetworkContextName } from './constants'
+import mobiusIcon from './assets/svg/mobius.svg'
 import App from './pages/App'
 import store from './state'
 import ApplicationUpdater from './state/application/updater'
@@ -18,9 +18,6 @@ import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import UserUpdater from './state/user/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
-import getLibrary from './utils/getLibrary'
-
-const Web3ProviderNetwork = createWeb3ReactRoot(NetworkContextName)
 
 if (window.celo) {
   window.celo.autoRefreshOnNetworkChange = false
@@ -60,19 +57,45 @@ function Updaters() {
 ReactDOM.render(
   <StrictMode>
     <FixedGlobalStyle />
-    <Web3ReactProvider getLibrary={getLibrary}>
-      <Web3ProviderNetwork getLibrary={getLibrary}>
-        <Provider store={store}>
-          <Updaters />
-          <ThemeProvider>
-            <ThemedGlobalStyle />
-            <HashRouter>
-              <App />
-            </HashRouter>
-          </ThemeProvider>
-        </Provider>
-      </Web3ProviderNetwork>
-    </Web3ReactProvider>
+    <ContractKitProvider
+      dapp={{
+        name: 'Mobius',
+        description: 'Multi-chain, stable swap exchange',
+        url: 'https://www.mobius.money/#/',
+        icon: mobiusIcon,
+      }}
+      connectModal={{
+        reactModalProps: {
+          style: {
+            content: {
+              top: '50%',
+              left: '50%',
+              right: 'auto',
+              bottom: 'auto',
+              transform: 'translate(-50%, -50%)',
+              border: 'unset',
+              background: 'unset',
+              padding: 'unset',
+              color: 'black',
+            },
+            overlay: {
+              zIndex: 100,
+            },
+          },
+          overlayClassName: 'tw-fixed tw-bg-gray-100 dark:tw-bg-gray-700 tw-bg-opacity-75 tw-inset-0',
+        },
+      }}
+    >
+      <Provider store={store}>
+        <Updaters />
+        <ThemeProvider>
+          <ThemedGlobalStyle />
+          <HashRouter>
+            <App />
+          </HashRouter>
+        </ThemeProvider>
+      </Provider>
+    </ContractKitProvider>
   </StrictMode>,
   document.getElementById('root')
 )

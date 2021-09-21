@@ -26,7 +26,7 @@ import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../
 import TradePrice from '../../components/swap/TradePrice'
 import TokenWarningModal from '../../components/TokenWarningModal'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useAllTokens, useCurrency, useStableTokens } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
@@ -77,7 +77,7 @@ export default function Swap() {
   //   return !(token.address in defaultTokens)
   // })
 
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected

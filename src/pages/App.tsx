@@ -1,3 +1,5 @@
+import '@celo-tools/use-contractkit/lib/styles.css'
+
 import { DappKitResponseStatus } from '@celo/utils'
 import { ErrorBoundary } from '@sentry/react'
 import React, { Suspense } from 'react'
@@ -8,7 +10,6 @@ import Header from '../components/Header'
 import Polling from '../components/Header/Polling'
 import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
-import Web3ReactManager from '../components/Web3ReactManager'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import Claim from './Claim'
@@ -103,24 +104,22 @@ export default function App() {
             </>
           )}
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
-            <Web3ReactManager>
-              <Switch>
-                <Route exact path="/" component={LandingPage} />
+            <Switch>
+              <Route exact path="/" component={LandingPage} />
 
-                <Route exact strict path="/swap" component={Swap} />
-                <Route exact strict path="/pool" component={Earn} />
-                <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-                <Route exact strict path="/risk" component={RiskPage} />
-                <Route exact strict path="/optics" component={Optics} />
-                {isLive && (
-                  <>
-                    <Route path="/claim" component={Claim} />
-                    <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
-                  </>
-                )}
-                {/* <Route component={RedirectPathToSwapOnly} /> */}
-              </Switch>
-            </Web3ReactManager>
+              <Route exact strict path="/swap" component={Swap} />
+              <Route exact strict path="/pool" component={Earn} />
+              <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
+              <Route exact strict path="/risk" component={RiskPage} />
+              <Route exact strict path="/optics" component={Optics} />
+              {isLive && (
+                <>
+                  <Route path="/claim" component={Claim} />
+                  <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
+                </>
+              )}
+              {/* <Route component={RedirectPathToSwapOnly} /> */}
+            </Switch>
           </ErrorBoundary>
           {location.pathname !== '/' && <Marginer />}
         </BodyWrapper>

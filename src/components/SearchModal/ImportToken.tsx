@@ -6,7 +6,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 import ListLogo from 'components/ListLogo'
 import { AutoRow, RowBetween, RowFixed } from 'components/Row'
 import { SectionBreak } from 'components/swap/styleds'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import useTheme from 'hooks/useTheme'
 import { transparentize } from 'polished'
 import React, { useState } from 'react'
@@ -49,7 +49,7 @@ interface ImportProps {
 export function ImportToken({ tokens, onBack, onDismiss, handleCurrencySelect }: ImportProps) {
   const theme = useTheme()
 
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const [confirmed, setConfirmed] = useState(false)
 

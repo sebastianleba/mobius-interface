@@ -51,7 +51,7 @@ export default function Optics() {
   const test = useWeb3React()
   const { account } = test
   const { chainId } = useWeb3React()
-  //const chainId = useWeb3ChainId()
+  //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
   const [val, setVal] = useState<string>()

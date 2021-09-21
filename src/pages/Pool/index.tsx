@@ -14,7 +14,7 @@ import FullPositionCard from '../../components/PositionCard'
 import { RowBetween, RowFixed } from '../../components/Row'
 import { Dots } from '../../components/swap/styleds'
 import { usePairs } from '../../data/Reserves'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import { ExternalLink, HideSmall, StyledInternalLink, TYPE } from '../../theme'
@@ -73,7 +73,7 @@ const EmptyProposals = styled.div`
 
 export default function Pool() {
   const theme = useContext(ThemeContext)
-  const test = useActiveWeb3React()
+  const test = useActiveContractKit()
   const { account } = test
 
   // fetch the user's balances of all tracked V2 LP tokens

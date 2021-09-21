@@ -1,5 +1,5 @@
 import { ChainId } from '@ubeswap/sdk'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
 import { AlertTriangle, X } from 'react-feather'
@@ -33,7 +33,7 @@ const appURL: { [id in ChainId]: string } = {
 export default function URLWarning() {
   const toggleURLWarning = useURLWarningToggle()
   const showURLWarning = useURLWarningVisible()
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   return isMobile ? (
     <PhishAlert isActive={showURLWarning}>

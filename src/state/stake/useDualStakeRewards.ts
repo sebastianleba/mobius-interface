@@ -2,7 +2,7 @@ import { Address } from '@celo/contractkit'
 import { BigNumber } from '@ethersproject/bignumber'
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { UBE } from 'constants/tokens'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useToken } from 'hooks/Tokens'
 import { useDualStakingContract } from 'hooks/useContract'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -37,7 +37,7 @@ export const useDualStakeRewards = (
   underlyingPool: StakingInfo | undefined,
   owner: Address | null | undefined
 ): DualRewardsInfo | null => {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const stakeRewards = useDualStakingContract(address)
 
   const [data, setData] = useState<RawPoolData | null>(null)

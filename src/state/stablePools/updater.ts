@@ -14,7 +14,7 @@ import LP from '../../constants/abis/LPToken.json'
 import SWAP from '../../constants/abis/Swap.json'
 import { STATIC_POOL_INFO } from '../../constants/StablePools'
 import { Erc20, LiquidityGaugeV3, Swap } from '../../generated'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import {
   useGaugeControllerContract,
   useLiquidityGaugeContract,
@@ -36,7 +36,7 @@ const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
 }
 
 export function UpdatePools(): null {
-  const { library, chainId, account } = useActiveWeb3React()
+  const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
@@ -153,7 +153,7 @@ export function UpdatePools(): null {
 //export const UpdatePendingMobi
 
 export default function BatchUpdatePools(): null {
-  const { library, chainId, account } = useActiveWeb3React()
+  const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]

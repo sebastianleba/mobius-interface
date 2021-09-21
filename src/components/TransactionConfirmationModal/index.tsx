@@ -5,7 +5,7 @@ import { Text } from 'rebass'
 import styled, { ThemeContext } from 'styled-components'
 
 import Circle from '../../assets/images/blue-loader.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { ExternalLink } from '../../theme'
 import { CloseIcon, CustomLightSpinner } from '../../theme/components'
 import { ButtonPrimary } from '../Button'
@@ -171,7 +171,7 @@ export default function TransactionConfirmationModal({
   pendingText,
   content,
 }: ConfirmationModalProps) {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   if (!chainId) return null
 

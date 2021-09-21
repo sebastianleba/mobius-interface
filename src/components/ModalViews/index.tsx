@@ -4,7 +4,7 @@ import { ArrowUpCircle } from 'react-feather'
 import styled, { ThemeContext } from 'styled-components'
 
 import Circle from '../../assets/images/blue-loader.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { CloseIcon, CustomLightSpinner, TYPE } from '../../theme'
 import { ExternalLink } from '../../theme/components'
 import { AutoColumn, ColumnCenter } from '../Column'
@@ -47,7 +47,7 @@ export function SubmittedView({
   hash: string | undefined
 }) {
   const theme = useContext(ThemeContext)
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   return (
     <ConfirmOrLoadingWrapper>

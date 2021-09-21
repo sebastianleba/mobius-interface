@@ -5,7 +5,7 @@ import { AutoColumn } from 'components/Column'
 import CurrencyLogo from 'components/CurrencyLogo'
 import Modal from 'components/Modal'
 import { AutoRow, RowBetween } from 'components/Row'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 import { CloseIcon, ExternalLink, TYPE } from 'theme'
@@ -44,7 +44,7 @@ export default function UnsupportedCurrencyFooter({
   show: boolean
   currencies: (Token | undefined)[]
 }) {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const [showDetails, setShowDetails] = useState(false)
 
   const tokens = currencies

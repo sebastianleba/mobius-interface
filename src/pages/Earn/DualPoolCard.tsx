@@ -1,6 +1,6 @@
 import { PoolCard } from 'components/earn/PoolCard'
 import Loader from 'components/Loader'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import React from 'react'
 import { StakingInfo } from 'state/stake/hooks'
 import { useDualStakeRewards } from 'state/stake/useDualStakeRewards'
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export const DualPoolCard: React.FC<Props> = ({ poolAddress, underlyingPool }: Props) => {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const mooPool = useDualStakeRewards(poolAddress, underlyingPool, account ?? null)
 
   if (!mooPool) {

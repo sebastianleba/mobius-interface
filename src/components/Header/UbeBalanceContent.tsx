@@ -8,7 +8,7 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 import tokenLogo from '../../assets/images/token-logo.png'
 import { UBE } from '../../constants'
 import { useTotalSupply } from '../../data/TotalSupply'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useTotalUbeEarned } from '../../state/stake/hooks'
 import { useAggregateUbeBalance, useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLink, StyledInternalLink, TYPE, UbeTokenAnimated } from '../../theme'
@@ -41,7 +41,7 @@ const StyledClose = styled(X)`
  * Content for balance stats modal
  */
 export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowUbeBalanceModal: any }) {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
   const ube = chainId ? UBE[chainId] : undefined
 
   const total = useAggregateUbeBalance()

@@ -1,10 +1,9 @@
-import { getBlockscoutLink } from '@ubeswap/sdk'
-import { networkInfo } from 'constants/NetworkInfo'
-import useENS from 'hooks/useENS'
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { ChainId, getBlockscoutLink } from '@ubeswap/sdk'
 import React, { useCallback, useContext } from 'react'
 import styled, { ThemeContext } from 'styled-components'
 
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import useENS from '../../hooks/useENS'
 import { ExternalLink, TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
 import { RowBetween } from '../Row'
@@ -52,16 +51,13 @@ const Input = styled.input<{ error?: boolean }>`
   }
   padding: 0px;
   -webkit-appearance: textfield;
-
   ::-webkit-search-decoration {
     -webkit-appearance: none;
   }
-
   ::-webkit-outer-spin-button,
   ::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-
   ::placeholder {
     color: ${({ theme }) => theme.text4};
   }
@@ -78,13 +74,11 @@ export default function AddressInputPanel({
   // triggers whenever the typed value changes
   onChange: (value: string) => void
 }) {
-  const { chainId } = useActiveWeb3React()
+  const { network } = useContractKit()
+  const chainId = network.chainId as unknown as ChainId
   const theme = useContext(ThemeContext)
-  const { address, loading, name } = useENS(value)
 
-  const otherChainId = useWeb3ChainId()
-  const { explorer } = networkInfo[otherChainId]
-  const explorerLink = getBlockscoutLink(chainId, name ?? address, 'address')
+  const { address, loading, name } = useENS(value)
 
   const handleInput = useCallback(
     (event) => {
@@ -107,7 +101,10 @@ export default function AddressInputPanel({
                 Recipient
               </TYPE.black>
               {address && chainId && (
-                <ExternalLink href={explorerLink} style={{ fontSize: '14px' }}>
+                <ExternalLink
+                  href={getBlockscoutLink(chainId, name ?? address, 'address')}
+                  style={{ fontSize: '14px' }}
+                >
                   (View on Celo Explorer)
                 </ExternalLink>
               )}

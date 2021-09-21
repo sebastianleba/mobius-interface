@@ -1,7 +1,7 @@
 import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
 import { Coins, PRICE } from 'constants/StablePools'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { partition } from 'lodash'
 import React, { useMemo } from 'react'
@@ -75,7 +75,7 @@ export default function Earn() {
   const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
   const now = new Date()
   const isLive = now >= launchTime
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   // toggle copy if rewards are inactive
   const stakingRewardsExist = true
