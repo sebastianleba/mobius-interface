@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
 import { TYPE } from '../../theme'
 import { RowBetween } from '../Row'
@@ -182,7 +182,7 @@ interface PropType {
 export function ChainSelect({ selectedNetwork, setSelectedNetwork, otherSelectedNetwork }: PropType) {
   const hideInput = false
   const isDarkMode = useIsDarkMode()
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   return (

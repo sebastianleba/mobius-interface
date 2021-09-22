@@ -4,7 +4,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
@@ -42,7 +42,7 @@ interface DepositModalProps {
 }
 
 export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositModalProps) {
-  const { library, account } = useActiveWeb3React()
+  const { library, account } = useActiveContractKit()
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, peggedTo, pegComesAfter } = poolInfo
@@ -267,7 +267,7 @@ const BalanceText = styled(TYPE.subHeader)`
 `
 
 const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }: CurrencyRowProps) => {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')

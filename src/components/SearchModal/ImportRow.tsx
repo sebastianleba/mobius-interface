@@ -4,7 +4,7 @@ import { AutoColumn } from 'components/Column'
 import CurrencyLogo from 'components/CurrencyLogo'
 import ListLogo from 'components/ListLogo'
 import { AutoRow, RowFixed } from 'components/Row'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useIsTokenActive, useIsUserAddedToken } from 'hooks/Tokens'
 import useTheme from 'hooks/useTheme'
 import React, { CSSProperties } from 'react'
@@ -54,7 +54,7 @@ export default function ImportRow({
   setImportToken: (token: Token) => void
 }) {
   // gloabls
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const theme = useTheme()
 
   // check if token comes from list

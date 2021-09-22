@@ -1,13 +1,14 @@
-import { getBlockscoutLink, Token } from '@ubeswap/sdk'
+import { Token } from '@ubeswap/sdk'
 import Row, { RowBetween, RowFixed } from 'components/Row'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useToken } from 'hooks/Tokens'
 import React, { RefObject, useCallback, useMemo, useRef, useState } from 'react'
-import { useRemoveUserAddedToken, useUserAddedTokens } from 'state/user/hooks'
+import { useRemoveUserAddedToken } from 'state/user/hooks'
 import styled from 'styled-components'
 import { ButtonText, ExternalLink, ExternalLinkIcon, TrashIcon, TYPE } from 'theme'
 import { isAddress } from 'utils'
 
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import useTheme from '../../hooks/useTheme'
 import Card from '../Card'
 import Column from '../Column'
@@ -42,7 +43,7 @@ export default function ManageTokens({
   setModalView: (view: CurrencyModalView) => void
   setImportToken: (token: Token) => void
 }) {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
   const theme = useTheme()
@@ -60,7 +61,7 @@ export default function ManageTokens({
   const searchToken = useToken(searchQuery)
 
   // all tokens for local lisr
-  const userAddedTokens: Token[] = useUserAddedTokens()
+  const userAddedTokens: Token[] = []
   const removeToken = useRemoveUserAddedToken()
 
   const handleRemoveAll = useCallback(() => {
@@ -78,7 +79,7 @@ export default function ManageTokens({
         <RowBetween key={token.address} width="100%">
           <RowFixed>
             <CurrencyLogo currency={token} size={'20px'} />
-            <ExternalLink href={getBlockscoutLink(chainId, token.address, 'address')}>
+            <ExternalLink href={getExplorerLink(chainId, token.address, 'address')}>
               <TYPE.main ml={'10px'} fontWeight={600}>
                 {token.symbol}
               </TYPE.main>
@@ -86,7 +87,7 @@ export default function ManageTokens({
           </RowFixed>
           <RowFixed>
             <TrashIcon onClick={() => removeToken(chainId, token.address)} />
-            <ExternalLinkIcon href={getBlockscoutLink(chainId, token.address, 'address')} />
+            <ExternalLinkIcon href={getExplorerLink(chainId, token.address, 'address')} />
           </RowFixed>
         </RowBetween>
       ))

@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 
 import { VestingAddresses } from '../../constants/StablePools'
 import { VestingEscrow } from '../../generated'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useVestingContract } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import { AppDispatch } from '../index'
@@ -12,7 +12,7 @@ import { update } from './actions'
 import { VestType } from './reducer'
 
 export default function UpdateClaim(): null {
-  const { library, chainId, account } = useActiveWeb3React()
+  const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useCurrentBlockTimestamp()
   const dispatch = useDispatch<AppDispatch>()
   const claimContract = useVestingContract()

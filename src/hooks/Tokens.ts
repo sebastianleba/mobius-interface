@@ -1,27 +1,20 @@
 import { arrayify } from '@ethersproject/bytes'
 import { parseBytes32String } from '@ethersproject/strings'
-import { currencyEquals, Token } from '@ubeswap/sdk'
+import { Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
 import { MOBI_TOKEN, STATIC_POOL_INFO } from '../constants/StablePools'
-import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
-import { useUserAddedTokens } from '../state/user/hooks'
 import { isAddress } from '../utils'
-import {
-  TokenAddressMap,
-  useDefaultTokenList,
-  useStableTokenList,
-  useUnsupportedTokenList,
-} from './../state/lists/hooks'
-import { useActiveWeb3React } from './index'
+import { TokenAddressMap } from './../state/lists/hooks'
+import { useActiveContractKit } from './index'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
 
 // reduce token map into standard address <-> Token mapping, optionally include user added tokens
 function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean): { [address: string]: Token } {
-  const { chainId } = useActiveWeb3React()
-  const userAddedTokens = useUserAddedTokens()
+  const { chainId } = useActiveContractKit()
+  console.log(chainId)
 
   return useMemo(() => {
     if (!chainId) return {}
@@ -32,30 +25,13 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
       return newMap
     }, {})
 
-    if (includeUserAdded) {
-      return (
-        userAddedTokens
-          // reduce into all ALL_TOKENS filtered by the current chain
-          .reduce<{ [address: string]: Token }>(
-            (tokenMap, token) => {
-              tokenMap[token.address] = token
-              return tokenMap
-            },
-            // must make a copy because reduce modifies the map, and we do not
-            // want to make a copy in every iteration
-            { ...mapWithoutUrls }
-          )
-      )
-    }
-
     return mapWithoutUrls
-  }, [chainId, userAddedTokens, tokenMap, includeUserAdded])
+  }, [chainId, tokenMap, includeUserAdded])
 }
 
 export function useSwappableTokens(): { [address: string]: Token } {
-  const { chainId } = useActiveWeb3React()
-  const pools = STATIC_POOL_INFO[chainId]
-  const defaultList = useStableTokenList()
+  const { chainId } = useActiveContractKit()
+  const pools = STATIC_POOL_INFO[chainId] ?? []
   const swappableTokens: { [address: string]: Token } = {}
 
   pools
@@ -68,42 +44,19 @@ export function useSwappableTokens(): { [address: string]: Token } {
 }
 
 export function useDefaultTokens(): { [address: string]: Token } {
-  const defaultList = useDefaultTokenList()
-  return useTokensFromMap(defaultList, false)
+  return {}
 }
 
 export function useAllTokens(): { [address: string]: Token } {
-  const allTokens = useCombinedActiveList()
-  return useTokensFromMap(allTokens, true)
-}
-
-export function useStableTokens(): { [address: string]: Token } {
-  const stableList = useStableTokenList()
-  return useTokensFromMap(stableList, false)
+  return {}
 }
 
 export function useAllInactiveTokens(): { [address: string]: Token } {
-  // get inactive tokens
-  const inactiveTokensMap = useCombinedInactiveList()
-  const inactiveTokens = useTokensFromMap(inactiveTokensMap, false)
-
-  // filter out any token that are on active list
-  const activeTokensAddresses = Object.keys(useAllTokens())
-  const filteredInactive = activeTokensAddresses
-    ? Object.keys(inactiveTokens).reduce<{ [address: string]: Token }>((newMap, address) => {
-        if (!activeTokensAddresses.includes(address)) {
-          newMap[address] = inactiveTokens[address]
-        }
-        return newMap
-      }, {})
-    : inactiveTokens
-
-  return filteredInactive
+  return {}
 }
 
 export function useUnsupportedTokens(): { [address: string]: Token } {
-  const unsupportedTokensMap = useUnsupportedTokenList()
-  return useTokensFromMap(unsupportedTokensMap, false)
+  return {}
 }
 
 export function useIsTokenActive(token: Token | undefined | null): boolean {
@@ -118,7 +71,7 @@ export function useIsTokenActive(token: Token | undefined | null): boolean {
 
 // used to detect extra search results
 export function useFoundOnInactiveList(searchQuery: string): Token[] | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const inactiveTokens = useAllInactiveTokens()
 
   return useMemo(() => {
@@ -133,13 +86,11 @@ export function useFoundOnInactiveList(searchQuery: string): Token[] | undefined
 
 // Check if currency is included in custom list from user storage
 export function useIsUserAddedToken(currency: Token | undefined | null): boolean {
-  const userAddedTokens = useUserAddedTokens()
-
   if (!currency) {
     return false
   }
 
-  return !!userAddedTokens.find((token) => currencyEquals(currency, token))
+  return false
 }
 
 // parse a name or symbol from a token response
@@ -158,7 +109,7 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
 // null if loading
 // otherwise returns the token
 export function useToken(tokenAddress?: string): Token | undefined | null {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const tokens = useSwappableTokens()
 
   const address = isAddress(tokenAddress)
@@ -213,6 +164,6 @@ export function useCurrency(currencyId: string | undefined): Token | null | unde
 }
 
 export function useMobi(): Token | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   return MOBI_TOKEN[chainId]
 }

@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { UBE } from 'constants/tokens'
-import { useActiveWeb3React } from 'hooks/index'
+import { useActiveContractKit } from 'hooks/index'
 import { useReleaseUbeContract, useTokenContract } from 'hooks/useContract'
 import { useEffect, useState } from 'react'
 import { useSingleContractMultipleData } from 'state/multicall/hooks'
@@ -21,7 +21,7 @@ const nonCirculatingAddresses = {
  * Fetches the circulating supply
  */
 export const useCirculatingSupply = (): TokenAmount | undefined => {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const ube = chainId ? UBE[chainId] : undefined
   const ubeContract = useTokenContract(ube?.address)
   const releaseUbe = useReleaseUbeContract()

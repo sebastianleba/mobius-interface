@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import styled, { css, keyframes } from 'styled-components'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useIsDarkMode } from '../../state/user/hooks'
 import { useCurrencyBalance, useTokenBalanceSingle } from '../../state/wallet/hooks'
@@ -217,7 +217,7 @@ export default function CurrencyInputPanel({
   const isDarkMode = useIsDarkMode()
 
   const [modalOpen, setModalOpen] = useState(false)
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const tokenBalanceFast = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const tokenBalanceSlow = useTokenBalanceSingle(account ?? undefined, currency ?? undefined)
   const selectedCurrencyBalance = tokenBalanceFast ?? tokenBalanceSlow
