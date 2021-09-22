@@ -19,8 +19,8 @@ export enum Coins {
 }
 
 export const PRICE: { [c in Coins]: number } = {
-  [Coins.Bitcoin]: 43774,
-  [Coins.Ether]: 3080,
+  [Coins.Bitcoin]: 42295,
+  [Coins.Ether]: 2909,
   [Coins.USD]: 1,
 }
 
