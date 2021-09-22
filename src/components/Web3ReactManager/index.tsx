@@ -80,9 +80,12 @@ export default function Web3ReactManager({ children }: { children: JSX.Element }
   return (
     <ContractKitProvider
       networks={NETWORK_CHAIN_ID === ChainId.ALFAJORES ? [Alfajores] : [Mainnet]}
-      dappName="Mobius"
-      dappDescription="Mobius is a cross-chain stableswap DeFi exchange on Celo."
-      dappUrl="https://mobius.money"
+      dapp={{
+        name: 'Mobius',
+        description: 'Mobius is a cross-chain stableswap DeFi exchange on Celo.',
+        url: 'https://mobius.money',
+        icon: '',
+      }}
     >
       {children}
     </ContractKitProvider>

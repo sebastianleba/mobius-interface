@@ -7,14 +7,11 @@ import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
-import UpdatePools from 'state/stablePools/updater'
 
 import { NetworkContextName } from './constants'
 import App from './pages/App'
 import store from './state'
 import ApplicationUpdater from './state/application/updater'
-import ListsUpdater from './state/lists/updater'
-import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import UserUpdater from './state/user/updater'
 import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from './theme'
@@ -47,12 +44,12 @@ if (process.env.REACT_APP_SENTRY_DSN) {
 function Updaters() {
   return (
     <>
-      <ListsUpdater />
+      {/* <ListsUpdater /> */}
       <UserUpdater />
       <ApplicationUpdater />
       <TransactionUpdater />
-      <MulticallUpdater />
-      <UpdatePools />
+      {/* <MulticallUpdater /> */}
+      {/* <UpdatePools /> */}
     </>
   )
 }

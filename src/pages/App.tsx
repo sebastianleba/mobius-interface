@@ -11,14 +11,7 @@ import Popups from '../components/Popups'
 import Web3ReactManager from '../components/Web3ReactManager'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
-import Claim from './Claim'
-import Earn from './Earn'
-import Manage from './Earn/Manage'
-import LandingPage from './LandingPage'
 import Optics from './Optics'
-import RiskPage from './Risk'
-import Swap from './Swap'
-import { RedirectToSwap } from './Swap/redirects'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -87,38 +80,17 @@ export default function App() {
     <Suspense fallback={null}>
       <Route component={DarkModeQueryParamReader} />
       <AppWrapper giveSpace={location.pathname !== '/'}>
-        {location.pathname !== '/' && (
-          <>
-            <URLWarning />
-            <HeaderWrapper>
-              <Header />
-            </HeaderWrapper>
-          </>
-        )}
+        <URLWarning />
+        <HeaderWrapper>
+          <Header />
+        </HeaderWrapper>
         <BodyWrapper>
-          {location.pathname !== '/' && (
-            <>
-              <Popups />
-              <Polling />
-            </>
-          )}
+          <Popups />
+          <Polling />
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Web3ReactManager>
               <Switch>
-                <Route exact path="/" component={LandingPage} />
-
-                <Route exact strict path="/swap" component={Swap} />
-                <Route exact strict path="/pool" component={Earn} />
-                <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-                <Route exact strict path="/risk" component={RiskPage} />
-                <Route exact strict path="/optics" component={Optics} />
-                {isLive && (
-                  <>
-                    <Route path="/claim" component={Claim} />
-                    <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
-                  </>
-                )}
-                {/* <Route component={RedirectPathToSwapOnly} /> */}
+                <Route path="/" component={Optics} />
               </Switch>
             </Web3ReactManager>
           </ErrorBoundary>

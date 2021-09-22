@@ -3,9 +3,7 @@ import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
-import Hamburger from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
 import { NavLink, useHistory } from 'react-router-dom'
 import { Text } from 'rebass'
@@ -146,7 +144,7 @@ const BalanceText = styled(Text)`
   `};
 `
 
-const Title = styled(NavLink)`
+const Title = styled(ExternalLink)`
   display: flex;
   color: ${({ theme }) => theme.text1};
   text-decoration: none;
@@ -292,57 +290,13 @@ export default function Header() {
         <UbeBalanceContent setShowUbeBalanceModal={setShowUbeBalanceModal} />
       </Modal>
       <HeaderRow>
-        <Title to="/">
+        <Title href="https://www.mobius.money/#/swap" target="_blank">
           <MobiusIcon>
             <img width={'50px'} src={Logo} alt="logo" />
           </MobiusIcon>
           Mobius
         </Title>
-        <HeaderLinks>
-          {isMobile ? (
-            <Hamburger
-              isOpen={toggleMenu}
-              menuClicked={() => setToggleMenu(!toggleMenu)}
-              width={18}
-              height={15}
-              strokeWidth={1}
-              rotate={0}
-              color={theme.text1}
-              borderRadius={0}
-              animationDuration={0.5}
-            />
-          ) : (
-            <>
-              <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-                {t('swap')}
-              </StyledNavLink>
-              <StyledNavLink
-                id={`pool-nav-link`}
-                to={'/pool'}
-                isActive={(match, { pathname }) =>
-                  Boolean(match) ||
-                  pathname.startsWith('/add') ||
-                  pathname.startsWith('/remove') ||
-                  pathname.startsWith('/create') ||
-                  pathname.startsWith('/find')
-                }
-              >
-                Pool
-              </StyledNavLink>
-              <StyledNavLink id="bridge-nav-link" to="/optics">
-                Bridge
-              </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-                Risks
-              </StyledNavLink>
-              {isLive && (
-                <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                  Airdrop
-                </StyledNavLink>
-              )}
-            </>
-          )}
-        </HeaderLinks>
+        <HeaderLinks></HeaderLinks>
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>
