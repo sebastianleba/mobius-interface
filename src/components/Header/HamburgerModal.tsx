@@ -10,6 +10,7 @@ import { NavLink } from 'react-router-dom'
 import { animated, useSpring, useTransition } from 'react-spring'
 import { useGesture } from 'react-use-gesture'
 import styled, { css } from 'styled-components'
+import { ExternalLink } from 'theme/components'
 
 import { TYPE } from '../../theme'
 
@@ -58,6 +59,33 @@ const Divider = styled.div`
   margin-top: 0.5rem;
   margin-bottom: 1.5rem;
 `
+const StyledExternalLink = styled(ExternalLink).attrs({
+  activeClassName,
+})<{ isActive?: boolean }>`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  border-radius: 3rem;
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${({ theme }) => theme.text2};
+  font-size: 1.5rem;
+  width: fit-content;
+  margin: 0 12px;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+
+  &.${activeClassName} {
+    border-radius: 12px;
+    font-weight: 600;
+    color: ${({ theme }) => theme.text1};
+  }
+
+  :hover,
+  :focus {
+    color: ${({ theme }) => darken(0.1, theme.text1)};
+  }
+`
 
 export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean; onDismiss: () => void }) {
   const { t } = useTranslation()
@@ -91,17 +119,15 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         >
           Pool
         </StyledNavLink>
-        <StyledNavLink id="bridge-nav-link" to="/optics" onClick={onDismiss}>
-          Bridge
-        </StyledNavLink>
         <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
           Risks
         </StyledNavLink>
-        {isLive && (
-          <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
-            Airdrop
-          </StyledNavLink>
-        )}
+        <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
+          Airdrop
+        </StyledNavLink>
+        <StyledExternalLink id="bridge-nav-link-hamburger" href="https://bridge.mobius.money/#/">
+          Bridge
+        </StyledExternalLink>
       </LinkContainer>
     </CustomModal>
   )

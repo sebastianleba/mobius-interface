@@ -4,6 +4,7 @@ import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { useEthBtcPrice } from 'state/application/hooks'
 import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
@@ -393,7 +394,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        {!!account && !openManage && (
+        {!!account && !openManage && !isMobile && (
           <StyledButton
             background={backgroundColorStart}
             backgroundHover={backgroundColorEnd}
@@ -403,6 +404,16 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           </StyledButton>
         )}
       </InfoContainer>
+      {!!account && !openManage && isMobile && (
+        <StyledButton
+          background={backgroundColorStart}
+          backgroundHover={backgroundColorEnd}
+          onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
+          style={{ width: '50%', marginLeft: 'auto', marginRight: '1rem' }}
+        >
+          {isStaking ? 'Manage' : 'Deposit'}
+        </StyledButton>
+      )}
       <div
         style={{
           display: 'flex',
