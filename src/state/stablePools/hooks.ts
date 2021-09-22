@@ -131,7 +131,7 @@ export function useExpectedLpTokens(
     if (allZero) {
       return [new TokenAmount(pool.lpToken, '0'), tokenAmounts]
     }
-    if (!pool.amountDeposited) {
+    if (!pool.amountDeposited || pool.amountDeposited.equalTo('0')) {
       const amount =
         tryParseAmount(
           tokenAmounts.reduce((accum, cur) => (parseInt(accum) + parseInt(cur.toFixed())).toString(), '0'),

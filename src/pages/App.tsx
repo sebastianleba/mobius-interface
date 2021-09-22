@@ -4,7 +4,7 @@ import { DappKitResponseStatus } from '@celo/utils'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ErrorBoundary } from '@sentry/react'
 import { ChainId } from '@ubeswap/sdk'
-import { NETWORK_CHAIN_ID } from 'connectors'
+import { NETWORK, NETWORK_CHAIN_ID } from 'connectors'
 import React, { Suspense } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
@@ -86,6 +86,9 @@ export default function App() {
           }
         }
       }
+    }
+    if (wrongNetwork) {
+      updateNetwork(NETWORK)
     }
   }, [location])
 

@@ -368,6 +368,14 @@ export function useMobiusTradeInfo(): {
     inputError = inputError ?? 'Enter an amount'
   }
 
+  if (!pool) {
+    inputError = inputError ?? 'Pool Info Loading'
+  }
+
+  if (pool && JSBI.equal(pool.lpTotalSupply, JSBI.BigInt('0'))) {
+    inputError = inputError ?? 'Insufficient Liquidity'
+  }
+
   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
     inputError = inputError ?? 'Select a token'
   }
@@ -379,7 +387,7 @@ export function useMobiusTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading) {
+  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading || inputError) {
     return {
       currencies,
       currencyBalances,
