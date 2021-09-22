@@ -148,6 +148,7 @@ const BalanceText = styled(Text)`
     display: none;
   `};
 `
+const activeClassName = 'ACTIVE'
 
 const Title = styled(NavLink)`
   display: flex;
@@ -167,7 +168,6 @@ const Title = styled(NavLink)`
     cursor: pointer;
   }
 `
-
 const MobiusIcon = styled.div`
   transition: transform 0.3s ease;
   margin-right: 0.1rem;
@@ -176,8 +176,6 @@ const MobiusIcon = styled.div`
   //   transform: rotate(-5deg);
   // }
 `
-
-const activeClassName = 'ACTIVE'
 
 const StyledNavLink = styled(NavLink).attrs({
   activeClassName,
@@ -332,17 +330,15 @@ export default function Header() {
               >
                 Pool
               </StyledNavLink>
-              <StyledNavLink id="bridge-nav-link" to="/optics">
-                Bridge
-              </StyledNavLink>
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
-              {isLive && (
-                <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                  Airdrop
-                </StyledNavLink>
-              )}
+              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+                Airdrop
+              </StyledNavLink>
+              <StyledExternalLink id="bridge-nav-link" href="https://bridge.mobius.money/#/">
+                Bridge
+              </StyledExternalLink>
             </>
           )}
         </HeaderLinks>
@@ -385,7 +381,9 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => history.push('/optics')}>{darkMode ? '🌉' : '🌁'}</StyledMenuButton>
+        <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+          {darkMode ? '🌉' : '🌁'}
+        </StyledMenuButton>
 
         <HeaderElementWrap>
           <StyledMenuButton onClick={() => toggleDarkMode()}>

@@ -4,7 +4,7 @@ import { DappKitResponseStatus } from '@celo/utils'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ErrorBoundary } from '@sentry/react'
 import { ChainId } from '@ubeswap/sdk'
-import { NETWORK, NETWORK_CHAIN_ID } from 'connectors'
+import { NETWORK_CHAIN_ID } from 'connectors'
 import React, { Suspense } from 'react'
 import { Route, Switch, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
@@ -19,7 +19,6 @@ import Claim from './Claim'
 import Earn from './Earn'
 import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
-import Optics from './Optics'
 import RiskPage from './Risk'
 import Swap from './Swap'
 import { RedirectToSwap } from './Swap/redirects'
@@ -88,9 +87,6 @@ export default function App() {
         }
       }
     }
-    if (wrongNetwork) {
-      updateNetwork(NETWORK)
-    }
   }, [location])
 
   return (
@@ -114,7 +110,6 @@ export default function App() {
           )}
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Switch>
-              <Route exact strict path="/optics" component={Optics} />
               <Route exact path="/" component={LandingPage} />
               <Route exact strict path="/swap" component={Swap} />
               <Route exact strict path="/pool" component={Earn} />
@@ -122,6 +117,7 @@ export default function App() {
               <Route exact strict path="/risk" component={RiskPage} />
               <Route path="/claim" component={Claim} />
               <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
+              {/* <Route exact strict path="/optics" component={Optics} /> */}
             </Switch>
           </ErrorBoundary>
           {location.pathname !== '/' && <Marginer />}
