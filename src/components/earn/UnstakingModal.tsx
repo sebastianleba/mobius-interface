@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 import { StablePoolInfo } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useLiquidityGaugeContract } from '../../hooks/useContract'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { CloseIcon, TYPE } from '../../theme'
@@ -28,7 +28,7 @@ interface StakingModalProps {
 }
 
 export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
@@ -86,17 +86,17 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
               <TYPE.body fontWeight={600} fontSize={36}>
                 {<FormattedCurrencyAmount currencyAmount={stakingInfo.stakedAmount} />}
               </TYPE.body>
-              <TYPE.body>Deposited liquidity:</TYPE.body>
+              <TYPE.body>Deposited liquidity</TYPE.body>
             </AutoColumn>
           )}
-          {pendingMobi && (
+          {/* {pendingMobi && (
             <AutoColumn justify="center" gap="md">
               <TYPE.body fontWeight={600} fontSize={36}>
                 {<FormattedCurrencyAmount currencyAmount={pendingMobi} />}
               </TYPE.body>
               <TYPE.body>Unclaimed MOBI</TYPE.body>
             </AutoColumn>
-          )}
+          )} */}
           {/* {stakingInfo?.dualRewards && stakingInfo?.earnedAmount && (
             <AutoColumn justify="center" gap="md">
               <TYPE.body fontWeight={600} fontSize={36}>
@@ -106,10 +106,10 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
             </AutoColumn>
           )} */}
           <TYPE.subHeader style={{ textAlign: 'center' }}>
-            When you withdraw, your MOBI is claimed and your liquidity is removed from the mining pool.
+            When you withdraw, your liquidity is removed from the mining pool.
           </TYPE.subHeader>
           <ButtonError disabled={!!error} error={!!error && !!stakingInfo?.stakedAmount} onClick={onWithdraw}>
-            {error ?? 'Withdraw & Claim'}
+            {error ?? 'Withdraw'}
           </ButtonError>
         </ContentWrapper>
       )}
@@ -117,7 +117,6 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
         <LoadingView onDismiss={wrappedOndismiss}>
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.body fontSize={20}>Withdrawing {stakingInfo?.stakedAmount?.toSignificant(4)} MOBI-LP</TYPE.body>
-            <TYPE.body fontSize={20}>Claiming {pendingMobi.toSignificant(4)} MOBI</TYPE.body>
           </AutoColumn>
         </LoadingView>
       )}
@@ -126,7 +125,6 @@ export default function UnstakingModal({ isOpen, onDismiss, stakingInfo }: Staki
           <AutoColumn gap="12px" justify={'center'}>
             <TYPE.largeHeader>Transaction Submitted</TYPE.largeHeader>
             <TYPE.body fontSize={20}>Withdrew MOBI-LP!</TYPE.body>
-            <TYPE.body fontSize={20}>Claimed MOBI!</TYPE.body>
           </AutoColumn>
         </SubmittedView>
       )}

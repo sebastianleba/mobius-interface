@@ -1,11 +1,10 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
-import { useActiveWeb3React } from 'hooks'
+import { useActiveContractKit } from 'hooks'
 import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { tryParseAmount } from 'state/swap/hooks'
-import { useTokenBalance } from 'state/wallet/hooks'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
@@ -73,17 +72,17 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   ),
   balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
   pegComesAfter: pool.pegComesAfter,
-  feesGenerated: pool.feesGenerated,
+  feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? '0'),
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  const totalStakedAmount = useTokenBalance(pool?.gaugeAddress, pool?.lpToken)
-  return !pool ? undefined : { ...getPoolInfo(pool), totalStakedAmount }
+  return !pool ? undefined : { ...getPoolInfo(pool) }
 }
 
 export function useStablePoolInfo(): readonly StablePoolInfo[] {
@@ -94,7 +93,7 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
   const contract = useStableSwapContract(pool.poolAddress)
   const { tokens } = pool
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const [expectedOut, setExpectedOut] = useState<TokenAmount[]>(
     tokens.map((token) => new TokenAmount(token, JSBI.BigInt('0')))
   )
@@ -132,7 +131,7 @@ export function useExpectedLpTokens(
     if (allZero) {
       return [new TokenAmount(pool.lpToken, '0'), tokenAmounts]
     }
-    if (!pool.amountDeposited) {
+    if (!pool.amountDeposited || pool.amountDeposited.equalTo('0')) {
       const amount =
         tryParseAmount(
           tokenAmounts.reduce((accum, cur) => (parseInt(accum) + parseInt(cur.toFixed())).toString(), '0'),

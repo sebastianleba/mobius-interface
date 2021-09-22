@@ -1,13 +1,12 @@
-import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
-import { useWeb3React } from '@web3-react/core'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
 import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
 import { ethers } from 'ethers'
+import { useActiveContractKit } from 'hooks'
 import { useBridgeableTokens, useNetworkDomains } from 'hooks/optics'
 import { useBridgeRouterContract } from 'hooks/useContract'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import { useTokenBalanceSingle } from 'state/wallet/hooks'
@@ -23,6 +22,7 @@ import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
+import { useDoTransaction } from '../../hooks/useDoTransaction'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
 import { ExternalLink, TYPE } from '../../theme'
@@ -48,10 +48,10 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const test = useWeb3React()
-  const { account } = test
-  const { chainId } = useWeb3React()
-  //const chainId = useWeb3ChainId()
+  const doTransaction = useDoTransaction()
+  const { chainId, account, destroy, network, connect, library, updateNetwork } = useActiveContractKit()
+  console.log({ chainId, account, network, library })
+  //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
   const [val, setVal] = useState<string>()
@@ -71,23 +71,14 @@ export default function Optics() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
       setAttempting(true)
-      await bridgeContract
-        .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {
-          gasLimit: 350000,
-        })
-        .then((response: TransactionResponse) => {
-          addTransaction(response, {
-            summary: `Bridged ${baseToken.symbol} to ${targetChain?.name}`,
-          })
-          setAttempting(false)
-          setSent(true)
-          setHash(response.hash)
-        })
-        .catch((error: any) => {
-          setAttempting(false)
-          setSent(true)
-          console.log(error)
-        })
+      await doTransaction(bridgeContract, 'send', {
+        args: [selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress],
+        summary: `Bridged ${baseToken?.symbol} to ${targetChain?.name}`,
+      }).catch((error: any) => {
+        setAttempting(false)
+        setSent(true)
+        throw error
+      })
     }
   }
 
@@ -110,6 +101,8 @@ export default function Optics() {
     }
     if (baseChain && baseChain.chainId !== chainId) {
       setStep(1)
+      setBaseToken(undefined)
+      setVal('')
       return
     }
 
@@ -155,7 +148,7 @@ export default function Optics() {
     } else if (chainId === MultiChainIds.POLYGON) {
       setExplorerURL('https://polygonscan.com/tx/')
     }
-  }, [chainId])
+  }, [chainId, step])
 
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
@@ -185,24 +178,6 @@ export default function Optics() {
     }
   }, [approval, approvalSubmitted])
 
-  // errors
-  const [showInverted, setShowInverted] = useState<boolean>(false)
-
-  // show approve flow when: no error on inputs, not approved or pending, or approved in current session
-  // never show if price impact is above threshold in non expert mode
-  const showApproveFlow =
-    approval === ApprovalState.NOT_APPROVED ||
-    approval === ApprovalState.PENDING ||
-    (approvalSubmitted && approval === ApprovalState.APPROVED)
-
-  const handleConfirmDismiss = useCallback(() => {
-    setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
-    // if there was a tx hash, we want to clear the input
-    if (txHash) {
-      //onUserInput(Field.INPUT, '')
-    }
-  }, [attemptingTxn, swapErrorMessage, tradeToConfirm, txHash])
-
   const listOfSteps = instructions.map((instruction, i) => (
     <RowFixed key={`instruction-${i}`} marginBottom="0.5rem" opacity={i === step ? 1 : 0.6}>
       <InstructionButton disabled={i > step} onClick={() => i < step && setStep(i)} marginRight="1rem">
@@ -228,6 +203,8 @@ export default function Optics() {
         key="wallet-button-asdsad"
         onClick={async () => {
           try {
+            updateNetwork(networkInfo[baseChainInfo.chainId])
+
             await window.ethereum?.request({
               method: 'wallet_switchEthereumChain',
               params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],

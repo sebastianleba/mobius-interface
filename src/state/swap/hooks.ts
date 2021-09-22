@@ -10,14 +10,14 @@ import { StableSwapPool } from 'state/stablePools/reducer'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { ROUTER_ADDRESS } from '../../constants'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
-import { useCurrentPool, useMathUtil } from '../stablePools/hooks'
+import { useCurrentPool, useMathUtil, usePools } from '../stablePools/hooks'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
@@ -174,7 +174,7 @@ export function useDerivedStableSwapInfo(): {
   v2Trade?: MobiTrade | undefined
   inputError?: string
 } {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
   const ONE = JSBI.BigInt(1)
 
   const {
@@ -322,7 +322,7 @@ export function useMobiusTradeInfo(): {
   v2Trade: MobiusTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const {
     independentField,
@@ -335,6 +335,8 @@ export function useMobiusTradeInfo(): {
   const outputCurrency = useCurrency(outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
 
+  const pools = usePools()
+  const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
   const mathUtil = useMathUtil(pool)
 
@@ -366,6 +368,14 @@ export function useMobiusTradeInfo(): {
     inputError = inputError ?? 'Enter an amount'
   }
 
+  if (!pool) {
+    inputError = inputError ?? 'Pool Info Loading'
+  }
+
+  if (pool && JSBI.equal(pool.lpTotalSupply, JSBI.BigInt('0'))) {
+    inputError = inputError ?? 'Insufficient Liquidity'
+  }
+
   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
     inputError = inputError ?? 'Select a token'
   }
@@ -377,7 +387,7 @@ export function useMobiusTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount) {
+  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading || inputError) {
     return {
       currencies,
       currencyBalances,
@@ -420,7 +430,7 @@ export function useDerivedSwapInfo(): {
   v2Trade: UbeswapTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const {
     independentField,
@@ -568,7 +578,7 @@ export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: ChainId)
 export function useDefaultsFromURLSearch():
   | { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined }
   | undefined {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const dispatch = useDispatch<AppDispatch>()
   const parsedQs = useParsedQueryString()
   const [result, setResult] = useState<

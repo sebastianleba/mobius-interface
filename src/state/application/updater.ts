@@ -1,13 +1,25 @@
+import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
+import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { useActiveWeb3React } from '../../hooks'
 import useDebounce from '../../hooks/useDebounce'
 import useIsWindowVisible from '../../hooks/useIsWindowVisible'
-import { updateBlockNumber } from './actions'
+import { btcEthPrice, updateBlockNumber } from './actions'
+
+const fetchEthBtcPrices = async (dispatch: any) => {
+  const resp = await axios.get(
+    'https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599%2C0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&vs_currencies=usd'
+  )
+  const btcPrice: string = resp.data['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']?.['usd']
+  const ethPrice: string = resp.data['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']?.['usd']
+  dispatch(btcEthPrice({ btcPrice: parseInt(btcPrice).toFixed(0), ethPrice: parseInt(ethPrice).toFixed(0) }))
+}
 
 export default function Updater(): null {
-  const { library, chainId } = useActiveWeb3React()
+  const library = useProvider()
+  const { network } = useContractKit()
+  const chainId = network.chainId
   const dispatch = useDispatch()
 
   const windowVisible = useIsWindowVisible()
@@ -16,6 +28,7 @@ export default function Updater(): null {
     chainId,
     blockNumber: null,
   })
+  fetchEthBtcPrices(dispatch)
 
   const blockNumberCallback = useCallback(
     (blockNumber: number) => {

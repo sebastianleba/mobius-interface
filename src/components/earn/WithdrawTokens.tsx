@@ -4,7 +4,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
@@ -29,7 +29,7 @@ interface WithdrawModalProps {
 }
 
 export default function WithdrawTokens({ poolInfo, setHash, setAttempting }: WithdrawModalProps) {
-  const { library, account } = useActiveWeb3React()
+  const { library, account } = useActiveContractKit()
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
@@ -180,7 +180,7 @@ const BalanceText = styled(TYPE.subHeader)`
 `
 
 const CurrencyRow = ({ tokenAmount, setTokenAmount, readOnly }: CurrencyRowProps) => {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')

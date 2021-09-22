@@ -4,7 +4,7 @@ import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
@@ -20,7 +20,7 @@ import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
 import { Input as NumericalInput } from '../NumericalInput'
 import QuestionHelper from '../QuestionHelper'
-import { RowBetween, RowFixed } from '../Row'
+import { AutoRow, RowBetween, RowFixed } from '../Row'
 import Toggle from '../Toggle'
 
 const TEN = JSBI.BigInt('10')
@@ -42,10 +42,10 @@ interface DepositModalProps {
 }
 
 export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositModalProps) {
-  const { library, account } = useActiveWeb3React()
+  const { library, account } = useActiveContractKit()
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
-  const { tokens, peggedTo, pegComesAfter } = poolInfo
+  const { tokens, peggedTo, pegComesAfter, totalDeposited } = poolInfo
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
@@ -53,7 +53,8 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   // const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
   //   poolInfo.tokens.map((t) => new TokenAmount(t, JSBI.BigInt('0')))
   // )
-  const [useEqualAmount, setUseEqualAmount] = useState<boolean>(false)
+  const isFirstDeposit = totalDeposited.equalTo('0')
+  const [useEqualAmount, setUseEqualAmount] = useState<boolean>(isFirstDeposit)
   const [ttl] = useUserTransactionTTL()
   const blockTimeStamp = useCurrentBlockTimestamp()
   const deadline = useTransactionDeadline()
@@ -128,6 +129,14 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             <TYPE.largeHeader>Deposit to {poolInfo.name}</TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
+          {isFirstDeposit && (
+            <AutoRow>
+              <TYPE.body color="red">
+                You are the first to deposit into the pool! <br />
+                Because of this, you will need to deposit an equal amount of tokens.
+              </TYPE.body>
+            </AutoRow>
+          )}
           <RowBetween>
             <RowFixed>
               <TYPE.subHeader fontWeight={400} fontSize={14}>
@@ -138,7 +147,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             <Toggle
               id="toggle-equal-amount-button"
               isActive={useEqualAmount}
-              toggle={() => setUseEqualAmount(!useEqualAmount)}
+              toggle={() => !isFirstDeposit && setUseEqualAmount(!useEqualAmount)}
             />
           </RowBetween>
           {poolInfo.tokens.map((token, i) => (
@@ -163,10 +172,12 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
           <TYPE.mediumHeader style={{ textAlign: 'center' }}>
             Expected Lp Tokens Received: {expectedLPTokens.toFixed(decimalPlacesForLP)}
           </TYPE.mediumHeader>
-          <TYPE.mediumHeader style={{ textAlign: 'center' }}>
-            Equivalent to: {pegComesAfter ? '' : peggedTo}
-            {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
-          </TYPE.mediumHeader>
+          {!isFirstDeposit && (
+            <TYPE.mediumHeader style={{ textAlign: 'center' }}>
+              Equivalent to: {pegComesAfter ? '' : peggedTo}
+              {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
+            </TYPE.mediumHeader>
+          )}
           {toApprove.length > 0 && expectedLPTokens.greaterThan(JSBI.BigInt('0')) && (
             <div style={{ display: 'flex' }}>
               {toApprove.map((i) => (
@@ -267,7 +278,7 @@ const BalanceText = styled(TYPE.subHeader)`
 `
 
 const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }: CurrencyRowProps) => {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const currency = tokenAmount.currency
   const tokenBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const TEN = JSBI.BigInt('10')

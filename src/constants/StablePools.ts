@@ -19,8 +19,8 @@ export enum Coins {
 }
 
 export const PRICE: { [c in Coins]: number } = {
-  [Coins.Bitcoin]: 43774,
-  [Coins.Ether]: 3080,
+  [Coins.Bitcoin]: 42295,
+  [Coins.Ether]: 2909,
   [Coins.USD]: 1,
 }
 
@@ -40,6 +40,12 @@ export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
   [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0x73a210637f6F6B7005512677Ba6B3C96bb4AA44B'),
   [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
   [ChainId.BAKLAVA]: undefined,
+}
+
+export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
+  [ChainId.MAINNET]: '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25',
+  [ChainId.ALFAJORES]: '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79',
+  [ChainId.BAKLAVA]: '',
 }
 
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
@@ -89,8 +95,57 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 0,
+      displayDecimals: 1,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+    },
+    {
+      name: 'USDC (PoS Optics) Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941',
+            decimals: 6,
+            symbol: 'pUSDC',
+            name: 'USD Coin (PoS Optics)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x2080AAa167e2225e1FC9923250bA60E19a180Fb2',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0xf5b454cF47Caca418D95930AA03975Ee4bf409bc',
+        18,
+        'MobLP',
+        'Mobius cUSD/pUSDC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 0,
+      gaugeAddress: '0x52517feb1Fc6141d5CF6718111C7Cc0FD764fA5d',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
     },
     {
@@ -236,7 +291,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 0,
+      displayDecimals: 1,
       gaugeAddress: '0xe2d6095685248F38Ae9fef1b360D772b78Ea19D1',
       totalMobiRate: JSBI.BigInt('146712000000000000'),
     },
@@ -285,7 +340,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 0,
+      displayDecimals: 1,
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
     },

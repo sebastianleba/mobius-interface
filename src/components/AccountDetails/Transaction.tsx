@@ -1,9 +1,10 @@
-import { getBlockscoutLink } from '@ubeswap/sdk'
+import { useContractKit } from '@celo-tools/use-contractkit'
+import { ChainId } from '@ubeswap/sdk'
 import React from 'react'
 import { CheckCircle, Triangle } from 'react-feather'
 import styled from 'styled-components'
 
-import { useActiveWeb3React } from '../../hooks'
+import { getExplorerLink } from '../../constants/NetworkInfo'
 import { useAllTransactions } from '../../state/transactions/hooks'
 import { ExternalLink } from '../../theme'
 import Loader from '../Loader'
@@ -37,7 +38,8 @@ const IconWrapper = styled.div<{ pending: boolean; success?: boolean }>`
 `
 
 export default function Transaction({ hash }: { hash: string }) {
-  const { chainId } = useActiveWeb3React()
+  const { network } = useContractKit()
+  const chainId = network.chainId as unknown as ChainId
   const allTransactions = useAllTransactions()
 
   const tx = allTransactions?.[hash]
@@ -49,7 +51,7 @@ export default function Transaction({ hash }: { hash: string }) {
 
   return (
     <TransactionWrapper>
-      <TransactionState href={getBlockscoutLink(chainId, hash, 'transaction')} pending={pending} success={success}>
+      <TransactionState href={getExplorerLink(chainId, hash, 'transaction')} pending={pending} success={success}>
         <RowFixed>
           <TransactionStatusText>{summary ?? hash} ↗</TransactionStatusText>
         </RowFixed>

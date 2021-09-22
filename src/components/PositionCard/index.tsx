@@ -8,7 +8,7 @@ import styled from 'styled-components'
 
 import { BIG_INT_ZERO } from '../../constants'
 import { useTotalSupply } from '../../data/TotalSupply'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import { useColor } from '../../hooks/useColor'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE } from '../../theme'
@@ -47,7 +47,7 @@ interface PositionCardProps {
 }
 
 export function MinimalPositionCard({ pair, border }: PositionCardProps) {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const currency0 = pair.token0
   const currency1 = pair.token1
@@ -155,7 +155,7 @@ export function MinimalPositionCard({ pair, border }: PositionCardProps) {
 }
 
 export default function FullPositionCard({ pair, border, stakedBalance }: PositionCardProps) {
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
 
   const currency0 = pair.token0
   const currency1 = pair.token1

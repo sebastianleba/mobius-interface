@@ -12,7 +12,7 @@ import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
-import { useActiveWeb3React, useWeb3ChainId } from '../../hooks'
+import { useActiveContractKit, useChainId } from '../../hooks'
 import { useBridgeableTokens } from '../../hooks/optics'
 import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
@@ -66,8 +66,8 @@ export function CurrencySearch({
   setImportToken,
 }: CurrencySearchProps) {
   const { t } = useTranslation()
-  const { chainId } = useActiveWeb3React()
-  const actualChainId = useWeb3ChainId()
+  const { chainId } = useActiveContractKit()
+  const actualChainId = useChainId()
   const theme = useTheme()
 
   // refs for fixed size lists

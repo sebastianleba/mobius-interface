@@ -5,7 +5,7 @@ import { ArrowDown } from 'react-feather'
 import styled, { css, keyframes } from 'styled-components'
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useIsDarkMode } from '../../state/user/hooks'
 import { AutoRow } from '../Row'
@@ -160,7 +160,7 @@ interface PropType {
 export function ChainSelector({ baseNetwork, setBaseNetwork, targetNetwork, setTargetNetwork }: PropType) {
   const hideInput = false
   const isDarkMode = useIsDarkMode()
-  const { account } = useActiveWeb3React()
+  const { account } = useActiveContractKit()
   const theme = useTheme()
 
   return (

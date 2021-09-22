@@ -1,16 +1,14 @@
+import { useContractKit, WalletTypes } from '@celo-tools/use-contractkit'
 import * as Sentry from '@sentry/react'
-import { AbstractConnector } from '@web3-react/abstract-connector'
-import { UnsupportedChainIdError, useWeb3React } from '@web3-react/core'
-import { ValoraConnector } from 'connectors/valora/ValoraConnector'
 import useAccountSummary from 'hooks/useAccountSummary'
 import { darken, lighten } from 'polished'
 import React, { useEffect, useMemo } from 'react'
 import { Activity } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
+import { isAddress } from 'web3-utils'
 
-import { injected, NETWORK_CHAIN_NAME } from '../../connectors'
-import { NetworkContextName } from '../../constants'
+import { NETWORK_CHAIN_NAME } from '../../connectors'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
 import { TransactionDetails } from '../../state/transactions/reducer'
@@ -49,20 +47,17 @@ const Web3StatusConnect = styled(Web3StatusGeneric)<{ faded?: boolean }>`
   border: none;
   color: ${({ theme }) => theme.primaryText1};
   font-weight: 500;
-
   :hover,
   :focus {
     border: 1px solid ${({ theme }) => darken(0.05, theme.primary4)};
     color: ${({ theme }) => theme.primaryText1};
   }
-
   ${({ faded }) =>
     faded &&
     css`
       background-color: ${({ theme }) => theme.primary5};
       border: 1px solid ${({ theme }) => theme.primary5};
       color: ${({ theme }) => theme.primaryText1};
-
       :hover,
       :focus {
         border: 1px solid ${({ theme }) => darken(0.05, theme.primary4)};
@@ -79,7 +74,6 @@ const Web3StatusConnected = styled(Web3StatusGeneric)<{ pending?: boolean }>`
   :hover,
   :focus {
     background-color: ${({ pending, theme }) => (pending ? darken(0.05, theme.primary1) : lighten(0.05, theme.bg2))};
-
     :focus {
       border: 1px solid ${({ pending, theme }) => (pending ? darken(0.1, theme.primary1) : darken(0.1, theme.bg3))};
     }
@@ -109,9 +103,13 @@ function newTransactionsFirst(a: TransactionDetails, b: TransactionDetails) {
   return b.addedTime - a.addedTime
 }
 
-// eslint-disable-next-line react/prop-types
-function StatusIcon({ connector }: { connector: AbstractConnector }) {
-  if (connector === injected) {
+const StatusIcon: React.FC = () => {
+  const { walletType } = useContractKit()
+  if (
+    walletType === WalletTypes.MetaMask ||
+    walletType === WalletTypes.CeloExtensionWallet ||
+    walletType === WalletTypes.Injected
+  ) {
     return <Identicon />
   }
   return null
@@ -119,8 +117,8 @@ function StatusIcon({ connector }: { connector: AbstractConnector }) {
 
 function Web3StatusInner() {
   const { t } = useTranslation()
-  const { account, connector, error } = useWeb3React()
-  const { summary } = useAccountSummary(account ?? undefined)
+  const { connect, address, account } = useContractKit()
+  const error = null
 
   const allTransactions = useAllTransactions()
 
@@ -133,11 +131,14 @@ function Web3StatusInner() {
 
   const hasPendingTransactions = !!pending.length
   const toggleWalletModal = useWalletModalToggle()
+  let accountName
   if (account) {
-    const accountName =
-      connector instanceof ValoraConnector && connector.valoraAccount
-        ? connector.valoraAccount.phoneNumber
-        : summary?.name || shortenAddress(account)
+    // Phone numbers show up under `account`, so we need to check if it is an address
+    accountName = isAddress(account) ? shortenAddress(account) : account
+  } else if (address) {
+    accountName = shortenAddress(address)
+  }
+  if (accountName) {
     return (
       <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
         {hasPendingTransactions ? (
@@ -149,19 +150,19 @@ function Web3StatusInner() {
             <Text>{accountName}</Text>
           </>
         )}
-        {!hasPendingTransactions && connector && <StatusIcon connector={connector} />}
+        {!hasPendingTransactions && <StatusIcon />}
       </Web3StatusConnected>
     )
   } else if (error) {
     return (
-      <Web3StatusError onClick={toggleWalletModal}>
+      <Web3StatusError onClick={() => connect().catch(console.warn)}>
         <NetworkIcon />
-        <Text>{error instanceof UnsupportedChainIdError ? 'Wrong Network' : 'Error'}</Text>
+        <Text>{error === 'unsupported' ? 'Wrong Network' : 'Error'}</Text>
       </Web3StatusError>
     )
   } else {
     return (
-      <Web3StatusConnect id="connect-wallet" onClick={toggleWalletModal} faded={!account}>
+      <Web3StatusConnect id="connect-wallet" onClick={() => connect().catch(console.warn)} faded={!address}>
         <Text>{t('Connect to a wallet')}</Text>
       </Web3StatusConnect>
     )
@@ -169,8 +170,7 @@ function Web3StatusInner() {
 }
 
 export default function Web3Status() {
-  const { active, account, connector } = useWeb3React()
-  const contextNetwork = useWeb3React(NetworkContextName)
+  const { address: account, walletType } = useContractKit()
   const allTransactions = useAllTransactions()
 
   const sortedRecentTransactions = useMemo(() => {
@@ -184,13 +184,9 @@ export default function Web3Status() {
 
   useEffect(() => {
     Sentry.setUser({ id: account ?? undefined })
-    Sentry.setTag('connector', connector?.constructor.name ?? 'disconnected')
+    Sentry.setTag('connector', walletType)
     Sentry.setTag('network', NETWORK_CHAIN_NAME)
-  }, [connector, account])
-
-  if (!contextNetwork.active && !active) {
-    return null
-  }
+  }, [walletType, account])
 
   return (
     <>

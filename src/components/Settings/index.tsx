@@ -10,7 +10,6 @@ import { useModalOpen, useToggleSettingsMenu } from '../../state/application/hoo
 import {
   useExpertModeManager,
   useIsDarkMode,
-  useUbeswapToggle,
   useUserSingleHopOnly,
   useUserSlippageTolerance,
   useUserTransactionTTL,
@@ -135,7 +134,7 @@ export default function SettingsTab() {
   const [minApprove, setMinApprove] = useUserMinApprove()
   const [allowMoolaWithdrawal, setAllowMoolaWithdrawal] = useUserAllowMoolaWithdrawal()
   const [disableSmartRouting, setDisableSmartRouting] = useUserDisableSmartRouting()
-  const [useUbeswap, setUseUbeswap] = useUbeswapToggle()
+  const useUbeswap = false
   const isDarkMode = useIsDarkMode()
 
   const [ttl, setTtl] = useUserTransactionTTL()

@@ -1,4 +1,5 @@
 import { CELO, TokenAmount } from '@ubeswap/sdk'
+import { CardNoise } from 'components/earn/styled'
 import Modal from 'components/Modal'
 import usePrevious from 'hooks/usePrevious'
 import { darken } from 'polished'
@@ -11,10 +12,12 @@ import { NavLink, useHistory } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
+import { TYPE } from 'theme'
 import { ExternalLink } from 'theme/components'
+import { CountUp } from 'use-count-up'
 
 import Logo from '../../assets/svg/mobius.svg'
-import { useActiveWeb3React } from '../../hooks'
+import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../state/user/hooks'
 import Row, { RowFixed } from '../Row'
@@ -145,6 +148,7 @@ const BalanceText = styled(Text)`
     display: none;
   `};
 `
+const activeClassName = 'ACTIVE'
 
 const Title = styled(NavLink)`
   display: flex;
@@ -164,7 +168,6 @@ const Title = styled(NavLink)`
     cursor: pointer;
   }
 `
-
 const MobiusIcon = styled.div`
   transition: transform 0.3s ease;
   margin-right: 0.1rem;
@@ -173,8 +176,6 @@ const MobiusIcon = styled.div`
   //   transform: rotate(-5deg);
   // }
 `
-
-const activeClassName = 'ACTIVE'
 
 const StyledNavLink = styled(NavLink).attrs({
   activeClassName,
@@ -269,7 +270,7 @@ export const StyledMenuButton = styled.button`
 // }
 
 export default function Header() {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
   const { t } = useTranslation()
   const theme = useTheme()
   const userCELOBalance = useTokenBalance(account ?? undefined, CELO[chainId])
@@ -329,25 +330,23 @@ export default function Header() {
               >
                 Pool
               </StyledNavLink>
-              <StyledNavLink id="bridge-nav-link" to="/optics">
-                Bridge
-              </StyledNavLink>
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
-              {isLive && (
-                <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                  Airdrop
-                </StyledNavLink>
-              )}
+              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
+                Airdrop
+              </StyledNavLink>
+              <StyledExternalLink id="bridge-nav-link" href="https://bridge.mobius.money/#/">
+                Bridge
+              </StyledExternalLink>
             </>
           )}
         </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>
-          {/* {aggregateBalance && (
-            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
+          {aggregateBalance && (
+            <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
                   <HideSmall>
@@ -367,11 +366,11 @@ export default function Header() {
                     </TYPE.white>
                   </HideSmall>
                 )}
-                UBE
+                MOBI
               </UBEAmount>
               <CardNoise />
             </UBEWrapper>
-          )} */}
+          )}
 
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
             {account && userCELOBalance ? (
@@ -382,7 +381,9 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => history.push('/optics')}>{darkMode ? '🌉' : '🌁'}</StyledMenuButton>
+        <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+          {darkMode ? '🌉' : '🌁'}
+        </StyledMenuButton>
 
         <HeaderElementWrap>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
