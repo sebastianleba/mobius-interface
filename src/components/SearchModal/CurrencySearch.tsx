@@ -85,11 +85,8 @@ export function CurrencySearch({
   const searchToken = useToken(searchQuery)
   const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
   const bridgeableTokens = useBridgeableTokens()
-  let tokensToSelect = allTokens
-  if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-  if (location.pathname.includes('optics')) {
-    tokensToSelect = bridgeableTokens
-  }
+  const tokensToSelect = bridgeableTokens
+
   useEffect(() => {
     if (isAddressSearch) {
       ReactGA.event({

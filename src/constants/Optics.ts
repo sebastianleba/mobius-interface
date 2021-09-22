@@ -160,17 +160,17 @@ export const BridgeableTokens: { [chainId in MultiChainIds]: Token[] } = {
     ),
   ],
   [MultiChainIds.POLYGON]: [
-    // new WrappedTokenInfo(
-    //   {
-    //     symbol: 'USDC',
-    //     name: 'US Dollar Coin',
-    //     address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-    //     chainId: MultiChainIds.POLYGON,
-    //     logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
-    //     decimals: 6,
-    //   },
-    //   []
-    // ),
+    new WrappedTokenInfo(
+      {
+        symbol: 'USDC',
+        name: 'US Dollar Coin (PoS)',
+        address: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
+        chainId: MultiChainIds.POLYGON,
+        logoURI: 'https://etherscan.io/token/images/centre-usdc_28.png',
+        decimals: 6,
+      },
+      []
+    ),
     // new WrappedTokenInfo(
     //   {
     //     symbol: 'Bridged USDC',
