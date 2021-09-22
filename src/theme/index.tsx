@@ -156,6 +156,12 @@ export const TYPE = {
   largeHeader(props: TextProps) {
     return <TextWrapper fontWeight={600} fontSize={24} {...props} />
   },
+  tvlHeader(props: TextProps) {
+    return <TextWrapper fontWeight={600} fontSize={28} {...props} />
+  },
+  price(props: TextProps) {
+    return <TextWrapper fontWeight={400} fontSize={20} {...props} />
+  },
   mediumHeader(props: TextProps) {
     return <TextWrapper fontWeight={500} fontSize={20} {...props} />
   },
