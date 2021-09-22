@@ -1,4 +1,3 @@
-import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { JSBI, Token } from '@ubeswap/sdk'
 import { ChainSelector } from 'components/Bridge/ChainSelector'
 import { NetworkInfo, networkInfo } from 'constants/NetworkInfo'
@@ -23,6 +22,7 @@ import { SwapPoolTabs } from '../../components/NavigationTabs'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { Wrapper } from '../../components/swap/styleds'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
+import { useDoTransaction } from '../../hooks/useDoTransaction'
 import { MobiusTrade, tryParseAmount, useDefaultsFromURLSearch } from '../../state/swap/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
 import { ExternalLink, TYPE } from '../../theme'
@@ -48,7 +48,9 @@ const VoteCard = styled(DataCard)`
 export default function Optics() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
-  const { chainId, account, network, updateNetwork } = useActiveContractKit()
+  const doTransaction = useDoTransaction()
+  const { chainId, account, destroy, network, connect, library, updateNetwork } = useActiveContractKit()
+  console.log({ chainId, account, network, library })
   //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
@@ -69,23 +71,14 @@ export default function Optics() {
     if (bridgeContract && step === 5) {
       const paddedAddress = ethers.utils.hexZeroPad(recipientAddress, 32)
       setAttempting(true)
-      await bridgeContract
-        .send(selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress, {
-          gasLimit: 350000,
-        })
-        .then((response: TransactionResponse) => {
-          addTransaction(response, {
-            summary: `Bridged ${baseToken.symbol} to ${targetChain?.name}`,
-          })
-          setAttempting(false)
-          setSent(true)
-          setHash(response.hash)
-        })
-        .catch((error: any) => {
-          setAttempting(false)
-          setSent(true)
-          console.log(error)
-        })
+      await doTransaction(bridgeContract, 'send', {
+        args: [selectedToken?.token.address, selectedToken?.raw.toString(), targetChain?.domain, paddedAddress],
+        summary: `Bridged ${baseToken?.symbol} to ${targetChain?.name}`,
+      }).catch((error: any) => {
+        setAttempting(false)
+        setSent(true)
+        throw error
+      })
     }
   }
 
@@ -108,6 +101,8 @@ export default function Optics() {
     }
     if (baseChain && baseChain.chainId !== chainId) {
       setStep(1)
+      setBaseToken(undefined)
+      setVal('')
       return
     }
 
@@ -209,26 +204,24 @@ export default function Optics() {
         onClick={async () => {
           try {
             updateNetwork(networkInfo[baseChainInfo.chainId])
-          } catch (e) {
-            try {
-              await window.ethereum?.request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
-              })
-            } catch (switchError) {
-              await window.ethereum?.request({
-                method: 'wallet_addEthereumChain',
-                params: [
-                  {
-                    chainId: '0x' + baseChainInfo.chainId.toString(16),
-                    chainName: baseChainInfo.name,
-                    nativeCurrency: baseChainInfo.nativeCurrency,
-                    rpcUrls: [baseChainInfo.rpcUrl],
-                    blockExplorerUrls: [baseChainInfo.explorer],
-                  },
-                ],
-              })
-            }
+
+            await window.ethereum?.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x' + baseChainInfo.chainId.toString(16) }],
+            })
+          } catch (switchError) {
+            await window.ethereum?.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  chainId: '0x' + baseChainInfo.chainId.toString(16),
+                  chainName: baseChainInfo.name,
+                  nativeCurrency: baseChainInfo.nativeCurrency,
+                  rpcUrls: [baseChainInfo.rpcUrl],
+                  blockExplorerUrls: [baseChainInfo.explorer],
+                },
+              ],
+            })
           }
         }}
       >

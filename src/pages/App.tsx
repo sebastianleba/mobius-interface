@@ -115,19 +115,13 @@ export default function App() {
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
             <Switch>
               <Route exact strict path="/optics" component={Optics} />
-
-              {!wrongNetwork && (
-                <>
-                  {' '}
-                  <Route exact path="/" component={LandingPage} />
-                  <Route exact strict path="/swap" component={Swap} />
-                  <Route exact strict path="/pool" component={Earn} />
-                  <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-                  <Route exact strict path="/risk" component={RiskPage} />
-                  <Route path="/claim" component={Claim} />
-                  <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
-                </>
-              )}
+              <Route exact path="/" component={LandingPage} />
+              <Route exact strict path="/swap" component={Swap} />
+              <Route exact strict path="/pool" component={Earn} />
+              <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
+              <Route exact strict path="/risk" component={RiskPage} />
+              <Route path="/claim" component={Claim} />
+              <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
             </Switch>
           </ErrorBoundary>
           {location.pathname !== '/' && <Marginer />}

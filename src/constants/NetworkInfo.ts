@@ -40,7 +40,7 @@ export type NetworkInfo = Network & {
 export const Ethereum: NetworkInfo = {
   name: 'Ethereum',
   chainId: 1,
-  rpcUrl: `https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`,
+  rpcUrl: 'https://main-light.eth.linkpool.io/', //`https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`,
   explorer: 'https://etherscan.io/',
   graphQl: '',
   nativeCurrency: {

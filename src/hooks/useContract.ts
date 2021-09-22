@@ -34,7 +34,7 @@ import {
   StakingRewards,
   Swap,
   VestingEscrow,
-} from '../generated'
+} from '../generated/index'
 import { getContract } from '../utils'
 import { useActiveContractKit } from './index'
 import { useMobi } from './Tokens'

@@ -63,7 +63,7 @@ ReactDOM.render(
   <StrictMode>
     <FixedGlobalStyle />
     <ContractKitProvider
-      networks={networks}
+      //networks={networks}
       dapp={{
         name: 'Mobius',
         description: 'Multi-chain, stable swap exchange',
