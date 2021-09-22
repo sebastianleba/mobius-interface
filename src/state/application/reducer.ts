@@ -1,6 +1,14 @@
 import { createReducer, nanoid } from '@reduxjs/toolkit'
 
-import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal, updateBlockNumber } from './actions'
+import {
+  addPopup,
+  ApplicationModal,
+  btcEthPrice,
+  PopupContent,
+  removePopup,
+  setOpenModal,
+  updateBlockNumber,
+} from './actions'
 
 type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>
 
@@ -8,12 +16,16 @@ export interface ApplicationState {
   readonly blockNumber: { readonly [chainId: number]: number }
   readonly popupList: PopupList
   readonly openModal: ApplicationModal | null
+  readonly btcPrice: string
+  readonly ethPrice: string
 }
 
 const initialState: ApplicationState = {
   blockNumber: {},
   popupList: [],
   openModal: null,
+  btcPrice: '41000',
+  ethPrice: '2700',
 }
 
 export default createReducer(initialState, (builder) =>
@@ -28,6 +40,10 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(setOpenModal, (state, action) => {
       state.openModal = action.payload
+    })
+    .addCase(btcEthPrice, (state, { payload: { ethPrice, btcPrice } }) => {
+      state.ethPrice = ethPrice
+      state.btcPrice = btcPrice
     })
     .addCase(addPopup, (state, { payload: { content, key, removeAfterMs = 15000 } }) => {
       state.popupList = (key ? state.popupList.filter((popup) => popup.key !== key) : state.popupList).concat([

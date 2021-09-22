@@ -1,4 +1,5 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
+import JSBI from 'jsbi'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -90,4 +91,16 @@ export function useRemovePopup(): (key: string) => void {
 export function useActivePopups(): AppState['application']['popupList'] {
   const list = useSelector((state: AppState) => state.application.popupList)
   return useMemo(() => list.filter((item) => item.show), [list])
+}
+
+export function useEthBtcPrice(address: string): JSBI {
+  const prices = useSelector((state: AppState) => ({
+    ethPrice: state.application.ethPrice,
+    btcPrice: state.application.btcPrice,
+  }))
+  return address === '0x19260b9b573569dDB105780176547875fE9fedA3'
+    ? JSBI.BigInt(prices.btcPrice)
+    : address === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+    ? JSBI.BigInt(prices.ethPrice)
+    : JSBI.BigInt('1')
 }
