@@ -6,7 +6,6 @@ import { darken, transparentize } from 'polished'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
 import { useTranslation } from 'react-i18next'
-import { NavLink } from 'react-router-dom'
 import { animated, useSpring, useTransition } from 'react-spring'
 import { useGesture } from 'react-use-gesture'
 import styled, { css } from 'styled-components'
@@ -15,7 +14,7 @@ import { TYPE } from '../../theme'
 
 const activeClassName = 'ACTIVE'
 
-const StyledNavLink = styled(NavLink).attrs({
+const StyledNavLink = styled.a.attrs({
   activeClassName,
 })`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -74,31 +73,17 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
           <TYPE.largeHeader onClick={onDismiss}>X</TYPE.largeHeader>
         </RowBetween>
         <Divider />
-        <StyledNavLink id={`swap-nav-link`} to={'/swap'} onClick={onDismiss}>
+        <StyledNavLink id={`swap-nav-link`} href={'https://www.mobius.money/#/swap'} onClick={onDismiss}>
           {t('swap')}
         </StyledNavLink>
-        <StyledNavLink
-          id={`pool-nav-link`}
-          to={'/pool'}
-          isActive={(match, { pathname }) =>
-            Boolean(match) ||
-            pathname.startsWith('/add') ||
-            pathname.startsWith('/remove') ||
-            pathname.startsWith('/create') ||
-            pathname.startsWith('/find')
-          }
-          onClick={onDismiss}
-        >
+        <StyledNavLink id={`pool-nav-link`} href={'https://www.mobius.money/#/pool'} onClick={onDismiss}>
           Pool
         </StyledNavLink>
-        <StyledNavLink id="bridge-nav-link" to="/optics" onClick={onDismiss}>
-          Bridge
-        </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
+        <StyledNavLink id={`swap-nav-link`} href={'https://www.mobius.money/#/risk'} onClick={onDismiss}>
           Risks
         </StyledNavLink>
         {isLive && (
-          <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
+          <StyledNavLink id={`swap-nav-link`} href={'https://www.mobius.money/#/claim'} onClick={onDismiss}>
             Airdrop
           </StyledNavLink>
         )}

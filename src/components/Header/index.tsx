@@ -290,13 +290,28 @@ export default function Header() {
         <UbeBalanceContent setShowUbeBalanceModal={setShowUbeBalanceModal} />
       </Modal>
       <HeaderRow>
-        <Title href="https://www.mobius.money/#/swap" target="_blank">
+        <Title target="_self" href="https://www.mobius.money/#/swap">
           <MobiusIcon>
             <img width={'50px'} src={Logo} alt="logo" />
           </MobiusIcon>
           Mobius
         </Title>
-        <HeaderLinks></HeaderLinks>
+        <HeaderLinks>
+          <StyledExternalLink id={`swap-nav-link`} target="_self" href={'https://www.mobius.money/#/swap'}>
+            {t('swap')}
+          </StyledExternalLink>
+          <StyledExternalLink id={`pool-nav-link`} target="_self" href={'https://www.mobius.money/#/pool'}>
+            Pool
+          </StyledExternalLink>
+          <StyledExternalLink id={`swap-nav-link`} target="_self" href={'https://www.mobius.money/#/risk'}>
+            Risks
+          </StyledExternalLink>
+          {isLive && (
+            <StyledExternalLink id={`swap-nav-link`} target="_self" href={'https://www.mobius.money/#/claim'}>
+              Airdrop
+            </StyledExternalLink>
+          )}
+        </HeaderLinks>
       </HeaderRow>
       <HeaderControls>
         <HeaderElement>
