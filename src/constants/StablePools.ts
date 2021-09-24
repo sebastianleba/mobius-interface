@@ -48,6 +48,12 @@ export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
   [ChainId.BAKLAVA]: '',
 }
 
+export const VOTING_ESCROW: { [K in ChainId]: string } = {
+  [ChainId.MAINNET]: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
+  [ChainId.ALFAJORES]: '',
+  [ChainId.BAKLAVA]: '',
+}
+
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
