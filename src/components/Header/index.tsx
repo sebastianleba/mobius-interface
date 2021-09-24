@@ -346,7 +346,8 @@ export default function Header() {
       <HeaderControls>
         <HeaderElement>
           {aggregateBalance && (
-            <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
+            // <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
+            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
                   <HideSmall>
@@ -381,7 +382,7 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+        <StyledMenuButton size={20} onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
           {darkMode ? '🌉' : '🌁'}
         </StyledMenuButton>
 
