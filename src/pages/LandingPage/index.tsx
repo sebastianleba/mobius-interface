@@ -146,7 +146,11 @@ export default function LandingPage() {
           <StyledMenuButton id={`home-nav-link`} to={'/swap'}>
             Open Mobius
           </StyledMenuButton>
-          <StyledMenuButton id={`home-nav-link`} to={'/optics'}>
+          <StyledMenuButton
+            id={`bridge-nav-link`}
+            to={'/'}
+            onClick={() => window.open('https://bridge.mobius.money/#/', '_self')}
+          >
             Bridge Assets
           </StyledMenuButton>
         </>
