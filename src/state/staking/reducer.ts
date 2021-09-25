@@ -4,7 +4,7 @@ import { JSBI } from '@ubeswap/sdk'
 import { updateStaking } from './actions'
 
 export type VoteLock = {
-  amountOfMOBI: JSBI
+  amount: JSBI
   end: number // UNIX time stamp
 }
 export type StakingState = {

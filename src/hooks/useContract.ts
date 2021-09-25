@@ -1,7 +1,7 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
 import { ChainId } from '@ubeswap/sdk'
-import { MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
+import { MOBIUS_MINTER_ADDRESS, VOTING_ESCROW as VOTING_ESCROW_ADDRESS } from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
@@ -20,6 +20,7 @@ import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import STABLE_SWAP from '../constants/abis/Swap.json'
 import VESTING_ABI from '../constants/abis/VestingEscrow.json'
+import VOTING_ESCROW from '../constants/abis/VotingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
   BridgeRouter,
@@ -34,6 +35,7 @@ import {
   StakingRewards,
   Swap,
   VestingEscrow,
+  VotingEscrow,
 } from '../generated/index'
 import { getContract } from '../utils'
 import { useActiveContractKit } from './index'
@@ -81,6 +83,12 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
   const { chainId } = useActiveContractKit()
 
   return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainId], MINTER.abi, withSignerIfPossible) as Minter
+}
+
+export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
+  const { chainId } = useActiveContractKit()
+
+  return useContract(address ?? VOTING_ESCROW_ADDRESS[chainId], VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
