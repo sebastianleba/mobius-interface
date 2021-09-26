@@ -1,5 +1,6 @@
 import { CeloContract, StableToken } from '@celo/contractkit'
 import { JSBI } from '@ubeswap/sdk'
+import { Exchange } from 'generated'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
@@ -16,27 +17,21 @@ export function UpdateMento(): null {
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
   const pools: MentoConstants[] = MENTO_POOL_INFO[chainId]
+  const mentoContract = UseMentoContract('0x12364a15F52b822F12dd858FAeEdC49F472fbA57')
 
   useEffect(() => {
-    const updatePool = async (poolInfo: MentoConstants, stable: StableToken | undefined) => {
+    const updatePool = async (poolInfo: MentoConstants, contract: Exchange | undefined) => {
+      if (!contract) return
       try {
-        let address: string
-        if (stable === StableToken.cUSD) {
-          address = await kit.registry.addressFor(CeloContract.Exchange)
-        } else {
-          address = await kit.registry.addressFor(CeloContract.ExchangeEUR)
-        }
-        const contract = UseMentoContract(address)
-        if (!contract) return
         const balances = (await contract.getBuyAndSellBuckets(false)).map((x) => JSBI.BigInt(x))
         const swapFee = JSBI.BigInt(await contract.spread())
         dispatch(
           initPool({
-            address: address,
+            address: contract.address,
             pool: {
               ...poolInfo,
               balances,
-              address,
+              address: contract.address,
               swapFee,
             },
           })
@@ -45,8 +40,14 @@ export function UpdateMento(): null {
         console.error(error)
       }
     }
-    pools.forEach((pool) => {
-      updatePool(pool, pool.stable)
+    pools.forEach(async (pool) => {
+      let address: string
+      if (pool.stable === StableToken.cUSD) {
+        address = await kit.registry.addressFor(CeloContract.Exchange)
+      } else {
+        address = await kit.registry.addressFor(CeloContract.ExchangeEUR)
+      }
+      updatePool(pool, mentoContract?.attach(address))
     })
   }, [blockNumber, library, account, dispatch, pools, kit.contracts])
 

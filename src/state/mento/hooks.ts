@@ -179,7 +179,9 @@ export function useMentoTradeInfo(): {
   const recipientLookup = useENS(recipient ?? undefined)
   const pools = usePools()
   const poolsLoading = pools.length === 0
+  console.log('inputC', inputCurrency?.address, outputCurrency?.address)
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
+  console.log(pool, 'hehehe')
   const mathUtil = useMathUtil(pool)
 
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
