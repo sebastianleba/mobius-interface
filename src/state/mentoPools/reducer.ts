@@ -17,8 +17,6 @@ export type MentoMathConstants = {
 
 export type MentoConstants = MentoMathConstants & {
   tokens: Token[]
-  tokenAddresses: string[]
-  address: string
   stable: StableToken
 }
 

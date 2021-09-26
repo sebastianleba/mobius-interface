@@ -1,5 +1,5 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { Token, TokenAmount } from '@ubeswap/sdk'
 import { useSelector } from 'react-redux'
 
 import { MentoMath } from '../../utils/mentoMath'
@@ -13,14 +13,14 @@ export interface MentoPoolInfo {
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [MentoPool] {
-  const pools = useSelector<AppState, MentoPool[]>((state) => {
-    console.log(state.mentoPools.pools)
-    return Object.values(state.mentoPools.pools)
+  const pools = useSelector<AppState, MentoPool[]>((state) =>
+    Object.values(state.mentoPools.pools)
       .map(({ pool }) => pool)
-      .filter(({ tokenAddresses }) => {
+      .filter((pool) => {
+        const tokenAddresses = pool.tokens.map((x) => x.address)
         return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
       })
-  })
+  )
   return [pools.length > 0 ? pools[0] : null]
 }
 
@@ -30,9 +30,6 @@ export function usePools(): readonly MentoPool[] {
   )
   return pools
 }
-
-const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
-  new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
 
 const getPoolInfo = (pool: MentoPool): MentoPoolInfo => ({
   poolAddress: pool.address,

@@ -1,4 +1,4 @@
-import { ExchangeWrapper } from '@celo/contractkit/lib/wrappers/Exchange'
+import { StableToken } from '@celo/contractkit'
 import { JSBI } from '@ubeswap/sdk'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
@@ -17,12 +17,12 @@ export function UpdateMento(): null {
   const pools: MentoConstants[] = MENTO_POOL_INFO[chainId]
 
   useEffect(() => {
-    const updatePool = async (poolInfo: MentoConstants, contract: ExchangeWrapper | undefined) => {
+    const updatePool = async (poolInfo: MentoConstants, stable: StableToken | undefined) => {
+      if (!stable) return
+      const contract = await kit.contracts.getExchange(stable)
       if (!contract) return
-
       try {
-        const balances = (await contract.getBuyAndSellBuckets(false)).map((num) => JSBI.BigInt(num))
-
+        const balances = (await contract.getBuyAndSellBuckets(false)).map((x) => JSBI.BigInt(x.toFixed()))
         dispatch(
           initPool({
             address: poolInfo.address,
@@ -36,9 +36,8 @@ export function UpdateMento(): null {
         console.error(error)
       }
     }
-    console.log('in update')
-    pools.forEach(async (pool) => {
-      updatePool(pool, await kit.contracts.getExchange(pool.stable))
+    pools.forEach((pool) => {
+      updatePool(pool, pool.stable)
     })
   }, [blockNumber, library, account, dispatch, pools, kit.contracts])
 
