@@ -13,13 +13,14 @@ export interface MentoPoolInfo {
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [MentoPool] {
-  const pools = useSelector<AppState, MentoPool[]>((state) =>
-    Object.values(state.mentoPools.pools)
+  const pools = useSelector<AppState, MentoPool[]>((state) => {
+    console.log(state.mentoPools.pools)
+    return Object.values(state.mentoPools.pools)
       .map(({ pool }) => pool)
       .filter(({ tokenAddresses }) => {
         return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
       })
-  )
+  })
   return [pools.length > 0 ? pools[0] : null]
 }
 
@@ -37,15 +38,14 @@ const getPoolInfo = (pool: MentoPool): MentoPoolInfo => ({
   poolAddress: pool.address,
   tokens: pool.tokens,
   balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
-  s,
 })
 
-export function useStablePoolInfoByName(name: string): MentoInfo | undefined {
+export function useMentoPoolInfoByName(name: string): MentoPoolInfo | undefined {
   const pool = useSelector<AppState, MentoPool>((state) => state.mentoPools.pools[name]?.pool)
   return !pool ? undefined : { ...getPoolInfo(pool) }
 }
 
-export function useStablePoolInfo(): readonly MentoInfo[] {
+export function useMentoPoolInfo(): readonly MentoPoolInfo[] {
   const pools = usePools()
   return pools.map((pool) => getPoolInfo(pool))
 }

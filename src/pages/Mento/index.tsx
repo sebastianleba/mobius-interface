@@ -46,7 +46,6 @@ import { ClickableText } from '../Pool/styleds'
 
 export default function Mento() {
   const loadedUrlParams = useDefaultsFromURLSearch()
-  console.log(loadedUrlParams)
   const isDarkMode = useIsDarkMode()
 
   // token warning stuff
@@ -54,8 +53,6 @@ export default function Mento() {
     useCurrency(true, loadedUrlParams?.inputCurrencyId),
     useCurrency(true, loadedUrlParams?.outputCurrencyId),
   ]
-  console.log(loadedInputCurrency)
-  console.log(loadedOutputCurrency)
   const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
     () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
@@ -136,7 +133,6 @@ export default function Mento() {
   const userHasSpecifiedInputOutput = Boolean(
     currencies[Field.INPUT] && currencies[Field.OUTPUT] && parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0))
   )
-  const route = null
   const noRoute = false
 
   // check whether the user has approved the router on the input token
@@ -445,11 +441,6 @@ export default function Mento() {
           </AutoRow>
         </Wrapper>
       </AppBodyNoBackground>
-      {/* {!swapIsUnsupported ? (
-        <AdvancedSwapDetailsDropdown trade={trade} />
-      ) : (
-        <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )} */}
     </>
   )
 }

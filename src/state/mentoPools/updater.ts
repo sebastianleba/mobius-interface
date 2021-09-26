@@ -10,7 +10,7 @@ import { AppDispatch } from '../index'
 import { initPool } from './actions'
 import { MentoConstants } from './reducer'
 
-export function UpdatePools(): null {
+export function UpdateMento(): null {
   const { library, chainId, account, kit } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
@@ -36,11 +36,11 @@ export function UpdatePools(): null {
         console.error(error)
       }
     }
-
+    console.log('in update')
     pools.forEach(async (pool) => {
       updatePool(pool, await kit.contracts.getExchange(pool.stable))
     })
-  }, [blockNumber, library, account, dispatch])
+  }, [blockNumber, library, account, dispatch, pools, kit.contracts])
 
   return null
 }
