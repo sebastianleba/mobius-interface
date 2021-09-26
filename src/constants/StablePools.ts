@@ -10,7 +10,18 @@ export type StablePoolInfo = {
   name: string
 }
 
-const mobiToken = (chainId: number, address: string) => new Token(chainId, address, 18, 'MOBI', 'Mobius')
+const mobiToken = (chainId: number, address: string) =>
+  new WrappedTokenInfo(
+    {
+      chainId,
+      address,
+      decimals: 18,
+      symbol: 'MOBI',
+      name: 'Mobius DAO Token',
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_MOBI.png',
+    },
+    []
+  )
 
 export enum Coins {
   Bitcoin,

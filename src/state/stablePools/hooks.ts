@@ -55,7 +55,7 @@ export function usePools(): readonly StableSwapPool[] {
 const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
   new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
 
-const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
+export const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   name: pool.name,
   poolAddress: pool.address,
   lpToken: pool.lpToken,
