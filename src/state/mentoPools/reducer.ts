@@ -8,14 +8,11 @@ import { initPool, updateVariableData } from './actions'
 
 export type MentoVariable = {
   balances: JSBI[]
-}
-
-export type MentoMathConstants = {
   address: string
   swapFee: JSBI
 }
 
-export type MentoConstants = MentoMathConstants & {
+export type MentoConstants = {
   tokens: Token[]
   stable: StableToken
 }

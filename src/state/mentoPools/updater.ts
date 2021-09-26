@@ -1,4 +1,4 @@
-import { StableToken } from '@celo/contractkit'
+import { CeloContract, StableToken } from '@celo/contractkit'
 import { JSBI } from '@ubeswap/sdk'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
@@ -6,6 +6,7 @@ import { useBlockNumber } from 'state/application/hooks'
 
 import { MENTO_POOL_INFO } from '../../constants/StablePools'
 import { useActiveContractKit } from '../../hooks'
+import { UseMentoContract } from '../../hooks/useContract'
 import { AppDispatch } from '../index'
 import { initPool } from './actions'
 import { MentoConstants } from './reducer'
@@ -18,17 +19,25 @@ export function UpdateMento(): null {
 
   useEffect(() => {
     const updatePool = async (poolInfo: MentoConstants, stable: StableToken | undefined) => {
-      if (!stable) return
-      const contract = await kit.contracts.getExchange(stable)
-      if (!contract) return
       try {
-        const balances = (await contract.getBuyAndSellBuckets(false)).map((x) => JSBI.BigInt(x.toFixed()))
+        let address: string
+        if (stable === StableToken.cUSD) {
+          address = await kit.registry.addressFor(CeloContract.Exchange)
+        } else {
+          address = await kit.registry.addressFor(CeloContract.ExchangeEUR)
+        }
+        const contract = UseMentoContract(address)
+        if (!contract) return
+        const balances = (await contract.getBuyAndSellBuckets(false)).map((x) => JSBI.BigInt(x))
+        const swapFee = JSBI.BigInt(await contract.spread())
         dispatch(
           initPool({
-            address: poolInfo.address,
+            address: address,
             pool: {
               ...poolInfo,
               balances,
+              address,
+              swapFee,
             },
           })
         )

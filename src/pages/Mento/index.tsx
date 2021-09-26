@@ -2,7 +2,7 @@ import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import SettingsTab from 'components/Settings'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
-import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
+import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import useENS from 'hooks/useENS'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -77,7 +77,6 @@ export default function Mento() {
 
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
-
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
   const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMentoTradeInfo()
@@ -89,7 +88,6 @@ export default function Mento() {
     [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.input,
     [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.output,
   }
-
   const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
@@ -150,10 +148,8 @@ export default function Mento() {
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
-
   // the callback to execute the swap
-  const { callback: swapCallback, error: swapCallbackError } = useTradeCallback(trade, allowedSlippage, recipient)
-
+  const { callback: swapCallback, error: swapCallbackError } = useMentoTradeCallback(trade, allowedSlippage, recipient)
   const { priceImpactWithoutFee } = computeTradePriceBreakdown(trade)
 
   const [singleHopOnly] = useUserSingleHopOnly()

@@ -139,19 +139,22 @@ function calcInputOutput(
     undefined,
   ]
 
-  console.log(input, output, parsedAmount)
+  const [balanceIn, balanceOut] =
+    input.address === poolInfo.tokens[0].address
+      ? [poolInfo.balances[0], poolInfo.balances[1]]
+      : [poolInfo.balances[1], poolInfo.balances[0]]
 
-  // if (isExactIn) {
-  //   details[0] = parsedAmount
-  //   const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-  //   details[1] = new TokenAmount(output, expectedOut)
-  //   details[2] = new TokenAmount(input, fee)
-  // } else {
-  //   details[1] = parsedAmount
-  //   const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-  //   details[0] = new TokenAmount(input, requiredIn)
-  //   details[2] = new TokenAmount(input, JSBI.BigInt('0'))
-  // }
+  if (isExactIn) {
+    details[0] = parsedAmount
+    const [expectedOut, fee] = math.getAmountOut(parsedAmount.raw, balanceIn, balanceOut)
+    details[1] = new TokenAmount(output, expectedOut)
+    details[2] = new TokenAmount(input, fee)
+  } else {
+    details[1] = parsedAmount
+    const [requiredIn, fee] = math.getAmountIn(parsedAmount.raw, balanceIn, balanceOut)
+    details[0] = new TokenAmount(input, requiredIn)
+    details[2] = new TokenAmount(input, fee)
+  }
   return details
 }
 
@@ -174,7 +177,6 @@ export function useMentoTradeInfo(): {
   const inputCurrency = useCurrency(true, inputCurrencyId)
   const outputCurrency = useCurrency(true, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
-
   const pools = usePools()
   const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
@@ -198,7 +200,6 @@ export function useMentoTradeInfo(): {
     [Field.INPUT]: inputCurrency ?? undefined,
     [Field.OUTPUT]: outputCurrency ?? undefined,
   }
-
   let inputError: string | undefined
   if (!account) {
     inputError = 'Connect Wallet'
@@ -207,11 +208,9 @@ export function useMentoTradeInfo(): {
   if (!parsedAmount) {
     inputError = inputError ?? 'Enter an amount'
   }
-
   if (!pool) {
     inputError = inputError ?? 'Pool Info Loading'
   }
-
   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
     inputError = inputError ?? 'Select a token'
   }
@@ -232,13 +231,7 @@ export function useMentoTradeInfo(): {
       v2Trade: undefined,
     }
   }
-  const { tokens = [] } = pool || {}
-
-  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
-  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
-
   const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
-
   if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
     inputError = 'Insufficient Balance'
   }
@@ -248,7 +241,6 @@ export function useMentoTradeInfo(): {
 
   const v2Trade: MentoTrade | undefined =
     input && output && pool ? { input, output, pool, executionPrice, tradeType, fee } : undefined
-
   return {
     currencies,
     currencyBalances,
@@ -257,101 +249,6 @@ export function useMentoTradeInfo(): {
     inputError,
   }
 }
-
-// // from the current swap inputs, compute the best trade and return it.
-// export function useDerivedSwapInfo(): {
-//   currencies: { [field in Field]?: Token }
-//   currencyBalances: { [field in Field]?: TokenAmount }
-//   parsedAmount: TokenAmount | undefined
-//   v2Trade: UbeswapTrade | undefined
-//   inputError?: string
-// } {
-//   const { account } = useActiveContractKit()
-
-//   const {
-//     independentField,
-//     typedValue,
-//     [Field.INPUT]: { currencyId: inputCurrencyId },
-//     [Field.OUTPUT]: { currencyId: outputCurrencyId },
-//     recipient,
-//   } = useSwapState()
-
-//   const inputCurrency = useCurrency(false, inputCurrencyId)
-//   const outputCurrency = useCurrency(false, outputCurrencyId)
-//   const recipientLookup = useENS(recipient ?? undefined)
-//   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
-
-//   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
-//     inputCurrency ?? undefined,
-//     outputCurrency ?? undefined,
-//   ])
-
-//   const isExactIn: boolean = independentField === Field.INPUT
-//   const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
-
-//   const bestTradeExactIn = useUbeswapTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
-//   const bestTradeExactOut = useUbeswapTradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
-
-//   const v2Trade = isExactIn ? bestTradeExactIn : bestTradeExactOut
-
-//   const currencyBalances = {
-//     [Field.INPUT]: relevantTokenBalances[0],
-//     [Field.OUTPUT]: relevantTokenBalances[1],
-//   }
-
-//   const currencies: { [field in Field]?: Token } = {
-//     [Field.INPUT]: inputCurrency ?? undefined,
-//     [Field.OUTPUT]: outputCurrency ?? undefined,
-//   }
-
-//   let inputError: string | undefined
-//   if (!account) {
-//     inputError = 'Connect Wallet'
-//   }
-
-//   if (!parsedAmount) {
-//     inputError = inputError ?? 'Enter an amount'
-//   }
-
-//   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
-//     inputError = inputError ?? 'Select a token'
-//   }
-
-//   const formattedTo = isAddress(to)
-//   if (!to || !formattedTo) {
-//     inputError = inputError ?? 'Enter a recipient'
-//   } else {
-//     if (
-//       BAD_RECIPIENT_ADDRESSES.indexOf(formattedTo) !== -1 ||
-//       (bestTradeExactIn && involvesAddress(bestTradeExactIn, formattedTo)) ||
-//       (bestTradeExactOut && involvesAddress(bestTradeExactOut, formattedTo))
-//     ) {
-//       inputError = inputError ?? 'Invalid recipient'
-//     }
-//   }
-
-//   const [allowedSlippage] = useUserSlippageTolerance()
-
-//   const slippageAdjustedAmounts = v2Trade && allowedSlippage && computeSlippageAdjustedAmounts(v2Trade, allowedSlippage)
-
-//   // compare input balance to max input based on version
-//   const [balanceIn, amountIn] = [
-//     currencyBalances[Field.INPUT],
-//     slippageAdjustedAmounts ? slippageAdjustedAmounts[Field.INPUT] : null,
-//   ]
-
-//   if (balanceIn && amountIn && balanceIn.lessThan(amountIn)) {
-//     inputError = 'Insufficient ' + amountIn.currency.symbol + ' balance'
-//   }
-
-//   return {
-//     currencies,
-//     currencyBalances,
-//     parsedAmount,
-//     v2Trade: v2Trade ?? undefined,
-//     inputError,
-//   }
-// }
 
 function parseCurrencyFromURLParameter(input: boolean, urlParam: any, chainId: ChainId): string {
   if (typeof urlParam === 'string') {
