@@ -19,6 +19,7 @@ import Claim from './Claim'
 import Earn from './Earn'
 import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
+import Mento from './Mento'
 import RiskPage from './Risk'
 import Swap from './Swap'
 import { RedirectToSwap } from './Swap/redirects'
@@ -115,6 +116,7 @@ export default function App() {
             <Switch>
               <Route exact path="/" component={LandingPage} />
               <Route exact strict path="/swap" component={Swap} />
+              <Route exact path="/mint" component={Mento} />
               <Route exact strict path="/pool" component={Earn} />
               <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
               <Route exact strict path="/risk" component={RiskPage} />

@@ -184,13 +184,16 @@ export function useDerivedStableSwapInfo(): {
     recipient,
   } = useSwapState()
 
-  const inputCurrency = useCurrency(inputCurrencyId)
-  const outputCurrency = useCurrency(outputCurrencyId)
+  const inputCurrency = useCurrency(false, inputCurrencyId)
+  const outputCurrency = useCurrency(false, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
   const [poolInfo] = POOLS_TO_TOKENS[chainId].filter(
     ({ tokens }) => tokens.includes(inputCurrency?.address || '') && tokens.includes(outputCurrency?.address || '')
   )
+
+  console.log(poolInfo, '8898')
+  console.log('in')
 
   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
     inputCurrency ?? undefined,
@@ -331,8 +334,8 @@ export function useMobiusTradeInfo(): {
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
     recipient,
   } = useSwapState()
-  const inputCurrency = useCurrency(inputCurrencyId)
-  const outputCurrency = useCurrency(outputCurrencyId)
+  const inputCurrency = useCurrency(false, inputCurrencyId)
+  const outputCurrency = useCurrency(false, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
 
   const pools = usePools()
@@ -440,8 +443,8 @@ export function useDerivedSwapInfo(): {
     recipient,
   } = useSwapState()
 
-  const inputCurrency = useCurrency(inputCurrencyId)
-  const outputCurrency = useCurrency(outputCurrencyId)
+  const inputCurrency = useCurrency(false, inputCurrencyId)
+  const outputCurrency = useCurrency(false, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
 

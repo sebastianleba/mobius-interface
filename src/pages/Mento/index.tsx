@@ -10,6 +10,7 @@ import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
+import { useDefaultsFromURLSearch, useMentoTradeInfo, useSwapActionHandlers, useSwapState } from 'state/mento/hooks'
 import { ThemeContext } from 'styled-components'
 
 import AddressInputPanel from '../../components/AddressInputPanel'
@@ -24,20 +25,13 @@ import { AutoRow, RowBetween } from '../../components/Row'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
 import TradePrice from '../../components/swap/TradePrice'
-import TokenWarningModal from '../../components/TokenWarningModal'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
 import { Field } from '../../state/swap/actions'
-import {
-  MobiusTrade,
-  useDefaultsFromURLSearch,
-  useMobiusTradeInfo,
-  useSwapActionHandlers,
-  useSwapState,
-} from '../../state/swap/hooks'
+import { MobiusTrade } from '../../state/swap/hooks'
 import {
   useExpertModeManager,
   useIsDarkMode,
@@ -50,15 +44,18 @@ import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import { AppBodyNoBackground } from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 
-export default function Swap() {
+export default function Mento() {
   const loadedUrlParams = useDefaultsFromURLSearch()
+  console.log(loadedUrlParams)
   const isDarkMode = useIsDarkMode()
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
-    useCurrency(false, loadedUrlParams?.inputCurrencyId),
-    useCurrency(false, loadedUrlParams?.outputCurrencyId),
+    useCurrency(true, loadedUrlParams?.inputCurrencyId),
+    useCurrency(true, loadedUrlParams?.outputCurrencyId),
   ]
+  console.log(loadedInputCurrency)
+  console.log(loadedOutputCurrency)
   const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
     () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
@@ -70,10 +67,6 @@ export default function Swap() {
 
   // dismiss warning if all imported tokens are in active lists
   const importTokensNotInDefault = []
-  // urlLoadedTokens &&
-  // urlLoadedTokens.filter((token: Token) => {
-  //   return !(token.address in defaultTokens)
-  // })
 
   const { account } = useActiveContractKit()
   const theme = useContext(ThemeContext)
@@ -90,7 +83,7 @@ export default function Swap() {
 
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
-  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMobiusTradeInfo()
+  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMentoTradeInfo()
 
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
@@ -253,11 +246,6 @@ export default function Swap() {
 
   return (
     <>
-      <TokenWarningModal
-        isOpen={importTokensNotInDefault.length > 0 && !dismissTokenWarning}
-        tokens={importTokensNotInDefault}
-        onConfirm={handleConfirmTokenWarning}
-      />
       <SwapPoolTabs active={'swap'} />
       <AppBodyNoBackground>
         {/* <SwapHeader title={actionLabel} /> */}

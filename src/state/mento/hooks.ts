@@ -1,14 +1,12 @@
 import { parseUnits } from '@ethersproject/units'
-import { ChainId, cUSD, JSBI, Percent, Price, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
+import { ChainId, cUSD, JSBI, Price, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
 import { useUbeswapTradeExactIn, useUbeswapTradeExactOut } from 'components/swap/routing/hooks/useTrade'
 import { UbeswapTrade } from 'components/swap/routing/trade'
-import { useStableSwapContract } from 'hooks/useContract'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useBlockNumber } from 'state/application/hooks'
-import { StableSwapPool } from 'state/stablePools/reducer'
-import { StableSwapMath } from 'utils/stableSwapMath'
+import { MentoPool } from 'state/mentoPools/reducer'
+import { MentoMath } from 'utils/mentoMath'
 
 import { ROUTER_ADDRESS } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
@@ -18,7 +16,7 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
-import { useCurrentPool, useMathUtil } from '../stablePools/hooks'
+import { useCurrentPool, useMathUtil, usePools } from '../mentoPools/hooks'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
@@ -81,8 +79,7 @@ export function tryParseAmount(value?: string, currency?: Token): TokenAmount | 
     return undefined
   }
   try {
-    const typedValue = value //value.startsWith('0.') ? '0' : value
-    const typedValueParsed = parseUnits(typedValue, currency.decimals).toString()
+    const typedValueParsed = parseUnits(value, currency.decimals).toString()
     if (typedValueParsed !== '0') {
       return new TokenAmount(currency as Token, JSBI.BigInt(typedValueParsed))
     }
@@ -113,164 +110,10 @@ function involvesAddress(trade: Trade, checksummedAddress: string): boolean {
   )
 }
 
-export type MobiTrade = {
-  poolName?: string
-  poolAddress?: string
-  inputAmount?: TokenAmount
-  outputAmount?: TokenAmount
-  executionPrice?: Price
-  nextMidPrice?: Price
-  priceImpact?: Percent
-}
-
-type PoolInfo = {
-  name: string
-  address: string
-  lpToken: string
-  tokens: string[]
-}
-
-export const POOLS_TO_TOKENS: { [c: number]: PoolInfo[] } = {
-  [ChainId.MAINNET]: [
-    {
-      name: 'Staked Celo Pool',
-      tokens: ['0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9', '0xBDeedCDA79BAbc4Eb509aB689895a3054461691e'],
-      address: '',
-      lpToken: '',
-    },
-    {
-      name: 'US Dollar Pool',
-      address: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-      tokens: [
-        '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
-        '0x695218A22c805Bab9C6941546CF5395F169Ad871',
-        '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
-      ],
-      lpToken: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
-    },
-  ],
-  [ChainId.ALFAJORES]: [
-    {
-      name: 'Staked Celo Pool',
-      tokens: ['0xf194afdf50b03e69bd7d057c1aa9e10c9954e4c9', '0xBDeedCDA79BAbc4Eb509aB689895a3054461691e'],
-      address: '',
-      lpToken: '',
-    },
-    {
-      name: 'US Dollar Pool',
-      address: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-      tokens: [
-        '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
-        '0x695218A22c805Bab9C6941546CF5395F169Ad871',
-        '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
-      ],
-      lpToken: '0x751c70e8f062071bDE19597e2766a5078709FCb9',
-    },
-  ],
-}
-
-export function useDerivedStableSwapInfo(): {
-  currencies?: { [field in Field]?: Token }
-  currencyBalances?: { [field in Field]?: TokenAmount }
-  parsedAmount?: TokenAmount | undefined
-  v2Trade?: MobiTrade | undefined
-  inputError?: string
-} {
-  const { account, chainId } = useActiveContractKit()
-  const ONE = JSBI.BigInt(1)
-
-  const {
-    typedValue,
-    [Field.INPUT]: { currencyId: inputCurrencyId },
-    [Field.OUTPUT]: { currencyId: outputCurrencyId },
-    recipient,
-  } = useSwapState()
-
-  const inputCurrency = useCurrency(false, inputCurrencyId)
-  const outputCurrency = useCurrency(false, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
-  const [poolInfo] = POOLS_TO_TOKENS[chainId].filter(
-    ({ tokens }) => tokens.includes(inputCurrency?.address || '') && tokens.includes(outputCurrency?.address || '')
-  )
-
-  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
-    inputCurrency ?? undefined,
-    outputCurrency ?? undefined,
-  ])
-
-  const currencies: { [field in Field]?: Token } = {
-    [Field.INPUT]: inputCurrency ?? undefined,
-    [Field.OUTPUT]: outputCurrency ?? undefined,
-  }
-
-  const currencyBalances = {
-    [Field.INPUT]: relevantTokenBalances[0],
-    [Field.OUTPUT]: relevantTokenBalances[1],
-  }
-
-  const parsedAmount = tryParseAmount(typedValue, inputCurrency ?? undefined)
-
-  const stableSwapContract = useStableSwapContract(poolInfo?.address)
-  const tokenOrder = poolInfo ? poolInfo.tokens : []
-  const inputIndex = tokenOrder.indexOf(inputCurrencyId || '')
-  const outputIndex = tokenOrder.indexOf(outputCurrencyId || '')
-
-  let inputError: string | undefined
-  if (!account) {
-    inputError = 'Connect Wallet'
-  }
-
-  if (!parsedAmount) {
-    inputError = inputError ?? 'Enter an amount'
-  }
-
-  if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
-    inputError = inputError ?? 'Select a token'
-  }
-
-  const v2Trade: MobiTrade = {
-    poolAddress: poolInfo?.address || '',
-    poolName: poolInfo?.name || 'Inactive pool',
-    inputAmount: parsedAmount,
-  }
-
-  const formattedTo = isAddress(to)
-  if (!to || !formattedTo) {
-    inputError = inputError ?? 'Enter a recipient'
-  }
-
-  if (!poolInfo) {
-    console.log('No pool!')
-    return {
-      currencies,
-      currencyBalances,
-    }
-  }
-  const asyncUpdateMobiTrade = async () => {
-    const expectedOut = await stableSwapContract?.functions.get_dy_underlying(inputIndex, outputIndex, parsedAmount)
-    const price = new Price(inputCurrency, outputCurrency, parsedAmount?.raw, expectedOut?.raw)
-    v2Trade.outputAmount = new TokenAmount(outputCurrency, expectedOut)
-    v2Trade.executionPrice = price
-  }
-
-  parsedAmount && asyncUpdateMobiTrade()
-
-  return {
-    currencies,
-    currencyBalances,
-    parsedAmount,
-    v2Trade: v2Trade ?? undefined,
-    inputError,
-  }
-}
-
-export type MobiusTrade = {
+export type MentoTrade = {
   input: TokenAmount
   output: TokenAmount
-  pool: StableSwapPool
-  indexFrom: number
-  indexTo: number
+  pool: MentoPool
   executionPrice: Price
   tradeType: TradeType
   fee: TokenAmount
@@ -281,8 +124,8 @@ function calcInputOutput(
   output: Token | undefined,
   isExactIn: boolean,
   parsedAmount: TokenAmount | undefined,
-  math: StableSwapMath,
-  poolInfo: StableSwapPool
+  math: MentoMath,
+  poolInfo: MentoPool
 ): readonly [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] {
   if (!input && !output) {
     return [undefined, undefined, undefined]
@@ -294,34 +137,31 @@ function calcInputOutput(
   if (!input) {
     return [undefined, parsedAmount, undefined]
   }
-  const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
-  const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
-
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
     undefined,
     undefined,
   ]
-  if (isExactIn) {
-    details[0] = parsedAmount
-    const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    details[1] = new TokenAmount(output, expectedOut)
-    details[2] = new TokenAmount(input, fee)
-  } else {
-    details[1] = parsedAmount
-    // TODO: add fee to this
-    const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    details[0] = new TokenAmount(input, requiredIn)
-    details[2] = new TokenAmount(input, JSBI.BigInt('0'))
-  }
+
+  // if (isExactIn) {
+  //   details[0] = parsedAmount
+  //   const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
+  //   details[1] = new TokenAmount(output, expectedOut)
+  //   details[2] = new TokenAmount(input, fee)
+  // } else {
+  //   details[1] = parsedAmount
+  //   const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
+  //   details[0] = new TokenAmount(input, requiredIn)
+  //   details[2] = new TokenAmount(input, JSBI.BigInt('0'))
+  // }
   return details
 }
 
-export function useMobiusTradeInfo(): {
+export function useMentoTradeInfo(): {
   currencies: { [field in Field]?: Token }
   currencyBalances: { [field in Field]?: TokenAmount }
   parsedAmount: TokenAmount | undefined
-  v2Trade: MobiusTrade | undefined
+  v2Trade: MentoTrade | undefined
   inputError?: string
 } {
   const { account } = useActiveContractKit()
@@ -333,14 +173,13 @@ export function useMobiusTradeInfo(): {
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
     recipient,
   } = useSwapState()
-  const inputCurrency = useCurrency(false, inputCurrencyId)
-  const outputCurrency = useCurrency(false, outputCurrencyId)
+  const inputCurrency = useCurrency(true, inputCurrencyId)
+  const outputCurrency = useCurrency(true, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
-  const block = useBlockNumber()
 
+  const pools = usePools()
+  const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
-  const contract = useStableSwapContract(pool?.address)
-  const [expectedOut, setExpectedOut] = useState<TokenAmount | undefined>(undefined)
   const mathUtil = useMathUtil(pool)
 
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
@@ -361,22 +200,9 @@ export function useMobiusTradeInfo(): {
     [Field.INPUT]: inputCurrency ?? undefined,
     [Field.OUTPUT]: outputCurrency ?? undefined,
   }
-  const { tokens = [] } = pool || {}
 
-  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
-  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
-
-  // const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
-
-  useEffect(() => {
-    const updateValue = async () => {
-      const expected = await contract?.calculateSwap(indexFrom, indexTo, parsedAmount?.raw.toString() ?? '1')
-      setExpectedOut(
-        outputCurrency ? new TokenAmount(outputCurrency, JSBI.BigInt(expected?.toString() || '1')) : undefined
-      )
-    }
-    updateValue()
-  }, [inputCurrency, outputCurrency, account, block, parsedAmount])
+  console.log(inputCurrency, 'kj')
+  console.log(outputCurrency, 1)
 
   let inputError: string | undefined
   if (!account) {
@@ -385,6 +211,10 @@ export function useMobiusTradeInfo(): {
 
   if (!parsedAmount) {
     inputError = inputError ?? 'Enter an amount'
+  }
+
+  if (!pool) {
+    inputError = inputError ?? 'Pool Info Loading'
   }
 
   if (!currencies[Field.INPUT] || !currencies[Field.OUTPUT]) {
@@ -398,7 +228,7 @@ export function useMobiusTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount) {
+  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading || inputError) {
     return {
       currencies,
       currencyBalances,
@@ -407,20 +237,22 @@ export function useMobiusTradeInfo(): {
       v2Trade: undefined,
     }
   }
+  const { tokens = [] } = pool || {}
 
-  const feeAmount = JSBI.divide(JSBI.multiply(parsedAmount.raw, pool.swapFee), pool.feeDenominator)
-  const fee = new TokenAmount(inputCurrency, feeAmount)
-  const [input, output] = [parsedAmount, expectedOut]
+  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
+  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
+
+  const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
 
   if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
     inputError = 'Insufficient Balance'
   }
 
-  const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw || '1')
+  const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
 
-  const v2Trade: MobiusTrade | undefined =
-    input && output && pool ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee } : undefined
+  const v2Trade: MentoTrade | undefined =
+    input && output && pool ? { input, output, pool, executionPrice, tradeType, fee } : undefined
 
   return {
     currencies,
@@ -526,16 +358,25 @@ export function useDerivedSwapInfo(): {
   }
 }
 
-function parseCurrencyFromURLParameter(urlParam: any, chainId: ChainId): string {
+function parseCurrencyFromURLParameter(input: boolean, urlParam: any, chainId: ChainId): string {
   if (typeof urlParam === 'string') {
     const valid = isAddress(urlParam)
     if (valid) return valid
-    if (urlParam.toUpperCase() === 'CUSD') return cUSD[chainId].address
+    if (urlParam.toUpperCase() === 'CUSD') {
+      console.log('in')
+      return cUSD[chainId].address
+    }
     if (valid === false) return cUSD[chainId].address
   }
-  return chainId === ChainId.ALFAJORES
-    ? '0x2AaF20d89277BF024F463749045964D7e7d3A774'
-    : '0x765DE816845861e75A25fCA122bb6898B8B1282a'
+  if (input) {
+    return chainId === ChainId.ALFAJORES
+      ? '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9'
+      : '0x471EcE3750Da237f93B8E339c536989b8978a438'
+  } else {
+    return chainId === ChainId.ALFAJORES
+      ? '0x2AaF20d89277BF024F463749045964D7e7d3A774'
+      : '0x765DE816845861e75A25fCA122bb6898B8B1282a'
+  }
 }
 
 function parseTokenAmountURLParameter(urlParam: any): string {
@@ -558,8 +399,10 @@ function validatedRecipient(recipient: any): string | null {
 }
 
 export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: ChainId): SwapState {
-  let inputCurrency = parseCurrencyFromURLParameter(parsedQs.inputCurrency, chainId)
-  let outputCurrency = parseCurrencyFromURLParameter(parsedQs.outputCurrency, chainId)
+  console.log(parsedQs.inputCurrency, parsedQs.outputCurrency, '33')
+  let inputCurrency = parseCurrencyFromURLParameter(true, parsedQs.inputCurrency, chainId)
+  let outputCurrency = parseCurrencyFromURLParameter(false, parsedQs.outputCurrency, chainId)
+
   if (inputCurrency === outputCurrency) {
     if (typeof parsedQs.outputCurrency === 'string') {
       inputCurrency = ''
