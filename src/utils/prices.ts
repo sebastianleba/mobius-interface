@@ -1,4 +1,5 @@
 import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 
 import {
@@ -37,8 +38,29 @@ export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
   }
   const priceImpact = new Percent(JSBI.subtract(inAmount, outAmount), outAmount)
 
-  // the amount of the input that accrues to LPs
-  const realizedLPFeeAmount = new TokenAmount(trade.input.token, JSBI.BigInt('0'))
+  return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
+}
+
+export function computeMentoTradePriceBreakdown(trade?: MentoTrade | null): {
+  priceImpactWithoutFee: Percent | undefined
+  realizedLPFee: TokenAmount | undefined | null
+} {
+  if (!trade) return {}
+  //todo: issue here
+
+  const inAmount: JSBI = trade.input.raw
+  const outAmount: JSBI = trade.output.raw
+  const reserveIn: JSBI =
+    trade.pool.tokens[0].address === trade.input.currency.address ? trade.pool.balances[0] : trade.pool.balances[1]
+  const reserveOut: JSBI =
+    trade.pool.tokens[0].address === trade.input.currency.address ? trade.pool.balances[1] : trade.pool.balances[0]
+
+  const priceImpact = new Percent(
+    JSBI.subtract(JSBI.multiply(inAmount, reserveOut), JSBI.multiply(outAmount, reserveIn)),
+    JSBI.multiply(outAmount, reserveIn)
+  )
+
+  console.log(priceImpact.toFixed(), 'price')
 
   return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
 }

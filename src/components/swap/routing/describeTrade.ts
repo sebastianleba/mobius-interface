@@ -1,3 +1,4 @@
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 
 export enum RoutingMethod {
@@ -8,7 +9,7 @@ export enum RoutingMethod {
 }
 
 export const describeTrade = (
-  trade: MobiusTrade | undefined
+  trade: MobiusTrade | MentoTrade | undefined
 ): {
   label: string
   makeLabel: (isInverted: boolean) => string

@@ -30,8 +30,8 @@ import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
+import { MentoTrade } from '../../state/mento/hooks'
 import { Field } from '../../state/swap/actions'
-import { MobiusTrade } from '../../state/swap/hooks'
 import {
   useExpertModeManager,
   useIsDarkMode,
@@ -40,7 +40,7 @@ import {
 } from '../../state/user/hooks'
 import { LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
-import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
+import { computeMentoTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import { AppBodyNoBackground } from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 
@@ -108,7 +108,7 @@ export default function Mento() {
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
     showConfirm: boolean
-    tradeToConfirm: MobiusTrade | undefined
+    tradeToConfirm: MentoTrade | undefined
     attemptingTxn: boolean
     swapErrorMessage: string | undefined
     txHash: string | undefined
@@ -150,7 +150,7 @@ export default function Mento() {
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
   // the callback to execute the swap
   const { callback: swapCallback, error: swapCallbackError } = useMentoTradeCallback(trade, allowedSlippage, recipient)
-  const { priceImpactWithoutFee } = computeTradePriceBreakdown(trade)
+  const { priceImpactWithoutFee } = computeMentoTradePriceBreakdown(trade)
 
   const [singleHopOnly] = useUserSingleHopOnly()
 

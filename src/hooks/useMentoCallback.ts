@@ -6,6 +6,7 @@ import { ContractTransaction } from 'ethers'
 import { useMemo } from 'react'
 
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
+import { CELO } from '../constants/tokens'
 import { MentoTrade } from '../state/mento/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { calculateGasMargin, getMentoContract, isAddress, shortenAddress } from '../utils'
@@ -48,7 +49,7 @@ function useSwapCallArguments(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): SwapCall[] {
-  const { address: account, network, kit } = useContractKit()
+  const { address: account, network } = useContractKit()
   const library = useProvider()
   const chainId = network.chainId
 
@@ -64,8 +65,8 @@ function useSwapCallArguments(
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
 
     const swapCallParameters: SwapParameters = {
-      methodName: 'swap',
-      args: [trade.input.raw.toString(), minDy.toString(), deadline.toString()],
+      methodName: 'exchange',
+      args: [trade.input.raw.toString(), minDy.toString(), trade.input.currency === CELO[chainId] ? '1' : '0'],
       value: '0',
     }
     const swapMethods = [swapCallParameters]

@@ -1,5 +1,6 @@
 import { currencyEquals } from '@ubeswap/sdk'
 import React, { useCallback, useMemo } from 'react'
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 
 import TransactionConfirmationModal, {
@@ -38,8 +39,8 @@ export default function ConfirmSwapModal({
   txHash,
 }: {
   isOpen: boolean
-  trade: MobiusTrade | undefined
-  originalTrade: MobiusTrade | undefined
+  trade: MobiusTrade | MentoTrade | undefined
+  originalTrade: MobiusTrade | MentoTrade | undefined
   attemptingTxn: boolean
   txHash: string | undefined
   recipient: string | null
