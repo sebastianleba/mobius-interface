@@ -170,5 +170,5 @@ export function useMobi(): Token | undefined {
 
 export function useVeMobi(): Token | undefined {
   const { chainId } = useActiveContractKit()
-  return new Token(chainId, VOTING_ESCROW, 18)
+  return new Token(chainId, VOTING_ESCROW[chainId], 18)
 }

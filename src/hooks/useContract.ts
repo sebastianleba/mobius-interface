@@ -36,7 +36,7 @@ import {
   Swap,
   VestingEscrow,
   VotingEscrow,
-} from '../generated/index'
+} from '../generated'
 import { getContract } from '../utils'
 import { useActiveContractKit } from './index'
 import { useMobi } from './Tokens'

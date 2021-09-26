@@ -124,8 +124,6 @@ const quote = (amount: TokenAmount, price?: Price) => {
   return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
 }
 
-const useQuote = (price?: Price) => (amount: TokenAmount) => quote(amount, price)
-
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { account, chainId } = useActiveContractKit()
   const {

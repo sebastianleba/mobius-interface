@@ -22,7 +22,7 @@ export default function StakingUpdater() {
         totalVotingPower: JSBI.BigInt(totalVotingPower?.result?.[0] ?? '0'),
         locked: {
           amount: JSBI.BigInt(locked?.result?.amount ?? '0'),
-          end: parseInt(locked?.result?.end.toString()),
+          end: parseInt(locked?.result?.end.toString()) * 1000, // Need unix in milliseconds
         },
       },
     })
