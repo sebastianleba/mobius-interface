@@ -67,7 +67,7 @@ export function computeMentoTradePriceBreakdown(trade?: MentoTrade | null): {
 
 // computes the minimum amount out and maximum amount in for a trade given a user specified allowed slippage in bips
 export function computeSlippageAdjustedAmounts(
-  trade: MobiusTrade | undefined,
+  trade: MobiusTrade | MentoTrade | undefined,
   allowedSlippage: number
 ): { [field in Field]?: TokenAmount } {
   if (!trade) return {}

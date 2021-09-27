@@ -13,7 +13,6 @@ import { Text } from 'rebass'
 import { useDefaultsFromURLSearch, useMentoTradeInfo, useSwapActionHandlers, useSwapState } from 'state/mento/hooks'
 import { ThemeContext } from 'styled-components'
 
-import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonError, ButtonPrimary } from '../../components/Button'
 import Card, { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
@@ -233,7 +232,7 @@ export default function Mento() {
 
   const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
 
-  const { isEstimate, makeLabel } = describeTrade(trade)
+  const { isEstimate, makeLabel } = describeTrade(true)
   const actionLabel = makeLabel(independentField !== Field.INPUT)
 
   return (
@@ -297,20 +296,6 @@ export default function Mento() {
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
             />
-
-            {recipient !== null ? (
-              <>
-                <AutoRow justify="space-between" style={{ padding: '0 1rem' }}>
-                  <ArrowWrapper clickable={false}>
-                    <ArrowDown size="16" color={theme.text2} />
-                  </ArrowWrapper>
-                  <LinkStyledButton id="remove-recipient-button" onClick={() => onChangeRecipient(null)}>
-                    - Remove send
-                  </LinkStyledButton>
-                </AutoRow>
-                <AddressInputPanel id="recipient" value={recipient} onChange={onChangeRecipient} />
-              </>
-            ) : null}
             <Card padding={'0px'} borderRadius={'20px'}>
               <AutoColumn gap="8px" style={{ padding: '0 16px' }}>
                 {Boolean(trade) && (
@@ -350,7 +335,6 @@ export default function Mento() {
             ) : noRoute && userHasSpecifiedInputOutput ? (
               <GreyCard style={{ textAlign: 'center' }}>
                 <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
-                {singleHopOnly && <TYPE.main mb="4px">Try enabling multi-hop trades.</TYPE.main>}
               </GreyCard>
             ) : showApproveFlow ? (
               <RowBetween>
