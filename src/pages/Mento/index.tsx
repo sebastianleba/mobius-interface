@@ -11,12 +11,13 @@ import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { useDefaultsFromURLSearch, useMentoTradeInfo, useSwapActionHandlers, useSwapState } from 'state/mento/hooks'
-import { ThemeContext } from 'styled-components'
+import styled, { ThemeContext } from 'styled-components'
 
 import { ButtonConfirmed, ButtonError, ButtonPrimary } from '../../components/Button'
 import Card, { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import ProgressSteps from '../../components/ProgressSteps'
@@ -37,11 +38,17 @@ import {
   useUserSingleHopOnly,
   useUserSlippageTolerance,
 } from '../../state/user/hooks'
-import { LinkStyledButton, TYPE } from '../../theme'
+import { ExternalLink, LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeMentoTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import { AppBodyNoBackground } from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
+
+const VoteCard = styled(DataCard)`
+  background: radial-gradient(90% 90% at 50% 5%, #fbcc5c 0%, #35d07f 100%);
+  overflow: hidden;
+  margin-bottom: 2rem;
+`
 
 export default function Mento() {
   const loadedUrlParams = useDefaultsFromURLSearch()
@@ -241,6 +248,28 @@ export default function Mento() {
       <AppBodyNoBackground>
         {/* <SwapHeader title={actionLabel} /> */}
         <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
+          <VoteCard>
+            <CardNoise />
+            <CardSection>
+              <AutoColumn gap="md">
+                <RowBetween>
+                  <TYPE.white fontWeight={600}>Mento Exchange</TYPE.white>
+                </RowBetween>
+                <RowBetween>
+                  <TYPE.white fontSize={14}>{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve.`}</TYPE.white>
+                </RowBetween>
+                <ExternalLink
+                  style={{ color: 'white', textDecoration: 'underline' }}
+                  target="_blank"
+                  href="https://docs.celo.org/celo-codebase/protocol/stability/doto"
+                >
+                  <TYPE.white fontSize={14}>Read more about the Mento exchange</TYPE.white>
+                </ExternalLink>
+              </AutoColumn>
+            </CardSection>
+            <CardNoise />
+          </VoteCard>
+          {/* <img src={MintLogo} /> */}
           <ConfirmSwapModal
             isOpen={showConfirm}
             trade={trade}
