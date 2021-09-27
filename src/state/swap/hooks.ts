@@ -390,7 +390,13 @@ export function useMobiusTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading || inputError) {
+  if (
+    !inputCurrency ||
+    !outputCurrency ||
+    !parsedAmount ||
+    poolsLoading ||
+    JSBI.equal(pool.lpTotalSupply, JSBI.BigInt('0'))
+  ) {
     return {
       currencies,
       currencyBalances,
