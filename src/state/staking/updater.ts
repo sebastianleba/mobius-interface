@@ -4,17 +4,19 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from 'state'
 import { useSingleCallResult } from 'state/multicall/hooks'
 
-import { useVotingEscrowContract } from '../../hooks/useContract'
+import { useGaugeControllerContract, useVotingEscrowContract } from '../../hooks/useContract'
 import { updateStaking } from './actions'
 
 export default function StakingUpdater() {
   const dispatch = useDispatch<AppDispatch>()
   const votingEscrow = useVotingEscrowContract()
+  const controller = useGaugeControllerContract()
   const { account } = useActiveContractKit()
 
   const votingPower = useSingleCallResult(votingEscrow, 'balanceOf(address)', [account ?? undefined])
   const totalVotingPower = useSingleCallResult(votingEscrow, 'totalSupply()')
   const locked = useSingleCallResult(votingEscrow, 'locked', [account ?? undefined])
+  const allocatedPower = useSingleCallResult(controller, 'vote_user_power', [account ?? undefined])
   dispatch(
     updateStaking({
       stakingInfo: {

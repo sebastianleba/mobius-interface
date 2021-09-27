@@ -11,11 +11,13 @@ export type StakingState = {
   votingPower: JSBI
   totalVotingPower: JSBI
   locked?: VoteLock
+  voteWeightLeft?: JSBI
 }
 
 const initialState: StakingState = {
   votingPower: JSBI.BigInt(0),
   totalVotingPower: JSBI.BigInt(0),
+  voteWeightLeft: JSBI.BigInt(0),
 }
 
 export default createReducer<StakingState>(initialState, (builder) =>
