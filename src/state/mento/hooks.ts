@@ -144,14 +144,17 @@ function calcInputOutput(
       ? [poolInfo.balances[0], poolInfo.balances[1]]
       : [poolInfo.balances[1], poolInfo.balances[0]]
 
+  console.log('swapFee', poolInfo.swapFee.toString())
+  const swapFee = JSBI.divide(poolInfo.swapFee, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18)))
+
   if (isExactIn) {
     details[0] = parsedAmount
-    const [expectedOut, fee] = math.getAmountOut(parsedAmount.raw, balanceIn, balanceOut)
+    const [expectedOut, fee] = math.getAmountOut(parsedAmount.raw, balanceIn, balanceOut, swapFee)
     details[1] = new TokenAmount(output, expectedOut)
     details[2] = new TokenAmount(input, fee)
   } else {
     details[1] = parsedAmount
-    const [requiredIn, fee] = math.getAmountIn(parsedAmount.raw, balanceIn, balanceOut)
+    const [requiredIn, fee] = math.getAmountIn(parsedAmount.raw, balanceIn, balanceOut, swapFee)
     details[0] = new TokenAmount(input, requiredIn)
     details[2] = new TokenAmount(input, fee)
   }

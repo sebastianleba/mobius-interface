@@ -4,6 +4,7 @@ import { MentoPool } from 'state/mentoPools/reducer'
 const ZERO = JSBI.BigInt(0)
 const ONE = JSBI.BigInt(1)
 const TWO = JSBI.BigInt(2)
+const big = JSBI.BigInt(1000000)
 export class MentoMath {
   public swapFee: JSBI
   public balances: JSBI[]
@@ -19,18 +20,22 @@ export class MentoMath {
     this.balances = balances
   }
 
-  getAmountIn(outAmount: JSBI, bucketIn: JSBI, bucketOut: JSBI): [JSBI, JSBI] {
-    const numerator = JSBI.multiply(JSBI.multiply(outAmount, bucketIn), JSBI.BigInt(1000))
-    const denominator = JSBI.multiply(JSBI.subtract(bucketOut, outAmount), JSBI.BigInt(997))
-    const amountIn = JSBI.add(JSBI.divide(numerator, denominator), JSBI.BigInt(1))
-    return [amountIn, JSBI.BigInt(0)]
+  getAmountIn(outAmount: JSBI, bucketIn: JSBI, bucketOut: JSBI, swapFee: JSBI): [JSBI, JSBI] {
+    const feeMult = JSBI.subtract(big, swapFee)
+    const numerator = JSBI.multiply(JSBI.multiply(outAmount, bucketIn), big)
+    const denominator = JSBI.multiply(JSBI.subtract(bucketOut, outAmount), feeMult)
+    const amountIn = JSBI.add(JSBI.divide(numerator, denominator), ONE)
+    const fee = JSBI.divide(JSBI.multiply(feeMult, amountIn), big)
+    return [amountIn, fee]
   }
 
-  getAmountOut(inAmount: JSBI, bucketIn: JSBI, bucketOut: JSBI): [JSBI, JSBI] {
-    const amountInWithFee = JSBI.multiply(inAmount, JSBI.BigInt(997))
+  getAmountOut(inAmount: JSBI, bucketIn: JSBI, bucketOut: JSBI, swapFee: JSBI): [JSBI, JSBI] {
+    const feeMult = JSBI.subtract(big, swapFee)
+    const amountInWithFee = JSBI.multiply(inAmount, feeMult)
     const numerator = JSBI.multiply(amountInWithFee, bucketOut)
-    const denominator = JSBI.add(JSBI.multiply(bucketIn, JSBI.BigInt(1000)), amountInWithFee)
+    const denominator = JSBI.add(JSBI.multiply(bucketIn, big), amountInWithFee)
     const amountOut = JSBI.divide(numerator, denominator)
-    return [amountOut, JSBI.BigInt(0)]
+    const fee = JSBI.divide(JSBI.subtract(JSBI.multiply(inAmount, feeMult), amountInWithFee), big)
+    return [amountOut, fee]
   }
 }

@@ -60,8 +60,6 @@ export function computeMentoTradePriceBreakdown(trade?: MentoTrade | null): {
     JSBI.multiply(outAmount, reserveIn)
   )
 
-  console.log(priceImpact.toFixed(), 'price')
-
   return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
 }
 
