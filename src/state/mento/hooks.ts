@@ -126,7 +126,6 @@ function calcInputOutput(
   if (!input && !output) {
     return [undefined, undefined, undefined]
   }
-  const { tokens } = poolInfo
   if (!output) {
     return [parsedAmount, undefined, undefined]
   }
@@ -224,7 +223,7 @@ export function useMentoTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading || inputError) {
+  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading) {
     return {
       currencies,
       currencyBalances,
