@@ -71,7 +71,7 @@ export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProp
       const dateAsUnix = date.valueOf() / MILLISECONDS_PER_SECOND
       const resp = await doTransaction(veMobiContract, 'create_lock', {
         args: [selectedAmount.raw.toString(), dateAsUnix.toFixed()],
-        summary: `Lock ${selectedAmount.toExact()} MOBI until ${date?.toLocaleDateString}`,
+        summary: `Lock ${selectedAmount.toExact()} MOBI until ${date?.toLocaleDateString()}`,
       }).catch((error: any) => {
         setAttempting(false)
         throw error

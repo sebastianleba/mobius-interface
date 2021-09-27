@@ -105,7 +105,7 @@ export default function Staking() {
       <Divider />
       <PositionsContainer>
         <Stake stakingInfo={stakingInfo} />
-        <Positions stakingInfo={stakingInfo} />
+        <Positions stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
         {/* <DoublePieChart
           width={Math.min((width ?? 600) * 0.95, 600)}
           height={Math.min((width ?? 600) * 0.95, 600)}

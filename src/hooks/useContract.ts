@@ -1,7 +1,10 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
-import { ChainId } from '@ubeswap/sdk'
-import { MOBIUS_MINTER_ADDRESS, VOTING_ESCROW as VOTING_ESCROW_ADDRESS } from 'constants/StablePools'
+import {
+  GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS,
+  MOBIUS_MINTER_ADDRESS,
+  VOTING_ESCROW as VOTING_ESCROW_ADDRESS,
+} from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
@@ -93,10 +96,7 @@ export function useVotingEscrowContract(address?: string, withSignerIfPossible?:
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
   const { chainId } = useActiveContractKit()
-  const fallBackAddress =
-    chainId === ChainId.MAINNET
-      ? '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25'
-      : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
+  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[chainId]
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 

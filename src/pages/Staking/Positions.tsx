@@ -1,15 +1,18 @@
+import { TokenAmount } from '@ubeswap/sdk'
 import { ButtonOutlined } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardNoise } from 'components/earn/styled'
 import Loader from 'components/Loader'
-import { AutoRow, RowBetween } from 'components/Row'
+import { AutoRow, RowBetween, RowFixed } from 'components/Row'
 import { useColor } from 'hooks/useColor'
 import React, { useState } from 'react'
+import { usePriceOfLp } from 'state/stablePools/hooks'
 import { GaugeSummary, MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 
 import ClaimAllMobiModal from './ClaimAllMobiModal'
+import GaugeVoteModal from './GaugeVoteModal'
 
 const Container = styled.div`
   width: 49%;
@@ -28,13 +31,15 @@ const SmallButton = styled(ButtonOutlined)`
   width: 8rem;
   border-color: ${({ theme }) => theme.primary1};
 `
-const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
+const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any; activated: boolean }>`
   border-radius: 12px;
   width: 100%;
   overflow: hidden;
   position: relative;
   margin-bottom: 1rem;
   padding: 1rem;
+  cursor: pointer;
+  opacity: ${({ activated }) => (activated ? 1 : 0.9)};
   overflow: hidden;
   position: relative;
   background: ${({ bgColor, theme }) =>
@@ -46,19 +51,23 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
     0px 24px 32px rgba(0, 0, 0, 0.01);`}
   ${({ theme }) => theme.mediaWidth.upToSmall`
 `}
+  &:hover {
+    opacity: 1;
+  }
 `
-const Divider = styled.div`
+const Divider = styled.div<{ bg?: string }>`
   width: 100%;
   height: 1px;
-  background: ${({ theme }) => theme.primary1};
+  background: ${({ theme, bg }) => (bg ? bg : theme.primary1)};
   margin-top: 0.25rem;
   margin-bottom: 1.5rem;
 `
 
 type PositionsProps = {
   stakingInfo: MobiStakingInfo
+  unclaimedMobi: TokenAmount
 }
-export default function Positions({ stakingInfo }: PositionsProps) {
+export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps) {
   const { positions = [] } = stakingInfo
   const loading = positions.length === 0
   const greaterThanZero = positions.filter(({ baseBalance }) => baseBalance.greaterThan('0'))
@@ -67,8 +76,11 @@ export default function Positions({ stakingInfo }: PositionsProps) {
     <Container>
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
       <RowBetween>
-        <TYPE.largeHeader>Your Unclaimed Mobi</TYPE.largeHeader>
-        <SmallButton onClick={() => setOpenModal(true)}>Claim All</SmallButton>
+        <TYPE.largeHeader>Your Positions</TYPE.largeHeader>
+        <SmallButton onClick={() => setOpenModal(true)}>Claim MOBI</SmallButton>
+      </RowBetween>
+      <RowBetween>
+        <TYPE.subHeader>{unclaimedMobi.toSignificant(4)} Unclaimed MOBI</TYPE.subHeader>
       </RowBetween>
       <Divider />
       {loading ? (
@@ -93,15 +105,36 @@ const ButtonGroup = styled.div`
 
 function PositionCard({ position }: { position: GaugeSummary }) {
   const backgroundColor = useColor(position.firstToken)
+  const lpAsUsd = usePriceOfLp(position.pool, position.baseBalance)
+  const [showMore, setShowMore] = useState(false)
+  const [voteModalOpen, setVoteModalOpen] = useState(false)
 
   return (
     <>
-      <Wrapper showBackground={true} bgColor={backgroundColor}>
+      <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
+
+      <Wrapper
+        activated={showMore}
+        showBackground={true}
+        bgColor={backgroundColor}
+        onClick={() => setShowMore(!showMore)}
+      >
         <CardNoise />
         <RowBetween>
           <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)}`}</TYPE.white>
+          <TYPE.white color="white">{`$${lpAsUsd?.toSignificant(4)} Staked`}</TYPE.white>
         </RowBetween>
+        {showMore && (
+          <>
+            <Divider bg="grey" />
+            <RowFixed>
+              <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} Unclaimed MOBI`}</TYPE.white>
+            </RowFixed>
+            <ButtonOutlined width="50%" marginLeft="auto" onClick={() => setVoteModalOpen(true)}>
+              Vote for Gauge Weight
+            </ButtonOutlined>
+          </>
+        )}
       </Wrapper>
     </>
   )

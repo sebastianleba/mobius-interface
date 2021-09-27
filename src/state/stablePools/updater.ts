@@ -220,6 +220,12 @@ export default function BatchUpdatePools(): null {
           JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
         )
 
+        console.log({
+          mobiRate,
+          weight,
+          weights,
+        })
+
         const collectedData: StableSwapPool = {
           ...poolInfo,
           virtualPrice,
