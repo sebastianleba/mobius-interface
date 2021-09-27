@@ -4,7 +4,7 @@ import { Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
-import { MOBI_TOKEN, STATIC_POOL_INFO } from '../constants/StablePools'
+import { MENTO_POOL_INFO, MOBI_TOKEN, STATIC_POOL_INFO } from '../constants/StablePools'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { isAddress } from '../utils'
 import { TokenAddressMap } from './../state/lists/hooks'
@@ -14,7 +14,6 @@ import { useBytes32TokenContract, useTokenContract } from './useContract'
 // reduce token map into standard address <-> Token mapping, optionally include user added tokens
 function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean): { [address: string]: Token } {
   const { chainId } = useActiveContractKit()
-  console.log(chainId)
 
   return useMemo(() => {
     if (!chainId) return {}
@@ -29,9 +28,9 @@ function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean):
   }, [chainId, tokenMap, includeUserAdded])
 }
 
-export function useSwappableTokens(): { [address: string]: Token } {
+export function useSwappableTokens(mento?: boolean): { [address: string]: Token } {
   const { chainId } = useActiveContractKit()
-  const pools = STATIC_POOL_INFO[chainId] ?? []
+  const pools = mento ? MENTO_POOL_INFO[chainId] ?? [] : STATIC_POOL_INFO[chainId] ?? []
   const swappableTokens: { [address: string]: Token } = {}
 
   pools
@@ -108,9 +107,9 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
 // undefined if invalid or does not exist
 // null if loading
 // otherwise returns the token
-export function useToken(tokenAddress?: string): Token | undefined | null {
+export function useToken(mento?: boolean, tokenAddress?: string): Token | undefined | null {
   const { chainId } = useActiveContractKit()
-  const tokens = useSwappableTokens()
+  const tokens = useSwappableTokens(mento)
 
   const address = isAddress(tokenAddress)
 
@@ -158,8 +157,8 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
   ])
 }
 
-export function useCurrency(currencyId: string | undefined): Token | null | undefined {
-  const token = useToken(currencyId)
+export function useCurrency(mento: boolean, currencyId: string | undefined): Token | null | undefined {
+  const token = useToken(mento, currencyId)
   return token
 }
 

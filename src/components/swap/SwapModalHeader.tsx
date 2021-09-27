@@ -2,13 +2,19 @@ import { TradeType } from '@ubeswap/sdk'
 import React, { useContext, useMemo } from 'react'
 import { AlertTriangle, ArrowDown } from 'react-feather'
 import { Text } from 'rebass'
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 import { ThemeContext } from 'styled-components'
 
 import { Field } from '../../state/swap/actions'
 import { TYPE } from '../../theme'
 import { isAddress, shortenAddress } from '../../utils'
-import { computeSlippageAdjustedAmounts, computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
+import {
+  computeMentoTradePriceBreakdown,
+  computeSlippageAdjustedAmounts,
+  computeTradePriceBreakdown,
+  warningSeverity,
+} from '../../utils/prices'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyLogo from '../CurrencyLogo'
@@ -22,18 +28,23 @@ export default function SwapModalHeader({
   recipient,
   showAcceptChanges,
   onAcceptChanges,
+  mento,
 }: {
-  trade: MobiusTrade
+  trade: MobiusTrade | MentoTrade
   allowedSlippage: number
   recipient: string | null
   showAcceptChanges: boolean
   onAcceptChanges: () => void
+  mento?: boolean
 }) {
   const slippageAdjustedAmounts = useMemo(
     () => computeSlippageAdjustedAmounts(trade, allowedSlippage),
     [trade, allowedSlippage]
   )
-  const { priceImpactWithoutFee } = useMemo(() => computeTradePriceBreakdown(trade), [trade])
+  const { priceImpactWithoutFee } = useMemo(
+    () => (mento ? computeMentoTradePriceBreakdown(trade) : computeTradePriceBreakdown(trade)),
+    [trade, mento]
+  )
   const priceImpactSeverity = warningSeverity(priceImpactWithoutFee)
 
   const theme = useContext(ThemeContext)

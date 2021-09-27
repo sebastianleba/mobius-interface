@@ -1,5 +1,7 @@
 import { currencyEquals } from '@ubeswap/sdk'
 import React, { useCallback, useMemo } from 'react'
+import { useLocation } from 'react-router'
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 
 import TransactionConfirmationModal, {
@@ -15,7 +17,7 @@ import SwapModalHeader from './SwapModalHeader'
  * @param tradeA trade A
  * @param tradeB trade B
  */
-function tradeMeaningfullyDiffers(tradeA: MobiusTrade, tradeB: MobiusTrade): boolean {
+function tradeMeaningfullyDiffers(tradeA: MobiusTrade | MentoTrade, tradeB: MobiusTrade | MentoTrade): boolean {
   return (
     !currencyEquals(tradeA.input.currency, tradeB.input.currency) ||
     !tradeA.input.equalTo(tradeB.input) ||
@@ -38,8 +40,8 @@ export default function ConfirmSwapModal({
   txHash,
 }: {
   isOpen: boolean
-  trade: MobiusTrade | undefined
-  originalTrade: MobiusTrade | undefined
+  trade: MobiusTrade | MentoTrade | undefined
+  originalTrade: MobiusTrade | MentoTrade | undefined
   attemptingTxn: boolean
   txHash: string | undefined
   recipient: string | null
@@ -53,7 +55,9 @@ export default function ConfirmSwapModal({
     () => Boolean(trade && originalTrade && tradeMeaningfullyDiffers(trade, originalTrade)),
     [originalTrade, trade]
   )
-  const { label } = describeTrade(trade)
+  const location = useLocation()
+  const mento = location.pathname.includes('mint')
+  const { label } = describeTrade(mento)
 
   const modalHeader = useCallback(() => {
     return trade ? (
@@ -63,6 +67,7 @@ export default function ConfirmSwapModal({
         recipient={recipient}
         showAcceptChanges={showAcceptChanges}
         onAcceptChanges={onAcceptChanges}
+        mento={mento}
       />
     ) : null
   }, [allowedSlippage, onAcceptChanges, recipient, showAcceptChanges, trade])
