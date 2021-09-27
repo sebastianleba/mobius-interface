@@ -14,7 +14,6 @@ import { useBytes32TokenContract, useTokenContract } from './useContract'
 // reduce token map into standard address <-> Token mapping, optionally include user added tokens
 function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean): { [address: string]: Token } {
   const { chainId } = useActiveContractKit()
-  console.log(chainId)
 
   return useMemo(() => {
     if (!chainId) return {}

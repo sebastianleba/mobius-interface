@@ -56,7 +56,9 @@ export function computeMentoTradePriceBreakdown(trade?: MentoTrade | null): {
     JSBI.multiply(outAmount, reserveIn)
   )
 
-  return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
+  const fee = new Percent(trade.pool.swapFee, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(24)))
+
+  return { priceImpactWithoutFee: priceImpact.subtract(fee), realizedLPFee: trade.fee }
 }
 
 // computes the minimum amount out and maximum amount in for a trade given a user specified allowed slippage in bips

@@ -144,7 +144,6 @@ function calcInputOutput(
       ? [poolInfo.balances[0], poolInfo.balances[1]]
       : [poolInfo.balances[1], poolInfo.balances[0]]
 
-  console.log('swapFee', poolInfo.swapFee.toString())
   const swapFee = JSBI.divide(poolInfo.swapFee, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18)))
 
   if (isExactIn) {
@@ -182,9 +181,7 @@ export function useMentoTradeInfo(): {
   const recipientLookup = useENS(recipient ?? undefined)
   const pools = usePools()
   const poolsLoading = pools.length === 0
-  console.log('inputC', inputCurrency?.address, outputCurrency?.address)
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
-  console.log(pool, 'hehehe')
   const mathUtil = useMathUtil(pool)
 
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
