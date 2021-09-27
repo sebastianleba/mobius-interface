@@ -128,7 +128,7 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
           Airdrop
         </StyledNavLink>
-        <StyledExternalLink id="bridge-nav-link-hamburger" href="https://bridge.mobius.money/#/">
+        <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
           Bridge
         </StyledExternalLink>
       </LinkContainer>

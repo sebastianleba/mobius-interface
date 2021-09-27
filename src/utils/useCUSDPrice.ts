@@ -32,12 +32,12 @@ export default function useCUSDPrice(token?: Token): Price | undefined {
       return new Price(CUSD, CUSD, '1', '1')
     }
 
-    if (cUSDPair) {
-      return cUSDPair.priceOf(token)
-    }
-
     if (celoPair && celoCUSDPair) {
       return celoPair.priceOf(token).multiply(celoCUSDPair.priceOf(celo))
+    }
+
+    if (cUSDPair) {
+      return cUSDPair.priceOf(token)
     }
 
     return undefined

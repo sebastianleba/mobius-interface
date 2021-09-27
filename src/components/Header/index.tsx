@@ -339,7 +339,7 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
                 Airdrop
               </StyledNavLink>
-              <StyledExternalLink id="bridge-nav-link" href="https://bridge.mobius.money/#/">
+              <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
                 Bridge
               </StyledExternalLink>
             </>
