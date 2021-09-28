@@ -347,7 +347,6 @@ export default function Header() {
       <HeaderControls>
         <HeaderElement>
           {aggregateBalance && (
-            // <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
             <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (

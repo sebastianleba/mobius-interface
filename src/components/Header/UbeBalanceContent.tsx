@@ -1,4 +1,4 @@
-import { ChainId, TokenAmount } from '@ubeswap/sdk'
+import { ChainId } from '@ubeswap/sdk'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { X } from 'react-feather'
@@ -7,15 +7,12 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 
 import tokenLogo from '../../assets/images/MOBI-200.png'
 import { UBE } from '../../constants'
-import { useTotalSupply } from '../../data/TotalSupply'
 import { useActiveContractKit } from '../../hooks'
-import { useTotalUbeEarned } from '../../state/stake/hooks'
-import { useAggregateUbeBalance, useTokenBalance } from '../../state/wallet/hooks'
+import { useAggregateUbeBalance } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE, UbeTokenAnimated } from '../../theme'
 import { AutoColumn } from '../Column'
 import { Break, CardNoise, CardSection, DataCard } from '../earn/styled'
 import { RowBetween } from '../Row'
-import { useCirculatingSupply } from './useCirculatingSupply'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -45,12 +42,13 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
   const ube = chainId ? UBE[chainId] : undefined
 
   const total = useAggregateUbeBalance()
-  const ubeBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, ube)
-  const ubeToClaim: TokenAmount | undefined = useTotalUbeEarned()
+  // const ubeBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, ube)
+  // const ubeToClaim: TokenAmount | undefined = useTotalUbeEarned()
 
-  const totalSupply: TokenAmount | undefined = useTotalSupply(ube)
-  const mobiprice = useCUSDPrice(useMobi())
-  const circulation = useCirculatingSupply()
+  // const totalSupply: TokenAmount | undefined = useTotalSupply(ube)
+  const mobi = useMobi()
+  const mobiprice = useCUSDPrice(mobi)
+  // const circulation = useCirculatingSupply()
 
   return (
     <ContentWrapper gap="lg">
@@ -108,12 +106,12 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
               <TYPE.white color="white">1,000,000,000</TYPE.white>
             </RowBetween>
             {ube && ube.chainId === ChainId.MAINNET ? (
-              <ExternalLink href={`https://info.ubeswap.org/token/${ube.address}`}>View MOBI Analytics</ExternalLink>
+              <ExternalLink href={`https://info.ubeswap.org/token/${ube.address}`}>
+                View MOBI Analytics on Ubeswap
+              </ExternalLink>
             ) : null}
             {ube && ube.chainId === ChainId.MAINNET ? (
-              <ExternalLink href={`https://www.coingecko.com/en/coins/mobius-money`}>
-                View MOBI on CoinGecko
-              </ExternalLink>
+              <ExternalLink href={`https://nomics.com/assets/mobi3-mobius-money`}>View MOBI on Nomics</ExternalLink>
             ) : null}
           </AutoColumn>
         </CardSection>
