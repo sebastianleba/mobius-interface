@@ -130,9 +130,6 @@ function PositionCard({ position }: { position: GaugeSummary }) {
             <RowFixed>
               <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} Unclaimed MOBI`}</TYPE.white>
             </RowFixed>
-            <ButtonOutlined width="50%" marginLeft="auto" onClick={() => setVoteModalOpen(true)}>
-              Vote for Gauge Weight
-            </ButtonOutlined>
           </>
         )}
       </Wrapper>

@@ -8,6 +8,7 @@ import styled from 'styled-components'
 
 import GradientTextBox from '../../components/Visx/GradientTextBox'
 import { getAllUnclaimedMobi } from './ClaimAllMobiModal'
+import GaugeWeights from './GaugeWeights'
 import Positions from './Positions'
 import Stake from './Stake'
 
@@ -113,6 +114,7 @@ export default function Staking() {
           outerChartData={outerPieData}
         /> */}
       </PositionsContainer>
+      <GaugeWeights summaries={stakingInfo.positions ?? []} />
     </OuterContainer>
   )
 }

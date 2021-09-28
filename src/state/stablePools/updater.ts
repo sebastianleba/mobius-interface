@@ -1,5 +1,5 @@
 import { Interface } from '@ethersproject/abi'
-import { JSBI, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { useEffect, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
@@ -235,6 +235,7 @@ export default function BatchUpdatePools(): null {
           lpOwned,
           aPrecise,
           feesGenerated: fees,
+          poolWeight: new Percent(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
           staking: {
             userStaked: lpStaked,
             pendingMobi,

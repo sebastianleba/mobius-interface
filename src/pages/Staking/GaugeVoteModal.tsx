@@ -56,7 +56,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
         .vote_for_gauge_weights(summary.address, input * 100, { gasLimit: 350000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Claim accumulated MOBI rewards`,
+            summary: `Voted for ${summary.pool} to receive ${input}% of MOBI inflation`,
           })
           setHash(response.hash)
         })
@@ -77,7 +77,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
       {!attempting && !hash && (
         <ContentWrapper gap="lg">
           <RowBetween>
-            <TYPE.mediumHeader>Vote for Pool Weights</TYPE.mediumHeader>
+            <TYPE.mediumHeader>Vote for {summary.pool}</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
           <RowFixed>

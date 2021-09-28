@@ -1,4 +1,4 @@
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
 import { useMobi, useVeMobi } from 'hooks/Tokens'
 import { useSelector } from 'react-redux'
 import { AppState } from 'state'
@@ -16,6 +16,7 @@ export type GaugeSummary = {
   totalStaked: TokenAmount
   unclaimedMobi: TokenAmount
   firstToken: Token
+  currentWeight: Percent
 }
 
 export type MobiStakingInfo = {
@@ -77,6 +78,7 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     ),
     unclaimedMobi: new TokenAmount(mobi, pool.staking?.pendingMobi ?? '0'),
     firstToken: pool.tokens[0],
+    currentWeight: pool.poolWeight,
   }))
   return {
     ...baseInfo,
