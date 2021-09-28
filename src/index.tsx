@@ -10,6 +10,7 @@ import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
+import { UpdateMento } from 'state/mentoPools/updater'
 import UpdatePools from 'state/stablePools/updater'
 
 import mobiusIcon from './assets/svg/mobius.svg'
@@ -55,6 +56,7 @@ function Updaters() {
       <TransactionUpdater />
       <MulticallUpdater />
       <UpdatePools />
+      <UpdateMento />
     </>
   )
 }

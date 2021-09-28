@@ -1,4 +1,5 @@
 import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 
 import {
@@ -9,10 +10,6 @@ import {
 } from '../constants'
 import { Field } from '../state/swap/actions'
 import { basisPointsToPercent } from './index'
-
-const BASE_FEE = new Percent(JSBI.BigInt(30), JSBI.BigInt(10000))
-const ONE_HUNDRED_PERCENT = new Percent(JSBI.BigInt(10000), JSBI.BigInt(10000))
-const INPUT_FRACTION_AFTER_FEE = ONE_HUNDRED_PERCENT.subtract(BASE_FEE)
 
 // computes price breakdown for the trade
 export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
@@ -37,15 +34,36 @@ export function computeTradePriceBreakdown(trade?: MobiusTrade | null): {
   }
   const priceImpact = new Percent(JSBI.subtract(inAmount, outAmount), outAmount)
 
-  // the amount of the input that accrues to LPs
-  const realizedLPFeeAmount = new TokenAmount(trade.input.token, JSBI.BigInt('0'))
-
   return { priceImpactWithoutFee: priceImpact, realizedLPFee: trade.fee }
+}
+
+export function computeMentoTradePriceBreakdown(trade?: MentoTrade | null): {
+  priceImpactWithoutFee: Percent | undefined
+  realizedLPFee: TokenAmount | undefined | null
+} {
+  if (!trade) return {}
+  //todo: issue here
+
+  const inAmount: JSBI = trade.input.raw
+  const outAmount: JSBI = trade.output.raw
+  const reserveIn: JSBI =
+    trade.pool.tokens[0].address === trade.input.currency.address ? trade.pool.balances[0] : trade.pool.balances[1]
+  const reserveOut: JSBI =
+    trade.pool.tokens[0].address === trade.input.currency.address ? trade.pool.balances[1] : trade.pool.balances[0]
+
+  const priceImpact = new Percent(
+    JSBI.subtract(JSBI.multiply(inAmount, reserveOut), JSBI.multiply(outAmount, reserveIn)),
+    JSBI.multiply(outAmount, reserveIn)
+  )
+
+  const fee = new Percent(trade.pool.swapFee, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(24)))
+
+  return { priceImpactWithoutFee: priceImpact.subtract(fee), realizedLPFee: trade.fee }
 }
 
 // computes the minimum amount out and maximum amount in for a trade given a user specified allowed slippage in bips
 export function computeSlippageAdjustedAmounts(
-  trade: MobiusTrade | undefined,
+  trade: MobiusTrade | MentoTrade | undefined,
   allowedSlippage: number
 ): { [field in Field]?: TokenAmount } {
   if (!trade) return {}

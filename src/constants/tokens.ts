@@ -24,6 +24,17 @@ export const UBE = makeTokens(
   'Mobius DAO Token'
 )
 
+export const CELO = makeTokens(
+  {
+    [ChainId.MAINNET]: '0x471EcE3750Da237f93B8E339c536989b8978a438',
+    [ChainId.ALFAJORES]: '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9',
+    [ChainId.BAKLAVA]: '0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9',
+  },
+  18,
+  'CELO',
+  'Celo native asset'
+)
+
 export const USD_LP = makeTokens(
   {
     [ChainId.MAINNET]: '0x751c70e8f062071bDE19597e2766a5078709FCb9',

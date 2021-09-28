@@ -1,5 +1,3 @@
-import { MobiusTrade } from 'state/swap/hooks'
-
 export enum RoutingMethod {
   UBESWAP = 0,
   MOOLA = 1,
@@ -8,17 +6,21 @@ export enum RoutingMethod {
 }
 
 export const describeTrade = (
-  trade: MobiusTrade | undefined
+  mento?: boolean
 ): {
   label: string
   makeLabel: (isInverted: boolean) => string
   routingMethod: RoutingMethod
   isEstimate: boolean
 } => {
+  let label = 'Swap'
+  if (mento) {
+    label = 'Mint'
+  }
   return {
-    label: 'Swap',
+    label: label,
     routingMethod: RoutingMethod.MOBIUS,
     isEstimate: true,
-    makeLabel: () => 'Swap',
+    makeLabel: () => label,
   }
 }

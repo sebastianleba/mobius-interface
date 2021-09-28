@@ -6,6 +6,8 @@ import burn from './burn/reducer'
 import claim from './claim/reducer'
 import { updateVersion } from './global/actions'
 import lists from './lists/reducer'
+import mento from './mento/reducer'
+import mentoPools from './mentoPools/reducer'
 import mint from './mint/reducer'
 import multicall from './multicall/reducer'
 import stablePools from './stablePools/reducer'
@@ -26,6 +28,8 @@ const store = configureStore({
     multicall,
     lists,
     stablePools,
+    mentoPools,
+    mento,
     claim,
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_KEYS })],

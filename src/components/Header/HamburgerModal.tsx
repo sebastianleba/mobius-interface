@@ -103,7 +103,10 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         </RowBetween>
         <Divider />
         <StyledNavLink id={`swap-nav-link`} to={'/swap'} onClick={onDismiss}>
-          {t('swap')}
+          {t('Swap')}
+        </StyledNavLink>
+        <StyledNavLink id={`mint-nav-link`} to={'/mint'} onClick={onDismiss}>
+          {t('Mint')}
         </StyledNavLink>
         <StyledNavLink
           id={`pool-nav-link`}

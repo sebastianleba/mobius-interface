@@ -46,8 +46,8 @@ export default function AddLiquidity({
   const { account, chainId, library } = useActiveContractKit()
   const theme = useContext(ThemeContext)
 
-  const currencyA = useCurrency(currencyIdA)
-  const currencyB = useCurrency(currencyIdB)
+  const currencyA = useCurrency(false, currencyIdA)
+  const currencyB = useCurrency(false, currencyIdB)
 
   const toggleWalletModal = useWalletModalToggle() // toggle wallet when disconnected
 
