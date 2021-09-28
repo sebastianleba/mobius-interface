@@ -382,17 +382,15 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton size={20} onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
-          {darkMode ? '🌉' : '🌁'}
-        </StyledMenuButton>
+        <RowFixed>
+          <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+            {darkMode ? '🌉' : '🌁'}
+          </StyledMenuButton>
 
-        <HeaderElementWrap>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
-
-          {/* <Menu /> */}
-        </HeaderElementWrap>
+        </RowFixed>
       </HeaderControls>
     </HeaderFrame>
   )
@@ -408,6 +406,7 @@ const UBEAmount = styled(AccountElement)`
 `
 
 const UBEWrapper = styled.span`
+  margin-left: 8px;
   width: fit-content;
   position: relative;
   cursor: pointer;
