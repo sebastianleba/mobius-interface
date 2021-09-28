@@ -27,6 +27,7 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>
     0px 24px 32px rgba(0, 0, 0, 0.01);`}
   ${({ theme }) => theme.mediaWidth.upToSmall`
 `}
+margin-top: 1rem;
 `
 const WrappedRow = styled.div`
   display: flex;
@@ -130,9 +131,6 @@ const PositionWrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: a
   }
   @media (min-width: 800px) {
     width: 49%;
-  }
-  @media (min-width: 1200px) {
-    width: 30%;
   }
 `
 
