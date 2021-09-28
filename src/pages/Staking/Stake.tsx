@@ -6,7 +6,7 @@ import { MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 
-import LockModal from './LockModal'
+import LockModal, { LockType } from './LockModal'
 
 const Container = styled.div`
   width: 49%;
@@ -54,11 +54,11 @@ type PropTypes = {
 }
 export default function Stake({ stakingInfo }: PropTypes) {
   const { mobiLocked, lockEnd } = stakingInfo
-  const [openLockModal, setOpenLockModal] = useState(false)
+  const [lockType, setLockType] = useState(-1)
 
   return (
     <Container>
-      <LockModal isOpen={openLockModal} onDismiss={() => setOpenLockModal(false)} />
+      <LockModal isOpen={lockType > -1} onDismiss={() => setLockType(-1)} lockType={lockType} />
       {mobiLocked && mobiLocked.greaterThan('0') ? (
         <Wrapper>
           <RowBetween marginBottom="1rem">
@@ -66,7 +66,7 @@ export default function Stake({ stakingInfo }: PropTypes) {
             <RowFixed width="33%">
               <TYPE.mediumHeader>{mobiLocked.toFixed(2)}</TYPE.mediumHeader>
               <div style={{ marginLeft: '1rem' }}>
-                <SmallButton>Lock More</SmallButton>
+                <SmallButton onClick={() => setLockType(LockType.increase)}>Lock More</SmallButton>
               </div>
             </RowFixed>
           </RowBetween>
@@ -75,7 +75,7 @@ export default function Stake({ stakingInfo }: PropTypes) {
             <RowFixed width="33%">
               <TYPE.mediumHeader>{lockEnd?.toLocaleDateString() ?? '--'}</TYPE.mediumHeader>
               <div style={{ marginLeft: '1rem' }}>
-                <SmallButton>Extend</SmallButton>
+                <SmallButton onClick={() => setLockType(LockType.extend)}>Extend</SmallButton>
               </div>
             </RowFixed>
           </RowBetween>
@@ -90,7 +90,7 @@ export default function Stake({ stakingInfo }: PropTypes) {
           <RowBetween marginBottom="1rem">
             <TYPE.mediumHeader fontSize={[16, 24]}>You currently do not have any locked MOBI</TYPE.mediumHeader>
           </RowBetween>
-          <ButtonPrimary onClick={() => setOpenLockModal(true)}>Lock MOBI</ButtonPrimary>
+          <ButtonPrimary onClick={() => setLockType(LockType.initial)}>Lock MOBI</ButtonPrimary>
         </Wrapper>
       )}
     </Container>

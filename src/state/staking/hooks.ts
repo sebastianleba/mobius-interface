@@ -113,3 +113,8 @@ export function usePriceOfDeposits() {
     }, JSBI.BigInt('0'))
   )
 }
+
+export function useLockEnd(): number {
+  const lockEnd = useSelector<AppState, number>((state) => state.staking?.locked?.end ?? 0)
+  return lockEnd
+}

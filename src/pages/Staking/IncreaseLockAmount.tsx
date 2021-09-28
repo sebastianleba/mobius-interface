@@ -8,7 +8,6 @@ import { AutoRow, RowBetween } from 'components/Row'
 import { useMobi } from 'hooks/Tokens'
 import { useDoTransaction } from 'hooks/useDoTransaction'
 import React, { useState } from 'react'
-import { Calendar } from 'react-date-range'
 import { Text } from 'rebass'
 import { useIsDarkMode } from 'state/user/hooks'
 import { useCurrencyBalance } from 'state/wallet/hooks'
@@ -22,34 +21,25 @@ import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useVotingEscrowContract } from '../../hooks/useContract'
 import { tryParseAmount } from '../../state/swap/hooks'
-import { useTransactionAdder } from '../../state/transactions/hooks'
 import { TYPE } from '../../theme'
 
 const MILLISECONDS_PER_SECOND = 1000
 const SECONDS_PER_WEEK = 604800
-interface WithdrawModalProps {
+interface IncreaseLockAmountProps {
   setAttempting: (attempting: boolean) => void
   setHash: (hash: string | undefined) => void
 }
 
-export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProps) {
+export default function IncreaseLockAmount({ setHash, setAttempting }: IncreaseLockAmountProps) {
   const { library, account } = useActiveContractKit()
 
   // monitor call to help UI loading state
-  const addTransaction = useTransactionAdder()
   const mobi = useMobi()
   const balance = useCurrencyBalance(account, mobi)
   const [approving, setApproving] = useState(false)
   const [input, setInput] = useState<string>('')
   const selectedAmount = tryParseAmount(input, mobi) || new TokenAmount(mobi, '0')
-  const [date, setDate] = useState<Date>()
   const isDarkMode = useIsDarkMode()
-  const roundedDate = date
-    ? new Date(
-        Math.floor(date?.valueOf() / (MILLISECONDS_PER_SECOND * SECONDS_PER_WEEK)) *
-          (MILLISECONDS_PER_SECOND * SECONDS_PER_WEEK)
-      )
-    : undefined
   const doTransaction = useDoTransaction()
 
   const veMobiContract = useVotingEscrowContract()
@@ -60,30 +50,17 @@ export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProp
     approval === ApprovalState.PENDING ||
     (approving && approval === ApprovalState.APPROVED)
   async function onLock() {
-    if (veMobiContract && date && selectedAmount) {
+    if (veMobiContract && selectedAmount) {
       setAttempting(true)
-      const dateAsUnix = date.valueOf() / MILLISECONDS_PER_SECOND
-      const resp = await doTransaction(veMobiContract, 'create_lock', {
-        args: [selectedAmount.raw.toString(), dateAsUnix.toFixed()],
-        summary: `Lock ${selectedAmount.toExact()} MOBI until ${date?.toLocaleDateString()}`,
+      const resp = await doTransaction(veMobiContract, 'increase_amount', {
+        args: [selectedAmount.raw.toString()],
+        summary: `Increase lock by ${selectedAmount.toExact()} MOBI`,
       }).catch((error: any) => {
         setAttempting(false)
         throw error
       })
       setHash(resp.hash)
       setAttempting(false)
-      // await veMobiContract
-      //   .create_lock(selectedAmount.raw.toString(), dateAsUnix.toFixed(0))
-      //   .then((response: TransactionResponse) => {
-      //     addTransaction(response, {
-      //       summary: `Lock ${selectedAmount.toExact()} MOBI until ${date?.toLocaleDateString}`,
-      //     })
-      //     setHash(response.hash)
-      //   })
-      //   .catch((error: any) => {
-      //     setAttempting(false)
-      //     console.log(error)
-      //   })
     }
   }
 
@@ -100,19 +77,14 @@ export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProp
     error = error ?? 'Insufficient Funds'
   }
 
-  if (!roundedDate || roundedDate.getTime() < Date.now()) {
-    error = error ?? 'Choose a Date in the Future'
-  }
-
   return (
     <>
+      <TYPE.mediumHeader marginBottom={0}>Select Additional Mobi</TYPE.mediumHeader>
       <CurrencyRow val={input} token={mobi} balance={balance} setTokenAmount={setInput} />
-      <TYPE.mediumHeader marginBottom={0}>Set Lock Date</TYPE.mediumHeader>
       <TYPE.subHeader marginTop={-20} color="red">
-        You will be unable to withdraw your locked MOBI until this date. This date will be rounded down to the nearest
-        Thursday 00:00:00 GTM 0
+        You will be unable to withdraw this additional MOBI until your lock date is reached.
       </TYPE.subHeader>
-      <Calendar date={roundedDate} onChange={setDate} />
+
       {showApproveFlow ? (
         <RowBetween>
           <ButtonConfirmed
@@ -143,14 +115,14 @@ export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProp
             error={!!error}
           >
             <Text fontSize={16} fontWeight={500}>
-              {error ? error : `Lock until ${roundedDate?.toLocaleDateString()}`}
+              {error ? error : `Increase Lock`}
             </Text>
           </ButtonError>
         </RowBetween>
       ) : (
         <ButtonError onClick={onLock} id="lock-button" disabled={!!error} error={!!error}>
           <Text fontSize={20} fontWeight={500} color={!error && (isDarkMode ? 'black' : 'white')}>
-            {error ? error : `Lock until ${roundedDate?.toLocaleDateString()}`}
+            {error ? error : `Increase Lock`}
           </Text>
         </ButtonError>
       )}

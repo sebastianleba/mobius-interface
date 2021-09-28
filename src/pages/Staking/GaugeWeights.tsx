@@ -46,6 +46,7 @@ interface GaugeWeightsProps {
   summaries: GaugeSummary[]
 }
 
+// TO DO: Account for Vote Power Allocations
 export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const data = summaries.map((summary) => ({
     label: summary.pool,
