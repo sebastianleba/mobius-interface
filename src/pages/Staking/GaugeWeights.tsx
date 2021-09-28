@@ -4,6 +4,7 @@ import Loader from 'components/Loader'
 import { AutoRow, RowBetween } from 'components/Row'
 import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
+import { darken } from 'polished'
 import React, { useState } from 'react'
 import { RadialChart } from 'react-vis'
 import { GaugeSummary } from 'state/staking/hooks'
@@ -43,17 +44,21 @@ const CardContainer = styled.div`
   justify-content: space-between;
 `
 
+const colorsForChart = ['#35D07F', '#73DDFF', '#BF97FF', '#3488EC', '#FB7C6D', '#FBCC5C', '#FEF2D6']
+
 interface GaugeWeightsProps {
   summaries: GaugeSummary[]
 }
 
 // TO DO: Account for Vote Power Allocations
 export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
-  const data = summaries.map((summary) => ({
+  const numColors = colorsForChart.length
+  const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
     radius: summary.boostedBalance.greaterThan('0') ? 100 : 9,
     subLabel: `${summary.currentWeight.toFixed(2)}%`,
+    color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i]),
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
@@ -77,6 +82,7 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
           </AutoRow>
           <WrappedRow>
             <RadialChart
+              colorType="literal"
               data={data}
               width={Math.min((width ?? 0) * 0.8, 600)}
               height={Math.min((width ?? 0) * 0.8, 600)}
