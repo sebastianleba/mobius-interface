@@ -135,7 +135,7 @@ const PositionWrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: a
   &:hover {
     opacity: 1;
   }
-  @media (min-width: 800px) {
+  @media (min-width: 899px) {
     width: 49%;
   }
 `
