@@ -244,6 +244,7 @@ export const StyledMenuButton = styled.button`
   margin: 0;
   padding: 0;
   height: 35px;
+  width: 35px;
   background-color: ${({ theme }) => theme.bg3};
   margin-left: 8px;
   padding: 0.15rem 0.5rem;
@@ -349,7 +350,7 @@ export default function Header() {
       <HeaderControls>
         <HeaderElement>
           {aggregateBalance && (
-            <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
+            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
                   <HideSmall>
@@ -384,17 +385,15 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
-          {darkMode ? '🌉' : '🌁'}
-        </StyledMenuButton>
+        <RowFixed>
+          <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+            {darkMode ? '🌉' : '🌁'}
+          </StyledMenuButton>
 
-        <HeaderElementWrap>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
-
-          {/* <Menu /> */}
-        </HeaderElementWrap>
+        </RowFixed>
       </HeaderControls>
     </HeaderFrame>
   )
@@ -410,6 +409,7 @@ const UBEAmount = styled(AccountElement)`
 `
 
 const UBEWrapper = styled.span`
+  margin-left: 8px;
   width: fit-content;
   position: relative;
   cursor: pointer;
