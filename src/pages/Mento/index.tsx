@@ -256,7 +256,9 @@ export default function Mento() {
                   <TYPE.white fontWeight={600}>Mento Exchange</TYPE.white>
                 </RowBetween>
                 <RowBetween>
-                  <TYPE.white fontSize={14}>{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve.`}</TYPE.white>
+                  <TYPE.white
+                    fontSize={14}
+                  >{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve. This exchange includes a 0.5% fee that is collected by the Celo Reserve.`}</TYPE.white>
                 </RowBetween>
                 <ExternalLink
                   style={{ color: 'white', textDecoration: 'underline' }}
