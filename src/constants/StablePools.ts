@@ -117,6 +117,55 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
     },
     {
+      name: 'USDC (Solana AllBridge) Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xCD7D7Ff64746C1909E44Db8e95331F9316478817',
+            decimals: 18,
+            symbol: 'asUSDC',
+            name: 'US Dollar Coin (Solana AllBridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x63C1914bf00A9b395A2bF89aaDa55A5615A3656e',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0xAFEe90ab6A2D3B265262f94F6e437E7f6d94e26E',
+        18,
+        'MobLP',
+        'Mobius cUSD/asUSDC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 1,
+      gaugeAddress: '0x27D9Bfa5F864862BeDC23cFab7e00b6b94488CC6',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+    },
+    {
       name: 'USDC (PoS Optics) Pool',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
       tokens: [
