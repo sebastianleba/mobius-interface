@@ -56,7 +56,7 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
-    radius: summary.boostedBalance.greaterThan('0') ? 100 : 9,
+    radius: summary.workingBalance.greaterThan('0') ? 10 : 9.5,
     subLabel: `${summary.currentWeight.toFixed(2)}%`,
     color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i]),
   }))

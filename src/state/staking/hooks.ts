@@ -12,11 +12,14 @@ export type GaugeSummary = {
   pool: string
   address: string
   baseBalance: TokenAmount
-  boostedBalance: TokenAmount
   totalStaked: TokenAmount
   unclaimedMobi: TokenAmount
   firstToken: Token
   currentWeight: Percent
+  workingBalance: TokenAmount
+  totalWorkingBalance: TokenAmount
+  workingPercentage: Percent
+  actualPercentage: Percent
 }
 
 export type MobiStakingInfo = {
@@ -79,6 +82,10 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     unclaimedMobi: new TokenAmount(mobi, pool.staking?.pendingMobi ?? '0'),
     firstToken: pool.tokens[0],
     currentWeight: pool.poolWeight,
+    workingBalance: new TokenAmount(pool.lpToken, pool.effectiveBalance),
+    totalWorkingBalance: new TokenAmount(pool.lpToken, pool.totalEffectiveBalance),
+    workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
+    actualPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
   }))
   return {
     ...baseInfo,

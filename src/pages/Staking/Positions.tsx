@@ -3,7 +3,7 @@ import { ButtonOutlined } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardNoise } from 'components/earn/styled'
 import Loader from 'components/Loader'
-import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import { AutoRow, RowBetween } from 'components/Row'
 import { useColor } from 'hooks/useColor'
 import React, { useState } from 'react'
 import { usePriceOfLp } from 'state/stablePools/hooks'
@@ -127,9 +127,18 @@ function PositionCard({ position }: { position: GaugeSummary }) {
         {showMore && (
           <>
             <Divider bg="grey" />
-            <RowFixed>
-              <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} Unclaimed MOBI`}</TYPE.white>
-            </RowFixed>
+            <RowBetween>
+              <TYPE.white>Unclaimed MOBI</TYPE.white>
+              <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.white>
+            </RowBetween>
+            <RowBetween>
+              <TYPE.white>Your actual share</TYPE.white>
+              <TYPE.white>{`${position.actualPercentage.toSignificant(4)}%`}</TYPE.white>
+            </RowBetween>
+            <RowBetween>
+              <TYPE.white>Your share, accounted for boosts</TYPE.white>
+              <TYPE.white>{`${position.workingPercentage.toSignificant(4)}%`}</TYPE.white>
+            </RowBetween>
           </>
         )}
       </Wrapper>

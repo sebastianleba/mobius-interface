@@ -22,6 +22,8 @@ export type StableSwapVariable = {
   feesGenerated: JSBI
   staking?: StableStakingInfo
   poolWeight: Percent
+  effectiveBalance: JSBI
+  totalEffectiveBalance: JSBI
 }
 
 export type StableSwapMathConstants = {

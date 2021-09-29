@@ -171,7 +171,7 @@ export default function BatchUpdatePools(): null {
   const lpOwned_multiple = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'balanceOf', [
     account ?? undefined,
   ])
-  const totalStakedAmount_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_supply')
+  const totalStakedAmount_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'totalSupply')
   const feesOne = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAdminBalance', [0])
   const feesTwo = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAdminBalance', [1])
   const lpStaked_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'balanceOf', [
@@ -186,6 +186,10 @@ export default function BatchUpdatePools(): null {
     'gauge_relative_weight(address)',
     gaugeAddresses.map((a) => [a ?? undefined])
   )
+  const effectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_balances', [
+    account ?? undefined,
+  ])
+  const totalEffectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_supply')
 
   useMemo(() => {
     pools
@@ -200,6 +204,8 @@ export default function BatchUpdatePools(): null {
         const aPrecise: JSBI = BigIntToJSBI((ampPrecises?.[i]?.result?.[0] as BigInt) ?? '1')
         const lpTotalSupply: JSBI = BigIntToJSBI((lpTotalSupplies?.[i]?.result?.[0] as BigInt) ?? '0')
         const lpOwned: JSBI = BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0')
+        const effectiveBalance: JSBI = BigIntToJSBI((effectiveBalances?.[i]?.result?.[0] as BigInt) ?? '0')
+        const totalEffectiveBalance: JSBI = BigIntToJSBI((totalEffectiveBalances?.[i]?.result?.[0] as BigInt) ?? '1')
         const fees: JSBI = JSBI.add(
           JSBI.multiply(
             BigIntToJSBI((feesOne?.[i]?.result?.[0] as BigInt) ?? '0'),
@@ -242,6 +248,8 @@ export default function BatchUpdatePools(): null {
             totalMobiRate,
             totalStakedAmount,
           },
+          effectiveBalance,
+          totalEffectiveBalance,
         }
         dispatch(
           initPool({
