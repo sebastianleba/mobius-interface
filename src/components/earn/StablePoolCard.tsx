@@ -151,7 +151,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
-  const userLP = poolInfo.amountDeposited //useTokenBalance(account ? account : '', poolInfo.lpToken)
+  const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo)
   const coinPrice = useEthBtcPrice(poolInfo.poolAddress)
   const totalStakedAmount = totalValueStaked
@@ -201,6 +201,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     })
   }
   const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
+
   const totalBalance = balances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
   const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
@@ -376,14 +377,16 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     <RowFixed>
                       <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
                         {!pegComesAfter && peggedTo}
-                        {balance.toFixed(displayDecimals)}
+                        {valueOfDeposited.toFixed(displayDecimals + 1)}
                         {pegComesAfter && ` ${peggedTo}`}
                       </TYPE.black>
                       <QuestionHelper
                         text={userBalances
                           .map(
                             (balance) =>
-                              `${balance?.toFixed(displayDecimals, { groupSeparator: ',' })} ${balance.token.symbol}`
+                              `${balance?.toFixed(displayDecimals + 1, { groupSeparator: ',' })} ${
+                                balance.token.symbol
+                              }`
                           )
                           .join(', ')}
                       />
