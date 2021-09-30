@@ -190,6 +190,11 @@ export default function BatchUpdatePools(): null {
     account ?? undefined,
   ])
   const totalEffectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_supply')
+  const lastUserVotes = useSingleContractMultipleData(
+    gaugeController,
+    'last_user_vote',
+    gaugeAddresses.map((a) => [account ?? undefined, a ?? undefined])
+  )
 
   useMemo(() => {
     pools
@@ -220,17 +225,12 @@ export default function BatchUpdatePools(): null {
         const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
+        const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] as BigInt).toString() ?? '0')
 
         const totalMobiRate = JSBI.divide(
           JSBI.multiply(mobiRate, weight),
           JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
         )
-
-        console.log({
-          mobiRate,
-          weight,
-          weights,
-        })
 
         const collectedData: StableSwapPool = {
           ...poolInfo,
@@ -250,6 +250,7 @@ export default function BatchUpdatePools(): null {
           },
           effectiveBalance,
           totalEffectiveBalance,
+          lastUserVote,
         }
         dispatch(
           initPool({
