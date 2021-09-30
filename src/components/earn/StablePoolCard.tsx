@@ -20,7 +20,6 @@ import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import { RowBetween, RowFixed } from '../Row'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
-//import { CardNoise } from './styled'
 
 const SubHeader = styled.div`
   display: flex;
@@ -116,22 +115,11 @@ interface Props {
   poolInfo: StablePoolInfo
 }
 
-const quote = (amount: TokenAmount, price?: Price) => {
-  if (!price) {
-    return amount
-  }
-  const fraction = new Fraction(price.denominator, price.numerator)
-  return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
-}
-
-const useQuote = (price?: Price) => (amount: TokenAmount) => quote(amount, price)
-
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const { account, chainId } = useActiveContractKit()
   const {
     tokens,
     peggedTo,
-    priceOfStaked,
     balances,
     totalDeposited,
     stakedAmount,
@@ -143,7 +131,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } = poolInfo
 
   const isLive = true
-  // const lpPrice = getLpPriceUSD(poolInfo?.poolAddress ?? '')
 
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
@@ -200,9 +187,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
-  const balance = userBalances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
-
-  const totalBalance = balances.map((x) => Number(x.toFixed(displayDecimals))).reduce((prev, cur) => prev + cur, 0)
   const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
   // get the color of the token
