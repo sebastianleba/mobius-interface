@@ -3,7 +3,7 @@ import { JSBI } from '@ubeswap/sdk'
 import { MaxButton } from 'pages/Pool/styleds'
 import React, { useState } from 'react'
 import { useBlockNumber } from 'state/application/hooks'
-import { GaugeSummary } from 'state/staking/hooks'
+import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
 import styled from 'styled-components'
 
 import { ButtonError } from '../../components/Button'
@@ -39,6 +39,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [input, setInput] = useState(0)
+  const votesLeft = useVotePowerLeft()
 
   function wrappedOnDismiss() {
     setHash(undefined)
@@ -80,35 +81,48 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
             <TYPE.mediumHeader>Vote for {summary.pool}</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
-          <RowFixed>
-            <TYPE.body>This can only be done once per pool per week!</TYPE.body>
-          </RowFixed>
-          <>
-            <RowBetween>
-              <Slider value={input} onChange={setInput} step={0.01} />
-              <TYPE.body>{input.toFixed(0)}%</TYPE.body>
-            </RowBetween>
-            <RowBetween marginTop={-20}>
-              <MaxButton onClick={() => setInput(25)} width="20%">
-                25%
-              </MaxButton>
-              <MaxButton onClick={() => setInput(50)} width="20%">
-                50%
-              </MaxButton>
-              <MaxButton onClick={() => setInput(75)} width="20%">
-                75%
-              </MaxButton>
-              <MaxButton onClick={() => setInput(100)} width="20%">
-                Max
-              </MaxButton>
-            </RowBetween>
-          </>
-          <RowFixed>
-            <TYPE.body>{`Vote for ${summary.pool} to receive ${input.toFixed(0)}% of additional rewards`}</TYPE.body>
-          </RowFixed>
-          <ButtonError disabled={!!error} error={!!error} onClick={onClaimReward}>
-            {error ?? `Vote!`}
-          </ButtonError>
+          {votesLeft === 0 ? (
+            <TYPE.mediumHeader fontWeight={1000} color="red" textAlign="center">
+              You have already allocated 100%, you cannot allocate more at this time
+            </TYPE.mediumHeader>
+          ) : (
+            <>
+              <RowFixed>
+                <TYPE.body>You will not be able to vote on a new weight for this pool for 10 days!</TYPE.body>
+              </RowFixed>
+              <RowFixed>
+                <TYPE.body>You have {votesLeft}% left to allocate!</TYPE.body>
+              </RowFixed>
+              <>
+                <RowBetween>
+                  <Slider value={input} onChange={setInput} step={0.01} max={votesLeft} />
+                  <TYPE.body>{input.toFixed(0)}%</TYPE.body>
+                </RowBetween>
+                <RowBetween marginTop={-20}>
+                  <MaxButton onClick={() => setInput(votesLeft / 4)} width="20%">
+                    25%
+                  </MaxButton>
+                  <MaxButton onClick={() => setInput(votesLeft / 2)} width="20%">
+                    50%
+                  </MaxButton>
+                  <MaxButton onClick={() => setInput(votesLeft * (3 / 4))} width="20%">
+                    75%
+                  </MaxButton>
+                  <MaxButton onClick={() => setInput(votesLeft)} width="20%">
+                    Max
+                  </MaxButton>
+                </RowBetween>
+              </>
+              <RowFixed>
+                <TYPE.body>{`Vote for ${summary.pool} to receive ${input.toFixed(
+                  0
+                )}% of additional rewards`}</TYPE.body>
+              </RowFixed>
+              <ButtonError disabled={!!error} error={!!error} onClick={onClaimReward}>
+                {error ?? `Vote!`}
+              </ButtonError>{' '}
+            </>
+          )}
         </ContentWrapper>
       )}
       {attempting && !hash && (

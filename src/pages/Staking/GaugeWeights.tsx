@@ -7,7 +7,7 @@ import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { RadialChart } from 'react-vis'
-import { GaugeSummary } from 'state/staking/hooks'
+import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
 import { useIsDarkMode } from 'state/user/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
@@ -53,6 +53,7 @@ interface GaugeWeightsProps {
 // TO DO: Account for Vote Power Allocations
 export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
+  const votePowerLeft = useVotePowerLeft()
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
@@ -100,6 +101,10 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
           <AutoRow>
             <TYPE.subHeader>Allocate your vote power to affect the MOBI distribution of each pool</TYPE.subHeader>
           </AutoRow>
+          <AutoRow>
+            <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
+          </AutoRow>
+
           <CardContainer>
             {summaries.map((summary) => (
               <WeightCard position={summary} key={`weight-card-${summary.pool}`} />

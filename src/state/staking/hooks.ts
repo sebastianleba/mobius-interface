@@ -125,3 +125,8 @@ export function useLockEnd(): number {
   const lockEnd = useSelector<AppState, number>((state) => state.staking?.locked?.end ?? 0)
   return lockEnd
 }
+
+export function useVotePowerLeft(): number {
+  const votePower = useSelector<AppState, JSBI>((state) => state.staking.voteUserPower)
+  return (10000 - parseInt(votePower.toString())) / 100
+}
