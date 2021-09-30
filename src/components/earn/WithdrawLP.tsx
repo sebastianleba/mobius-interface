@@ -81,7 +81,7 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
       {selectedAmount.greaterThan(JSBI.BigInt('0')) && (
         <div>
           <TYPE.mediumHeader style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
-            You will received
+            You will receive
           </TYPE.mediumHeader>
           {expectedTokens.map((tokenAmount, i) => (
             <>
