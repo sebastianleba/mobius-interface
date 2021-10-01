@@ -55,7 +55,7 @@ const InputRow = styled.div<{ selected: boolean }>`
   ${({ theme }) => theme.flexRowNoWrap};
   align-items: center;
   justify-content: space-between;
-  padding: ${({ selected }) => (selected ? '0.75rem 0.5rem 0.75rem 1rem' : '0.75rem 0.75rem 0.75rem 1rem')};
+  padding: ${({ selected }) => (selected ? '0.75rem 1rem 0.75rem .75rem' : '0.75rem 1rem 0.75rem .75rem')};
 `
 
 const InputDiv = styled.div`
@@ -68,6 +68,7 @@ const CurrencySelect = styled.button<{
   walletConnected: boolean
   bgColor: any
   isDarkMode: boolean
+  pair: boolean
 }>`
   display: flex;
   align-items: center;
@@ -75,8 +76,7 @@ const CurrencySelect = styled.button<{
   height: 2.2rem;
   font-size: 20px;
   font-weight: 500;
-  ${({ selected, bgColor, isDarkMode }) =>
-    selected && `background-color: ${darken(isDarkMode ? 0.2 : -0.425, bgColor)};`}
+  ${({ selected, bgColor, isDarkMode }) => selected && `background-color: ${darken(isDarkMode ? 0.2 : -0.4, bgColor)};`}
   color: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
   border-radius: 12px;
   box-shadow: ${({ selected }) => (selected ? 'none' : '0px 6px 10px rgba(0, 0, 0, 0.075)')};
@@ -85,7 +85,7 @@ const CurrencySelect = styled.button<{
   cursor: pointer;
   user-select: none;
   border: none;
-  width: 10rem;
+  width: ${({ pair }) => (pair ? '14rem' : '10rem')};
   height: 3rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     padding: 0 0.5rem;
@@ -94,7 +94,7 @@ const CurrencySelect = styled.button<{
   :focus,
   :hover {
     background-color: ${({ selected, theme, bgColor, isDarkMode }) =>
-      selected ? darken(isDarkMode ? 0.25 : -0.35, bgColor) : darken(0.05, theme.primary1)};
+      selected ? darken(isDarkMode ? 0.2 : -0.3, bgColor) : darken(0.05, theme.primary1)};
   }
 `
 
@@ -114,7 +114,6 @@ const LabelRow = styled.div`
 const Aligner = styled.span`
   display: flex;
   align-items: center;
-  justify-content: space-between;
 `
 
 const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
@@ -257,6 +256,7 @@ export default function CurrencyInputPanel({
               bgColor={tokenSelectBackground}
               selected={!!currency}
               walletConnected={!!account}
+              pair={!!pair}
               className="open-currency-select-button"
               onClick={() => {
                 if (!disableCurrencySelect) {
@@ -271,7 +271,7 @@ export default function CurrencyInputPanel({
                   <CurrencyLogo currency={currency} size={'24px'} />
                 ) : null}
                 {pair ? (
-                  <StyledTokenName className="pair-name-container">
+                  <StyledTokenName active={!!currency} className="pair-name-container">
                     {pair?.token0.symbol}:{pair?.token1.symbol}
                   </StyledTokenName>
                 ) : (

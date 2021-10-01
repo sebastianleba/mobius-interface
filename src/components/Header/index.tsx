@@ -20,6 +20,7 @@ import Logo from '../../assets/svg/mobius.svg'
 import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../state/user/hooks'
+import Menu from '../Menu'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
 import HamburgerModal from './HamburgerModal'
@@ -337,9 +338,6 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                Airdrop
-              </StyledNavLink>
               <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
                 Bridge
               </StyledExternalLink>
@@ -389,10 +387,10 @@ export default function Header() {
           <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
             {darkMode ? '🌉' : '🌁'}
           </StyledMenuButton>
-
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
+          <Menu />
         </RowFixed>
       </HeaderControls>
     </HeaderFrame>
