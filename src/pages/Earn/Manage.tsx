@@ -1,4 +1,4 @@
-import { Fraction, JSBI, Price, TokenAmount } from '@ubeswap/sdk'
+import { Fraction, JSBI, TokenAmount } from '@ubeswap/sdk'
 import CurrencyPoolLogo from 'components/CurrencyPoolLogo'
 import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
@@ -88,13 +88,6 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
-const quote = (price: Price, amount: TokenAmount) => {
-  const fraction = new Fraction(price.denominator, price.numerator)
-  return new TokenAmount(price.quoteCurrency, fraction.multiply(amount.raw).quotient)
-}
-
-const useQuote = (price: Price) => (amount: TokenAmount) => quote(price, amount)
-
 export default function Manage({
   match: {
     params: { poolName },
@@ -147,10 +140,6 @@ export default function Manage({
     return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
   })
 
-  const balance = userBalances
-    .map((x) => Number(x.toFixed(stakingInfo.displayDecimals)))
-    .reduce((prev, cur) => prev + cur, 0)
-
   const decimalPlacesForLP = stakedAmount?.greaterThan('1') ? 6 : stakedAmount?.greaterThan('0') ? 12 : 2
 
   // detect existing unstaked LP position to show add button if none found
@@ -184,10 +173,6 @@ export default function Manage({
       toggleWalletModal()
     }
   }, [account, toggleWalletModal])
-
-  const formatNumber = (num: string) => {
-    return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-  }
 
   return (
     <PageWrapper gap="lg" justify="center">
