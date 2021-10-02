@@ -31,8 +31,12 @@ interface GaugeVoteModalProps {
 export const getAllUnclaimedMobi = (summaries: GaugeSummary[]): JSBI =>
   summaries.reduce((accum, { unclaimedMobi }) => JSBI.add(accum, unclaimedMobi.raw), JSBI.BigInt(0))
 
+function daysBetween(d1: Date, d2: Date): number {
+  return Math.floor((d1.getTime() - d2.getTime()) / (1000 * 3600 * 24))
+}
+
 export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVoteModalProps) {
-  const { account, chainId } = useActiveContractKit()
+  const { account } = useActiveContractKit()
 
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
@@ -40,6 +44,8 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
   const [attempting, setAttempting] = useState(false)
   const [input, setInput] = useState(0)
   const votesLeft = useVotePowerLeft()
+  const today = new Date(Date.now())
+  const lastVote = summary.lastVote
 
   function wrappedOnDismiss() {
     setHash(undefined)
@@ -73,6 +79,10 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
     error = 'Connect Wallet'
   }
 
+  if (daysBetween(today, lastVote) < 10) {
+    error = error ?? `Wait ${10 - daysBetween(today, lastVote)} days to vote for this pool again`
+  }
+
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOnDismiss} maxHeight={90}>
       {!attempting && !hash && (
@@ -81,7 +91,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
             <TYPE.mediumHeader>Vote for {summary.pool}</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
-          {votesLeft === 0 ? (
+          {votesLeft !== 0 ? (
             <TYPE.mediumHeader fontWeight={1000} color="red" textAlign="center">
               You have already allocated 100%, you cannot allocate more at this time
             </TYPE.mediumHeader>

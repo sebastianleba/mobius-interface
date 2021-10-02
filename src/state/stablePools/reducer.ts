@@ -24,6 +24,7 @@ export type StableSwapVariable = {
   poolWeight: Percent
   effectiveBalance: JSBI
   totalEffectiveBalance: JSBI
+  lastUserVote: number
 }
 
 export type StableSwapMathConstants = {
