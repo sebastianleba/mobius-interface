@@ -1,4 +1,4 @@
-import { TokenAmount } from '@ubeswap/sdk'
+import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { ButtonOutlined } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardNoise } from 'components/earn/styled'
@@ -10,6 +10,7 @@ import { usePriceOfLp } from 'state/stablePools/hooks'
 import { GaugeSummary, MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
+import { calcBoost } from 'utils/calcExpectedVeMobi'
 
 import ClaimAllMobiModal from './ClaimAllMobiModal'
 import GaugeVoteModal from './GaugeVoteModal'
@@ -88,7 +89,14 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
           <Loader style={{ margin: 'auto' }} />
         </AutoRow>
       ) : greaterThanZero.length > 0 ? (
-        greaterThanZero.map((position) => <PositionCard key={`positions-card-${position.pool}`} position={position} />)
+        greaterThanZero.map((position) => (
+          <PositionCard
+            key={`positions-card-${position.pool}`}
+            position={position}
+            votingPower={stakingInfo.votingPower.raw}
+            totalVotingPower={stakingInfo.totalVotingPower.raw}
+          />
+        ))
       ) : (
         <TYPE.largeHeader>You do not have any deposits</TYPE.largeHeader>
       )}
@@ -103,11 +111,20 @@ const ButtonGroup = styled.div`
   margin-top: 1.5rem;
 `
 
-function PositionCard({ position }: { position: GaugeSummary }) {
+function PositionCard({
+  position,
+  votingPower,
+  totalVotingPower,
+}: {
+  position: GaugeSummary
+  votingPower: JSBI
+  totalVotingPower: JSBI
+}) {
   const backgroundColor = useColor(position.firstToken)
   const lpAsUsd = usePriceOfLp(position.pool, position.baseBalance)
   const [showMore, setShowMore] = useState(false)
   const [voteModalOpen, setVoteModalOpen] = useState(false)
+  const boost = calcBoost(position, votingPower, totalVotingPower)
 
   return (
     <>
@@ -138,6 +155,10 @@ function PositionCard({ position }: { position: GaugeSummary }) {
             <RowBetween>
               <TYPE.white>Your share, accounted for boosts</TYPE.white>
               <TYPE.white>{`${position.workingPercentage.toSignificant(4)}%`}</TYPE.white>
+            </RowBetween>
+            <RowBetween>
+              <TYPE.white>Your Boost</TYPE.white>
+              <TYPE.white>{`${boost.toFixed(0)}%`}</TYPE.white>
             </RowBetween>
           </>
         )}

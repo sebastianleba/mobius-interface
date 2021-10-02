@@ -10,9 +10,11 @@ import { useDoTransaction } from 'hooks/useDoTransaction'
 import React, { useState } from 'react'
 import { Calendar } from 'react-date-range'
 import { Text } from 'rebass'
+import { useMobiStakingInfo } from 'state/staking/hooks'
 import { useIsDarkMode } from 'state/user/hooks'
 import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
+import { calcBoost, calcExpectedVeMobi } from 'utils/calcExpectedVeMobi'
 
 import { ButtonConfirmed, ButtonError } from '../../components/Button'
 import Column from '../../components/Column'
@@ -22,38 +24,43 @@ import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useVotingEscrowContract } from '../../hooks/useContract'
 import { tryParseAmount } from '../../state/swap/hooks'
-import { useTransactionAdder } from '../../state/transactions/hooks'
 import { TYPE } from '../../theme'
 
 const MILLISECONDS_PER_SECOND = 1000
 const SECONDS_PER_WEEK = 604800
-interface WithdrawModalProps {
+
+const roundDate = (date: Date) =>
+  new Date(
+    Math.floor(date.valueOf() / (MILLISECONDS_PER_SECOND * SECONDS_PER_WEEK)) *
+      (MILLISECONDS_PER_SECOND * SECONDS_PER_WEEK)
+  )
+interface LockProps {
   setAttempting: (attempting: boolean) => void
   setHash: (hash: string | undefined) => void
 }
 
-export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProps) {
+export default function Lock({ setHash, setAttempting }: LockProps) {
   const { library, account } = useActiveContractKit()
 
   // monitor call to help UI loading state
-  const addTransaction = useTransactionAdder()
+  const stakingInfo = useMobiStakingInfo()
+  const positions = stakingInfo.positions?.filter((pos) => pos.baseBalance.greaterThan('0')) ?? []
   const mobi = useMobi()
   const balance = useCurrencyBalance(account, mobi)
   const [approving, setApproving] = useState(false)
   const [input, setInput] = useState<string>('')
+  const [showBoosts, setShowBoosts] = useState(false)
   const selectedAmount = tryParseAmount(input, mobi) || new TokenAmount(mobi, '0')
   const [date, setDate] = useState<Date>()
   const isDarkMode = useIsDarkMode()
-  const roundedDate = date
-    ? new Date(
-        Math.floor(date?.valueOf() / (MILLISECONDS_PER_SECOND * SECONDS_PER_WEEK)) *
-          (MILLISECONDS_PER_SECOND * SECONDS_PER_WEEK)
-      )
-    : undefined
+  const roundedDate = date ? roundDate(date) : undefined
   const doTransaction = useDoTransaction()
 
   const veMobiContract = useVotingEscrowContract()
-
+  const expectedVeMobi = calcExpectedVeMobi(
+    selectedAmount,
+    roundedDate ? roundedDate.getTime() - roundDate(new Date(Date.now())).getTime() : 0
+  )
   const [approval, approveCallback] = useApproveCallback(selectedAmount, veMobiContract.address)
   const showApproveFlow =
     approval === ApprovalState.NOT_APPROVED ||
@@ -72,18 +79,6 @@ export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProp
       })
       setHash(resp.hash)
       setAttempting(false)
-      // await veMobiContract
-      //   .create_lock(selectedAmount.raw.toString(), dateAsUnix.toFixed(0))
-      //   .then((response: TransactionResponse) => {
-      //     addTransaction(response, {
-      //       summary: `Lock ${selectedAmount.toExact()} MOBI until ${date?.toLocaleDateString}`,
-      //     })
-      //     setHash(response.hash)
-      //   })
-      //   .catch((error: any) => {
-      //     setAttempting(false)
-      //     console.log(error)
-      //   })
     }
   }
 
@@ -113,6 +108,29 @@ export default function WithdrawLP({ setHash, setAttempting }: WithdrawModalProp
         Thursday 00:00:00 GTM 0
       </TYPE.subHeader>
       <Calendar date={roundedDate} onChange={setDate} />
+      <RowBetween>
+        <TYPE.body>Expected veMobi</TYPE.body>
+        <TYPE.body>{expectedVeMobi.toFixed(2)}</TYPE.body>
+      </RowBetween>
+      {!showBoosts ? (
+        <AutoRow onClick={() => setShowBoosts(true)} style={{ cursor: 'pointer' }}>
+          <TYPE.body>Show Boosts</TYPE.body>
+        </AutoRow>
+      ) : (
+        positions.map((pos) => {
+          const boost = calcBoost(
+            pos,
+            expectedVeMobi.raw,
+            JSBI.add(expectedVeMobi.raw, stakingInfo.totalVotingPower.raw)
+          )
+          return (
+            <RowBetween key={`boost-info-${pos.pool}`}>
+              <TYPE.body>{pos.pool}</TYPE.body>
+              <TYPE.body>{boost.toFixed(0)}%</TYPE.body>
+            </RowBetween>
+          )
+        })
+      )}
       {showApproveFlow ? (
         <RowBetween>
           <ButtonConfirmed
