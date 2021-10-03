@@ -106,13 +106,16 @@ export default function Manage({
     tokens: [],
   }
 
-  const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi)
+  const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? '0')
 
   const { valueOfStaked, totalValueDeposited } = getDepositValues(stakingInfo)
 
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
   if (stakingInfo && stakingInfo?.workingPercentage.greaterThan('0')) {
-    userMobiRate = new TokenAmount(mobi, stakingInfo?.workingPercentage.multiply(stakingInfo?.mobiRate ?? '0'))
+    userMobiRate = new TokenAmount(
+      mobi,
+      stakingInfo?.workingPercentage.multiply(stakingInfo?.mobiRate ?? '0').toFixed(0) ?? '0'
+    )
   }
 
   const totalMobiRate = new TokenAmount(mobi, stakingInfo?.mobiRate ?? JSBI.BigInt('0'))
