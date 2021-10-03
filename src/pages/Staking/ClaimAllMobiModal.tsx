@@ -1,6 +1,7 @@
 import { TransactionResponse } from '@ethersproject/providers'
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useMobi } from 'hooks/Tokens'
+import { useDoTransaction } from 'hooks/useDoTransaction'
 import React, { useState } from 'react'
 import { GaugeSummary } from 'state/staking/hooks'
 import styled from 'styled-components'
@@ -37,6 +38,7 @@ export default function ClaimAllMobiModal({ isOpen, onDismiss, summaries }: Stak
   const addTransaction = useTransactionAdder()
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
+  const doTransaction = useDoTransaction()
 
   function wrappedOnDismiss() {
     setHash(undefined)
@@ -55,7 +57,7 @@ export default function ClaimAllMobiModal({ isOpen, onDismiss, summaries }: Stak
     if (minter) {
       setAttempting(true)
       await minter
-        .mint_many(gaugeAddresses)
+        .mint_many(gaugeAddresses, { gasLimit: 10000000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Claim accumulated MOBI rewards`,
