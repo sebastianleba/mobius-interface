@@ -193,7 +193,7 @@ export default function BatchUpdatePools(): null {
   const lastUserVotes = useSingleContractMultipleData(
     gaugeController,
     'last_user_vote',
-    gaugeAddresses.map((a) => [account ?? undefined, a ?? undefined])
+    gaugeAddresses.map((a) => [account ?? a, a])
   )
 
   useMemo(() => {
