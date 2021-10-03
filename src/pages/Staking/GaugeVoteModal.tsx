@@ -91,7 +91,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
             <TYPE.mediumHeader>Vote for {summary.pool}</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
-          {votesLeft !== 0 ? (
+          {votesLeft === 0 ? (
             <TYPE.mediumHeader fontWeight={1000} color="red" textAlign="center">
               You have already allocated 100%, you cannot allocate more at this time
             </TYPE.mediumHeader>
