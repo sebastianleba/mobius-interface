@@ -1,5 +1,5 @@
 import { Interface } from '@ethersproject/abi'
-import { JSBI, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { useEffect, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
@@ -171,7 +171,7 @@ export default function BatchUpdatePools(): null {
   const lpOwned_multiple = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'balanceOf', [
     account ?? undefined,
   ])
-  const totalStakedAmount_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_supply')
+  const totalStakedAmount_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'totalSupply')
   const feesOne = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAdminBalance', [0])
   const feesTwo = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAdminBalance', [1])
   const lpStaked_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'balanceOf', [
@@ -185,6 +185,15 @@ export default function BatchUpdatePools(): null {
     gaugeController,
     'gauge_relative_weight(address)',
     gaugeAddresses.map((a) => [a ?? undefined])
+  )
+  const effectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_balances', [
+    account ?? undefined,
+  ])
+  const totalEffectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_supply')
+  const lastUserVotes = useSingleContractMultipleData(
+    gaugeController,
+    'last_user_vote',
+    gaugeAddresses.map((a) => [account ?? undefined, a ?? undefined])
   )
 
   useMemo(() => {
@@ -200,6 +209,8 @@ export default function BatchUpdatePools(): null {
         const aPrecise: JSBI = BigIntToJSBI((ampPrecises?.[i]?.result?.[0] as BigInt) ?? '1')
         const lpTotalSupply: JSBI = BigIntToJSBI((lpTotalSupplies?.[i]?.result?.[0] as BigInt) ?? '0')
         const lpOwned: JSBI = BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0')
+        const effectiveBalance: JSBI = BigIntToJSBI((effectiveBalances?.[i]?.result?.[0] as BigInt) ?? '0')
+        const totalEffectiveBalance: JSBI = BigIntToJSBI((totalEffectiveBalances?.[i]?.result?.[0] as BigInt) ?? '1')
         const fees: JSBI = JSBI.add(
           JSBI.multiply(
             BigIntToJSBI((feesOne?.[i]?.result?.[0] as BigInt) ?? '0'),
@@ -214,6 +225,7 @@ export default function BatchUpdatePools(): null {
         const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
+        const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] as BigInt).toString() ?? '0')
 
         const totalMobiRate = JSBI.divide(
           JSBI.multiply(mobiRate, weight),
@@ -229,12 +241,16 @@ export default function BatchUpdatePools(): null {
           lpOwned,
           aPrecise,
           feesGenerated: fees,
+          poolWeight: new Percent(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
           staking: {
             userStaked: lpStaked,
             pendingMobi,
             totalMobiRate,
             totalStakedAmount,
           },
+          effectiveBalance,
+          totalEffectiveBalance,
+          lastUserVote,
         }
         dispatch(
           initPool({

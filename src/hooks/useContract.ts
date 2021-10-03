@@ -1,7 +1,10 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
-import { ChainId } from '@ubeswap/sdk'
-import { MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
+import {
+  GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS,
+  MOBIUS_MINTER_ADDRESS,
+  VOTING_ESCROW as VOTING_ESCROW_ADDRESS,
+} from 'constants/StablePools'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
@@ -21,6 +24,7 @@ import RELEASE_UBE_ABI from '../constants/abis/ReleaseUbe.json'
 import STAKING_REWARDS_ABI from '../constants/abis/StakingRewards.json'
 import STABLE_SWAP from '../constants/abis/Swap.json'
 import VESTING_ABI from '../constants/abis/VestingEscrow.json'
+import VOTING_ESCROW from '../constants/abis/VotingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
   BridgeRouter,
@@ -36,7 +40,8 @@ import {
   StakingRewards,
   Swap,
   VestingEscrow,
-} from '../generated/index'
+  VotingEscrow,
+} from '../generated'
 import { getContract } from '../utils'
 import { useActiveContractKit } from './index'
 import { useMobi } from './Tokens'
@@ -85,12 +90,15 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
   return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainId], MINTER.abi, withSignerIfPossible) as Minter
 }
 
+export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
+  const { chainId } = useActiveContractKit()
+
+  return useContract(address ?? VOTING_ESCROW_ADDRESS[chainId], VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
+}
+
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
   const { chainId } = useActiveContractKit()
-  const fallBackAddress =
-    chainId === ChainId.MAINNET
-      ? '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25'
-      : '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79'
+  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[chainId]
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 

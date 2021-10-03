@@ -338,6 +338,9 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
+              <StyledNavLink id={`swap-nav-link`} to={'/stake'}>
+                Stake
+              </StyledNavLink>
               <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
                 Bridge
               </StyledExternalLink>

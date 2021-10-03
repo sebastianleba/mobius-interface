@@ -21,6 +21,7 @@ import Manage from './Earn/Manage'
 import LandingPage from './LandingPage'
 import Mento from './Mento'
 import RiskPage from './Risk'
+import Staking from './Staking'
 import Swap from './Swap'
 import { RedirectToSwap } from './Swap/redirects'
 
@@ -122,6 +123,7 @@ export default function App() {
               <Route exact strict path="/risk" component={RiskPage} />
               <Route path="/claim" component={Claim} />
               <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
+              <Route exact strict path="/stake" component={Staking} />
               {/* <Route exact strict path="/optics" component={Optics} /> */}
             </Switch>
           </ErrorBoundary>

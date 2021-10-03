@@ -3,8 +3,7 @@ import CurrencyPoolLogo from 'components/CurrencyPoolLogo'
 import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
 import { useMobi } from 'hooks/Tokens'
-import { useLiquidityGaugeContract } from 'hooks/useContract'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
 import { useStablePoolInfoByName } from 'state/stablePools/hooks'
 import UpdatePools from 'state/stablePools/updater'
@@ -107,27 +106,15 @@ export default function Manage({
     tokens: [],
   }
 
+  const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi)
+
   const { valueOfStaked, totalValueDeposited } = getDepositValues(stakingInfo)
 
-  //const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? JSBI.BigInt('0'))
-  const [earnedMobi, setEarnedMobi] = useState<TokenAmount>()
-  const gaugeContract = useLiquidityGaugeContract(stakingInfo?.gaugeAddress)
-
-  useEffect(() => {
-    const updateMobi = async () => {
-      const bigInt = await gaugeContract?.claimable_tokens(account)
-      setEarnedMobi(new TokenAmount(mobi, bigInt?.toString() ?? '0'))
-    }
-    account && updateMobi()
-  }, [gaugeContract, setEarnedMobi, account])
-
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-  if (totalStakedAmount && totalStakedAmount.greaterThan('0')) {
-    userMobiRate = new TokenAmount(
-      mobi,
-      JSBI.divide(JSBI.multiply(stakingInfo?.mobiRate, stakedAmount?.raw), totalStakedAmount?.raw)
-    )
+  if (stakingInfo && stakingInfo?.workingPercentage.greaterThan('0')) {
+    userMobiRate = new TokenAmount(mobi, stakingInfo?.workingPercentage.multiply(stakingInfo?.mobiRate ?? '0'))
   }
+
   const totalMobiRate = new TokenAmount(mobi, stakingInfo?.mobiRate ?? JSBI.BigInt('0'))
 
   const userBalances = balances.map((amount) => {

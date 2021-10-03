@@ -12,6 +12,7 @@ import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 import { UpdateMento } from 'state/mentoPools/updater'
 import UpdatePools from 'state/stablePools/updater'
+import StakingUpdater from 'state/staking/updater'
 
 import mobiusIcon from './assets/svg/mobius.svg'
 import App from './pages/App'
@@ -56,6 +57,7 @@ function Updaters() {
       <TransactionUpdater />
       <MulticallUpdater />
       <UpdatePools />
+      <StakingUpdater />
       <UpdateMento />
     </>
   )
