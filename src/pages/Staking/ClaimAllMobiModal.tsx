@@ -2,7 +2,6 @@ import { TransactionResponse } from '@ethersproject/providers'
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { useMobi } from 'hooks/Tokens'
 import React, { useState } from 'react'
-import { useBlockNumber } from 'state/application/hooks'
 import { GaugeSummary } from 'state/staking/hooks'
 import styled from 'styled-components'
 
@@ -52,13 +51,11 @@ export default function ClaimAllMobiModal({ isOpen, onDismiss, summaries }: Stak
     i < summaries.length ? summaries[i].address : '0x0000000000000000000000000000000000000000'
   )
 
-  const blockNumber = useBlockNumber()
   async function onClaimReward() {
-    console.log({ gaugeAddresses, summaries })
     if (minter) {
       setAttempting(true)
       await minter
-        .mint_many(gaugeAddresses, { gasLimit: 350000 })
+        .mint_many(gaugeAddresses)
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Claim accumulated MOBI rewards`,

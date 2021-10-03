@@ -225,7 +225,7 @@ export default function BatchUpdatePools(): null {
         const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
-        const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] as BigInt).toString() ?? '0')
+        const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0')
 
         const totalMobiRate = JSBI.divide(
           JSBI.multiply(mobiRate, weight),
