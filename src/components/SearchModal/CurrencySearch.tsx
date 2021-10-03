@@ -52,6 +52,7 @@ interface CurrencySearchProps {
   showManageView: () => void
   showImportView: () => void
   setImportToken: (token: Token) => void
+  mento?: boolean
 }
 
 export function CurrencySearch({
@@ -64,6 +65,7 @@ export function CurrencySearch({
   showManageView,
   showImportView,
   setImportToken,
+  mento,
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { chainId } = useActiveContractKit()
@@ -77,13 +79,11 @@ export function CurrencySearch({
   const [invertSearchOrder] = useState<boolean>(false)
   const location = useLocation()
 
-  const allTokens = useSwappableTokens()
-  // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
-
+  const allTokens = useSwappableTokens(location.pathname.includes('mint'))
   // if they input an address, use it
   const isAddressSearch = isAddress(searchQuery)
-  const searchToken = useToken(searchQuery)
-  const [tokensInSamePool] = useTokensTradeable(otherSelectedCurrency)
+  const searchToken = useToken(location.pathname.includes('mint'), searchQuery)
+  const [tokensInSamePool] = useTokensTradeable(location.pathname.includes('mint'), otherSelectedCurrency)
   const bridgeableTokens = useBridgeableTokens()
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
@@ -100,10 +100,6 @@ export function CurrencySearch({
     }
   }, [isAddressSearch])
 
-  // const showETH: boolean = useMemo(() => {
-  //   const s = searchQuery.toLowerCase().trim()
-  //   return s === '' || s === 'e' || s === 'et' || s === 'eth'
-  // }, [searchQuery])
   const showETH = false
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
@@ -209,18 +205,20 @@ export function CurrencySearch({
           </Text>
           <CloseIcon onClick={onDismiss} />
         </RowBetween>
-        <Row>
-          <SearchInput
-            type="text"
-            id="token-search-input"
-            placeholder={t('tokenSearchPlaceholder')}
-            autoComplete="off"
-            value={searchQuery}
-            ref={inputRef as RefObject<HTMLInputElement>}
-            onChange={handleInput}
-            onKeyDown={handleEnter}
-          />
-        </Row>
+        {!location.pathname.includes('mint') && (
+          <Row>
+            <SearchInput
+              type="text"
+              id="token-search-input"
+              placeholder={t('tokenSearchPlaceholder')}
+              autoComplete="off"
+              value={searchQuery}
+              ref={inputRef as RefObject<HTMLInputElement>}
+              onChange={handleInput}
+              onKeyDown={handleEnter}
+            />
+          </Row>
+        )}
         {showCommonBases && (
           <CommonBases chainId={chainId} onSelect={handleCurrencySelect} selectedCurrency={selectedCurrency} />
         )}

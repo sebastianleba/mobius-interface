@@ -12,6 +12,7 @@ import BRIDGE_ROUTER from '../constants/abis/BridgeRouter.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
+import EXCHANGE from '../constants/abis/Exchange.json'
 import GAUGE_CONTROLLER from '../constants/abis/GaugeController.json'
 import LIQUIDITY_GAUGE_V3 from '../constants/abis/LiquidityGaugeV3.json'
 import LP from '../constants/abis/LPToken.json'
@@ -29,6 +30,7 @@ import {
   BridgeRouter,
   Erc20,
   ERC20MOBI,
+  Exchange,
   GaugeController,
   LiquidityGaugeV3,
   Minter,
@@ -122,6 +124,10 @@ export function useStableSwapContract(swapAddress?: string, withSignerIfPossible
 
 export function useLpTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Erc20 | null {
   return useContract(tokenAddress, LP.abi, withSignerIfPossible) as Erc20 | null
+}
+
+export function UseMentoContract(exchangeAddress: string, withSignerIfPossible?: boolean): Exchange | null {
+  return useContract(exchangeAddress, EXCHANGE, withSignerIfPossible) as Exchange | null
 }
 
 export function useMulticallContract(): Contract | null {

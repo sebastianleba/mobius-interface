@@ -46,7 +46,7 @@ async function getColorFromToken(token: Token): Promise<string | null> {
 
   const path = images[token.address]
   if (!path) {
-    return '#FAAB14'
+    return '#35D07F'
   }
 
   return Vibrant.from(path)

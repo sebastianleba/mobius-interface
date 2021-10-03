@@ -14,7 +14,7 @@ import ERC_20_INTERFACE from '../../constants/abis/erc20'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
 // Interfaces
 import { UNISWAP_V2_PAIR_INTERFACE } from '../../constants/abis/uniswap-v2-pair'
-import { STATIC_POOL_INFO, USD_POOL_ADDRESSES } from '../../constants/StablePools'
+import { MENTO_POOL_INFO, STATIC_POOL_INFO, USD_POOL_ADDRESSES } from '../../constants/StablePools'
 import { useActiveContractKit } from '../../hooks'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import {
@@ -166,9 +166,12 @@ export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
   }
 }
 
-export function useTokensTradeable(tokenIn: Token | null | undefined): readonly [{ [address: string]: Token }] {
+export function useTokensTradeable(
+  mento: boolean,
+  tokenIn: Token | null | undefined
+): readonly [{ [address: string]: Token }] {
   const tradeable: { [address: string]: Token } = {}
-  const pools = STATIC_POOL_INFO
+  const pools = mento ? MENTO_POOL_INFO : STATIC_POOL_INFO
   const { chainId } = useActiveContractKit()
 
   if (!tokenIn) return [{}]

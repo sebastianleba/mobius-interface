@@ -1,7 +1,7 @@
 import React from 'react'
+import { useLocation } from 'react-router'
 import { MobiusTrade } from 'state/swap/hooks'
 
-import { describeTrade } from '../describeTrade'
 import { MobiusTradeDetails } from './MobiusTradeDetails'
 
 interface Props {
@@ -10,7 +10,8 @@ interface Props {
 }
 
 export const TradeDetails: React.FC<Props> = ({ trade, allowedSlippage }: Props) => {
-  const { routingMethod } = describeTrade(trade)
+  const location = useLocation()
+  const mento = location.pathname.includes('mint')
 
-  return <MobiusTradeDetails trade={trade} allowedSlippage={allowedSlippage} />
+  return <MobiusTradeDetails trade={trade} allowedSlippage={allowedSlippage} mento={mento} />
 }

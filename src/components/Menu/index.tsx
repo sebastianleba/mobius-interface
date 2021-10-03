@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { BookOpen, Code, Info, MessageCircle, PieChart, Send } from 'react-feather'
+import { BookOpen, Code, MessageCircle, Send, Twitter } from 'react-feather'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -99,7 +99,7 @@ const MenuItemInternal = styled(NavLink)`
   }
 `
 
-const CODE_LINK = 'https://github.com/Ubeswap/ubeswap-interface'
+const CODE_LINK = 'https://github.com/mobiusAMM'
 
 export default function Menu() {
   const node = useRef<HTMLDivElement>()
@@ -116,29 +116,25 @@ export default function Menu() {
 
       {open && (
         <MenuFlyout>
-          <MenuItemInternal id="link" to="/send">
+          <MenuItemInternal id="link" to="/claim">
             <Send size={14} />
-            Send
+            Airdrop
           </MenuItemInternal>
-          <MenuItem id="link" href="https://ubeswap.org/">
-            <Info size={14} />
-            About
-          </MenuItem>
-          <MenuItem id="link" href="https://docs.ubeswap.org/">
+          <MenuItem id="link" href="https://medium.com/@mobiusmoney">
             <BookOpen size={14} />
-            Docs
+            Medium
+          </MenuItem>
+          <MenuItem id="link" href="https://twitter.com/MobiusMoney">
+            <Twitter size={14} />
+            Twitter
           </MenuItem>
           <MenuItem id="link" href={CODE_LINK}>
             <Code size={14} />
             Code
           </MenuItem>
-          <MenuItem id="link" href="https://discord.gg/zZkUXCMPGP">
+          <MenuItem id="link" href="https://discord.gg/E8hEDJ2S">
             <MessageCircle size={14} />
             Discord
-          </MenuItem>
-          <MenuItem id="link" href="https://info.ubeswap.org/">
-            <PieChart size={14} />
-            Analytics
           </MenuItem>
         </MenuFlyout>
       )}

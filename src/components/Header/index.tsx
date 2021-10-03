@@ -20,6 +20,7 @@ import Logo from '../../assets/svg/mobius.svg'
 import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../state/user/hooks'
+import Menu from '../Menu'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
 import HamburgerModal from './HamburgerModal'
@@ -244,6 +245,7 @@ export const StyledMenuButton = styled.button`
   margin: 0;
   padding: 0;
   height: 35px;
+  width: 35px;
   background-color: ${({ theme }) => theme.bg3};
   margin-left: 8px;
   padding: 0.15rem 0.5rem;
@@ -315,7 +317,10 @@ export default function Header() {
           ) : (
             <>
               <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-                {t('swap')}
+                {t('Swap')}
+              </StyledNavLink>
+              <StyledNavLink id={`mint-nav-link`} to={'/mint'}>
+                {t('Mint')}
               </StyledNavLink>
               <StyledNavLink
                 id={`pool-nav-link`}
@@ -333,9 +338,6 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 Risks
               </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                Airdrop
-              </StyledNavLink>
               <StyledNavLink id={`swap-nav-link`} to={'/stake'}>
                 Stake
               </StyledNavLink>
@@ -349,7 +351,7 @@ export default function Header() {
       <HeaderControls>
         <HeaderElement>
           {aggregateBalance && (
-            <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
+            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
                   <HideSmall>
@@ -384,17 +386,15 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
-          {darkMode ? '🌉' : '🌁'}
-        </StyledMenuButton>
-
-        <HeaderElementWrap>
+        <RowFixed>
+          <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+            {darkMode ? '🌉' : '🌁'}
+          </StyledMenuButton>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
-
-          {/* <Menu /> */}
-        </HeaderElementWrap>
+          <Menu />
+        </RowFixed>
       </HeaderControls>
     </HeaderFrame>
   )
@@ -410,6 +410,7 @@ const UBEAmount = styled(AccountElement)`
 `
 
 const UBEWrapper = styled.span`
+  margin-left: 8px;
   width: fit-content;
   position: relative;
   cursor: pointer;

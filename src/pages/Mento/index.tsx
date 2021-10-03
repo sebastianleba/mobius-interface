@@ -2,7 +2,7 @@ import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import SettingsTab from 'components/Settings'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
-import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
+import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import useENS from 'hooks/useENS'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -10,13 +10,14 @@ import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
-import { ThemeContext } from 'styled-components'
+import { useDefaultsFromURLSearch, useMentoTradeInfo, useSwapActionHandlers, useSwapState } from 'state/mento/hooks'
+import styled, { ThemeContext } from 'styled-components'
 
-import AddressInputPanel from '../../components/AddressInputPanel'
 import { ButtonConfirmed, ButtonError, ButtonPrimary } from '../../components/Button'
 import Card, { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
 import ProgressSteps from '../../components/ProgressSteps'
@@ -24,40 +25,39 @@ import { AutoRow, RowBetween } from '../../components/Row'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
 import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
 import TradePrice from '../../components/swap/TradePrice'
-import TokenWarningModal from '../../components/TokenWarningModal'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
+import { MentoTrade } from '../../state/mento/hooks'
 import { Field } from '../../state/swap/actions'
-import {
-  MobiusTrade,
-  useDefaultsFromURLSearch,
-  useMobiusTradeInfo,
-  useSwapActionHandlers,
-  useSwapState,
-} from '../../state/swap/hooks'
 import {
   useExpertModeManager,
   useIsDarkMode,
   useUserSingleHopOnly,
   useUserSlippageTolerance,
 } from '../../state/user/hooks'
-import { LinkStyledButton, TYPE } from '../../theme'
+import { ExternalLink, LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
-import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
+import { computeMentoTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import { AppBodyNoBackground } from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 
-export default function Swap() {
+const VoteCard = styled(DataCard)`
+  background: radial-gradient(90% 90% at 50% 5%, #fbcc5c 0%, #35d07f 100%);
+  overflow: hidden;
+  margin-bottom: 2rem;
+`
+
+export default function Mento() {
   const loadedUrlParams = useDefaultsFromURLSearch()
   const isDarkMode = useIsDarkMode()
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
-    useCurrency(false, loadedUrlParams?.inputCurrencyId),
-    useCurrency(false, loadedUrlParams?.outputCurrencyId),
+    useCurrency(true, loadedUrlParams?.inputCurrencyId),
+    useCurrency(true, loadedUrlParams?.outputCurrencyId),
   ]
   const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
@@ -70,10 +70,6 @@ export default function Swap() {
 
   // dismiss warning if all imported tokens are in active lists
   const importTokensNotInDefault = []
-  // urlLoadedTokens &&
-  // urlLoadedTokens.filter((token: Token) => {
-  //   return !(token.address in defaultTokens)
-  // })
 
   const { account } = useActiveContractKit()
   const theme = useContext(ThemeContext)
@@ -87,10 +83,9 @@ export default function Swap() {
 
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
-
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
-  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMobiusTradeInfo()
+  const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMentoTradeInfo()
 
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
@@ -99,7 +94,6 @@ export default function Swap() {
     [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.input,
     [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.output,
   }
-
   const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
@@ -120,7 +114,7 @@ export default function Swap() {
   // modal and loading
   const [{ showConfirm, tradeToConfirm, swapErrorMessage, attemptingTxn, txHash }, setSwapState] = useState<{
     showConfirm: boolean
-    tradeToConfirm: MobiusTrade | undefined
+    tradeToConfirm: MentoTrade | undefined
     attemptingTxn: boolean
     swapErrorMessage: string | undefined
     txHash: string | undefined
@@ -143,7 +137,6 @@ export default function Swap() {
   const userHasSpecifiedInputOutput = Boolean(
     currencies[Field.INPUT] && currencies[Field.OUTPUT] && parsedAmounts[independentField]?.greaterThan(JSBI.BigInt(0))
   )
-  const route = null
   const noRoute = false
 
   // check whether the user has approved the router on the input token
@@ -161,11 +154,9 @@ export default function Swap() {
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
-
   // the callback to execute the swap
-  const { callback: swapCallback, error: swapCallbackError } = useTradeCallback(trade, allowedSlippage, recipient)
-
-  const { priceImpactWithoutFee } = computeTradePriceBreakdown(trade)
+  const { callback: swapCallback, error: swapCallbackError } = useMentoTradeCallback(trade, allowedSlippage, recipient)
+  const { priceImpactWithoutFee } = computeMentoTradePriceBreakdown(trade)
 
   const [singleHopOnly] = useUserSingleHopOnly()
 
@@ -248,20 +239,39 @@ export default function Swap() {
 
   const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
 
-  const { isEstimate, makeLabel } = describeTrade()
+  const { isEstimate, makeLabel } = describeTrade(true)
   const actionLabel = makeLabel(independentField !== Field.INPUT)
 
   return (
     <>
-      <TokenWarningModal
-        isOpen={importTokensNotInDefault.length > 0 && !dismissTokenWarning}
-        tokens={importTokensNotInDefault}
-        onConfirm={handleConfirmTokenWarning}
-      />
       <SwapPoolTabs active={'swap'} />
       <AppBodyNoBackground>
         {/* <SwapHeader title={actionLabel} /> */}
         <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
+          <VoteCard>
+            <CardNoise />
+            <CardSection>
+              <AutoColumn gap="md">
+                <RowBetween>
+                  <TYPE.white fontWeight={600}>Mento Exchange</TYPE.white>
+                </RowBetween>
+                <RowBetween>
+                  <TYPE.white
+                    fontSize={14}
+                  >{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve. This exchange includes a 0.5% fee that is collected by the Celo Reserve.`}</TYPE.white>
+                </RowBetween>
+                <ExternalLink
+                  style={{ color: 'white', textDecoration: 'underline' }}
+                  target="_blank"
+                  href="https://docs.celo.org/celo-codebase/protocol/stability/doto"
+                >
+                  <TYPE.white fontSize={14}>Read more about the Mento exchange</TYPE.white>
+                </ExternalLink>
+              </AutoColumn>
+            </CardSection>
+            <CardNoise />
+          </VoteCard>
+          {/* <img src={MintLogo} /> */}
           <ConfirmSwapModal
             isOpen={showConfirm}
             trade={trade}
@@ -317,20 +327,6 @@ export default function Swap() {
               otherCurrency={currencies[Field.INPUT]}
               id="swap-currency-output"
             />
-
-            {recipient !== null ? (
-              <>
-                <AutoRow justify="space-between" style={{ padding: '0 1rem' }}>
-                  <ArrowWrapper clickable={false}>
-                    <ArrowDown size="16" color={theme.text2} />
-                  </ArrowWrapper>
-                  <LinkStyledButton id="remove-recipient-button" onClick={() => onChangeRecipient(null)}>
-                    - Remove send
-                  </LinkStyledButton>
-                </AutoRow>
-                <AddressInputPanel id="recipient" value={recipient} onChange={onChangeRecipient} />
-              </>
-            ) : null}
             <Card padding={'0px'} borderRadius={'20px'}>
               <AutoColumn gap="8px" style={{ padding: '0 16px' }}>
                 {Boolean(trade) && (
@@ -370,7 +366,6 @@ export default function Swap() {
             ) : noRoute && userHasSpecifiedInputOutput ? (
               <GreyCard style={{ textAlign: 'center' }}>
                 <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>
-                {singleHopOnly && <TYPE.main mb="4px">Try enabling multi-hop trades.</TYPE.main>}
               </GreyCard>
             ) : showApproveFlow ? (
               <RowBetween>
@@ -457,11 +452,6 @@ export default function Swap() {
           </AutoRow>
         </Wrapper>
       </AppBodyNoBackground>
-      {/* {!swapIsUnsupported ? (
-        <AdvancedSwapDetailsDropdown trade={trade} />
-      ) : (
-        <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )} */}
     </>
   )
 }

@@ -1214,9 +1214,9 @@
   integrity sha512-an5TaLv/esjQLEYtF79f8isBUtHEN+ZiHci2H4gVTEAgRgS+nSp5QCq8/LV/biAh9kJJEpojEzlxJALSKu8Klg==
 
 "@celo-tools/use-contractkit@npm:@poofcash/use-contractkit@^1.0.2":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@poofcash/use-contractkit/-/use-contractkit-1.0.4.tgz#efea7e2ff9c463a6d8b0f233c1271ef0e7b4e71f"
-  integrity sha512-M294JQ21z6roMWsu4aNres/661mKmhZYKW+l0Q0YfuiwvbKwdf3SjlD5lewmGCCB7X5jOPmJ8bAo1rOGb4eA0w==
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@poofcash/use-contractkit/-/use-contractkit-1.0.6.tgz#55545bc95d6e701d36e98ba9009b9c73863aefbe"
+  integrity sha512-Kmrr8OlLgN1mcB1g2Cka7eUgdgcOcS/QzzRVdOPAvXVO6bunlioP1FPamJ3KZ0goDkImxOsxYLFPyXcBAiKn3w==
   dependencies:
     "@celo-tools/celo-ethers-wrapper" "^0.0.5"
     "@celo/contractkit" "1.2.4"
