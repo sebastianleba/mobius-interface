@@ -33,7 +33,7 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, lpToken } = poolInfo
-  const lpBalance = poolInfo.amountDeposited
+  const lpBalance = poolInfo.amountDeposited?.subtract(poolInfo.stakedAmount)
   const [approving, setApproving] = useState(false)
   const [input, setInput] = useState<string>('')
   const selectedAmount = tryParseAmount(input, lpToken) || new TokenAmount(lpToken, '0')
@@ -75,8 +75,15 @@ export default function WithdrawLP({ poolInfo, setHash, setAttempting }: Withdra
     error = error ?? 'Insufficient Funds'
   }
 
+  const decimalPlacesForBalance = lpBalance?.greaterThan('1') ? 2 : lpBalance?.greaterThan('0') ? 10 : 2
+
   return (
     <>
+      {poolInfo.stakedAmount.greaterThan(JSBI.BigInt(0)) && (
+        <TYPE.mediumHeader>
+          {poolInfo.stakedAmount.toFixed(decimalPlacesForBalance)} MobLP currently deposited in the farm
+        </TYPE.mediumHeader>
+      )}
       <CurrencyRow val={input} token={lpToken} balance={lpBalance} setTokenAmount={setInput} />
       {selectedAmount.greaterThan(JSBI.BigInt('0')) && (
         <div>
