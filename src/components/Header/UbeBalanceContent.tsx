@@ -1,5 +1,6 @@
 import { ChainId } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
+import QuestionHelper from 'components/QuestionHelper'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { X } from 'react-feather'
@@ -13,7 +14,7 @@ import { useAggregateUbeBalance } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE, UbeTokenAnimated } from '../../theme'
 import { AutoColumn } from '../Column'
 import { Break, CardNoise, CardSection, DataCard } from '../earn/styled'
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
 import { useCirculatingSupply } from './useCirculatingSupply'
 
 const ContentWrapper = styled(AutoColumn)`
@@ -100,7 +101,10 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
               <TYPE.white color="white">${mobiprice?.toFixed(3) ?? '-'}</TYPE.white>
             </RowBetween>
             <RowBetween>
-              <TYPE.white color="white">MOBI in circulation:</TYPE.white>
+              <RowFixed>
+                <TYPE.white color="white">MOBI in circulation:</TYPE.white>
+                <QuestionHelper text={'Total minted supply - treasury - unvested - staked'} />
+              </RowFixed>
               <TYPE.white color="white">{circulation?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
             </RowBetween>
             <RowBetween>
