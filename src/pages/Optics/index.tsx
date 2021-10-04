@@ -50,7 +50,6 @@ export default function Optics() {
   const isDarkMode = useIsDarkMode()
   const doTransaction = useDoTransaction()
   const { chainId, account, destroy, network, connect, library, updateNetwork } = useActiveContractKit()
-  console.log({ chainId, account, network, library })
   //const chainId = useChainId()
   const tokens = useBridgeableTokens()
   const networkConfigs = useNetworkDomains()
