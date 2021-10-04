@@ -124,9 +124,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
                 </RowBetween>
               </>
               <RowFixed>
-                <TYPE.body>{`Vote for ${summary.pool} to receive ${input.toFixed(
-                  0
-                )}% of additional rewards`}</TYPE.body>
+                <TYPE.body>{`Vote for ${summary.pool} to receive ${input.toFixed(0)}% of inflation`}</TYPE.body>
               </RowFixed>
               <ButtonError disabled={!!error} error={!!error} onClick={onClaimReward}>
                 {error ?? `Vote!`}

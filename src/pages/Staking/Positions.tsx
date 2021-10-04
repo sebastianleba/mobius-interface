@@ -139,7 +139,7 @@ function PositionCard({
         <CardNoise />
         <RowBetween>
           <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <TYPE.white color="white">{`$${lpAsUsd?.toSignificant(4)} Staked`}</TYPE.white>
+          <TYPE.white color="white">{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.white>
         </RowBetween>
         {showMore && (
           <>
@@ -148,14 +148,14 @@ function PositionCard({
               <TYPE.white>Unclaimed MOBI</TYPE.white>
               <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.white>
             </RowBetween>
-            <RowBetween>
+            {/* <RowBetween>
               <TYPE.white>Your actual share</TYPE.white>
               <TYPE.white>{`${position.actualPercentage.toSignificant(4)}%`}</TYPE.white>
             </RowBetween>
             <RowBetween>
               <TYPE.white>Your share, accounted for boosts</TYPE.white>
               <TYPE.white>{`${position.workingPercentage.toSignificant(4)}%`}</TYPE.white>
-            </RowBetween>
+            </RowBetween> */}
             <RowBetween>
               <TYPE.white>Your Boost</TYPE.white>
               <TYPE.white>{`${boost.toFixed(0)}%`}</TYPE.white>

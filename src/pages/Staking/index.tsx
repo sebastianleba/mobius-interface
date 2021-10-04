@@ -48,17 +48,6 @@ export default function Staking() {
   const mobi = useMobi()
   const unclaimedMobi = new TokenAmount(mobi, getAllUnclaimedMobi(stakingInfo.positions ?? []))
 
-  const outerPieData =
-    stakingInfo.positions?.map((info) => ({
-      label: info.pool,
-      value: parseInt(info.boostedBalance.toExact()),
-    })) ?? []
-  const innerPieData =
-    stakingInfo.positions?.map((info) => ({
-      label: info.pool,
-      value: parseInt(info.totalStaked.toExact()),
-    })) ?? []
-
   const displayData = [
     {
       label: 'Your Voting Power',

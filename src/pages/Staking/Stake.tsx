@@ -1,3 +1,4 @@
+import { TransactionResponse } from '@ethersproject/abstract-provider'
 import { ButtonOutlined, ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { RowBetween, RowFixed } from 'components/Row'
@@ -6,6 +7,8 @@ import { MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 
+import { useVotingEscrowContract } from '../../hooks/useContract'
+import { useTransactionAdder } from '../../state/transactions/hooks'
 import LockModal, { LockType } from './LockModal'
 
 const Container = styled.div`
@@ -55,6 +58,28 @@ type PropTypes = {
 export default function Stake({ stakingInfo }: PropTypes) {
   const { mobiLocked, lockEnd } = stakingInfo
   const [lockType, setLockType] = useState(-1)
+  const veMobiContract = useVotingEscrowContract()
+  const [attempting, setAttempting] = useState(false)
+  const addTransaction = useTransactionAdder()
+  async function onClaim() {
+    if (veMobiContract) {
+      setAttempting(true)
+      await veMobiContract
+        .withdraw({ gasLimit: 10000000 })
+        .then((response: TransactionResponse) => {
+          addTransaction(response, {
+            summary: `Claimed locked MOBI`,
+          })
+        })
+        .catch((error: any) => {
+          setAttempting(false)
+          console.log(error)
+        })
+        .finally(() => {
+          setAttempting(false)
+        })
+    }
+  }
 
   return (
     <Container>
@@ -81,7 +106,9 @@ export default function Stake({ stakingInfo }: PropTypes) {
           </RowBetween>
           {Date.now() > (lockEnd?.valueOf() ?? 0) && (
             <ButtonGroup>
-              <ButtonPrimary disabled={Date.now() < (lockEnd?.valueOf() ?? 0)}>Claim Locked Mobi</ButtonPrimary>
+              <ButtonPrimary onClick={onClaim} disabled={attempting || Date.now() < (lockEnd?.valueOf() ?? 0)}>
+                {attempting ? 'Claiming...' : 'Claim Locked Mobi'}
+              </ButtonPrimary>
             </ButtonGroup>
           )}
         </Wrapper>

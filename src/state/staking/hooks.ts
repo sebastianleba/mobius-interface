@@ -71,15 +71,6 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     address: pool.gaugeAddress ?? '',
     baseBalance: new TokenAmount(pool.lpToken, pool.staking?.userStaked ?? '0'),
     totalStaked: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
-    boostedBalance: new TokenAmount(
-      pool.lpToken,
-      calculateBoostedBalance(
-        stakingInfo.votingPower,
-        stakingInfo.totalVotingPower,
-        pool.staking?.userStaked ?? JSBI.BigInt('0'),
-        pool.staking?.totalStakedAmount ?? JSBI.BigInt('1')
-      )
-    ),
     unclaimedMobi: new TokenAmount(mobi, pool.staking?.pendingMobi ?? '0'),
     firstToken: pool.tokens[0],
     currentWeight: pool.poolWeight,
