@@ -1,9 +1,10 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
 import { useActiveContractKit } from 'hooks'
 import { useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useEthBtcPrice } from 'state/application/hooks'
 import { tryParseAmount } from 'state/swap/hooks'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
@@ -32,6 +33,7 @@ export interface StablePoolInfo {
   readonly mobiRate: JSBI | undefined
   readonly pendingMobi: JSBI | undefined
   readonly gaugeAddress?: string
+  readonly workingPercentage: Percent
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -55,7 +57,7 @@ export function usePools(): readonly StableSwapPool[] {
 const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
   new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
 
-const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
+export const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   name: pool.name,
   poolAddress: pool.address,
   lpToken: pool.lpToken,
@@ -78,6 +80,7 @@ const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
   totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? '0'),
+  workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
@@ -161,4 +164,18 @@ export function usePool(): readonly [StableSwapPool] {
     state.swap.OUTPUT.currencyId,
   ])
   return useCurrentPool(tok1, tok2)
+}
+
+export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAmount | undefined {
+  const pool = useStablePoolInfoByName(poolName)
+  const price = useEthBtcPrice(pool?.poolAddress ?? '')
+  return pool && price && amountOfLp
+    ? new TokenAmount(
+        amountOfLp.token,
+        JSBI.divide(
+          JSBI.multiply(amountOfLp.raw, JSBI.multiply(pool?.virtualPrice, price)),
+          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+        )
+      )
+    : undefined
 }

@@ -205,7 +205,6 @@ export function useUserAddedTokens(): Token[] {
   const serializedTokensMap = useSelector<AppState, AppState['user']['tokens']>(({ user: { tokens } }) => tokens)
 
   return useMemo(() => {
-    console.log({ chainId, serializedTokensMap })
     if (!chainId) return []
     return Object.values(serializedTokensMap[chainId] ?? {}).map(deserializeToken)
   }, [serializedTokensMap, chainId])

@@ -122,6 +122,10 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         >
           Pool
         </StyledNavLink>
+        <StyledNavLink id={`swap-nav-link`} to={'/stake'} onClick={onDismiss}>
+          Stake
+        </StyledNavLink>
+
         <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
           Risks
         </StyledNavLink>

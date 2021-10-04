@@ -12,7 +12,18 @@ export type StablePoolInfo = {
   name: string
 }
 
-const mobiToken = (chainId: number, address: string) => new Token(chainId, address, 18, 'MOBI', 'Mobius')
+const mobiToken = (chainId: number, address: string) =>
+  new WrappedTokenInfo(
+    {
+      chainId,
+      address,
+      decimals: 18,
+      symbol: 'MOBI',
+      name: 'Mobius DAO Token',
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_MOBI.png',
+    },
+    []
+  )
 
 export enum Coins {
   Bitcoin,
@@ -34,19 +45,25 @@ export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
 
 export const MOBIUS_MINTER_ADDRESS: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0x5F0200CA03196D5b817E2044a0Bb0D837e0A7823',
-  [ChainId.ALFAJORES]: '0xa9f324CdB134f0b24094DCC80Fb720181e992437',
+  [ChainId.ALFAJORES]: '0x5c212FA1cf8b1143f2142C26161e65404034c01f',
   [ChainId.BAKLAVA]: '',
 }
 
 export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
   [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0x73a210637f6F6B7005512677Ba6B3C96bb4AA44B'),
-  [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
+  [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x6dDcbC22c1ED5D0662635ffb020c82DF4e1Ba234'),
   [ChainId.BAKLAVA]: undefined,
 }
 
 export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25',
-  [ChainId.ALFAJORES]: '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79',
+  [ChainId.ALFAJORES]: '0x00063Fbe0c90834EE90C6191d0D9F04eaB01A14f',
+  [ChainId.BAKLAVA]: '',
+}
+
+export const VOTING_ESCROW: { [K in ChainId]: string } = {
+  [ChainId.MAINNET]: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
+  [ChainId.ALFAJORES]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
   [ChainId.BAKLAVA]: '',
 }
 
@@ -442,7 +459,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: 'CELO',
       pegComesAfter: true,
-      gaugeAddress: '0x1a567D4F6870Cd3eC1aD82f3CF8fF0EbCCbBfEcF',
+      gaugeAddress: '0x8222452cF3780825aA657B40C63D492F33F28bF6',
       relativeGaugeWeight: new Fraction('1', '10'),
       displayDecimals: 0,
     },
@@ -507,7 +524,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
-      gaugeAddress: '0x97Ae8F2962B8e6951CaF1868f31bD3DfD4093489',
+      gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
       relativeGaugeWeight: new Fraction('9', '10'),
     },
   ],

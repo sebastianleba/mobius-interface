@@ -192,9 +192,6 @@ export function useDerivedStableSwapInfo(): {
     ({ tokens }) => tokens.includes(inputCurrency?.address || '') && tokens.includes(outputCurrency?.address || '')
   )
 
-  console.log(poolInfo, '8898')
-  console.log('in')
-
   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,

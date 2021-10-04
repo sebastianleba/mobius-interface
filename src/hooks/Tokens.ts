@@ -4,7 +4,7 @@ import { Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
-import { MENTO_POOL_INFO, MOBI_TOKEN, STATIC_POOL_INFO } from '../constants/StablePools'
+import { MENTO_POOL_INFO, MOBI_TOKEN, STATIC_POOL_INFO, VOTING_ESCROW } from '../constants/StablePools'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { isAddress } from '../utils'
 import { TokenAddressMap } from './../state/lists/hooks'
@@ -165,4 +165,9 @@ export function useCurrency(mento: boolean, currencyId: string | undefined): Tok
 export function useMobi(): Token | undefined {
   const { chainId } = useActiveContractKit()
   return MOBI_TOKEN[chainId]
+}
+
+export function useVeMobi(): Token | undefined {
+  const { chainId } = useActiveContractKit()
+  return new Token(chainId, VOTING_ESCROW[chainId], 18)
 }
