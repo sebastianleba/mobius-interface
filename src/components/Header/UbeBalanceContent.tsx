@@ -1,4 +1,5 @@
 import { ChainId } from '@ubeswap/sdk'
+import Loader from 'components/Loader'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { X } from 'react-feather'
@@ -13,6 +14,7 @@ import { ExternalLink, TYPE, UbeTokenAnimated } from '../../theme'
 import { AutoColumn } from '../Column'
 import { Break, CardNoise, CardSection, DataCard } from '../earn/styled'
 import { RowBetween } from '../Row'
+import { useCirculatingSupply } from './useCirculatingSupply'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -48,7 +50,7 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
   // const totalSupply: TokenAmount | undefined = useTotalSupply(ube)
   const mobi = useMobi()
   const mobiprice = useCUSDPrice(mobi)
-  // const circulation = useCirculatingSupply()
+  const circulation = useCirculatingSupply()
 
   return (
     <ContentWrapper gap="lg">
@@ -97,10 +99,10 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
               <TYPE.white color="white">MOBI price:</TYPE.white>
               <TYPE.white color="white">${mobiprice?.toFixed(3) ?? '-'}</TYPE.white>
             </RowBetween>
-            {/* <RowBetween>
-              <TYPE.white color="white">UBE in circulation:</TYPE.white>
-              {/* <TYPE.white color="white">{circulation?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white> */}
-            {/* </RowBetween> */}
+            <RowBetween>
+              <TYPE.white color="white">MOBI in circulation:</TYPE.white>
+              <TYPE.white color="white">{circulation?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
+            </RowBetween>
             <RowBetween>
               <TYPE.white color="white">Total Supply</TYPE.white>
               <TYPE.white color="white">1,000,000,000</TYPE.white>
