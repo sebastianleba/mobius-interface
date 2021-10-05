@@ -120,18 +120,17 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
           }
           onClick={onDismiss}
         >
-          Pool
+          {t('Pool')}
         </StyledNavLink>
         <StyledNavLink id={`swap-nav-link`} to={'/stake'} onClick={onDismiss}>
-          Stake
-        </StyledNavLink>
-
-        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
-          Risks
+          {t('Stake')}
         </StyledNavLink>
         <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
-          Bridge
+          {t('Bridge')}
         </StyledExternalLink>
+        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
+          {t('Risks')}
+        </StyledNavLink>
       </LinkContainer>
     </CustomModal>
   )

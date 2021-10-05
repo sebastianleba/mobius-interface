@@ -1,3 +1,4 @@
+import JSBI from 'jsbi'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
@@ -50,10 +51,16 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
             </RowFixed>
             <Toggle id="toggle-equal-amount-button" isActive={byToken} toggle={() => setByToken(!byToken)} />
           </RowBetween> */}
-          {byToken ? (
-            <WithdrawTokens poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
+          {JSBI.greaterThan(JSBI.subtract(poolInfo.amountDeposited?.raw, poolInfo.stakedAmount.raw), JSBI.BigInt(0)) ? (
+            byToken ? (
+              <WithdrawTokens poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
+            ) : (
+              <WithdrawLP poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
+            )
           ) : (
-            <WithdrawLP poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
+            <RowBetween>
+              <TYPE.mediumHeader>Withdraw from farm first</TYPE.mediumHeader>
+            </RowBetween>
           )}
         </ContentWrapper>
       )}

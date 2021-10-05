@@ -8,7 +8,7 @@ import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
 import Hamburger from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
@@ -282,11 +282,6 @@ export default function Header() {
   const aggregateBalance: TokenAmount | undefined = useAggregateUbeBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
-  const history = useHistory()
-
-  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
-  const now = new Date()
-  const isLive = true
 
   return (
     <HeaderFrame>
@@ -333,17 +328,17 @@ export default function Header() {
                   pathname.startsWith('/find')
                 }
               >
-                Pool
-              </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-                Risks
+                {t('Pool')}
               </StyledNavLink>
               <StyledNavLink id={`swap-nav-link`} to={'/stake'}>
-                Stake
+                {t('Stake')}
               </StyledNavLink>
               <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
-                Bridge
+                {t('Bridge')}
               </StyledExternalLink>
+              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+                {t('Risks')}
+              </StyledNavLink>
             </>
           )}
         </HeaderLinks>
@@ -406,7 +401,7 @@ const UBEAmount = styled(AccountElement)`
   height: 36px;
   font-weight: 500;
   background-color: ${({ theme }) => theme.bg3};
-  background: radial-gradient(174.47% 188.91% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #2172e5 100%), #edeef2;
+  background: radial-gradient(174.47% 188.91% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #3488ec 100%), #edeef2;
 `
 
 const UBEWrapper = styled.span`

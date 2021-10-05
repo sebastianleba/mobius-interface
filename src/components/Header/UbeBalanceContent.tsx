@@ -1,4 +1,6 @@
 import { ChainId } from '@ubeswap/sdk'
+import Loader from 'components/Loader'
+import QuestionHelper from 'components/QuestionHelper'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { X } from 'react-feather'
@@ -12,7 +14,8 @@ import { useAggregateUbeBalance } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE, UbeTokenAnimated } from '../../theme'
 import { AutoColumn } from '../Column'
 import { Break, CardNoise, CardSection, DataCard } from '../earn/styled'
-import { RowBetween } from '../Row'
+import { RowBetween, RowFixed } from '../Row'
+import { useCirculatingSupply } from './useCirculatingSupply'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -20,7 +23,7 @@ const ContentWrapper = styled(AutoColumn)`
 
 const ModalUpper = styled(DataCard)`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #021d43 100%), #edeef2;
+  background: radial-gradient(76.02% 75.41% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #3488ec 100%), #edeef2;
   padding: 0.5rem;
 `
 
@@ -48,7 +51,7 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
   // const totalSupply: TokenAmount | undefined = useTotalSupply(ube)
   const mobi = useMobi()
   const mobiprice = useCUSDPrice(mobi)
-  // const circulation = useCirculatingSupply()
+  const ret = useCirculatingSupply()
 
   return (
     <ContentWrapper gap="lg">
@@ -94,13 +97,20 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
         <CardSection gap="sm">
           <AutoColumn gap="md">
             <RowBetween>
-              <TYPE.white color="white">MOBI price:</TYPE.white>
+              <TYPE.white color="white">MOBI price</TYPE.white>
               <TYPE.white color="white">${mobiprice?.toFixed(3) ?? '-'}</TYPE.white>
             </RowBetween>
-            {/* <RowBetween>
-              <TYPE.white color="white">UBE in circulation:</TYPE.white>
-              {/* <TYPE.white color="white">{circulation?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white> */}
-            {/* </RowBetween> */}
+            <RowBetween>
+              <RowFixed>
+                <TYPE.white color="white">MOBI in circulation</TYPE.white>
+                <QuestionHelper text={'Total minted supply - treasury - unvested - staked'} />
+              </RowFixed>
+              <TYPE.white color="white">{ret?.supply?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
+            </RowBetween>
+            <RowBetween>
+              <TYPE.white color="white">Staked MOBI</TYPE.white>
+              <TYPE.white color="white">{ret?.staked?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
+            </RowBetween>
             <RowBetween>
               <TYPE.white color="white">Total Supply</TYPE.white>
               <TYPE.white color="white">1,000,000,000</TYPE.white>

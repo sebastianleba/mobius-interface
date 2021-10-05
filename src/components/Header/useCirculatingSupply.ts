@@ -1,63 +1,67 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { JSBI, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { UBE } from 'constants/tokens'
 import { useActiveContractKit } from 'hooks/index'
-import { useReleaseUbeContract, useTokenContract } from 'hooks/useContract'
+import { useMobiContract } from 'hooks/useContract'
 import { useEffect, useState } from 'react'
 import { useSingleContractMultipleData } from 'state/multicall/hooks'
-import { useUnclaimedStakingRewards } from 'state/stake/hooks'
-
-const DECIMALS = BigNumber.from(10).pow(18)
-const HARDCAP = BigNumber.from(100_000_000).mul(DECIMALS)
-const RELEASED = BigNumber.from(25_700_000).mul(DECIMALS)
 
 // Addresses that do not contribute to circulating supply
+
 const nonCirculatingAddresses = {
-  MiningReleaseEscrow: '0x9d0a92AA8832518328D14Ed5930eC6B44448165e',
-  PoolManager: '0x9Ee3600543eCcc85020D6bc77EB553d1747a65D2',
+  Treasury: '0x16E319d8dAFeF25AAcec0dF0f1E349819D36993c',
+  Airdrop: '0x74Fc71eF736feeaCfd58aeb2543c5fe4d33aDc14',
+  Founder: '0x34deFd314fa23821a87FCbF5393311Bc5B7608C1',
+  Investor: '0x5498248EaB20ff314bC465268920B48eed4Cdb7C',
+  Advisor: '0x54Bf52862E1Fdf0D43D9B19Abb5ec72acA0a25A6',
 }
 
 /**
  * Fetches the circulating supply
  */
-export const useCirculatingSupply = (): TokenAmount | undefined => {
+export const useCirculatingSupply = (): { supply: TokenAmount; staked: Percent } | undefined => {
   const { chainId } = useActiveContractKit()
-  const ube = chainId ? UBE[chainId] : undefined
-  const ubeContract = useTokenContract(ube?.address)
-  const releaseUbe = useReleaseUbeContract()
+  const mobi = chainId ? UBE[chainId] : undefined
+  const mobiContract = useMobiContract()
 
   // compute amount that is locked up
   const balancesRaw = useSingleContractMultipleData(
-    ubeContract,
+    mobiContract,
     'balanceOf',
     Object.values(nonCirculatingAddresses).map((addr) => [addr])
   )
+
+  const [available, setAvailable] = useState<BigNumber | null>(null)
+  useEffect(() => {
+    void (async () => {
+      setAvailable((await mobiContract?.available_supply())!)
+    })()
+  }, [mobiContract])
+
+  //Voting contract
+  const [staked, setStaked] = useState<BigNumber | null>(null)
+  useEffect(() => {
+    void (async () => {
+      setStaked((await mobiContract?.balanceOf('0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E'))!)
+    })()
+  }, [mobiContract])
+
   // if we are still loading, do not load
   const balances = balancesRaw?.find((result) => !result.result)
     ? null
     : (balancesRaw.map((b) => b.result?.[0] ?? BigNumber.from(0)) as readonly BigNumber[])
   const lockedBalancesSum = balances?.reduce((sum, b) => b.add(sum), BigNumber.from(0))
 
-  // add amount of tokens that could be claimed but are not being claimed
-  const { noncirculatingSupply } = useUnclaimedStakingRewards()
-
-  // compute amount that has been released
-  const [released, setReleased] = useState<BigNumber | null>(null)
-  useEffect(() => {
-    void (async () => {
-      if (releaseUbe) {
-        setReleased(RELEASED.sub(await releaseUbe.releasableSupplyOfPrincipal(RELEASED)))
-      }
-    })()
-  }, [releaseUbe])
-
-  if (!lockedBalancesSum || !released || !noncirculatingSupply) {
+  if (!lockedBalancesSum || !available || !staked) {
     return undefined
   }
-  return ube
-    ? new TokenAmount(
-        ube,
-        JSBI.BigInt(HARDCAP.sub(lockedBalancesSum).sub(released).sub(noncirculatingSupply).toString())
-      )
+  return mobi
+    ? {
+        supply: new TokenAmount(
+          mobi,
+          JSBI.subtract(JSBI.subtract(JSBI.BigInt(available), JSBI.BigInt(lockedBalancesSum)), JSBI.BigInt(staked))
+        ),
+        staked: new TokenAmount(mobi, JSBI.BigInt(staked)),
+      }
     : undefined
 }
