@@ -71,7 +71,9 @@ type PositionsProps = {
 export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps) {
   const { positions = [] } = stakingInfo
   const loading = positions.length === 0
-  const greaterThanZero = positions.filter(({ baseBalance }) => baseBalance.greaterThan('0'))
+  const greaterThanZero = positions.filter(
+    ({ baseBalance, unclaimedMobi }) => baseBalance.greaterThan('0') || unclaimedMobi.greaterThan('0')
+  )
   const [openModal, setOpenModal] = useState(false)
   return (
     <Container>
