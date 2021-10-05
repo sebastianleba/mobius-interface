@@ -1,5 +1,5 @@
 import { BigNumber } from '@ethersproject/bignumber'
-import { JSBI, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { UBE } from 'constants/tokens'
 import { useActiveContractKit } from 'hooks/index'
 import { useMobiContract } from 'hooks/useContract'
@@ -14,13 +14,12 @@ const nonCirculatingAddresses = {
   Founder: '0x34deFd314fa23821a87FCbF5393311Bc5B7608C1',
   Investor: '0x5498248EaB20ff314bC465268920B48eed4Cdb7C',
   Advisor: '0x54Bf52862E1Fdf0D43D9B19Abb5ec72acA0a25A6',
-  Voting: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
 }
 
 /**
  * Fetches the circulating supply
  */
-export const useCirculatingSupply = (): TokenAmount | undefined => {
+export const useCirculatingSupply = (): { supply: TokenAmount; staked: Percent } | undefined => {
   const { chainId } = useActiveContractKit()
   const mobi = chainId ? UBE[chainId] : undefined
   const mobiContract = useMobiContract()
@@ -39,7 +38,12 @@ export const useCirculatingSupply = (): TokenAmount | undefined => {
     })()
   }, [mobiContract])
 
-  console.log(available?.toString())
+  const [staked, setStaked] = useState<BigNumber | null>(null)
+  useEffect(() => {
+    void (async () => {
+      setStaked((await mobiContract?.balanceOf('0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E'))!)
+    })()
+  }, [mobiContract])
 
   // if we are still loading, do not load
   const balances = balancesRaw?.find((result) => !result.result)
@@ -47,8 +51,16 @@ export const useCirculatingSupply = (): TokenAmount | undefined => {
     : (balancesRaw.map((b) => b.result?.[0] ?? BigNumber.from(0)) as readonly BigNumber[])
   const lockedBalancesSum = balances?.reduce((sum, b) => b.add(sum), BigNumber.from(0))
 
-  if (!lockedBalancesSum || !available) {
+  if (!lockedBalancesSum || !available || !staked) {
     return undefined
   }
-  return mobi ? new TokenAmount(mobi, JSBI.subtract(JSBI.BigInt(available), JSBI.BigInt(lockedBalancesSum))) : undefined
+  return mobi
+    ? {
+        supply: new TokenAmount(
+          mobi,
+          JSBI.subtract(JSBI.subtract(JSBI.BigInt(available), JSBI.BigInt(lockedBalancesSum)), JSBI.BigInt(staked))
+        ),
+        staked: new TokenAmount(mobi, JSBI.BigInt(staked)),
+      }
+    : undefined
 }

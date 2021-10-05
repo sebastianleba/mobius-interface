@@ -51,7 +51,7 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
   // const totalSupply: TokenAmount | undefined = useTotalSupply(ube)
   const mobi = useMobi()
   const mobiprice = useCUSDPrice(mobi)
-  const circulation = useCirculatingSupply()
+  const ret = useCirculatingSupply()
 
   return (
     <ContentWrapper gap="lg">
@@ -97,15 +97,19 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
         <CardSection gap="sm">
           <AutoColumn gap="md">
             <RowBetween>
-              <TYPE.white color="white">MOBI price:</TYPE.white>
+              <TYPE.white color="white">MOBI price</TYPE.white>
               <TYPE.white color="white">${mobiprice?.toFixed(3) ?? '-'}</TYPE.white>
             </RowBetween>
             <RowBetween>
               <RowFixed>
-                <TYPE.white color="white">MOBI in circulation:</TYPE.white>
+                <TYPE.white color="white">MOBI in circulation</TYPE.white>
                 <QuestionHelper text={'Total minted supply - treasury - unvested - staked'} />
               </RowFixed>
-              <TYPE.white color="white">{circulation?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
+              <TYPE.white color="white">{ret?.supply?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
+            </RowBetween>
+            <RowBetween>
+              <TYPE.white color="white">Staked MOBI</TYPE.white>
+              <TYPE.white color="white">{ret?.staked?.toFixed(0, { groupSeparator: ',' }) ?? <Loader />}</TYPE.white>
             </RowBetween>
             <RowBetween>
               <TYPE.white color="white">Total Supply</TYPE.white>
