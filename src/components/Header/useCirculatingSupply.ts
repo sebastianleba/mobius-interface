@@ -38,6 +38,7 @@ export const useCirculatingSupply = (): { supply: TokenAmount; staked: Percent }
     })()
   }, [mobiContract])
 
+  //Voting contract
   const [staked, setStaked] = useState<BigNumber | null>(null)
   useEffect(() => {
     void (async () => {
