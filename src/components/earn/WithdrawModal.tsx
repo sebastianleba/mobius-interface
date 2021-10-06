@@ -1,9 +1,12 @@
 import JSBI from 'jsbi'
+import { darken } from 'polished'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
+import { useColor } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
-import { CloseIcon, TYPE } from '../../theme'
+import { CloseIcon, StyledInternalLink, TYPE } from '../../theme'
+import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
@@ -14,6 +17,19 @@ import WithdrawTokens from './WithdrawTokens'
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
   padding: 1rem;
+  gap: 2rem;
+`
+const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any }>`
+  background: ${({ background }) => background};
+  flex: 0.6;
+  &:hover {
+    background: ${({ background }) => darken(0.1, background)};
+  }
+`
+
+const DepositWithdrawBtn = styled(StyledButton)`
+  width: 100%;
+  flex: none;
 `
 
 interface WithdrawModalProps {
@@ -33,6 +49,9 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
     setAttempting(false)
     onDismiss()
   }
+
+  // get the color of the token
+  const backgroundColor = useColor()
 
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
@@ -58,9 +77,20 @@ export default function WithdrawModal({ isOpen, onDismiss, poolInfo }: WithdrawM
               <WithdrawLP poolInfo={poolInfo} setAttempting={setAttempting} setHash={setHash} />
             )
           ) : (
-            <RowBetween>
-              <TYPE.mediumHeader>Withdraw from farm first</TYPE.mediumHeader>
-            </RowBetween>
+            <ContentWrapper>
+              <RowBetween>
+                <TYPE.mediumHeader>Withdraw from farm first</TYPE.mediumHeader>
+              </RowBetween>
+              <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '100%' }}>
+                <DepositWithdrawBtn
+                  background={backgroundColor}
+                  backgroundHover={backgroundColor}
+                  style={{ width: '100%' }}
+                >
+                  Farm
+                </DepositWithdrawBtn>
+              </StyledInternalLink>
+            </ContentWrapper>
           )}
         </ContentWrapper>
       )}

@@ -13,13 +13,7 @@ import { tryParseAmount } from '../../state/swap/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
-import { AutoColumn } from '../Column'
 import { Input as NumericalInput } from '../NumericalInput'
-
-const ContentWrapper = styled(AutoColumn)`
-  width: 100%;
-  padding: 1rem;
-`
 
 interface WithdrawModalProps {
   setAttempting: (attempting: boolean) => void
