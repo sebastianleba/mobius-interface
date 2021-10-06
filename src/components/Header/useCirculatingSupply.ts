@@ -57,10 +57,7 @@ export const useCirculatingSupply = (): { supply: TokenAmount; staked: Percent }
   }
   return mobi
     ? {
-        supply: new TokenAmount(
-          mobi,
-          JSBI.subtract(JSBI.subtract(JSBI.BigInt(available), JSBI.BigInt(lockedBalancesSum)), JSBI.BigInt(staked))
-        ),
+        supply: new TokenAmount(mobi, JSBI.subtract(JSBI.BigInt(available), JSBI.BigInt(lockedBalancesSum))),
         staked: new TokenAmount(mobi, JSBI.BigInt(staked)),
       }
     : undefined
