@@ -17,6 +17,7 @@ export default function StakingUpdater() {
   const totalVotingPower = useSingleCallResult(votingEscrow, 'totalSupply()')
   const locked = useSingleCallResult(votingEscrow, 'locked', [account ?? undefined])
   const allocatedPower = useSingleCallResult(controller, 'vote_user_power', [account ?? undefined])
+  const totalWeight = useSingleCallResult(controller, 'get_total_weight')
   dispatch(
     updateStaking({
       stakingInfo: {
@@ -27,6 +28,7 @@ export default function StakingUpdater() {
           end: parseInt(locked?.result?.end.toString()) * 1000, // Need unix in milliseconds
         },
         voteUserPower: JSBI.BigInt(allocatedPower?.result?.[0] ?? '0'),
+        totalWeight: JSBI.BigInt(totalWeight?.result?.[0] ?? '0'),
       },
     })
   )

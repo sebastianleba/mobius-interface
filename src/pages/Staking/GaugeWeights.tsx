@@ -1,7 +1,7 @@
 import { CardNoise } from 'components/claim/styled'
 import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
-import { AutoRow, RowBetween } from 'components/Row'
+import { AutoRow, RowBetween, RowFixed } from 'components/Row'
 import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
@@ -144,6 +144,9 @@ const PositionWrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: a
     width: 49%;
   }
 `
+const RowWithGap = styled(RowFixed)`
+  gap: 8px;
+`
 
 function WeightCard({ position }: { position: GaugeSummary }) {
   const backgroundColor = useColor(position.firstToken)
@@ -162,7 +165,10 @@ function WeightCard({ position }: { position: GaugeSummary }) {
         <CardNoise />
         <RowBetween>
           <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
+          <RowWithGap gap="4px">
+            <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
+            <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
+          </RowWithGap>
         </RowBetween>
       </PositionWrapper>
     </>
