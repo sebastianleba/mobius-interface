@@ -21,6 +21,7 @@ export type GaugeSummary = {
   workingPercentage: Percent
   actualPercentage: Percent
   lastVote: Date
+  futureWeight: Percent
 }
 
 export type MobiStakingInfo = {
@@ -74,6 +75,10 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     unclaimedMobi: new TokenAmount(mobi, pool.staking?.pendingMobi ?? '0'),
     firstToken: pool.tokens[0],
     currentWeight: pool.poolWeight,
+    futureWeight: new Percent(
+      pool.futureWeight,
+      JSBI.divide(stakingInfo.totalWeight, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18)))
+    ),
     workingBalance: new TokenAmount(pool.lpToken, pool.effectiveBalance),
     totalWorkingBalance: new TokenAmount(pool.lpToken, pool.totalEffectiveBalance),
     workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),

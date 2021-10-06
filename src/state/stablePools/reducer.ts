@@ -25,6 +25,7 @@ export type StableSwapVariable = {
   effectiveBalance: JSBI
   totalEffectiveBalance: JSBI
   lastUserVote: number
+  futureWeight: JSBI
 }
 
 export type StableSwapMathConstants = {
