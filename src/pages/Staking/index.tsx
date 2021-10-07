@@ -52,19 +52,19 @@ export default function Staking() {
   const displayData = [
     {
       label: 'Your Voting Power',
-      value: stakingInfo.votingPower.toSignificant(4),
+      value: stakingInfo.votingPower.toSignificant(4, { groupSeparator: ',' }),
     },
     {
       label: 'Total Voting Power',
-      value: stakingInfo.totalVotingPower.toSignificant(4),
+      value: stakingInfo.totalVotingPower.toSignificant(4, { groupSeparator: ',' }),
     },
     {
       label: 'Your total deposits',
-      value: '$' + priceOfDeposits.toSignificant(4),
+      value: '$' + priceOfDeposits.toSignificant(4, { groupSeparator: ',' }),
     },
     {
       label: 'Unclaimed Mobi',
-      value: unclaimedMobi.toSignificant(4),
+      value: unclaimedMobi.toSignificant(4, { groupSeparator: ',' }),
     },
   ]
   if (width && width > 1280) {

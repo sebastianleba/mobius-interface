@@ -290,7 +290,7 @@ export default function Header() {
         <UbeBalanceContent setShowUbeBalanceModal={setShowUbeBalanceModal} />
       </Modal>
       <HeaderRow>
-        <Title to="/">
+        <Title to="/swap">
           <MobiusIcon>
             <img width={'50px'} src={Logo} alt="logo" />
           </MobiusIcon>
