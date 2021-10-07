@@ -196,7 +196,9 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
               <StyledTokenName active={!!pool} className="pair-name-container">
                 {pool.name}
               </StyledTokenName>
-            ) : null}
+            ) : (
+              <TYPE.mediumHeader>Select a pool</TYPE.mediumHeader>
+            )}
             <StyledDropDown selected={true} />
           </Aligner>
         </CurrencySelect>
