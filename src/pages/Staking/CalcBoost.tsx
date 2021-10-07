@@ -1,22 +1,23 @@
-import { JSBI, TokenAmount } from '@ubeswap/sdk'
-import { ButtonOutlined } from 'components/Button'
+import { Fraction, JSBI, TokenAmount } from '@ubeswap/sdk'
 import { AutoColumn } from 'components/Column'
-import { CardNoise } from 'components/earn/styled'
 import { RowBetween } from 'components/Row'
 import { useMobi, useVeMobi } from 'hooks/Tokens'
 import { useColor } from 'hooks/useColor'
+import { darken } from 'polished'
 import React, { useState } from 'react'
-import { usePriceOfLp } from 'state/stablePools/hooks'
-import { GaugeSummary, MobiStakingInfo } from 'state/staking/hooks'
+import { tryParseAmount } from 'state/mento/hooks'
+import { MobiStakingInfo, useMobiStakingInfo } from 'state/staking/hooks'
 import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
-import { TYPE } from 'theme'
-import { calcBoost } from 'utils/calcExpectedVeMobi'
+import { theme, TYPE } from 'theme'
+import { calcEstimatedBoost, calcVotesForMaxBoost } from 'utils/calcExpectedVeMobi'
 
+import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
+import DoubleCurrencyLogo from '../../components/DoubleLogo'
 import { useActiveContractKit } from '../../hooks'
 import { useStablePoolInfo } from '../../state/stablePools/hooks'
+import { useIsDarkMode } from '../../state/user/hooks'
 import ClaimAllMobiModal from './ClaimAllMobiModal'
-import GaugeVoteModal from './GaugeVoteModal'
 import { CurrencyRow } from './IncreaseLockAmount'
 
 const Container = styled.div`
@@ -31,11 +32,7 @@ const Container = styled.div`
     width: 100%
 `}
 `
-const SmallButton = styled(ButtonOutlined)`
-  padding: 0.5rem;
-  width: 8rem;
-  border-color: ${({ theme }) => theme.primary1};
-`
+
 const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any; activated: boolean }>`
   border-radius: 12px;
   width: 100%;
@@ -69,6 +66,61 @@ const Divider = styled.div<{ bg?: string }>`
   margin-bottom: 0.5rem;
 `
 
+const CurrencySelect = styled.button<{
+  selected: boolean
+  walletConnected: boolean
+  bgColor: any
+  isDarkMode: boolean
+  pair: boolean
+}>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2rem;
+  font-size: 20px;
+  font-weight: 500;
+  ${({ selected, bgColor, isDarkMode }) => selected && `background-color: ${darken(isDarkMode ? 0.2 : -0.4, bgColor)};`}
+  color: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
+  border-radius: 12px;
+  box-shadow: ${({ selected }) => (selected ? 'none' : '0px 6px 10px rgba(0, 0, 0, 0.075)')};
+  outline: none;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  width: 22rem;
+  height: 3rem;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    padding: 0 0.5rem;
+  `}
+
+  :focus,
+  :hover {
+    background-color: ${({ selected, theme, bgColor, isDarkMode }) =>
+      selected ? darken(isDarkMode ? 0.2 : -0.3, bgColor) : darken(0.05, theme.primary1)};
+  }
+`
+
+const Aligner = styled.span`
+  display: flex;
+  align-items: center;
+`
+
+const StyledTokenName = styled.span<{ active?: boolean }>`
+  ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}
+  font-size:  ${({ active }) => (active ? '20px' : '16px')};
+  color: ${({ theme, active }) => (active ? theme.text1 : theme.white)};
+`
+
+const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
+  margin: 0 0.25rem 0 0.5rem;
+  height: 35%;
+
+  path {
+    stroke: ${({ selected, theme }) => (selected ? theme.text1 : theme.white)};
+    stroke-width: 1.5px;
+  }
+`
+
 type PositionsProps = {
   stakingInfo: MobiStakingInfo
   unclaimedMobi: TokenAmount
@@ -87,13 +139,53 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
   const pool = stablePools[0] ?? undefined
   const lpBalance = pool ? pool.amountDeposited : new TokenAmount(mobi, JSBI.BigInt(0))
   const veBalance = useCurrencyBalance(account, vemobi)
+  const isDarkMode = useIsDarkMode()
+  const color = useColor()
+  const staking = useMobiStakingInfo()
+  const stake = staking.positions
+    ? staking.positions.filter((s) => s.address.toLowerCase() === pool.gaugeAddress?.toLowerCase())[0]
+    : undefined
 
-  if (!pool) return null
+  if (!pool || !stake || !vemobi) return null
+
+  const veParse = tryParseAmount(veInput, vemobi)
+  const lpParse = tryParseAmount(lpInput, pool.lpToken)
+  const boost =
+    !veParse || !lpParse
+      ? new Fraction(JSBI.BigInt(0))
+      : calcEstimatedBoost(stake, veParse.raw, staking.totalVotingPower.raw, lpParse.raw)
+
+  const votes = !lpParse
+    ? new TokenAmount(vemobi, JSBI.BigInt(0))
+    : calcVotesForMaxBoost(stake, staking.totalVotingPower.raw, lpParse.raw, vemobi)
   return (
     <Container>
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
       <RowBetween>
         <TYPE.largeHeader>Calculate Boosts</TYPE.largeHeader>
+        <CurrencySelect
+          isDarkMode={isDarkMode}
+          bgColor={color}
+          selected={true}
+          walletConnected={!!account}
+          pair={false}
+          className="open-currency-select-button"
+          // onClick={() => {
+          //   setModalOpen(true)
+          // }}
+        >
+          <Aligner>
+            {pool ? (
+              <DoubleCurrencyLogo currency0={pool.tokens[0]} currency1={pool.tokens[1]} size={24} margin={true} />
+            ) : null}
+            {pool ? (
+              <StyledTokenName active={!!pool} className="pair-name-container">
+                {pool.name}
+              </StyledTokenName>
+            ) : null}
+            <StyledDropDown selected={true} />
+          </Aligner>
+        </CurrencySelect>
       </RowBetween>
       <Divider />
       <TYPE.mediumHeader marginBottom={0}>Select amount of LP tokens</TYPE.mediumHeader>
@@ -103,70 +195,14 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
       <Divider />
       <Wrapper>
         <RowBetween>
-          <TYPE.mediumHeader>Boost</TYPE.mediumHeader>
-          <TYPE.mediumHeader>3.4x</TYPE.mediumHeader>
+          <TYPE.largeHeader>Boost</TYPE.largeHeader>
+          <TYPE.mediumHeader color={theme().primary1}>{boost.toFixed(2)}x</TYPE.mediumHeader>
         </RowBetween>
         <RowBetween>
-          <TYPE.mediumHeader>veMOBI to get max boost</TYPE.mediumHeader>
-          <TYPE.mediumHeader>1.343</TYPE.mediumHeader>
+          <TYPE.largeHeader>veMOBI to get max boost</TYPE.largeHeader>
+          <TYPE.mediumHeader color={theme().primary1}>{votes.toFixed(2)}</TYPE.mediumHeader>
         </RowBetween>
       </Wrapper>
     </Container>
-  )
-}
-
-function PositionCard({
-  position,
-  votingPower,
-  totalVotingPower,
-}: {
-  position: GaugeSummary
-  votingPower: JSBI
-  totalVotingPower: JSBI
-}) {
-  const backgroundColor = useColor(position.firstToken)
-  const lpAsUsd = usePriceOfLp(position.pool, position.baseBalance)
-  const [showMore, setShowMore] = useState(false)
-  const [voteModalOpen, setVoteModalOpen] = useState(false)
-  const boost = calcBoost(position, votingPower, totalVotingPower)
-
-  return (
-    <>
-      <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
-
-      <Wrapper
-        activated={showMore}
-        showBackground={true}
-        bgColor={backgroundColor}
-        onClick={() => setShowMore(!showMore)}
-      >
-        <CardNoise />
-        <RowBetween>
-          <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <TYPE.white color="white">{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.white>
-        </RowBetween>
-        {showMore && (
-          <>
-            <Divider bg="grey" />
-            <RowBetween>
-              <TYPE.white>Unclaimed MOBI</TYPE.white>
-              <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.white>
-            </RowBetween>
-            {/* <RowBetween>
-              <TYPE.white>Your actual share</TYPE.white>
-              <TYPE.white>{`${position.actualPercentage.toSignificant(4)}%`}</TYPE.white>
-            </RowBetween>
-            <RowBetween>
-              <TYPE.white>Your share, accounted for boosts</TYPE.white>
-              <TYPE.white>{`${position.workingPercentage.toSignificant(4)}%`}</TYPE.white>
-            </RowBetween> */}
-            <RowBetween>
-              <TYPE.white>Your Boost</TYPE.white>
-              <TYPE.white>{`${boost.toFixed(0)}%`}</TYPE.white>
-            </RowBetween>
-          </>
-        )}
-      </Wrapper>
-    </>
   )
 }
