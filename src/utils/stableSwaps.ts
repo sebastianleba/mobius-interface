@@ -13,7 +13,8 @@ const scaleAmount =
       : new TokenAmount(dummyToken, '0')
 
 export const getDepositValues = (
-  pool: StablePoolInfo | undefined
+  pool: StablePoolInfo | undefined,
+  workingSupply?: JSBI
 ): {
   valueOfStaked: TokenAmount
   valueOfDeposited: TokenAmount
@@ -32,7 +33,9 @@ export const getDepositValues = (
 
   const valueOfStaked = scale(stakedAmount)
   const valueOfDeposited = scale(amountDeposited)
-  const totalValueStaked = scale(totalStakedAmount)
+  const totalValueStaked = workingSupply
+    ? scale(totalStakedAmount?.add(new TokenAmount(totalStakedAmount.token, workingSupply)))
+    : scale(totalStakedAmount)
   const totalValueDeposited = scale(totalDeposited)
   return {
     valueOfStaked,
