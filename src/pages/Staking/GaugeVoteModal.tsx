@@ -2,7 +2,6 @@ import { TransactionResponse } from '@ethersproject/providers'
 import { JSBI } from '@ubeswap/sdk'
 import { MaxButton } from 'pages/Pool/styleds'
 import React, { useState } from 'react'
-import { useBlockNumber } from 'state/application/hooks'
 import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
 import styled from 'styled-components'
 
@@ -55,7 +54,6 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
 
   const controller = useGaugeControllerContract()
 
-  const blockNumber = useBlockNumber()
   async function onClaimReward() {
     if (controller) {
       setAttempting(true)

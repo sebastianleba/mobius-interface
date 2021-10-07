@@ -94,6 +94,10 @@ export function UpdatePools(): null {
           JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
         )
 
+        const futureWeight = JSBI.BigInt(
+          ((await gaugeController?.get_gauge_weight(poolInfo.gaugeAddress)) ?? '0').toString()
+        )
+
         dispatch(
           initPool({
             address: poolInfo.name,
@@ -111,6 +115,7 @@ export function UpdatePools(): null {
                 totalMobiRate: totalMobiPerBlock,
                 pendingMobi,
               },
+              futureWeight,
             },
           })
         )
@@ -186,6 +191,12 @@ export default function BatchUpdatePools(): null {
     'gauge_relative_weight(address)',
     gaugeAddresses.map((a) => [a ?? undefined])
   )
+  const futureWeights = useSingleContractMultipleData(
+    gaugeController,
+    'get_gauge_weight',
+    gaugeAddresses.map((a) => [a ?? undefined])
+  )
+
   const effectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_balances', [
     account ?? undefined,
   ])
@@ -224,6 +235,7 @@ export default function BatchUpdatePools(): null {
         const lpStaked: JSBI = BigIntToJSBI((lpStaked_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
+        const futureWeight: JSBI = BigIntToJSBI((futureWeights?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0')
 
@@ -251,6 +263,7 @@ export default function BatchUpdatePools(): null {
           effectiveBalance,
           totalEffectiveBalance,
           lastUserVote,
+          futureWeight,
         }
         dispatch(
           initPool({
