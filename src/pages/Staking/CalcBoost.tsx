@@ -4,7 +4,7 @@ import { RowBetween } from 'components/Row'
 import { useMobi, useVeMobi } from 'hooks/Tokens'
 import { useColor } from 'hooks/useColor'
 import { darken } from 'polished'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { tryParseAmount } from 'state/mento/hooks'
 import { MobiStakingInfo, useMobiStakingInfo } from 'state/staking/hooks'
 import { useCurrencyBalance } from 'state/wallet/hooks'
@@ -14,8 +14,9 @@ import { calcEstimatedBoost, calcVotesForMaxBoost } from 'utils/calcExpectedVeMo
 
 import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 import DoubleCurrencyLogo from '../../components/DoubleLogo'
+import CurrencySearchModal from '../../components/PoolSearchModal/CurrencySearchModal'
 import { useActiveContractKit } from '../../hooks'
-import { useStablePoolInfo } from '../../state/stablePools/hooks'
+import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
 import ClaimAllMobiModal from './ClaimAllMobiModal'
 import { CurrencyRow } from './IncreaseLockAmount'
@@ -136,20 +137,33 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
   const vemobi = useVeMobi()
   const [lpInput, setLPInput] = useState<string>('')
   const [veInput, setVEInput] = useState<string>('')
-  const pool = stablePools[0] ?? undefined
+  const [pool, setPool] = useState<StablePoolInfo | undefined>(stablePools[0] ?? undefined)
   const lpBalance = pool ? pool.amountDeposited : new TokenAmount(mobi, JSBI.BigInt(0))
   const veBalance = useCurrencyBalance(account, vemobi)
   const isDarkMode = useIsDarkMode()
   const color = useColor()
   const staking = useMobiStakingInfo()
-  const stake = staking.positions
-    ? staking.positions.filter((s) => s.address.toLowerCase() === pool.gaugeAddress?.toLowerCase())[0]
-    : undefined
+  const [modalOpen, setModalOpen] = useState(false)
+  const handleDismissSearch = useCallback(() => {
+    setModalOpen(false)
+  }, [setModalOpen])
 
-  if (!pool || !stake || !vemobi) return null
+  const onCurrencySelect = useCallback(
+    (currency) => {
+      setPool(stablePools.filter((x) => x.lpToken?.address === currency.address)[0])
+    },
+    [stablePools]
+  )
+
+  const stake =
+    staking.positions && pool
+      ? staking.positions.filter((s) => s.address.toLowerCase() === pool.gaugeAddress?.toLowerCase())[0]
+      : undefined
+
+  if (!vemobi) return null
 
   const veParse = tryParseAmount(veInput, vemobi)
-  const lpParse = tryParseAmount(lpInput, pool.lpToken)
+  const lpParse = pool ? tryParseAmount(lpInput, pool.lpToken) : undefined
   const boost =
     !veParse || !lpParse
       ? new Fraction(JSBI.BigInt(0))
@@ -170,9 +184,9 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
           walletConnected={!!account}
           pair={false}
           className="open-currency-select-button"
-          // onClick={() => {
-          //   setModalOpen(true)
-          // }}
+          onClick={() => {
+            setModalOpen(true)
+          }}
         >
           <Aligner>
             {pool ? (
@@ -187,22 +201,36 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
           </Aligner>
         </CurrencySelect>
       </RowBetween>
+      <CurrencySearchModal
+        isOpen={modalOpen}
+        onDismiss={handleDismissSearch}
+        onCurrencySelect={onCurrencySelect}
+        selectedCurrency={pool ? pool.lpToken : undefined}
+        otherSelectedCurrency={undefined}
+        showCommonBases={false}
+      />
       <Divider />
-      <TYPE.mediumHeader marginBottom={0}>Select amount of LP tokens</TYPE.mediumHeader>
-      <CurrencyRow val={lpInput} token={pool.lpToken} balance={lpBalance} setTokenAmount={setLPInput} />
-      <TYPE.mediumHeader marginBottom={0}>Select amount of veMOBI</TYPE.mediumHeader>
-      <CurrencyRow val={veInput} token={vemobi} balance={veBalance} setTokenAmount={setVEInput} />
-      <Divider />
-      <Wrapper>
-        <RowBetween>
-          <TYPE.largeHeader>Boost</TYPE.largeHeader>
-          <TYPE.mediumHeader color={theme().primary1}>{boost.toFixed(2)}x</TYPE.mediumHeader>
-        </RowBetween>
-        <RowBetween>
-          <TYPE.largeHeader>veMOBI to get max boost</TYPE.largeHeader>
-          <TYPE.mediumHeader color={theme().primary1}>{votes.toFixed(2)}</TYPE.mediumHeader>
-        </RowBetween>
-      </Wrapper>
+      {!pool ? (
+        <TYPE.mediumHeader>Select a Pool</TYPE.mediumHeader>
+      ) : (
+        <div>
+          <TYPE.mediumHeader marginBottom={0}>Select amount of LP tokens</TYPE.mediumHeader>
+          <CurrencyRow val={lpInput} token={pool.lpToken} balance={lpBalance} setTokenAmount={setLPInput} />
+          <TYPE.mediumHeader marginBottom={0}>Select amount of veMOBI</TYPE.mediumHeader>
+          <CurrencyRow val={veInput} token={vemobi} balance={veBalance} setTokenAmount={setVEInput} />
+          <Divider />
+          <Wrapper>
+            <RowBetween>
+              <TYPE.largeHeader>Boost</TYPE.largeHeader>
+              <TYPE.mediumHeader color={theme().primary1}>{boost.toFixed(2)}x</TYPE.mediumHeader>
+            </RowBetween>
+            <RowBetween>
+              <TYPE.largeHeader>veMOBI to get max boost</TYPE.largeHeader>
+              <TYPE.mediumHeader color={theme().primary1}>{votes.toFixed(2)}</TYPE.mediumHeader>
+            </RowBetween>
+          </Wrapper>
+        </div>
+      )}
     </Container>
   )
 }

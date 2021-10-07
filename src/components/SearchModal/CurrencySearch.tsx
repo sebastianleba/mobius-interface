@@ -65,7 +65,6 @@ export function CurrencySearch({
   showManageView,
   showImportView,
   setImportToken,
-  mento,
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { chainId } = useActiveContractKit()
