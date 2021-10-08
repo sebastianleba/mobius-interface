@@ -1,7 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { useEffect, useMemo } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
 import {
   useMultipleContractSingleData,
@@ -22,8 +22,8 @@ import {
   useMobiContract,
   useStableSwapContract,
 } from '../../hooks/useContract'
-import { AppDispatch } from '../index'
-import { initPool } from './actions'
+import { AppDispatch, AppState } from '../index'
+import { initPool, updateExternalRewards } from './actions'
 import { StableSwapConstants, StableSwapPool } from './reducer'
 
 const SECONDS_PER_BLOCK = JSBI.BigInt('5')
@@ -273,5 +273,23 @@ export default function BatchUpdatePools(): null {
         )
       })
   }, [blockNumber, library, account, dispatch])
+  return null
+}
+
+export function UpdateExternalRewards({ poolName }: { poolName: string }) {
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
+  const gauge = useLiquidityGaugeContract(pool.gaugeAddress)
+  const { account } = useActiveContractKit()
+  const dispatch = useDispatch<AppDispatch>()
+  const claimableTokens = useSingleContractMultipleData(
+    gauge,
+    'claimable_reward',
+    pool.additionalRewards?.map((token) => [account ?? undefined, token ?? undefined])
+  )
+  const externalRewards = claimableTokens?.map((result, i) => ({
+    token: pool?.additionalRewards?.[i] ?? '',
+    unclaimed: BigIntToJSBI(result?.result?.[0], '0'),
+  }))
+  dispatch(updateExternalRewards({ pool: pool.name, externalRewards }))
   return null
 }

@@ -5,13 +5,6 @@ import { WrappedTokenInfo } from 'state/lists/hooks'
 import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
-export type StablePoolInfo = {
-  poolAddress: string
-  lpAddress: string
-  token: Array<Token | string>
-  name: string
-}
-
 const mobiToken = (chainId: number, address: string) =>
   new WrappedTokenInfo(
     {
@@ -462,6 +455,11 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x8222452cF3780825aA657B40C63D492F33F28bF6',
       relativeGaugeWeight: new Fraction('1', '10'),
       displayDecimals: 0,
+      additionalRewards: [
+        '0x2AaF20d89277BF024F463749045964D7e7d3A774',
+        '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609',
+        '0x7588110A070987ea0347Cf788226c28d1476d641',
+      ],
     },
     {
       name: 'USD Pool',
@@ -664,29 +662,6 @@ export const TOKENS: { [chain in ChainId]: { [address: string]: Token } } = {
   [ChainId.ALFAJORES]: {},
   [ChainId.BAKLAVA]: {},
 }
-
-export const STAKED_CELO_POOL: StablePoolInfo = {
-  name: 'Staked CELO Pool',
-  poolAddress: '0x000',
-  lpAddress: '0x000',
-  token: ['CELO', 'rCELO'],
-}
-
-export const USD_POOL: StablePoolInfo = {
-  name: 'US Dollar Pool',
-  poolAddress: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  lpAddress: '0x000',
-  token: ['cUSD', 'USDC', 'USDT'],
-}
-
-export const EURO_POOL: StablePoolInfo = {
-  name: 'Euro Pool',
-  poolAddress: '0x0000',
-  lpAddress: '0x000',
-  token: ['cEUR', 'bEURS', 'mcEUR'],
-}
-
-export const STABLE_POOLS = [STAKED_CELO_POOL, USD_POOL, EURO_POOL]
 
 //todo: replace Mainnet and Baklava Pool Addresses
 type AddressMap = { [K in ChainId]: string }
