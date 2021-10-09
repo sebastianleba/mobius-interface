@@ -4,7 +4,6 @@ import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { useEthBtcPrice } from 'state/application/hooks'
 import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
@@ -12,7 +11,7 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor } from '../../hooks/useColor'
-import { StablePoolInfo } from '../../state/stablePools/hooks'
+import { StablePoolInfo, useExternalRewards } from '../../state/stablePools/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -28,10 +27,11 @@ const SubHeader = styled.div`
   padding-top: 0;
 `
 
-const VerticalDivider = styled.div`
-  width: 1px;
-  height: 100%;
-  margin-right: 0.5rem;
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
   background: ${({ theme }) => theme.bg4};
 `
 
@@ -131,7 +131,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } = poolInfo
 
   const isLive = true
-
+  const rewards = useExternalRewards({ poolName: poolInfo.name })
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -152,7 +152,22 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   if (account && mobiRate && totalStakedLPs && totalStakedLPs.greaterThan(JSBI.BigInt(0))) {
     userMobiRate = new TokenAmount(mobi, poolInfo.workingPercentage.multiply(mobiRate ?? '0').toFixed(0))
   }
-  const rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
+  let userExternalRates: TokenAmount[] = []
+  if (account && poolInfo.externalRewardRates) {
+    userExternalRates = poolInfo.externalRewardRates.map(
+      (rate) => new TokenAmount(rate.token, poolInfo.totalPercentage.multiply(rate.raw).toFixed(0))
+    )
+  }
+  let rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
+  for (let i = 0; i < 8; i++) {
+    const rate = poolInfo.externalRewardRates?.[i] ?? totalMobiRate
+    // eslint-disable-next-line
+    const priceOfToken = useCUSDPrice(rate.token)
+    if (poolInfo.externalRewardRates && i < poolInfo.externalRewardRates.length) {
+      rewardPerYear = rewardPerYear.add(priceOfToken?.raw.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0')
+      console.log(rewardPerYear)
+    }
+  }
   const apyFraction =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
       ? rewardPerYear.multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).divide(totalStakedAmount)
@@ -289,14 +304,28 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             {mobiRate && (
               <RowBetween>
                 <TYPE.black>Pool rate</TYPE.black>
-                <RowFixed>
+                <AutoColumn style={{ alignItems: 'end' }}>
                   <TYPE.black>
                     {totalMobiRate
                       ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
                       : '0'}
                     {' MOBI / week'}
                   </TYPE.black>
-                </RowFixed>
+                  {poolInfo.externalRewardRates &&
+                    poolInfo.externalRewardRates.map((rate) => (
+                      <TYPE.black
+                        fontSize={16}
+                        fontWeight={500}
+                        marginLeft="auto"
+                        key={`additional-reward-total-${rate.currency.symbol}-${poolInfo.name}`}
+                      >
+                        {rate
+                          ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                          : '0'}
+                        {` ${rate.token.symbol} / week`}
+                      </TYPE.black>
+                    ))}
+                </AutoColumn>
               </RowBetween>
             )}
 
@@ -336,20 +365,39 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
           {isLive && isStaking && (
             <>
+              <Divider />
               <BottomSection showBackground={true}>
                 {mobiRate && (
                   <RowBetween>
                     <TYPE.black fontWeight={500}>Your rate</TYPE.black>
-                    <TYPE.black fontSize={16} fontWeight={500}>
-                      <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
-                        ⚡
-                      </span>
-                      {mobiRate
-                        ? userMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ??
-                          '-'
-                        : '0'}
-                      {' MOBI / week'}
-                    </TYPE.black>
+                    <AutoColumn>
+                      <TYPE.black fontSize={16} fontWeight={500}>
+                        <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
+                          ⚡
+                        </span>
+                        {mobiRate
+                          ? userMobiRate
+                              ?.multiply(BIG_INT_SECONDS_IN_WEEK)
+                              ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                          : '0'}
+                        {' MOBI / week'}
+                      </TYPE.black>
+                      {poolInfo.externalRewardRates &&
+                        userExternalRates.map((rate) => (
+                          <TYPE.black
+                            fontSize={16}
+                            fontWeight={500}
+                            key={`additional-reward-${rate.currency.symbol}-${poolInfo.name}`}
+                            marginLeft="auto"
+                          >
+                            {rate
+                              ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ??
+                                '-'
+                              : '0'}
+                            {` ${rate.token.symbol} / week`}
+                          </TYPE.black>
+                        ))}
+                    </AutoColumn>
                   </RowBetween>
                 )}
                 {isStaking && (
@@ -381,7 +429,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </>
           )}
         </div>
-        {!!account && !openManage && !isMobile && (
+        {/* {!!account && !openManage && !isMobile && (
           <StyledButton
             background={backgroundColorStart}
             backgroundHover={backgroundColorEnd}
@@ -389,9 +437,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           >
             {isStaking ? 'Manage' : 'Deposit'}
           </StyledButton>
-        )}
+        )} */}
       </InfoContainer>
-      {!!account && !openManage && isMobile && (
+      {!!account && !openManage && (
         <StyledButton
           background={backgroundColorStart}
           backgroundHover={backgroundColorEnd}

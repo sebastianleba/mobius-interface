@@ -460,6 +460,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609',
         '0x7588110A070987ea0347Cf788226c28d1476d641',
       ],
+      additionalRewardRate: ['10000000000000000', '10000000000000000', '12312312312312312'],
     },
     {
       name: 'USD Pool',

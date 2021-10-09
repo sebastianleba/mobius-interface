@@ -1,7 +1,7 @@
 import { Interface } from '@ethersproject/abi'
 import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { useEffect, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
 import {
   useMultipleContractSingleData,
@@ -22,8 +22,8 @@ import {
   useMobiContract,
   useStableSwapContract,
 } from '../../hooks/useContract'
-import { AppDispatch, AppState } from '../index'
-import { initPool, updateExternalRewards } from './actions'
+import { AppDispatch } from '../index'
+import { initPool } from './actions'
 import { StableSwapConstants, StableSwapPool } from './reducer'
 
 const SECONDS_PER_BLOCK = JSBI.BigInt('5')
@@ -31,7 +31,7 @@ const SwapInterface = new Interface(SWAP.abi)
 const lpInterface = new Interface(LP.abi)
 const gaugeInterface = new Interface(GAUGE_V3.abi)
 
-const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
+export const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
   return JSBI.BigInt(num?.toString() ?? fallBack)
 }
 
@@ -79,7 +79,6 @@ export function UpdatePools(): null {
             )
           )
         )
-        const stakingInfo = {}
         const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
         const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
         const weight = JSBI.BigInt(
@@ -273,23 +272,5 @@ export default function BatchUpdatePools(): null {
         )
       })
   }, [blockNumber, library, account, dispatch])
-  return null
-}
-
-export function UpdateExternalRewards({ poolName }: { poolName: string }) {
-  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  const gauge = useLiquidityGaugeContract(pool.gaugeAddress)
-  const { account } = useActiveContractKit()
-  const dispatch = useDispatch<AppDispatch>()
-  const claimableTokens = useSingleContractMultipleData(
-    gauge,
-    'claimable_reward',
-    pool.additionalRewards?.map((token) => [account ?? undefined, token ?? undefined])
-  )
-  const externalRewards = claimableTokens?.map((result, i) => ({
-    token: pool?.additionalRewards?.[i] ?? '',
-    unclaimed: BigIntToJSBI(result?.result?.[0], '0'),
-  }))
-  dispatch(updateExternalRewards({ pool: pool.name, externalRewards }))
   return null
 }

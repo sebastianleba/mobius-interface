@@ -58,7 +58,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   gaugeAddress?: string
   relativeGaugeWeight?: Fraction
   additionalRewards?: string[]
-  additionalRewardRate?: JSBI[]
+  additionalRewardRate?: string[]
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
