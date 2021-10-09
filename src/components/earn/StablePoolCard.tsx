@@ -11,7 +11,7 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor } from '../../hooks/useColor'
-import { StablePoolInfo, useExternalRewards } from '../../state/stablePools/hooks'
+import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
@@ -131,7 +131,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } = poolInfo
 
   const isLive = true
-  const rewards = useExternalRewards({ poolName: poolInfo.name })
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)

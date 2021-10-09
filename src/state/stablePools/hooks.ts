@@ -204,16 +204,16 @@ export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAm
 
 export function useExternalRewards({ poolName }: { poolName: string }): TokenAmount[] {
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[poolName]?.pool)
-  const gauge = useLiquidityGaugeContract(pool.gaugeAddress)
+  const gauge = useLiquidityGaugeContract(pool?.gaugeAddress ?? undefined)
   const { account, chainId } = useActiveContractKit()
 
   const tokens = useDefaultTokenList()[chainId]
-  console.log(tokens)
   const claimableTokens = useSingleContractMultipleData(
     gauge,
     'claimable_reward',
-    pool.additionalRewards?.map((token) => [account ?? undefined, token ?? undefined])
+    pool?.additionalRewards?.map((token) => [account ?? undefined, token ?? undefined]) ?? undefined
   )
+  console.log(claimableTokens)
   const externalRewards = claimableTokens?.map(
     (result, i) =>
       new TokenAmount(
