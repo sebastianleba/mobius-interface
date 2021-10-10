@@ -22,7 +22,8 @@ import ClaimAllMobiModal from './ClaimAllMobiModal'
 import { CurrencyRow } from './IncreaseLockAmount'
 
 const Container = styled.div`
-  width: 49%;
+  margin-top: 1rem;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -88,7 +89,7 @@ const CurrencySelect = styled.button<{
   cursor: pointer;
   user-select: none;
   border: none;
-  width: 22rem;
+  width: 25rem;
   height: 3rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     padding: 0 0.5rem;
@@ -110,6 +111,9 @@ const StyledTokenName = styled.span<{ active?: boolean }>`
   ${({ active }) => (active ? '  margin: 0 0.25rem 0 0.75rem;' : '  margin: 0 0.25rem 0 0.25rem;')}
   font-size:  ${({ active }) => (active ? '20px' : '16px')};
   color: ${({ theme, active }) => (active ? theme.text1 : theme.white)};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 0.9rem;
+  `}
 `
 
 const StyledDropDown = styled(DropDown)<{ selected: boolean }>`
@@ -175,7 +179,7 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
   return (
     <Container>
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
-      <RowBetween>
+      <RowBetween style={{ flexWrap: 'wrap' }}>
         <TYPE.largeHeader>Calculate Boosts</TYPE.largeHeader>
         <CurrencySelect
           isDarkMode={isDarkMode}

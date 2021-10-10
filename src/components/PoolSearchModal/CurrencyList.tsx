@@ -9,7 +9,6 @@ import { useActiveContractKit } from '../../hooks'
 import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
 import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
-import { TYPE } from '../../theme'
 import { isTokenOnList } from '../../utils'
 import Column from '../Column'
 import CurrencyLogo from '../CurrencyLogo'
@@ -130,9 +129,6 @@ function CurrencyRow({
         <Text title={currency.name} fontWeight={500}>
           {currency.symbol}
         </Text>
-        <TYPE.darkGray ml="0px" fontSize={'12px'} fontWeight={300}>
-          {currency.name} {!isOnSelectedList && customAdded && '• Added by user'}
-        </TYPE.darkGray>
       </Column>
       <TokenTags currency={currency} />
       <RowFixed style={{ justifySelf: 'flex-end' }}>
@@ -151,6 +147,7 @@ export default function CurrencyList({
   fixedListRef,
   showImportView,
   setImportToken,
+  displayNames,
 }: {
   height: number
   currencies: Token[]
@@ -161,6 +158,7 @@ export default function CurrencyList({
   showETH: boolean
   showImportView: () => void
   setImportToken: (token: Token) => void
+  displayNames?: string[]
 }) {
   const itemData = currencies
 
