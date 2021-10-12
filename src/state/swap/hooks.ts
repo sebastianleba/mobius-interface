@@ -17,7 +17,7 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
-import { useCurrentPool, useMathUtil, usePools } from '../stablePools/hooks'
+import { useCurrentPool, useMathUtil, usePools, useUnderlyingPool } from '../stablePools/hooks'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
@@ -272,6 +272,7 @@ export type MobiusTrade = {
   executionPrice: Price
   tradeType: TradeType
   fee: TokenAmount
+  isMeta?: boolean
 }
 
 function calcInputOutput(
@@ -280,7 +281,9 @@ function calcInputOutput(
   isExactIn: boolean,
   parsedAmount: TokenAmount | undefined,
   math: StableSwapMath,
-  poolInfo: StableSwapPool
+  poolInfo: StableSwapPool,
+  underlyingPool?: StableSwapPool,
+  underlyingMath?: StableSwapMath
 ): readonly [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] {
   if (!input && !output) {
     return [undefined, undefined, undefined]
@@ -292,8 +295,14 @@ function calcInputOutput(
   if (!input) {
     return [undefined, parsedAmount, undefined]
   }
-  const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
-  const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
+  let indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
+  let indexTo = tokens.map(({ address }) => address).indexOf(output.address)
+
+  if (indexFrom == -1) {
+    indexFrom = tokens.length - 1
+  } else if (indexTo == -1) {
+    indexTo = tokens.length - 1
+  }
 
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
@@ -338,7 +347,9 @@ export function useMobiusTradeInfo(): {
   const pools = usePools()
   const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
+  const underlyingMath = useMathUtil(pool?.metaPool ?? '')
   const mathUtil = useMathUtil(pool)
+  const underlyingPool = useUnderlyingPool(pool?.name ?? '')
 
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
@@ -404,10 +415,32 @@ export function useMobiusTradeInfo(): {
   }
   const { tokens = [] } = pool || {}
 
-  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
-  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
+  let indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
+  let indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
 
-  const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
+  const indexFromUnderlying = inputCurrency
+    ? underlyingPool?.tokens.map(({ address }) => address).indexOf(inputCurrency.address) ?? 0
+    : 0
+  const indexToUnderlying = outputCurrency
+    ? underlyingPool?.tokens.map(({ address }) => address).indexOf(outputCurrency.address) ?? 0
+    : 0
+
+  if (underlyingPool && indexFrom == -1) {
+    indexFrom = tokens.length + indexFromUnderlying
+  }
+
+  if (underlyingPool && indexTo == -1) {
+    indexTo = tokens.length + indexToUnderlying
+  }
+  const [input, output, fee] = calcInputOutput(
+    inputCurrency,
+    outputCurrency,
+    isExactIn,
+    parsedAmount,
+    mathUtil,
+    pool,
+    underlyingMath
+  )
 
   if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
     inputError = 'Insufficient Balance'
@@ -415,10 +448,14 @@ export function useMobiusTradeInfo(): {
 
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+  const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
 
   const v2Trade: MobiusTrade | undefined =
-    input && output && pool ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee } : undefined
+    input && output && pool
+      ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta }
+      : undefined
 
+  console.log(v2Trade)
   return {
     currencies,
     currencyBalances,

@@ -32,7 +32,6 @@ export function useSwappableTokens(mento?: boolean): { [address: string]: Token 
   const { chainId } = useActiveContractKit()
   const pools = mento ? MENTO_POOL_INFO[chainId] ?? [] : STATIC_POOL_INFO[chainId] ?? []
   const swappableTokens: { [address: string]: Token } = {}
-
   pools
     .flatMap(({ tokens }) => tokens)
     .forEach((token) => {

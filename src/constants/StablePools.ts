@@ -527,6 +527,56 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
       relativeGaugeWeight: new Fraction('9', '10'),
     },
+    {
+      name: 'Test Meta Pool',
+      tokenAddresses: ['0x2AaF20d89277BF024F463749045964D7e7d3A774', '0x18B1cC7ac290591853b9728BF0a88085EBc7F981'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.ALFAJORES,
+            address: '0x2AaF20d89277BF024F463749045964D7e7d3A774',
+            decimals: 18,
+            symbol: 'cTC1',
+            name: 'Test Coin 1',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_sCELO.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.ALFAJORES,
+            address: '0x18B1cC7ac290591853b9728BF0a88085EBc7F981',
+            decimals: 18,
+            symbol: 'MobiLP',
+            name: 'Mobius USD LP',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_rCELO.png',
+          },
+          []
+        ),
+      ],
+      address: '0xf1C1a115628B8cFD3ecB0561f947308b160eb553',
+      lpToken: new Token(
+        ChainId.ALFAJORES,
+        '0x21b9213a56d29013B7138e3dB5f73CD0245fD0d6',
+        18,
+        'MobiLP',
+        'Mobius Celo LP'
+      ),
+      swapFee: JSBI.BigInt('50000000'),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.BigInt('10000000000'),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: 'CELO',
+      pegComesAfter: true,
+      gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
+      relativeGaugeWeight: new Fraction('1', '10'),
+      displayDecimals: 0,
+      metaPool: 'USD Pool',
+    },
   ],
   [ChainId.BAKLAVA]: [],
 }

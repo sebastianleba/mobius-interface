@@ -51,6 +51,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   displayDecimals: number
   gaugeAddress?: string
   relativeGaugeWeight?: Fraction
+  metaPool?: string
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable

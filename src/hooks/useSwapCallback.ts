@@ -5,7 +5,7 @@ import { JSBI, SwapParameters } from '@ubeswap/sdk'
 import { ContractTransaction } from 'ethers'
 import { useMemo } from 'react'
 
-import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
+import { INITIAL_ALLOWED_SLIPPAGE } from '../constants'
 import { MobiusTrade } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { calculateGasMargin, getStableSwapContract, isAddress, shortenAddress } from '../utils'
@@ -62,10 +62,11 @@ function useSwapCallArguments(
     const contract = getStableSwapContract(trade.pool.address, library, account)
     const { indexFrom = 0, indexTo = 0 } = trade || {}
     const outputRaw = trade.output.raw
-    const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
+    const minDy = JSBI.BigInt(1) //JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
+    console.log(trade.isMeta)
 
     const swapCallParameters: SwapParameters = {
-      methodName: 'swap',
+      methodName: trade.isMeta ? 'swapUnderlying' : 'swap',
       args: [
         indexFrom.toString(),
         indexTo.toString(),
