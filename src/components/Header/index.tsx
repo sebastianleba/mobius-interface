@@ -8,7 +8,7 @@ import { isMobile } from 'react-device-detect'
 import { Moon, Sun } from 'react-feather'
 import Hamburger from 'react-hamburger-menu'
 import { useTranslation } from 'react-i18next'
-import { NavLink, useHistory } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { Text } from 'rebass'
 import { useAggregateUbeBalance, useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
@@ -20,6 +20,7 @@ import Logo from '../../assets/svg/mobius.svg'
 import { useActiveContractKit } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../state/user/hooks'
+import Menu from '../Menu'
 import Row, { RowFixed } from '../Row'
 import Web3Status from '../Web3Status'
 import HamburgerModal from './HamburgerModal'
@@ -244,6 +245,7 @@ export const StyledMenuButton = styled.button`
   margin: 0;
   padding: 0;
   height: 35px;
+  width: 35px;
   background-color: ${({ theme }) => theme.bg3};
   margin-left: 8px;
   padding: 0.15rem 0.5rem;
@@ -280,11 +282,6 @@ export default function Header() {
   const aggregateBalance: TokenAmount | undefined = useAggregateUbeBalance()
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
-  const history = useHistory()
-
-  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
-  const now = new Date()
-  const isLive = true
 
   return (
     <HeaderFrame>
@@ -293,7 +290,7 @@ export default function Header() {
         <UbeBalanceContent setShowUbeBalanceModal={setShowUbeBalanceModal} />
       </Modal>
       <HeaderRow>
-        <Title to="/">
+        <Title to="/swap">
           <MobiusIcon>
             <img width={'50px'} src={Logo} alt="logo" />
           </MobiusIcon>
@@ -315,7 +312,10 @@ export default function Header() {
           ) : (
             <>
               <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
-                {t('swap')}
+                {t('Swap')}
+              </StyledNavLink>
+              <StyledNavLink id={`mint-nav-link`} to={'/mint'}>
+                {t('Mint')}
               </StyledNavLink>
               <StyledNavLink
                 id={`pool-nav-link`}
@@ -328,20 +328,17 @@ export default function Header() {
                   pathname.startsWith('/find')
                 }
               >
-                Pool
-              </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-                Risks
-              </StyledNavLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/claim'}>
-                Airdrop
+                {t('Pool')}
               </StyledNavLink>
               <StyledNavLink id={`swap-nav-link`} to={'/stake'}>
-                Stake
+                {t('Stake')}
               </StyledNavLink>
               <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
-                Bridge
+                {t('Bridge')}
               </StyledExternalLink>
+              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+                {t('Risks')}
+              </StyledNavLink>
             </>
           )}
         </HeaderLinks>
@@ -349,7 +346,7 @@ export default function Header() {
       <HeaderControls>
         <HeaderElement>
           {aggregateBalance && (
-            <UBEWrapper onClick={() => window.open('https://www.coingecko.com/en/coins/mobius-money', '_blank')}>
+            <UBEWrapper onClick={() => setShowUbeBalanceModal(true)}>
               <UBEAmount active={!!account} style={{ pointerEvents: 'auto' }}>
                 {account && (
                   <HideSmall>
@@ -384,17 +381,15 @@ export default function Header() {
             <Web3Status />
           </AccountElement>
         </HeaderElement>
-        <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
-          {darkMode ? '🌉' : '🌁'}
-        </StyledMenuButton>
-
-        <HeaderElementWrap>
+        <RowFixed>
+          <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
+            {darkMode ? '🌉' : '🌁'}
+          </StyledMenuButton>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>
-
-          {/* <Menu /> */}
-        </HeaderElementWrap>
+          <Menu />
+        </RowFixed>
       </HeaderControls>
     </HeaderFrame>
   )
@@ -406,10 +401,11 @@ const UBEAmount = styled(AccountElement)`
   height: 36px;
   font-weight: 500;
   background-color: ${({ theme }) => theme.bg3};
-  background: radial-gradient(174.47% 188.91% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #2172e5 100%), #edeef2;
+  background: radial-gradient(174.47% 188.91% at 1.84% 0%, ${({ theme }) => theme.primary1} 0%, #3488ec 100%), #edeef2;
 `
 
 const UBEWrapper = styled.span`
+  margin-left: 8px;
   width: fit-content;
   position: relative;
   cursor: pointer;

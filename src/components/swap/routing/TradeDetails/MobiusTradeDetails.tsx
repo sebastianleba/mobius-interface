@@ -5,7 +5,11 @@ import { MobiusTrade } from 'state/swap/hooks'
 import { ThemeContext } from 'styled-components'
 
 import { TYPE } from '../../../../theme'
-import { computeSlippageAdjustedAmounts, computeTradePriceBreakdown } from '../../../../utils/prices'
+import {
+  computeMentoTradePriceBreakdown,
+  computeSlippageAdjustedAmounts,
+  computeTradePriceBreakdown,
+} from '../../../../utils/prices'
 import QuestionHelper from '../../../QuestionHelper'
 import { RowBetween, RowFixed } from '../../../Row'
 import FormattedPriceImpact from '../../FormattedPriceImpact'
@@ -13,11 +17,14 @@ import FormattedPriceImpact from '../../FormattedPriceImpact'
 interface Props {
   trade: MobiusTrade
   allowedSlippage: number
+  mento?: boolean
 }
 
-export const MobiusTradeDetails: React.FC<Props> = ({ trade, allowedSlippage }: Props) => {
+export const MobiusTradeDetails: React.FC<Props> = ({ trade, allowedSlippage, mento }: Props) => {
   const theme = useContext(ThemeContext)
-  const { priceImpactWithoutFee, realizedLPFee } = computeTradePriceBreakdown(trade)
+  const { priceImpactWithoutFee, realizedLPFee } = mento
+    ? computeMentoTradePriceBreakdown(trade)
+    : computeTradePriceBreakdown(trade)
   const isExactIn = trade.tradeType === TradeType.EXACT_INPUT
   const slippageAdjustedAmounts = computeSlippageAdjustedAmounts(trade, allowedSlippage)
 

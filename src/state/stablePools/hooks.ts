@@ -1,14 +1,18 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
 import { useActiveContractKit } from 'hooks'
-import { useStableSwapContract } from 'hooks/useContract'
+import { useLiquidityGaugeContract, useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useEthBtcPrice } from 'state/application/hooks'
+import { useDefaultTokenList } from 'state/lists/hooks'
+import { useSingleContractMultipleData } from 'state/multicall/hooks'
 import { tryParseAmount } from 'state/swap/hooks'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
 import { StableSwapPool } from './reducer'
+import { BigIntToJSBI } from './updater'
 
 export interface StablePoolInfo {
   readonly name: string
@@ -32,6 +36,9 @@ export interface StablePoolInfo {
   readonly mobiRate: JSBI | undefined
   readonly pendingMobi: JSBI | undefined
   readonly gaugeAddress?: string
+  readonly workingPercentage: Percent
+  readonly totalPercentage: Percent
+  readonly externalRewardRates?: TokenAmount[]
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -55,7 +62,15 @@ export function usePools(): readonly StableSwapPool[] {
 const tokenAmountScaled = (token: Token, amount: JSBI): TokenAmount =>
   new TokenAmount(token, JSBI.divide(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(token.decimals))))
 
-export const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
+export const getPoolInfo = (
+  pool: StableSwapPool,
+  tokens: {
+    [tokenAddress: string]: {
+      token: WrappedTokenInfo
+      list: TokenList
+    }
+  } = {}
+): StablePoolInfo => ({
   name: pool.name,
   poolAddress: pool.address,
   lpToken: pool.lpToken,
@@ -78,16 +93,26 @@ export const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
   totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? '0'),
+  workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
+  totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
+  externalRewardRates:
+    pool.additionalRewardRate?.map(
+      (rate, i) => new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
+    ) ?? undefined,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
-  return !pool ? undefined : { ...getPoolInfo(pool) }
+  const { chainId } = useActiveContractKit()
+  const tokens = useDefaultTokenList()[chainId]
+  return !pool ? undefined : { ...getPoolInfo(pool, tokens) }
 }
 
 export function useStablePoolInfo(): readonly StablePoolInfo[] {
   const pools = usePools()
-  return pools.map((pool) => getPoolInfo(pool))
+  const { chainId } = useActiveContractKit()
+  const tokens = useDefaultTokenList()[chainId]
+  return pools.map((pool) => getPoolInfo(pool, tokens))
 }
 
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
@@ -161,4 +186,40 @@ export function usePool(): readonly [StableSwapPool] {
     state.swap.OUTPUT.currencyId,
   ])
   return useCurrentPool(tok1, tok2)
+}
+
+export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAmount | undefined {
+  const pool = useStablePoolInfoByName(poolName)
+  const price = useEthBtcPrice(pool?.poolAddress ?? '')
+  return pool && price && amountOfLp
+    ? new TokenAmount(
+        amountOfLp.token,
+        JSBI.divide(
+          JSBI.multiply(amountOfLp.raw, JSBI.multiply(pool?.virtualPrice, price)),
+          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+        )
+      )
+    : undefined
+}
+
+export function useExternalRewards({ poolName }: { poolName: string }): TokenAmount[] {
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[poolName]?.pool)
+  const gauge = useLiquidityGaugeContract(pool?.gaugeAddress ?? undefined)
+  const { account, chainId } = useActiveContractKit()
+
+  const tokens = useDefaultTokenList()[chainId]
+  const claimableTokens = useSingleContractMultipleData(
+    gauge,
+    'claimable_reward',
+    pool?.additionalRewards?.map((token) => [account ?? undefined, token ?? undefined]) ?? undefined
+  )
+  console.log(claimableTokens)
+  const externalRewards = claimableTokens?.map(
+    (result, i) =>
+      new TokenAmount(
+        tokens[pool?.additionalRewards?.[i] ?? '']?.token,
+        BigIntToJSBI(result?.result?.[0] ?? '0', '0') ?? '0'
+      )
+  )
+  return externalRewards
 }

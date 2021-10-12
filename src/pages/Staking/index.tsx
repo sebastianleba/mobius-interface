@@ -8,6 +8,7 @@ import styled from 'styled-components'
 
 import GradientTextBox from '../../components/Visx/GradientTextBox'
 import { getAllUnclaimedMobi } from './ClaimAllMobiModal'
+import GaugeWeights from './GaugeWeights'
 import Positions from './Positions'
 import Stake from './Stake'
 
@@ -47,33 +48,22 @@ export default function Staking() {
   const mobi = useMobi()
   const unclaimedMobi = new TokenAmount(mobi, getAllUnclaimedMobi(stakingInfo.positions ?? []))
 
-  const outerPieData =
-    stakingInfo.positions?.map((info) => ({
-      label: info.pool,
-      value: parseInt(info.boostedBalance.toExact()),
-    })) ?? []
-  const innerPieData =
-    stakingInfo.positions?.map((info) => ({
-      label: info.pool,
-      value: parseInt(info.totalStaked.toExact()),
-    })) ?? []
-
   const displayData = [
     {
       label: 'Your Voting Power',
-      value: stakingInfo.votingPower.toSignificant(4),
+      value: stakingInfo.votingPower.toSignificant(4, { groupSeparator: ',' }),
     },
     {
       label: 'Total Voting Power',
-      value: stakingInfo.totalVotingPower.toSignificant(4),
+      value: stakingInfo.totalVotingPower.toSignificant(4, { groupSeparator: ',' }),
     },
     {
       label: 'Your total deposits',
-      value: '$' + priceOfDeposits.toSignificant(4),
+      value: '$' + priceOfDeposits.toSignificant(4, { groupSeparator: ',' }),
     },
     {
       label: 'Unclaimed Mobi',
-      value: unclaimedMobi.toSignificant(4),
+      value: unclaimedMobi.toSignificant(4, { groupSeparator: ',' }),
     },
   ]
   if (width && width > 1280) {
@@ -105,7 +95,7 @@ export default function Staking() {
       <Divider />
       <PositionsContainer>
         <Stake stakingInfo={stakingInfo} />
-        <Positions stakingInfo={stakingInfo} />
+        <Positions stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
         {/* <DoublePieChart
           width={Math.min((width ?? 600) * 0.95, 600)}
           height={Math.min((width ?? 600) * 0.95, 600)}
@@ -113,6 +103,7 @@ export default function Staking() {
           outerChartData={outerPieData}
         /> */}
       </PositionsContainer>
+      <GaugeWeights summaries={stakingInfo.positions ?? []} />
     </OuterContainer>
   )
 }

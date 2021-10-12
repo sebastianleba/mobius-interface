@@ -4,9 +4,10 @@ import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
-import { IUniswapV2Router02, UbeswapMoolaRouter } from 'generated/index'
+import { Exchange, IUniswapV2Router02, Swap, UbeswapMoolaRouter } from 'generated/index'
 
 import { ROUTER_ADDRESS, UBESWAP_MOOLA_ROUTER_ADDRESS } from '../constants'
+import EXCHANGE from '../constants/abis/Exchange.json'
 import IUniswapV2Router02ABI from '../constants/abis/IUniswapV2Router02.json'
 import SWAP from '../constants/abis/Swap.json'
 import UbeswapMoolaRouterABI from '../constants/abis/UbeswapMoolaRouter.json'
@@ -87,4 +88,8 @@ export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Token):
 }
 export function getStableSwapContract(address: string, library: Web3Provider, account?: string): Swap {
   return getContract(address, SWAP.abi, library, account) as Swap
+}
+
+export function getMentoContract(address: string, library: Web3Provider, account?: string): Exchange {
+  return getContract(address, EXCHANGE, library, account) as Exchange
 }

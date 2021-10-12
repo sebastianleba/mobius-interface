@@ -44,7 +44,10 @@ export default function RemoveLiquidity({
     params: { currencyIdA, currencyIdB },
   },
 }: RouteComponentProps<{ currencyIdA: string; currencyIdB: string }>) {
-  const [currencyA, currencyB] = [useCurrency(currencyIdA) ?? undefined, useCurrency(currencyIdB) ?? undefined]
+  const [currencyA, currencyB] = [
+    useCurrency(false, currencyIdA) ?? undefined,
+    useCurrency(false, currencyIdB) ?? undefined,
+  ]
   const { account, chainId, library } = useActiveContractKit()
   const [tokenA, tokenB] = [currencyA, currencyB]
 

@@ -184,8 +184,8 @@ export function useDerivedStableSwapInfo(): {
     recipient,
   } = useSwapState()
 
-  const inputCurrency = useCurrency(inputCurrencyId)
-  const outputCurrency = useCurrency(outputCurrencyId)
+  const inputCurrency = useCurrency(false, inputCurrencyId)
+  const outputCurrency = useCurrency(false, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
   const [poolInfo] = POOLS_TO_TOKENS[chainId].filter(
@@ -331,8 +331,8 @@ export function useMobiusTradeInfo(): {
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
     recipient,
   } = useSwapState()
-  const inputCurrency = useCurrency(inputCurrencyId)
-  const outputCurrency = useCurrency(outputCurrencyId)
+  const inputCurrency = useCurrency(false, inputCurrencyId)
+  const outputCurrency = useCurrency(false, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
 
   const pools = usePools()
@@ -387,7 +387,13 @@ export function useMobiusTradeInfo(): {
       inputError = inputError ?? 'Invalid recipient'
     }
   }
-  if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading || inputError) {
+  if (
+    !inputCurrency ||
+    !outputCurrency ||
+    !parsedAmount ||
+    poolsLoading ||
+    JSBI.equal(pool.lpTotalSupply, JSBI.BigInt('0'))
+  ) {
     return {
       currencies,
       currencyBalances,
@@ -440,8 +446,8 @@ export function useDerivedSwapInfo(): {
     recipient,
   } = useSwapState()
 
-  const inputCurrency = useCurrency(inputCurrencyId)
-  const outputCurrency = useCurrency(outputCurrencyId)
+  const inputCurrency = useCurrency(false, inputCurrencyId)
+  const outputCurrency = useCurrency(false, outputCurrencyId)
   const recipientLookup = useENS(recipient ?? undefined)
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
 

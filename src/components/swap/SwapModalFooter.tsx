@@ -1,10 +1,17 @@
 import React, { useContext, useMemo, useState } from 'react'
 import { Repeat } from 'react-feather'
+import { useLocation } from 'react-router'
 import { Text } from 'rebass'
+import { MentoTrade } from 'state/mento/hooks'
 import { MobiusTrade } from 'state/swap/hooks'
 import { ThemeContext } from 'styled-components'
 
-import { computeTradePriceBreakdown, formatExecutionPrice, warningSeverity } from '../../utils/prices'
+import {
+  computeMentoTradePriceBreakdown,
+  computeTradePriceBreakdown,
+  formatExecutionPrice,
+  warningSeverity,
+} from '../../utils/prices'
 import { ButtonError } from '../Button'
 import { AutoColumn } from '../Column'
 import { AutoRow, RowBetween } from '../Row'
@@ -19,16 +26,21 @@ export default function SwapModalFooter({
   swapErrorMessage,
   disabledConfirm,
 }: {
-  trade: MobiusTrade
+  trade: MobiusTrade | MentoTrade
   allowedSlippage: number
   onConfirm: () => void
   swapErrorMessage: string | undefined
   disabledConfirm: boolean
 }) {
-  const { label, routingMethod } = describeTrade(trade)
+  const location = useLocation()
+  const mento = location.pathname.includes('mint')
+  const { label, routingMethod } = describeTrade(mento)
   const [showInverted, setShowInverted] = useState<boolean>(false)
   const theme = useContext(ThemeContext)
-  const { priceImpactWithoutFee } = useMemo(() => computeTradePriceBreakdown(trade), [trade])
+  const { priceImpactWithoutFee } = useMemo(
+    () => (mento ? computeMentoTradePriceBreakdown(trade) : computeTradePriceBreakdown(trade)),
+    [mento, trade]
+  )
   const severity = warningSeverity(priceImpactWithoutFee)
 
   let info: React.ReactNode = null
@@ -104,7 +116,7 @@ export default function SwapModalFooter({
           id="confirm-swap-or-send"
         >
           <Text fontSize={20} fontWeight={500}>
-            {severity > 2 ? 'Swap Anyway' : `Confirm ${label}`}
+            {severity > 2 ? `${label} Anyway` : `Confirm ${label}`}
           </Text>
         </ButtonError>
         {swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}

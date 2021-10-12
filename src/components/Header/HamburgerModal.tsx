@@ -103,7 +103,10 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         </RowBetween>
         <Divider />
         <StyledNavLink id={`swap-nav-link`} to={'/swap'} onClick={onDismiss}>
-          {t('swap')}
+          {t('Swap')}
+        </StyledNavLink>
+        <StyledNavLink id={`mint-nav-link`} to={'/mint'} onClick={onDismiss}>
+          {t('Mint')}
         </StyledNavLink>
         <StyledNavLink
           id={`pool-nav-link`}
@@ -117,17 +120,17 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
           }
           onClick={onDismiss}
         >
-          Pool
+          {t('Pool')}
         </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
-          Risks
-        </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/claim'} onClick={onDismiss}>
-          Airdrop
+        <StyledNavLink id={`swap-nav-link`} to={'/stake'} onClick={onDismiss}>
+          {t('Stake')}
         </StyledNavLink>
         <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
-          Bridge
+          {t('Bridge')}
         </StyledExternalLink>
+        <StyledNavLink id={`swap-nav-link`} to={'/risk'} onClick={onDismiss}>
+          {t('Risks')}
+        </StyledNavLink>
       </LinkContainer>
     </CustomModal>
   )

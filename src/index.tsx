@@ -10,6 +10,7 @@ import React, { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
+import { UpdateMento } from 'state/mentoPools/updater'
 import UpdatePools from 'state/stablePools/updater'
 import StakingUpdater from 'state/staking/updater'
 
@@ -57,6 +58,7 @@ function Updaters() {
       <MulticallUpdater />
       <UpdatePools />
       <StakingUpdater />
+      <UpdateMento />
     </>
   )
 }

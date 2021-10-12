@@ -1,14 +1,9 @@
+import { StableToken } from '@celo/contractkit'
 import { ChainId, Fraction, JSBI, Token } from '@ubeswap/sdk'
 import { VestType } from 'state/claim/reducer'
 import { WrappedTokenInfo } from 'state/lists/hooks'
+import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
-
-export type StablePoolInfo = {
-  poolAddress: string
-  lpAddress: string
-  token: Array<Token | string>
-  name: string
-}
 
 const mobiToken = (chainId: number, address: string) =>
   new WrappedTokenInfo(
@@ -43,25 +38,25 @@ export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
 
 export const MOBIUS_MINTER_ADDRESS: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0x5F0200CA03196D5b817E2044a0Bb0D837e0A7823',
-  [ChainId.ALFAJORES]: '0xa9f324CdB134f0b24094DCC80Fb720181e992437',
+  [ChainId.ALFAJORES]: '0x5c212FA1cf8b1143f2142C26161e65404034c01f',
   [ChainId.BAKLAVA]: '',
 }
 
 export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
   [ChainId.MAINNET]: mobiToken(ChainId.MAINNET, '0x73a210637f6F6B7005512677Ba6B3C96bb4AA44B'),
-  [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x0745fCefEE0084296D876cDc179369B3A8A67AB2'),
+  [ChainId.ALFAJORES]: mobiToken(ChainId.ALFAJORES, '0x6dDcbC22c1ED5D0662635ffb020c82DF4e1Ba234'),
   [ChainId.BAKLAVA]: undefined,
 }
 
 export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25',
-  [ChainId.ALFAJORES]: '0x5F4d3EF2b872AEcbbD1703ce80f29A9303F63A79',
+  [ChainId.ALFAJORES]: '0x00063Fbe0c90834EE90C6191d0D9F04eaB01A14f',
   [ChainId.BAKLAVA]: '',
 }
 
 export const VOTING_ESCROW: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
-  [ChainId.ALFAJORES]: '',
+  [ChainId.ALFAJORES]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
   [ChainId.BAKLAVA]: '',
 }
 
@@ -114,6 +109,55 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       pegComesAfter: false,
       displayDecimals: 1,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+    },
+    {
+      name: 'USDC (Solana AllBridge) Pool',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xCD7D7Ff64746C1909E44Db8e95331F9316478817',
+            decimals: 18,
+            symbol: 'asUSDC',
+            name: 'US Dollar Coin (Solana AllBridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x63C1914bf00A9b395A2bF89aaDa55A5615A3656e',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0xAFEe90ab6A2D3B265262f94F6e437E7f6d94e26E',
+        18,
+        'MobLP',
+        'Mobius cUSD/asUSDC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 1,
+      gaugeAddress: '0x27D9Bfa5F864862BeDC23cFab7e00b6b94488CC6',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
     },
     {
@@ -408,9 +452,15 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: 'CELO',
       pegComesAfter: true,
-      gaugeAddress: '0x1a567D4F6870Cd3eC1aD82f3CF8fF0EbCCbBfEcF',
+      gaugeAddress: '0x8222452cF3780825aA657B40C63D492F33F28bF6',
       relativeGaugeWeight: new Fraction('1', '10'),
       displayDecimals: 0,
+      additionalRewards: [
+        '0x2AaF20d89277BF024F463749045964D7e7d3A774',
+        '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609',
+        '0xCC531BfBA46cA251D3D9f3aCc37ABD5DCF3ed0B3',
+      ],
+      additionalRewardRate: ['10000000000000000', '10000000000000000', '12312312312312312'],
     },
     {
       name: 'USD Pool',
@@ -473,10 +523,71 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 0,
-      gaugeAddress: '0x97Ae8F2962B8e6951CaF1868f31bD3DfD4093489',
+      gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
       relativeGaugeWeight: new Fraction('9', '10'),
     },
   ],
+  [ChainId.BAKLAVA]: [],
+}
+
+export const MENTO_POOL_INFO: { [K in ChainId]: MentoConstants[] } = {
+  [ChainId.MAINNET]: [
+    {
+      stable: StableToken.cUSD,
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x471EcE3750Da237f93B8E339c536989b8978a438',
+            decimals: 18,
+            symbol: 'CELO',
+            name: 'Celo native asset',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+      ],
+    },
+    {
+      stable: StableToken.cEUR,
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x471EcE3750Da237f93B8E339c536989b8978a438',
+            decimals: 18,
+            symbol: 'CELO',
+            name: 'Celo native asset',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
+            decimals: 18,
+            symbol: 'cEUR',
+            name: 'Celo Euro',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cEUR.png',
+          },
+          []
+        ),
+      ],
+    },
+  ],
+  [ChainId.ALFAJORES]: [],
   [ChainId.BAKLAVA]: [],
 }
 
@@ -552,29 +663,6 @@ export const TOKENS: { [chain in ChainId]: { [address: string]: Token } } = {
   [ChainId.ALFAJORES]: {},
   [ChainId.BAKLAVA]: {},
 }
-
-export const STAKED_CELO_POOL: StablePoolInfo = {
-  name: 'Staked CELO Pool',
-  poolAddress: '0x000',
-  lpAddress: '0x000',
-  token: ['CELO', 'rCELO'],
-}
-
-export const USD_POOL: StablePoolInfo = {
-  name: 'US Dollar Pool',
-  poolAddress: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  lpAddress: '0x000',
-  token: ['cUSD', 'USDC', 'USDT'],
-}
-
-export const EURO_POOL: StablePoolInfo = {
-  name: 'Euro Pool',
-  poolAddress: '0x0000',
-  lpAddress: '0x000',
-  token: ['cEUR', 'bEURS', 'mcEUR'],
-}
-
-export const STABLE_POOLS = [STAKED_CELO_POOL, USD_POOL, EURO_POOL]
 
 //todo: replace Mainnet and Baklava Pool Addresses
 type AddressMap = { [K in ChainId]: string }

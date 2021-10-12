@@ -5,22 +5,36 @@ import { AutoColumn } from '../../components/Column'
 import Modal from '../../components/Modal'
 import { LoadingView, SubmittedView } from '../../components/ModalViews'
 import { RowBetween } from '../../components/Row'
-import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { CloseIcon, TYPE } from '../../theme'
+import ExtendLock from './ExtendLock'
+import IncreaseLockAmount from './IncreaseLockAmount'
 import Lock from './Lock'
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
   padding: 1rem;
 `
+export enum LockType {
+  initial,
+  extend,
+  increase,
+}
 
 interface LockModalProps {
   isOpen: boolean
   onDismiss: () => void
-  poolInfo: StablePoolInfo
+  lockType?: LockType
 }
 
-export default function LockModal({ isOpen, onDismiss }: LockModalProps) {
+const ModifiedWrapper = styled(ContentWrapper)`
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+  }
+`
+
+export default function LockModal({ isOpen, onDismiss, lockType = LockType.initial }: LockModalProps) {
   // monitor call to help UI loading state
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
@@ -34,22 +48,25 @@ export default function LockModal({ isOpen, onDismiss }: LockModalProps) {
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
       {!attempting && !hash && (
-        <ContentWrapper gap="lg">
+        <ModifiedWrapper gap="lg">
           <RowBetween>
-            <TYPE.largeHeader>Lock Mobi</TYPE.largeHeader>
+            <TYPE.largeHeader>
+              {lockType === LockType.initial
+                ? 'Lock Mobi'
+                : lockType === LockType.extend
+                ? 'Extend Lock'
+                : 'Increase Amount of Mobi Locked'}
+            </TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          {/* <RowBetween>
-            <RowFixed>
-              <TYPE.subHeader fontWeight={400} fontSize={14}>
-                By Token Amount
-              </TYPE.subHeader>
-              <QuestionHelper text="Withdraw by specific token amounts rather than LP tokens." />
-            </RowFixed>
-            <Toggle id="toggle-equal-amount-button" isActive={byToken} toggle={() => setByToken(!byToken)} />
-          </RowBetween> */}
-          <Lock setAttempting={setAttempting} setHash={setHash} />
-        </ContentWrapper>
+          {lockType === LockType.initial ? (
+            <Lock setAttempting={setAttempting} setHash={setHash} />
+          ) : lockType === LockType.extend ? (
+            <ExtendLock setAttempting={setAttempting} setHash={setHash} />
+          ) : (
+            <IncreaseLockAmount setAttempting={setAttempting} setHash={setHash} />
+          )}
+        </ModifiedWrapper>
       )}
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>

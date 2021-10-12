@@ -56,8 +56,8 @@ export default function Swap() {
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
-    useCurrency(loadedUrlParams?.inputCurrencyId),
-    useCurrency(loadedUrlParams?.outputCurrencyId),
+    useCurrency(false, loadedUrlParams?.inputCurrencyId),
+    useCurrency(false, loadedUrlParams?.outputCurrencyId),
   ]
   const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
@@ -248,7 +248,7 @@ export default function Swap() {
 
   const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
 
-  const { isEstimate, makeLabel } = describeTrade(trade)
+  const { isEstimate, makeLabel } = describeTrade()
   const actionLabel = makeLabel(independentField !== Field.INPUT)
 
   return (

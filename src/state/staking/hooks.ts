@@ -1,4 +1,4 @@
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
 import { useMobi, useVeMobi } from 'hooks/Tokens'
 import { useSelector } from 'react-redux'
 import { AppState } from 'state'
@@ -12,10 +12,16 @@ export type GaugeSummary = {
   pool: string
   address: string
   baseBalance: TokenAmount
-  boostedBalance: TokenAmount
   totalStaked: TokenAmount
   unclaimedMobi: TokenAmount
   firstToken: Token
+  currentWeight: Percent
+  workingBalance: TokenAmount
+  totalWorkingBalance: TokenAmount
+  workingPercentage: Percent
+  actualPercentage: Percent
+  lastVote: Date
+  futureWeight: Percent
 }
 
 export type MobiStakingInfo = {
@@ -66,17 +72,18 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     address: pool.gaugeAddress ?? '',
     baseBalance: new TokenAmount(pool.lpToken, pool.staking?.userStaked ?? '0'),
     totalStaked: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
-    boostedBalance: new TokenAmount(
-      pool.lpToken,
-      calculateBoostedBalance(
-        stakingInfo.votingPower,
-        stakingInfo.totalVotingPower,
-        pool.staking?.userStaked ?? JSBI.BigInt('0'),
-        pool.staking?.totalStakedAmount ?? JSBI.BigInt('1')
-      )
-    ),
     unclaimedMobi: new TokenAmount(mobi, pool.staking?.pendingMobi ?? '0'),
     firstToken: pool.tokens[0],
+    currentWeight: pool.poolWeight,
+    futureWeight: new Percent(
+      pool.futureWeight,
+      JSBI.divide(stakingInfo.totalWeight, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18)))
+    ),
+    workingBalance: new TokenAmount(pool.lpToken, pool.effectiveBalance),
+    totalWorkingBalance: new TokenAmount(pool.lpToken, pool.totalEffectiveBalance),
+    workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
+    actualPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
+    lastVote: new Date(pool.lastUserVote * 1000),
   }))
   return {
     ...baseInfo,
@@ -110,4 +117,14 @@ export function usePriceOfDeposits() {
       return JSBI.add(accum, JSBI.multiply(valueOfDeposited.raw, price))
     }, JSBI.BigInt('0'))
   )
+}
+
+export function useLockEnd(): number {
+  const lockEnd = useSelector<AppState, number>((state) => state.staking?.locked?.end ?? 0)
+  return lockEnd
+}
+
+export function useVotePowerLeft(): number {
+  const votePower = useSelector<AppState, JSBI>((state) => state.staking.voteUserPower)
+  return (10000 - parseInt(votePower.toString())) / 100
 }
