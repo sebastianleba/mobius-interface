@@ -30,7 +30,7 @@ interface CurrencySearchProps {
   onCurrencySelect: (currency: Token) => void
 }
 
-export function CurrencySearch({ selectedCurrency, onCurrencySelect, onDismiss, isOpen }: CurrencySearchProps) {
+export function CurrencySearch({ selectedCurrency, onCurrencySelect, onDismiss }: CurrencySearchProps) {
   const { chainId } = useActiveContractKit()
   const theme = useTheme()
 
@@ -48,8 +48,6 @@ export function CurrencySearch({ selectedCurrency, onCurrencySelect, onDismiss, 
         []
       )
   )
-
-  const showETH = false
 
   const handleCurrencySelect = useCallback(
     (currency: Token) => {
@@ -81,14 +79,10 @@ export function CurrencySearch({ selectedCurrency, onCurrencySelect, onDismiss, 
             {({ height }) => (
               <CurrencyList
                 height={height}
-                showETH={showETH}
                 currencies={tokensToSelect}
                 onCurrencySelect={handleCurrencySelect}
-                otherCurrency={null}
                 selectedCurrency={selectedCurrency}
                 fixedListRef={fixedList}
-                showImportView={() => null}
-                setImportToken={() => null}
               />
             )}
           </AutoSizer>

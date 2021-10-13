@@ -9,8 +9,6 @@ interface CurrencySearchModalProps {
   onDismiss: () => void
   selectedCurrency?: Token | null
   onCurrencySelect: (currency: Token) => void
-  otherSelectedCurrency?: Token | null
-  showCommonBases?: boolean
 }
 
 export default function CurrencySearchModal({

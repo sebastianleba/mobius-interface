@@ -1,33 +1,18 @@
-import { currencyEquals, JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { currencyEquals, Token } from '@ubeswap/sdk'
 import React, { CSSProperties, MutableRefObject, useCallback } from 'react'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import checkedLogo from '../../assets/svg/mobius.svg'
-import { useActiveContractKit } from '../../hooks'
-import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
-import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
-import { useCurrencyBalance } from '../../state/wallet/hooks'
-import { isTokenOnList } from '../../utils'
+import { WrappedTokenInfo } from '../../state/lists/hooks'
 import Column from '../Column'
-import CurrencyLogo from '../CurrencyLogo'
-import Loader from '../Loader'
-import { RowFixed } from '../Row'
-import ImportRow from '../SearchModal/ImportRow'
 import { MenuItem } from '../SearchModal/styleds'
 import { MouseoverTooltip } from '../Tooltip'
 
 function currencyKey(currency: Token): string {
   return currency instanceof Token ? currency.address : ''
 }
-
-const StyledBalanceText = styled(Text)`
-  white-space: nowrap;
-  overflow: hidden;
-  max-width: 5rem;
-  text-overflow: ellipsis;
-`
 
 const Tag = styled.div`
   background-color: ${({ theme }) => theme.bg3};
@@ -42,19 +27,6 @@ const Tag = styled.div`
   justify-self: flex-end;
   margin-right: 4px;
 `
-
-function Balance({ balance }: { balance: TokenAmount }) {
-  const max = balance.token.decimals
-  const decimalPlacesForBalance = balance?.greaterThan(
-    JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(balance.token.decimals)).toString()
-  )
-    ? 2
-    : balance?.greaterThan('0')
-    ? Math.min(10, max)
-    : 2
-
-  return <StyledBalanceText title={balance.toExact()}>{balance.toFixed(decimalPlacesForBalance)}</StyledBalanceText>
-}
 
 const TagContainer = styled.div`
   display: flex;
@@ -94,22 +66,18 @@ function CurrencyRow({
   currency,
   onSelect,
   isSelected,
-  otherSelected,
   style,
 }: {
   currency: Token
   onSelect: () => void
   isSelected: boolean
-  otherSelected: boolean
   style: CSSProperties
 }) {
-  const { account } = useActiveContractKit()
+  // const { account } = useActiveContractKit()
   const key = currencyKey(currency)
-  const selectedTokenList = useCombinedActiveList()
-  const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
-  const customAdded = useIsUserAddedToken(currency)
-  const balance = useCurrencyBalance(account ?? undefined, currency)
-  if (isSelected || otherSelected)
+  // const selectedTokenList = useCombinedActiveList()
+  // const balance = useCurrencyBalance(account ?? undefined, currency)
+  if (isSelected)
     currency = {
       ...currency,
       logoURI: checkedLogo,
@@ -122,18 +90,16 @@ function CurrencyRow({
       className={`token-item-${key}`}
       onClick={() => (isSelected ? null : onSelect())}
       disabled={isSelected}
-      selected={otherSelected}
     >
-      <CurrencyLogo currency={currency} size={'24px'} />
       <Column>
         <Text title={currency.name} fontWeight={500}>
           {currency.symbol}
         </Text>
       </Column>
       <TokenTags currency={currency} />
-      <RowFixed style={{ justifySelf: 'flex-end' }}>
+      {/* <RowFixed style={{ justifySelf: 'flex-end' }}>
         {balance ? <Balance balance={balance} /> : account ? <Loader /> : null}
-      </RowFixed>
+      </RowFixed> */}
     </MenuItem>
   )
 }
@@ -143,63 +109,32 @@ export default function CurrencyList({
   currencies,
   selectedCurrency,
   onCurrencySelect,
-  otherCurrency,
   fixedListRef,
-  showImportView,
-  setImportToken,
-  displayNames,
 }: {
   height: number
   currencies: Token[]
   selectedCurrency?: Token | null
   onCurrencySelect: (currency: Token) => void
-  otherCurrency?: Token | null
   fixedListRef?: MutableRefObject<FixedSizeList | undefined>
-  showETH: boolean
-  showImportView: () => void
-  setImportToken: (token: Token) => void
   displayNames?: string[]
 }) {
   const itemData = currencies
 
-  const inactiveTokens: {
-    [address: string]: Token
-  } = useAllInactiveTokens()
+  // const inactiveTokens: {
+  //   [address: string]: Token
+  // } = useAllInactiveTokens()
 
   const Row = useCallback(
     ({ data, index, style }) => {
       const currency: Token = data[index]
       const isSelected = Boolean(selectedCurrency && currencyEquals(selectedCurrency, currency))
-      const otherSelected = Boolean(otherCurrency && currencyEquals(otherCurrency, currency))
       const handleSelect = () => onCurrencySelect(currency)
 
-      const token = currency
+      // const token = currency
 
-      const showImport = inactiveTokens && token && Object.keys(inactiveTokens).includes(token.address)
-
-      if (showImport && token) {
-        return (
-          <ImportRow
-            style={style}
-            token={token}
-            showImportView={showImportView}
-            setImportToken={setImportToken}
-            dim={true}
-          />
-        )
-      } else {
-        return (
-          <CurrencyRow
-            style={style}
-            currency={currency}
-            isSelected={isSelected}
-            onSelect={handleSelect}
-            otherSelected={otherSelected}
-          />
-        )
-      }
+      return <CurrencyRow style={style} currency={currency} isSelected={isSelected} onSelect={handleSelect} />
     },
-    [onCurrencySelect, otherCurrency, selectedCurrency]
+    [onCurrencySelect, selectedCurrency]
   )
 
   const itemKey = useCallback((index: number, data: any) => currencyKey(data[index]), [])

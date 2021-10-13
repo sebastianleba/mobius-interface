@@ -212,8 +212,6 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
         onDismiss={handleDismissSearch}
         onCurrencySelect={onCurrencySelect}
         selectedCurrency={pool ? pool.lpToken : undefined}
-        otherSelectedCurrency={undefined}
-        showCommonBases={false}
       />
       <Divider />
       {!pool ? (
