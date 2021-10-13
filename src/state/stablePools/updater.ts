@@ -80,6 +80,8 @@ export function UpdatePools(): null {
           )
         )
         const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
+        const workingLiquidity = JSBI.BigInt(((await gauge?.working_supply()) ?? '0').toString())
+
         const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
         const weight = JSBI.BigInt(
           (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
@@ -106,6 +108,7 @@ export function UpdatePools(): null {
               balances,
               amp,
               lpTotalSupply,
+              workingLiquidity,
               lpOwned,
               aPrecise,
               feesGenerated: feesGenerated.raw,
@@ -181,6 +184,7 @@ export default function BatchUpdatePools(): null {
   const lpStaked_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'balanceOf', [
     account ?? undefined,
   ])
+  const workingLiquidityMulti = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_supply')
   const pendingMobi_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'claimable_tokens', [
     account ?? undefined,
   ])
@@ -238,6 +242,7 @@ export default function BatchUpdatePools(): null {
         const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
         const futureWeight: JSBI = BigIntToJSBI((futureWeights?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
+        const workingLiquidity: JSBI = BigIntToJSBI((workingLiquidityMulti?.[i]?.result?.[0] as BigInt) ?? '0')
         const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0')
         const lastClaim: Date = new Date(
           parseInt((lastClaims?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0') * 1000
@@ -264,6 +269,7 @@ export default function BatchUpdatePools(): null {
             totalMobiRate,
             totalStakedAmount,
           },
+          workingLiquidity,
           effectiveBalance,
           totalEffectiveBalance,
           lastUserVote,

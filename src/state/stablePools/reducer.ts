@@ -21,6 +21,7 @@ export type StableSwapVariable = {
   balances: JSBI[]
   amp: JSBI
   lpTotalSupply: JSBI
+  workingLiquidity: JSBI
   lpOwned: JSBI
   virtualPrice: JSBI
   aPrecise: JSBI

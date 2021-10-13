@@ -160,7 +160,7 @@ function PositionCard({
             </RowBetween> */}
             <RowBetween>
               <TYPE.white>Your Boost</TYPE.white>
-              <TYPE.white>{`${boost.toFixed(0)}%`}</TYPE.white>
+              <TYPE.white>{`${boost.toFixed(2)}x`}</TYPE.white>
             </RowBetween>
           </>
         )}
