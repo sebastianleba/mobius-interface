@@ -59,6 +59,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   relativeGaugeWeight?: Fraction
   additionalRewards?: string[]
   additionalRewardRate?: string[]
+  lastClaim?: Date
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable

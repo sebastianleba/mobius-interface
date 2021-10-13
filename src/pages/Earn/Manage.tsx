@@ -17,7 +17,7 @@ import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
 import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
-import { RowBetween, RowFixed } from '../../components/Row'
+import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { BIG_INT_SECONDS_IN_WEEK } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { useColor } from '../../hooks/useColor'
@@ -77,6 +77,14 @@ const VoteCard = styled(DataCard)`
   overflow: hidden;
 `
 
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${({ theme }) => theme.text3};
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+`
+
 const DataRow = styled(RowBetween)`
   justify-content: center;
   gap: 12px;
@@ -86,6 +94,9 @@ const DataRow = styled(RowBetween)`
     gap: 12px;
   `};
 `
+
+const MS_IN_HOUR = 1000 * 60 * 60
+const MS_IN_MINUTE = 1000 * 60
 
 export default function Manage({
   match: {
@@ -100,12 +111,15 @@ export default function Manage({
 
   const stakingInfo = useStablePoolInfoByName(poolName)
 
-  const { balances, stakedAmount, totalStakedAmount, tokens, peggedTo, pegComesAfter } = stakingInfo ?? {
+  const { balances, stakedAmount, totalStakedAmount, tokens, peggedTo, pegComesAfter, lastClaim } = stakingInfo ?? {
     balances: [],
     stakedAmount: undefined,
     totalStakedAmount: undefined,
     tokens: [],
   }
+
+  const nextClaimableTime = new Date(lastClaim?.valueOf() + MS_IN_HOUR)
+  const minutesUntilRefresh = (nextClaimableTime - Date.now()) / MS_IN_MINUTE
 
   const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? '0')
 
@@ -345,14 +359,6 @@ export default function Manage({
                       >
                         Claim MOBI
                       </ButtonEmpty>
-                      <ButtonEmpty
-                        padding="8px"
-                        borderRadius="8px"
-                        width="fit-content"
-                        onClick={() => setShowExternalRewardModal(true)}
-                      >
-                        Claim Rest
-                      </ButtonEmpty>
                     </RowFixed>
                   )}
                 </RowBetween>
@@ -379,33 +385,51 @@ export default function Manage({
                     {' MOBI / week'}
                   </TYPE.black>
                 </RowBetween>
-                {externalRewards &&
-                  externalRewards.map((reward, i) => (
-                    <RowBetween style={{ alignItems: 'baseline' }} key={`reward-line-${stakingInfo.name}-${i}`}>
-                      <TYPE.largeHeader fontSize={36} fontWeight={600}>
-                        <CountUp
-                          key={`${mobiCountUpAmount}-countup`}
-                          isCounting
-                          decimalPlaces={4}
-                          start={parseFloat(reward.toFixed(4))}
-                          end={parseFloat(reward.toFixed(4))}
-                          thousandsSeparator={','}
-                          duration={1}
-                        />
-                      </TYPE.largeHeader>
-                      <TYPE.black fontSize={16} fontWeight={500}>
-                        <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
-                          ⚡
-                        </span>
-                        {stakingInfo
-                          ? stakingInfo.externalRewardRates?.[i]
-                              ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                              ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
-                          : '0'}
-                        {` ${stakingInfo.externalRewardRates?.[i].token.symbol} / week`}
-                      </TYPE.black>
+                {externalRewards && (
+                  <>
+                    <Divider />
+                    <RowBetween>
+                      <TYPE.black>External rewards refresh once per hour</TYPE.black>
+                      <ButtonEmpty
+                        padding="8px"
+                        borderRadius="8px"
+                        width="fit-content"
+                        onClick={() => setShowExternalRewardModal(true)}
+                      >
+                        Claim External
+                      </ButtonEmpty>
                     </RowBetween>
-                  ))}
+                    <AutoRow>
+                      <TYPE.subHeader>Next Refresh in {minutesUntilRefresh.toFixed(0)} minutes</TYPE.subHeader>
+                    </AutoRow>
+                    {externalRewards.map((reward, i) => (
+                      <RowBetween style={{ alignItems: 'baseline' }} key={`reward-line-${stakingInfo.name}-${i}`}>
+                        <TYPE.largeHeader fontSize={36} fontWeight={600}>
+                          <CountUp
+                            key={`${mobiCountUpAmount}-countup`}
+                            isCounting
+                            decimalPlaces={4}
+                            start={parseFloat(reward.toFixed(4))}
+                            end={parseFloat(reward.toFixed(4))}
+                            thousandsSeparator={','}
+                            duration={1}
+                          />
+                        </TYPE.largeHeader>
+                        <TYPE.black fontSize={16} fontWeight={500}>
+                          <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
+                            ⚡
+                          </span>
+                          {stakingInfo
+                            ? stakingInfo.externalRewardRates?.[i]
+                                ?.multiply(BIG_INT_SECONDS_IN_WEEK)
+                                ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                            : '0'}
+                          {` ${stakingInfo.externalRewardRates?.[i].token.symbol} / week`}
+                        </TYPE.black>
+                      </RowBetween>
+                    ))}
+                  </>
+                )}
               </AutoColumn>
             </StyledBottomCard>
           </BottomSection>

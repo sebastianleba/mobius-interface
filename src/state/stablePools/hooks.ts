@@ -39,6 +39,7 @@ export interface StablePoolInfo {
   readonly workingPercentage: Percent
   readonly totalPercentage: Percent
   readonly externalRewardRates?: TokenAmount[]
+  readonly lastClaim?: Date
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -99,6 +100,7 @@ export const getPoolInfo = (
     pool.additionalRewardRate?.map(
       (rate, i) => new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
     ) ?? undefined,
+  lastClaim: pool.lastClaim,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
