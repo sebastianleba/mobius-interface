@@ -7,6 +7,7 @@ import { useMobiStakingInfo, usePriceOfDeposits } from 'state/staking/hooks'
 import styled from 'styled-components'
 
 import GradientTextBox from '../../components/Visx/GradientTextBox'
+import CalcBoost from './CalcBoost'
 import { getAllUnclaimedMobi } from './ClaimAllMobiModal'
 import GaugeWeights from './GaugeWeights'
 import Positions from './Positions'
@@ -96,6 +97,7 @@ export default function Staking() {
       <PositionsContainer>
         <Stake stakingInfo={stakingInfo} />
         <Positions stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
+        <CalcBoost stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
         {/* <DoublePieChart
           width={Math.min((width ?? 600) * 0.95, 600)}
           height={Math.min((width ?? 600) * 0.95, 600)}

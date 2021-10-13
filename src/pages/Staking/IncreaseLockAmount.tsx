@@ -190,7 +190,7 @@ const BalanceText = styled(TYPE.subHeader)`
   cursor: pointer;
 `
 
-const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: CurrencyRowProps) => {
+export const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: CurrencyRowProps) => {
   const { account } = useActiveContractKit()
   const currency = token
   const tokenBalance = balance

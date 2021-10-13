@@ -126,7 +126,7 @@ export default function Lock({ setHash, setAttempting }: LockProps) {
           return (
             <RowBetween key={`boost-info-${pos.pool}`}>
               <TYPE.body>{pos.pool}</TYPE.body>
-              <TYPE.body>{boost.toFixed(0)}%</TYPE.body>
+              <TYPE.body>{boost.toFixed(2)}x</TYPE.body>
             </RowBetween>
           )
         })
