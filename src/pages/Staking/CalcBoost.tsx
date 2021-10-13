@@ -219,7 +219,7 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
       ) : (
         <div>
           <TYPE.mediumHeader marginBottom={0}>Select amount of LP tokens</TYPE.mediumHeader>
-          <CurrencyRow val={lpInput} token={pool.lpToken} balance={lpBalance} setTokenAmount={setLPInput} />
+          <CurrencyRow val={lpInput} token={pool.lpToken} balance={lpBalance} setTokenAmount={setLPInput} pool={pool} />
           <TYPE.mediumHeader marginBottom={0}>Select amount of veMOBI</TYPE.mediumHeader>
           <CurrencyRow val={veInput} token={vemobi} balance={veBalance} setTokenAmount={setVEInput} />
           <Divider />

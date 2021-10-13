@@ -9,12 +9,14 @@ import { useMobi } from 'hooks/Tokens'
 import { useDoTransaction } from 'hooks/useDoTransaction'
 import React, { useState } from 'react'
 import { Text } from 'rebass'
+import { StablePoolInfo } from 'state/stablePools/hooks'
 import { useIsDarkMode } from 'state/user/hooks'
 import { useCurrencyBalance } from 'state/wallet/hooks'
 import styled from 'styled-components'
 
 import { ButtonConfirmed, ButtonError } from '../../components/Button'
 import Column from '../../components/Column'
+import DoubleCurrencyLogo from '../../components/DoubleLogo'
 import { Input as NumericalInput } from '../../components/NumericalInput'
 import ProgressSteps from '../../components/ProgressSteps'
 import { useActiveContractKit } from '../../hooks'
@@ -141,6 +143,7 @@ type CurrencyRowProps = {
   setTokenAmount: (tokenAmount: string) => void
   readOnly: boolean | undefined
   balance?: TokenAmount
+  pool?: StablePoolInfo
 }
 
 const InputRowLeft = styled.div``
@@ -190,7 +193,7 @@ const BalanceText = styled(TYPE.subHeader)`
   cursor: pointer;
 `
 
-export const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: CurrencyRowProps) => {
+export const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly, pool }: CurrencyRowProps) => {
   const { account } = useActiveContractKit()
   const currency = token
   const tokenBalance = balance
@@ -200,7 +203,11 @@ export const CurrencyRow = ({ val, token, setTokenAmount, balance, readOnly }: C
     <InputRow>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <Aligner>
-          <CurrencyLogo currency={currency} size={'34px'} />
+          {pool ? (
+            <DoubleCurrencyLogo currency0={pool.tokens[0]} currency1={pool.tokens[1]} size={24} margin={true} />
+          ) : (
+            <CurrencyLogo currency={currency} size={'34px'} />
+          )}
           <StyledTokenName className="token-symbol-container" active={Boolean(currency && currency.symbol)}>
             {(currency && currency.symbol && currency.symbol.length > 20
               ? currency.symbol.slice(0, 4) +

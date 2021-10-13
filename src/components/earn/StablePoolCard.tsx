@@ -279,7 +279,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <RowFixed>
             <QuestionHelper text={'APR after staking'} />
             <TYPE.subHeader
-              style={{ paddingLeft: '.15rem' }}
+              style={{ paddingLeft: '.15rem', alignContent: 'right' }}
               color={backgroundColorStart}
               className="bapr"
               fontWeight={800}
