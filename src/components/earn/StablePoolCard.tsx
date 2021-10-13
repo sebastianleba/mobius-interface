@@ -98,7 +98,7 @@ const TopSection = styled.div`
 const SecondSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: right;
+  justify-content: flex-end;
   padding: 1rem;
   padding-bottom: 0.25rem;
   padding-top: 0;
@@ -279,7 +279,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <RowFixed>
             <QuestionHelper text={'APR after staking'} />
             <TYPE.subHeader
-              style={{ paddingLeft: '.15rem', alignContent: 'right' }}
+              style={{ paddingLeft: '.15rem' }}
               color={backgroundColorStart}
               className="bapr"
               fontWeight={800}
