@@ -100,7 +100,8 @@ export const getPoolInfo = (
   totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
   externalRewardRates:
     pool.additionalRewardRate?.map(
-      (rate, i) => new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
+      (rate, i) =>
+        tokens[pool.additionalRewards?.[i]] && new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
     ) ?? undefined,
   lastClaim: pool.lastClaim,
 })

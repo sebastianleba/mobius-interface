@@ -17,6 +17,14 @@ export const StableTokens: TokenList = {
   timestamp: '2021-08-10T17:02:02.069Z',
   tokens: [
     {
+      chainId: ChainId.MAINNET,
+      address: '0x471EcE3750Da237f93B8E339c536989b8978a438',
+      decimals: 18,
+      symbol: 'Celo',
+      name: 'Celo',
+      logoURI: '',
+    },
+    {
       chainId: ChainId.ALFAJORES,
       address: '0x7588110A070987ea0347Cf788226c28d1476d641',
       decimals: 18,

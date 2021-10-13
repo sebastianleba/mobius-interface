@@ -129,6 +129,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['7302827380000000'],
     },
     {
       name: 'USDC (Solana AllBridge) Pool',
@@ -178,6 +180,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0x27D9Bfa5F864862BeDC23cFab7e00b6b94488CC6',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['1460565500000000'],
     },
     {
       name: 'USDC (PoS Optics) Pool',
@@ -227,6 +231,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 0,
       gaugeAddress: '0x52517feb1Fc6141d5CF6718111C7Cc0FD764fA5d',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['2190848200000000'],
     },
     {
       name: 'BTC Pool',
@@ -423,6 +429,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['730282730000000'],
     },
   ],
   [ChainId.ALFAJORES]: [
