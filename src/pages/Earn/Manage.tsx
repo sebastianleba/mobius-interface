@@ -135,7 +135,7 @@ export default function Manage({
   let userExternalRates: TokenAmount[] = []
   if (account && stakingInfo && stakingInfo.externalRewardRates) {
     userExternalRates = stakingInfo.externalRewardRates.map(
-      (rate) => new TokenAmount(rate.token, stakingInfo.totalPercentage.multiply(rate.raw).toFixed(0))
+      (rate) => new TokenAmount(rate.token, stakingInfo.workingPercentage.multiply(rate.raw).toFixed(0))
     )
   }
 
@@ -402,7 +402,7 @@ export default function Manage({
                     <AutoRow>
                       <TYPE.subHeader>Next Refresh in {minutesUntilRefresh.toFixed(0)} minutes</TYPE.subHeader>
                     </AutoRow>
-                    {externalRewards.map((reward, i) => (
+                    {userExternalRates.map((reward, i) => (
                       <RowBetween style={{ alignItems: 'baseline' }} key={`reward-line-${stakingInfo.name}-${i}`}>
                         <TYPE.largeHeader fontSize={36} fontWeight={600}>
                           <CountUp

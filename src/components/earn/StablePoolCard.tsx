@@ -154,7 +154,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   let userExternalRates: TokenAmount[] = []
   if (account && poolInfo.externalRewardRates) {
     userExternalRates = poolInfo.externalRewardRates.map(
-      (rate) => new TokenAmount(rate.token, poolInfo.totalPercentage.multiply(rate.raw).toFixed(0))
+      (rate) => new TokenAmount(rate.token, poolInfo.workingPercentage.multiply(rate.raw).toFixed(0))
     )
   }
   let rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
