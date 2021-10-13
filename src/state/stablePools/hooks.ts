@@ -206,14 +206,14 @@ export function useExternalRewards({ poolName }: { poolName: string }): TokenAmo
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[poolName]?.pool)
   const gauge = useLiquidityGaugeContract(pool?.gaugeAddress ?? undefined)
   const { account, chainId } = useActiveContractKit()
-
+  gauge?.claimable_reward_write
   const tokens = useDefaultTokenList()[chainId]
   const claimableTokens = useSingleContractMultipleData(
     gauge,
-    'claimable_reward',
+    'claimable_reward_write',
     pool?.additionalRewards?.map((token) => [account ?? undefined, token ?? undefined]) ?? undefined
   )
-  console.log(claimableTokens)
+  // console.log(claimableTokens)
   const externalRewards = claimableTokens?.map(
     (result, i) =>
       new TokenAmount(

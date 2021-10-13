@@ -525,6 +525,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 0,
       gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
       relativeGaugeWeight: new Fraction('9', '10'),
+      additionalRewards: ['0x2AaF20d89277BF024F463749045964D7e7d3A774', '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609'],
+      additionalRewardRate: ['10000000000000000', '10000000000000000'],
     },
   ],
   [ChainId.BAKLAVA]: [],

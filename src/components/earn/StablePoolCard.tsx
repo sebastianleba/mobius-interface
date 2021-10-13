@@ -164,7 +164,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     const priceOfToken = useCUSDPrice(rate.token)
     if (poolInfo.externalRewardRates && i < poolInfo.externalRewardRates.length) {
       rewardPerYear = rewardPerYear.add(priceOfToken?.raw.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0')
-      console.log(rewardPerYear)
     }
   }
   const apyFraction =

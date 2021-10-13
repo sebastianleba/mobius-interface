@@ -164,6 +164,14 @@ export default function Manage({
 
   const toggleWalletModal = useWalletModalToggle()
 
+  // const test = async () => {
+  //   stakingInfo?.externalRewardRates?.forEach(async (rate) => {
+  //     const amount = await gauge?.claimable_reward_write(account, rate.token.address, { gasLimit: 350000 })
+  //     console.log(amount)
+  //   })
+  // }
+  // test()
+
   const handleDepositClick = useCallback(() => {
     if (account) {
       setShowStakingModal(true)

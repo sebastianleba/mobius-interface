@@ -60,7 +60,7 @@ export default function ExternalRewardsModal({ isOpen, onDismiss, stakingInfo }:
   async function onClaimReward() {
     if (stakingContract && stakingInfo?.stakedAmount) {
       setAttempting(true)
-      await stakingContract['claim_rewards()']({ gasLimit: 10000000 })
+      await stakingContract['claim_rewards(address)'](account, { gasLimit: 1000000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Claim accumulated rewards`,
