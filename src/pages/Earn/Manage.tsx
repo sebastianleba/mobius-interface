@@ -118,8 +118,8 @@ export default function Manage({
     tokens: [],
   }
 
-  const nextClaimableTime = new Date(lastClaim?.valueOf() + MS_IN_HOUR)
-  const minutesUntilRefresh = (nextClaimableTime - Date.now()) / MS_IN_MINUTE
+  const nextClaimableTime = lastClaim?.valueOf() + MS_IN_HOUR
+  const minutesUntilRefresh = Math.max(0, (nextClaimableTime - Date.now()) / MS_IN_MINUTE)
 
   const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? '0')
 
@@ -402,7 +402,7 @@ export default function Manage({
                     <AutoRow>
                       <TYPE.subHeader>Next Refresh in {minutesUntilRefresh.toFixed(0)} minutes</TYPE.subHeader>
                     </AutoRow>
-                    {userExternalRates.map((reward, i) => (
+                    {externalRewards.map((reward, i) => (
                       <RowBetween style={{ alignItems: 'baseline' }} key={`reward-line-${stakingInfo.name}-${i}`}>
                         <TYPE.largeHeader fontSize={36} fontWeight={600}>
                           <CountUp
@@ -420,7 +420,7 @@ export default function Manage({
                             ⚡
                           </span>
                           {stakingInfo
-                            ? stakingInfo.externalRewardRates?.[i]
+                            ? userExternalRates?.[i]
                                 ?.multiply(BIG_INT_SECONDS_IN_WEEK)
                                 ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
                             : '0'}
