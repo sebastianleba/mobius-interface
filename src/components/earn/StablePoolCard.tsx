@@ -95,6 +95,18 @@ const TopSection = styled.div`
     grid-template-columns: 48px 1fr 96px;
   `};
 `
+const SecondSection = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 1rem;
+  padding-bottom: 0.25rem;
+  padding-top: 0;
+  z-index: 1;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    grid-template-columns: 48px 1fr 96px;
+  `};
+`
 
 const BottomSection = styled.div<{ showBackground: boolean }>`
   padding: 12px 16px;
@@ -123,12 +135,21 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     balances,
     totalDeposited,
     stakedAmount,
+    workingSupply,
     pegComesAfter,
     feesGenerated,
     mobiRate,
     displayDecimals,
     totalStakedAmount: totalStakedLPs,
   } = poolInfo
+
+  // console.log(poolInfo.name)
+  // console.log(workingSupply.toString())
+  // console.log(poolInfo.totalStakedAmount.toFixed())
+  // // console.log(totalDeposited.toExact())
+  // 3529370906912529506344093
+  // 7974951.397442721004431525
+  // 3529370.906912529506344093
 
   const isLive = true
 
@@ -139,7 +160,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited
-  const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo)
+  const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
   const coinPrice = useEthBtcPrice(poolInfo.poolAddress)
   const totalStakedAmount = totalValueStaked
     ? new Fraction(
@@ -236,7 +257,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               fontWeight={800}
               fontSize={[14, 18]}
             >
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : ' -'} APR
+              {apy.denominator.toString() !== '0' ? `${apy.toFixed(1, { groupSeparator: ',' })}%` : ' -'} Base APR
             </TYPE.subHeader>
           </RowFixed>
         ) : feesGenerated ? (
@@ -253,6 +274,37 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           </TYPE.black>
         )}
       </TopSection>
+      <SecondSection>
+        {apy ? (
+          <RowFixed>
+            <QuestionHelper text={'APR after staking'} />
+            <TYPE.subHeader
+              style={{ paddingLeft: '.15rem' }}
+              color={backgroundColorStart}
+              className="bapr"
+              fontWeight={800}
+              fontSize={[14, 18]}
+            >
+              {apy.denominator.toString() !== '0'
+                ? `${apy.multiply(new Fraction(JSBI.BigInt(500), JSBI.BigInt(2))).toFixed(1, { groupSeparator: ',' })}%`
+                : ' -'}{' '}
+              Boosted APR
+            </TYPE.subHeader>
+          </RowFixed>
+        ) : feesGenerated ? (
+          <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
+            Fees Generated: {pegComesAfter ? '' : peggedTo}
+            {feesGenerated.denominator.toString() !== '0'
+              ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
+              : '-'}
+            {pegComesAfter ? peggedTo : ''}
+          </TYPE.subHeader>
+        ) : (
+          <TYPE.black fontWeight={600} fontSize={[14, 18]}>
+            Coming Soon!
+          </TYPE.black>
+        )}
+      </SecondSection>
       <SubHeader>
         <RowBetween>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} />

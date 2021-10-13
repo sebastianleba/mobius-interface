@@ -21,6 +21,7 @@ export interface StablePoolInfo {
   readonly totalDeposited: TokenAmount
   readonly apr?: TokenAmount
   readonly totalStakedAmount?: TokenAmount
+  readonly workingSupply?: JSBI
   readonly stakedAmount: TokenAmount
   readonly totalVolume?: TokenAmount
   readonly peggedTo: string
@@ -72,6 +73,7 @@ export const getPoolInfo = (pool: StableSwapPool): StablePoolInfo => ({
     pool.lpToken,
     JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
   ),
+  workingSupply: pool.workingLiquidity,
   balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
   pegComesAfter: pool.pegComesAfter,
   feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
