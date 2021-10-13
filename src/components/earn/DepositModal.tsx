@@ -95,7 +95,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
       setAttempting(true)
       const tokenAmounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
       await stakingContract
-        .addLiquidity(tokenAmounts, withSlippage.toString(), deadline)
+        .addLiquidity(tokenAmounts, withSlippage.toString(), deadline, { gasLimit: 10000000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Deposit Liquidity into ${poolInfo.name}`,
