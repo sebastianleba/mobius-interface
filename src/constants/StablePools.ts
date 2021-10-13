@@ -5,13 +5,6 @@ import { WrappedTokenInfo } from 'state/lists/hooks'
 import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
-export type StablePoolInfo = {
-  poolAddress: string
-  lpAddress: string
-  token: Array<Token | string>
-  name: string
-}
-
 const mobiToken = (chainId: number, address: string) =>
   new WrappedTokenInfo(
     {
@@ -136,6 +129,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['7302827380000000'],
     },
     {
       name: 'USDC (Solana AllBridge) Pool',
@@ -185,6 +180,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0x27D9Bfa5F864862BeDC23cFab7e00b6b94488CC6',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['1460565500000000'],
     },
     {
       name: 'USDC (PoS Optics) Pool',
@@ -234,6 +231,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 0,
       gaugeAddress: '0x52517feb1Fc6141d5CF6718111C7Cc0FD764fA5d',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['2190848200000000'],
     },
     {
       name: 'BTC Pool',
@@ -430,6 +429,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['730282730000000'],
     },
   ],
   [ChainId.ALFAJORES]: [
@@ -481,6 +482,12 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x8222452cF3780825aA657B40C63D492F33F28bF6',
       relativeGaugeWeight: new Fraction('1', '10'),
       displayDecimals: 0,
+      additionalRewards: [
+        '0x2AaF20d89277BF024F463749045964D7e7d3A774',
+        '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609',
+        '0xCC531BfBA46cA251D3D9f3aCc37ABD5DCF3ed0B3',
+      ],
+      additionalRewardRate: ['10000000000000000', '10000000000000000', '12312312312312312'],
     },
     {
       name: 'USD Pool',
@@ -545,6 +552,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 0,
       gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
       relativeGaugeWeight: new Fraction('9', '10'),
+      additionalRewards: ['0x2AaF20d89277BF024F463749045964D7e7d3A774', '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609'],
+      additionalRewardRate: ['10000000000000000', '10000000000000000'],
     },
   ],
   [ChainId.BAKLAVA]: [],
@@ -683,29 +692,6 @@ export const TOKENS: { [chain in ChainId]: { [address: string]: Token } } = {
   [ChainId.ALFAJORES]: {},
   [ChainId.BAKLAVA]: {},
 }
-
-export const STAKED_CELO_POOL: StablePoolInfo = {
-  name: 'Staked CELO Pool',
-  poolAddress: '0x000',
-  lpAddress: '0x000',
-  token: ['CELO', 'rCELO'],
-}
-
-export const USD_POOL: StablePoolInfo = {
-  name: 'US Dollar Pool',
-  poolAddress: '0xe83e3750eeE33218586015Cf3a34c6783C0F63Ac',
-  lpAddress: '0x000',
-  token: ['cUSD', 'USDC', 'USDT'],
-}
-
-export const EURO_POOL: StablePoolInfo = {
-  name: 'Euro Pool',
-  poolAddress: '0x0000',
-  lpAddress: '0x000',
-  token: ['cEUR', 'bEURS', 'mcEUR'],
-}
-
-export const STABLE_POOLS = [STAKED_CELO_POOL, USD_POOL, EURO_POOL]
 
 //todo: replace Mainnet and Baklava Pool Addresses
 type AddressMap = { [K in ChainId]: string }
