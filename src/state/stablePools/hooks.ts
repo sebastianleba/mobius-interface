@@ -171,7 +171,6 @@ export function useExpectedLpTokens(
         tokenAmounts.map((ta) => ta?.raw || JSBI.BigInt('0')),
         isDeposit
       ) ?? JSBI.BigInt('0')
-    console.log(amount.toString())
     return [new TokenAmount(pool.lpToken, amount), tokenAmounts]
   }, [input, mathUtil, tokenAmounts])
 }
