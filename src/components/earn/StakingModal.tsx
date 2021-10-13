@@ -101,13 +101,13 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
   const [approval, approveCallback] = useApproveCallback(parsedAmount, stakingInfo.gaugeAddress)
 
   const stakingContract = useLiquidityGaugeContract(stakingInfo.gaugeAddress)
-  const depositFunction = stakingContract?.['deposit(uint256,address,bool)']
+  const depositFunction = stakingContract?.['deposit(uint256)']
 
   async function onStake() {
     setAttempting(true)
     if (stakingContract && parsedAmount && deadline) {
       if (approval === ApprovalState.APPROVED) {
-        await depositFunction(parsedAmount.raw.toString(), account, false, { gasLimit: 10000000 }).then(
+        await depositFunction(parsedAmount.raw.toString(), { gasLimit: 10000000 }).then(
           (response: TransactionResponse) => {
             addTransaction(response, {
               summary: `Stake deposited liquidity`,
