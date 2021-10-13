@@ -218,18 +218,18 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
         <TYPE.mediumHeader>Select a Pool</TYPE.mediumHeader>
       ) : (
         <div>
-          <TYPE.mediumHeader marginBottom={0}>Select amount of LP tokens</TYPE.mediumHeader>
+          <TYPE.mediumHeader marginBottom={0}>Enter amount</TYPE.mediumHeader>
           <CurrencyRow val={lpInput} token={pool.lpToken} balance={lpBalance} setTokenAmount={setLPInput} pool={pool} />
-          <TYPE.mediumHeader marginBottom={0}>Select amount of veMOBI</TYPE.mediumHeader>
+          <TYPE.mediumHeader marginBottom={0}>Enter amount</TYPE.mediumHeader>
           <CurrencyRow val={veInput} token={vemobi} balance={veBalance} setTokenAmount={setVEInput} />
           <Divider />
           <Wrapper>
             <RowBetween>
-              <TYPE.largeHeader>Boost</TYPE.largeHeader>
+              <TYPE.mediumHeader>Boost</TYPE.mediumHeader>
               <TYPE.mediumHeader color={theme().primary1}>{boost.toFixed(2)}x</TYPE.mediumHeader>
             </RowBetween>
             <RowBetween>
-              <TYPE.largeHeader>veMOBI to get max boost</TYPE.largeHeader>
+              <TYPE.mediumHeader>veMOBI to get max boost</TYPE.mediumHeader>
               <TYPE.mediumHeader color={theme().primary1}>{votes.toFixed(2)}</TYPE.mediumHeader>
             </RowBetween>
           </Wrapper>
