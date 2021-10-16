@@ -3,7 +3,7 @@ import { Fraction, Percent, Token } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { initPool, updateVariableData } from './actions'
+import { initPool, updateExternalRewards, updateVariableData } from './actions'
 
 export type StableStakingInfo = {
   userStaked: JSBI
@@ -12,10 +12,16 @@ export type StableStakingInfo = {
   pendingMobi: JSBI
 }
 
+export type ExternalRewards = {
+  token: string
+  unclaimed: JSBI
+}
+
 export type StableSwapVariable = {
   balances: JSBI[]
   amp: JSBI
   lpTotalSupply: JSBI
+  workingLiquidity: JSBI
   lpOwned: JSBI
   virtualPrice: JSBI
   aPrecise: JSBI
@@ -26,6 +32,7 @@ export type StableSwapVariable = {
   totalEffectiveBalance: JSBI
   lastUserVote: number
   futureWeight: JSBI
+  externalRewards?: ExternalRewards[]
 }
 
 export type StableSwapMathConstants = {
@@ -52,6 +59,9 @@ export type StableSwapConstants = StableSwapMathConstants & {
   gaugeAddress?: string
   relativeGaugeWeight?: Fraction
   metaPool?: string
+  additionalRewards?: string[]
+  additionalRewardRate?: string[]
+  lastClaim?: Date
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
@@ -83,6 +93,10 @@ export default createReducer<PoolState>(initialState, (builder) =>
           },
         },
       }
+    })
+    .addCase(updateExternalRewards, (state, { payload: { pool, externalRewards } }) => {
+      if (!state.pools[pool]) return
+      state.pools[pool].pool.externalRewards = externalRewards
     })
     .addCase(updateVariableData, (state, { payload: { name, variableData } }) => {
       const pool = state.pools[name]
