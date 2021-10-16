@@ -133,6 +133,58 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['7302827380000000'],
     },
     {
+      name: 'Poof USD Meta Pool',
+      tokenAddresses: ['0x691e6877271675eaf372a9dBcDf4b39eb8c06d69', '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x691e6877271675eaf372a9dBcDf4b39eb8c06d69',
+            decimals: 18,
+            symbol: 'pUSD',
+            name: 'Poof USD',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4',
+            decimals: 18,
+            symbol: 'Mob LP',
+            name: 'Mobius USDC LP',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x1049d130926bb66d30B5EC3DB480c9acab6737DF',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x68095D768B3c78919c6048F52Cc68267aD2b37fd',
+        18,
+        'MobLP',
+        'Mobius pUSD Meta LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 1,
+      gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
+      additionalRewardRate: ['0', '0'],
+      metaPool: 'USDC (Optics Bridge) Pool',
+    },
+    {
       name: 'USDC (Solana AllBridge) Pool',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
       tokens: [
