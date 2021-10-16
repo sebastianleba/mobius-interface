@@ -250,9 +250,23 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
       )}
       <TopSection>
-        <TYPE.black fontWeight={600} fontSize={[18, 24]}>
-          {poolInfo.name}
-        </TYPE.black>
+        <RowFixed>
+          <TYPE.black fontWeight={600} fontSize={[18, 24]}>
+            {poolInfo.name}
+          </TYPE.black>
+          {poolInfo.meta && (
+            <QuestionHelper
+              text={
+                <>
+                  A meta pool pairs one token with the LP token of another pool to build on already-existing liquidity.{' '}
+                  <br />
+                  <br />
+                  This meta pool builds off of {poolInfo.meta}
+                </>
+              }
+            />
+          )}
+        </RowFixed>
         {apy ? (
           <RowFixed>
             <QuestionHelper
