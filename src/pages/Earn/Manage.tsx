@@ -1,12 +1,12 @@
 import { Fraction, JSBI, TokenAmount } from '@ubeswap/sdk'
 import CurrencyPoolLogo from 'components/CurrencyPoolLogo'
+import ExternalRewardsModal from 'components/earn/ClaimExternalRewardsModal'
 import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
 import { useMobi } from 'hooks/Tokens'
 import React, { useCallback, useState } from 'react'
 import { Link, RouteComponentProps } from 'react-router-dom'
-import { useStablePoolInfoByName } from 'state/stablePools/hooks'
-import UpdatePools from 'state/stablePools/updater'
+import { useExternalRewards, useStablePoolInfoByName } from 'state/stablePools/hooks'
 import styled from 'styled-components'
 import { CountUp } from 'use-count-up'
 import { getDepositValues } from 'utils/stableSwaps'
@@ -17,7 +17,7 @@ import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
 import StakingModal from '../../components/earn/StakingModal'
 import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
-import { RowBetween, RowFixed } from '../../components/Row'
+import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { BIG_INT_SECONDS_IN_WEEK } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { useColor } from '../../hooks/useColor'
@@ -77,6 +77,14 @@ const VoteCard = styled(DataCard)`
   overflow: hidden;
 `
 
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${({ theme }) => theme.text3};
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+`
+
 const DataRow = styled(RowBetween)`
   justify-content: center;
   gap: 12px;
@@ -87,6 +95,9 @@ const DataRow = styled(RowBetween)`
   `};
 `
 
+const MS_IN_HOUR = 1000 * 60 * 60
+const MS_IN_MINUTE = 1000 * 60
+
 export default function Manage({
   match: {
     params: { poolName },
@@ -94,17 +105,21 @@ export default function Manage({
 }: RouteComponentProps<{ poolName: string }>) {
   const { account, chainId } = useActiveContractKit()
   const mobi = useMobi()
+  const externalRewards = useExternalRewards({ poolName })
 
   // get currencies and pair
 
   const stakingInfo = useStablePoolInfoByName(poolName)
 
-  const { balances, stakedAmount, totalStakedAmount, tokens, peggedTo, pegComesAfter } = stakingInfo ?? {
+  const { balances, stakedAmount, totalStakedAmount, tokens, peggedTo, pegComesAfter, lastClaim } = stakingInfo ?? {
     balances: [],
     stakedAmount: undefined,
     totalStakedAmount: undefined,
     tokens: [],
   }
+
+  const nextClaimableTime = lastClaim?.valueOf() + MS_IN_HOUR
+  const minutesUntilRefresh = Math.max(0, (nextClaimableTime - Date.now()) / MS_IN_MINUTE)
 
   const earnedMobi = new TokenAmount(mobi, stakingInfo?.pendingMobi ?? '0')
 
@@ -115,6 +130,12 @@ export default function Manage({
     userMobiRate = new TokenAmount(
       mobi,
       stakingInfo?.workingPercentage.multiply(stakingInfo?.mobiRate ?? '0').toFixed(0) ?? '0'
+    )
+  }
+  let userExternalRates: TokenAmount[] = []
+  if (account && stakingInfo && stakingInfo.externalRewardRates) {
+    userExternalRates = stakingInfo.externalRewardRates.map(
+      (rate) => new TokenAmount(rate.token, stakingInfo.workingPercentage.multiply(rate.raw).toFixed(0))
     )
   }
 
@@ -140,6 +161,7 @@ export default function Manage({
   const [showStakingModal, setShowStakingModal] = useState(false)
   const [showUnstakingModal, setShowUnstakingModal] = useState(false)
   const [showClaimRewardModal, setShowClaimRewardModal] = useState(false)
+  const [showExternalRewardModal, setShowExternalRewardModal] = useState(false)
 
   // fade cards if nothing staked or nothing earned yet
   const disableTop = !stakingInfo?.stakedAmount || stakingInfo.stakedAmount.equalTo(JSBI.BigInt(0))
@@ -156,6 +178,14 @@ export default function Manage({
 
   const toggleWalletModal = useWalletModalToggle()
 
+  // const test = async () => {
+  //   stakingInfo?.externalRewardRates?.forEach(async (rate) => {
+  //     const amount = await gauge?.claimable_reward_write(account, rate.token.address, { gasLimit: 350000 })
+  //     console.log(amount)
+  //   })
+  // }
+  // test()
+
   const handleDepositClick = useCallback(() => {
     if (account) {
       setShowStakingModal(true)
@@ -166,7 +196,6 @@ export default function Manage({
 
   return (
     <PageWrapper gap="lg" justify="center">
-      <UpdatePools />
       {!stakingInfo && <Loader />}
       {stakingInfo && (
         <>
@@ -203,6 +232,15 @@ export default function Manage({
                     : '0'}
                   {' MOBI / week'}
                 </TYPE.body>
+                {stakingInfo &&
+                  stakingInfo.externalRewardRates &&
+                  stakingInfo.externalRewardRates.map((rate) => (
+                    <TYPE.body fontSize={24} fontWeight={500} key={`total-rate-manage-${rate.token.symbol}`}>
+                      {`${rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' })} ${
+                        rate.token.symbol
+                      } / week`}
+                    </TYPE.body>
+                  ))}
               </AutoColumn>
             </PoolData>
           </DataRow>
@@ -249,6 +287,11 @@ export default function Manage({
           <ClaimRewardModal
             isOpen={showClaimRewardModal}
             onDismiss={() => setShowClaimRewardModal(false)}
+            stakingInfo={stakingInfo}
+          />
+          <ExternalRewardsModal
+            isOpen={showExternalRewardModal}
+            onDismiss={() => setShowExternalRewardModal(false)}
             stakingInfo={stakingInfo}
           />
         </>
@@ -307,14 +350,16 @@ export default function Manage({
                     <TYPE.black>Your unclaimed rewards</TYPE.black>
                   </div>
                   {earnedMobi && (
-                    <ButtonEmpty
-                      padding="8px"
-                      borderRadius="8px"
-                      width="fit-content"
-                      onClick={() => setShowClaimRewardModal(true)}
-                    >
-                      Claim
-                    </ButtonEmpty>
+                    <RowFixed>
+                      <ButtonEmpty
+                        padding="8px"
+                        borderRadius="8px"
+                        width="fit-content"
+                        onClick={() => setShowClaimRewardModal(true)}
+                      >
+                        Claim MOBI
+                      </ButtonEmpty>
+                    </RowFixed>
                   )}
                 </RowBetween>
                 <RowBetween style={{ alignItems: 'baseline' }}>
@@ -340,6 +385,51 @@ export default function Manage({
                     {' MOBI / week'}
                   </TYPE.black>
                 </RowBetween>
+                {externalRewards && (
+                  <>
+                    <Divider />
+                    <RowBetween>
+                      <TYPE.black>External rewards refresh once per hour</TYPE.black>
+                      <ButtonEmpty
+                        padding="8px"
+                        borderRadius="8px"
+                        width="fit-content"
+                        onClick={() => setShowExternalRewardModal(true)}
+                      >
+                        Claim External
+                      </ButtonEmpty>
+                    </RowBetween>
+                    <AutoRow>
+                      <TYPE.subHeader>Next Refresh in {minutesUntilRefresh.toFixed(0)} minutes</TYPE.subHeader>
+                    </AutoRow>
+                    {externalRewards.map((reward, i) => (
+                      <RowBetween style={{ alignItems: 'baseline' }} key={`reward-line-${stakingInfo.name}-${i}`}>
+                        <TYPE.largeHeader fontSize={36} fontWeight={600}>
+                          <CountUp
+                            key={`${mobiCountUpAmount}-countup`}
+                            isCounting
+                            decimalPlaces={4}
+                            start={parseFloat(reward.toFixed(4))}
+                            end={parseFloat(reward.toFixed(4))}
+                            thousandsSeparator={','}
+                            duration={1}
+                          />
+                        </TYPE.largeHeader>
+                        <TYPE.black fontSize={16} fontWeight={500}>
+                          <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
+                            ⚡
+                          </span>
+                          {stakingInfo
+                            ? userExternalRates?.[i]
+                                ?.multiply(BIG_INT_SECONDS_IN_WEEK)
+                                ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                            : '0'}
+                          {` ${stakingInfo.externalRewardRates?.[i].token.symbol} / week`}
+                        </TYPE.black>
+                      </RowBetween>
+                    ))}
+                  </>
+                )}
               </AutoColumn>
             </StyledBottomCard>
           </BottomSection>

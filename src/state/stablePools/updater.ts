@@ -31,7 +31,7 @@ const SwapInterface = new Interface(SWAP.abi)
 const lpInterface = new Interface(LP.abi)
 const gaugeInterface = new Interface(GAUGE_V3.abi)
 
-const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
+export const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
   return JSBI.BigInt(num?.toString() ?? fallBack)
 }
 
@@ -200,6 +200,8 @@ export default function BatchUpdatePools(): null {
     gaugeAddresses.map((a) => [a ?? undefined])
   )
 
+  const lastClaims = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'last_claim')
+
   const effectiveBalances = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'working_balances', [
     account ?? undefined,
   ])
@@ -242,6 +244,9 @@ export default function BatchUpdatePools(): null {
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const workingLiquidity: JSBI = BigIntToJSBI((workingLiquidityMulti?.[i]?.result?.[0] as BigInt) ?? '0')
         const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0')
+        const lastClaim: Date = new Date(
+          parseInt((lastClaims?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0') * 1000
+        )
 
         const totalMobiRate = JSBI.divide(
           JSBI.multiply(mobiRate, weight),
@@ -269,6 +274,7 @@ export default function BatchUpdatePools(): null {
           totalEffectiveBalance,
           lastUserVote,
           futureWeight,
+          lastClaim,
         }
         dispatch(
           initPool({

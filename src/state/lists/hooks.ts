@@ -1,4 +1,3 @@
-import DEFAULT_TOKEN_LIST from '@ubeswap/default-token-list'
 import { ChainId, Token } from '@ubeswap/sdk'
 import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
 import { useMemo } from 'react'
@@ -18,28 +17,52 @@ export const StableTokens: TokenList = {
   timestamp: '2021-08-10T17:02:02.069Z',
   tokens: [
     {
-      address: '0x695218A22c805Bab9C6941546CF5395F169Ad871',
-      name: 'USD Coin',
-      symbol: 'cUSDC',
-      chainId: ChainId.ALFAJORES,
+      chainId: ChainId.MAINNET,
+      address: '0x471EcE3750Da237f93B8E339c536989b8978a438',
       decimals: 18,
-      logoURI: 'https://bit.ly/3CwGimW',
+      symbol: 'Celo',
+      name: 'Celo',
+      logoURI: '',
     },
     {
-      address: '0x4DA9471c101e0cac906E52DF4f00943b21863efF',
-      name: 'Tether',
-      symbol: 'cUSDT',
       chainId: ChainId.ALFAJORES,
+      address: '0x7588110A070987ea0347Cf788226c28d1476d641',
       decimals: 18,
+      symbol: 'cUSD',
+      name: 'Celo Dollar',
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+    },
+    {
+      chainId: ChainId.ALFAJORES,
+      address: '0x17Ec8dab839a9880D656c3cEF40cf4038657d168',
+      decimals: 18,
+      symbol: 'USDT',
+      name: 'Tether',
       logoURI: 'https://bit.ly/3AMrCyD',
     },
     {
-      address: '0x874069Fa1Eb16D44d622F2e0Ca25eeA172369bC1',
-      name: 'Celo Dollar',
-      symbol: 'cUSD',
       chainId: ChainId.ALFAJORES,
+      address: '0xCC531BfBA46cA251D3D9f3aCc37ABD5DCF3ed0B3',
       decimals: 18,
-      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+      symbol: 'USDC',
+      name: 'US Dollar Coin',
+      logoURI: 'https://bit.ly/3CwGimW',
+    },
+    {
+      chainId: ChainId.ALFAJORES,
+      address: '0x2AaF20d89277BF024F463749045964D7e7d3A774',
+      decimals: 18,
+      symbol: 'cTC1',
+      name: 'Test Coin 1',
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_sCELO.png',
+    },
+    {
+      chainId: ChainId.ALFAJORES,
+      address: '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609',
+      decimals: 18,
+      symbol: 'cTC2',
+      name: 'Test Coin 2',
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_rCELO.png',
     },
   ],
   version: {
@@ -205,7 +228,7 @@ export function useInactiveListUrls(): string[] {
 export function useCombinedActiveList(): TokenAddressMap {
   const activeListUrls = useActiveListUrls()
   const activeTokens = useCombinedTokenMapFromUrls(activeListUrls)
-  const defaultTokenMap = listToTokenMap(DEFAULT_TOKEN_LIST)
+  const defaultTokenMap = listToTokenMap(StableTokens)
   return combineMaps(activeTokens, defaultTokenMap)
 }
 
@@ -217,7 +240,7 @@ export function useCombinedInactiveList(): TokenAddressMap {
 
 // used to hide warnings on import for default tokens
 export function useDefaultTokenList(): TokenAddressMap {
-  return listToTokenMap(DEFAULT_TOKEN_LIST)
+  return listToTokenMap(StableTokens)
 }
 
 // list of tokens not supported on interface, used to show warnings and prevent swaps and adds

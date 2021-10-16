@@ -26,6 +26,14 @@ interface LockModalProps {
   lockType?: LockType
 }
 
+const ModifiedWrapper = styled(ContentWrapper)`
+  overflow-y: scroll;
+  ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+  }
+`
+
 export default function LockModal({ isOpen, onDismiss, lockType = LockType.initial }: LockModalProps) {
   // monitor call to help UI loading state
   const [hash, setHash] = useState<string | undefined>()
@@ -40,7 +48,7 @@ export default function LockModal({ isOpen, onDismiss, lockType = LockType.initi
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
       {!attempting && !hash && (
-        <ContentWrapper gap="lg">
+        <ModifiedWrapper gap="lg">
           <RowBetween>
             <TYPE.largeHeader>
               {lockType === LockType.initial
@@ -58,7 +66,7 @@ export default function LockModal({ isOpen, onDismiss, lockType = LockType.initi
           ) : (
             <IncreaseLockAmount setAttempting={setAttempting} setHash={setHash} />
           )}
-        </ContentWrapper>
+        </ModifiedWrapper>
       )}
       {attempting && !hash && (
         <LoadingView onDismiss={wrappedOndismiss}>
