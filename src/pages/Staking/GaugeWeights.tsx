@@ -54,13 +54,15 @@ interface GaugeWeightsProps {
 export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
   const votePowerLeft = useVotePowerLeft()
-  const data = summaries.map((summary, i) => ({
-    label: summary.pool,
-    angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
-    radius: summary.workingBalance.greaterThan('0') ? 10 : 9.5,
-    subLabel: `${summary.currentWeight.toFixed(2)}%`,
-    color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i]),
-  }))
+  const data = summaries
+    .filter(({ currentWeight }) => currentWeight.greaterThan('0'))
+    .map((summary, i) => ({
+      label: summary.pool,
+      angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
+      radius: summary.workingBalance.greaterThan('0') ? 10 : 9.5,
+      subLabel: `${summary.currentWeight.toFixed(2)}%`,
+      color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i % numColors]),
+    }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
   const leftToAllocate = 20
