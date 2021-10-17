@@ -178,7 +178,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 1,
-      gaugeAddress: '0x0000000000000000000000000000000000000000',
+      gaugeAddress: '0x1A648004d8AB84eE34d2D1cd2F2A7a7828D6939F',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
       additionalRewardRate: ['0', '0'],
