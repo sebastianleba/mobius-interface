@@ -106,14 +106,14 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
           <AutoRow>
             <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
           </AutoRow>
-          <AutoRow>
+          <AutoRow marginTop="0.5rem">
             <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} /> Show My
             Votes
           </AutoRow>
 
           <CardContainer>
             {summaries.map((summary) => (
-              <WeightCard position={summary} key={`weight-card-${summary.pool}`} />
+              <WeightCard showUserVote={showUserVote} position={summary} key={`weight-card-${summary.pool}`} />
             ))}
           </CardContainer>
         </>
@@ -173,8 +173,8 @@ function WeightCard({ position, showUserVote }: { position: GaugeSummary; showUs
           <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
           {showUserVote ? (
             <RowWithGap gap="4px">
-              <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
-              <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
+              <TYPE.white color="white">Your Vote: </TYPE.white>
+              <TYPE.white color="white">{`${position.powerAllocated.toFixed(2)}%`}</TYPE.white>
             </RowWithGap>
           ) : (
             <RowWithGap gap="4px">
