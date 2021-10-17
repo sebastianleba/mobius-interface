@@ -282,7 +282,7 @@ export default function BatchUpdatePools(): null {
           lastUserVote,
           futureWeight,
           lastClaim,
-          powerAllocated,
+          powerAllocated: powerAllocated / 100,
         }
         dispatch(
           initPool({
