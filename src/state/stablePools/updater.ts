@@ -211,6 +211,12 @@ export default function BatchUpdatePools(): null {
     'last_user_vote',
     gaugeAddresses.map((a) => [account ?? a, a])
   )
+  // vote_user_slopes
+  const slopes = useSingleContractMultipleData(
+    gaugeController,
+    'vote_user_slopes',
+    gaugeAddresses.map((a) => [account ?? a, a])
+  )
 
   useMemo(() => {
     pools
@@ -247,6 +253,7 @@ export default function BatchUpdatePools(): null {
         const lastClaim: Date = new Date(
           parseInt((lastClaims?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0') * 1000
         )
+        const powerAllocated: number = parseInt((slopes?.[i]?.result?.[1] ?? BigInt('0')).toString() ?? '0')
 
         const totalMobiRate = JSBI.divide(
           JSBI.multiply(mobiRate, weight),
@@ -275,6 +282,7 @@ export default function BatchUpdatePools(): null {
           lastUserVote,
           futureWeight,
           lastClaim,
+          powerAllocated,
         }
         dispatch(
           initPool({

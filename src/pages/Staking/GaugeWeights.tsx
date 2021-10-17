@@ -2,6 +2,7 @@ import { CardNoise } from 'components/claim/styled'
 import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
 import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import Toggle from 'components/Toggle'
 import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
@@ -54,6 +55,7 @@ interface GaugeWeightsProps {
 export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
   const votePowerLeft = useVotePowerLeft()
+  const [showUserVote, setShowUserVote] = useState(false)
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
@@ -103,6 +105,10 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
           </AutoRow>
           <AutoRow>
             <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
+          </AutoRow>
+          <AutoRow>
+            <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} /> Show My
+            Votes
           </AutoRow>
 
           <CardContainer>

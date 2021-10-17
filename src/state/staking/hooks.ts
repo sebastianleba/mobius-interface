@@ -22,6 +22,7 @@ export type GaugeSummary = {
   actualPercentage: Percent
   lastVote: Date
   futureWeight: Percent
+  powerAllocated: number
 }
 
 export type MobiStakingInfo = {
@@ -84,6 +85,7 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
     actualPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
     lastVote: new Date(pool.lastUserVote * 1000),
+    powerAllocated: pool.powerAllocated,
   }))
   return {
     ...baseInfo,
