@@ -134,12 +134,12 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     },
     {
       name: 'Poof USD Meta Pool',
-      tokenAddresses: ['0x691e6877271675eaf372a9dBcDf4b39eb8c06d69', '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4'],
+      tokenAddresses: ['0xba13bD87671fA4Ff861D1dE16F751784027be09b', '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4'],
       tokens: [
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0x691e6877271675eaf372a9dBcDf4b39eb8c06d69',
+            address: '0xba13bD87671fA4Ff861D1dE16F751784027be09b',
             decimals: 18,
             symbol: 'pUSD',
             name: 'Poof USD',
