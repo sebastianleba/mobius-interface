@@ -169,11 +169,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-  if (account && mobiRate && totalStakedLPs && totalStakedLPs.greaterThan(JSBI.BigInt(0))) {
+  if (account && mobiRate && totalStakedLPs && totalStakedLPs.greaterThan('0')) {
     userMobiRate = new TokenAmount(mobi, poolInfo.workingPercentage.multiply(mobiRate ?? '0').toFixed(0))
   }
   let userExternalRates: TokenAmount[] = []
-  if (account && poolInfo.externalRewardRates) {
+  if (account && poolInfo.externalRewardRates && totalStakedLPs && totalStakedLPs.greaterThan('0')) {
     userExternalRates = poolInfo.externalRewardRates.map(
       (rate) => new TokenAmount(rate.token, poolInfo.workingPercentage.multiply(rate.raw).toFixed(0))
     )

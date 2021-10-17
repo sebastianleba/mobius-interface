@@ -103,7 +103,7 @@ export const getPoolInfo = (
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
-  totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? '0'),
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
   workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
   totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
   externalRewardRates:
