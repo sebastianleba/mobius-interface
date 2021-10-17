@@ -206,7 +206,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   try {
     weeklyAPY = apy
       ? new Percent(
-          Math.floor(parseFloat(apy.divide('52').add('1').toFixed(10)) ** 52 * 1_000_000).toFixed(0),
+          Math.floor(parseFloat(apy.divide('52').add('1').toFixed(10)) ** 52 * 1_000_000 - 1_000_000).toFixed(0),
           '1000000'
         ).toFixed(0, { groupSeparator: ',' })
       : undefined
