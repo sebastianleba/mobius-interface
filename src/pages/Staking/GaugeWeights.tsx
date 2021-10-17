@@ -154,7 +154,7 @@ const RowWithGap = styled(RowFixed)`
   gap: 8px;
 `
 
-function WeightCard({ position }: { position: GaugeSummary }) {
+function WeightCard({ position, showUserVote }: { position: GaugeSummary; showUserVote: boolean }) {
   const backgroundColor = useColor(position.firstToken)
   const [voteModalOpen, setVoteModalOpen] = useState(false)
 
@@ -171,10 +171,17 @@ function WeightCard({ position }: { position: GaugeSummary }) {
         <CardNoise />
         <RowBetween>
           <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <RowWithGap gap="4px">
-            <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
-            <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
-          </RowWithGap>
+          {showUserVote ? (
+            <RowWithGap gap="4px">
+              <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
+              <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
+            </RowWithGap>
+          ) : (
+            <RowWithGap gap="4px">
+              <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
+              <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
+            </RowWithGap>
+          )}
         </RowBetween>
       </PositionWrapper>
     </>
