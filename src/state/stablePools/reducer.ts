@@ -31,6 +31,7 @@ export type StableSwapVariable = {
   effectiveBalance: JSBI
   totalEffectiveBalance: JSBI
   lastUserVote: number
+  powerAllocated: number
   futureWeight: JSBI
   externalRewards?: ExternalRewards[]
 }

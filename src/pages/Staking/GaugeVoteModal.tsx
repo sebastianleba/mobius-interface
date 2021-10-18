@@ -42,7 +42,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [input, setInput] = useState(0)
-  const votesLeft = useVotePowerLeft()
+  const votesLeft = useVotePowerLeft() + summary.powerAllocated
   const today = new Date(Date.now())
   const lastVote = summary.lastVote
 
@@ -91,7 +91,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
           </RowBetween>
           {votesLeft === 0 ? (
             <TYPE.mediumHeader fontWeight={1000} color="red" textAlign="center">
-              You have already allocated 100%, you cannot allocate more at this time
+              You have already allocated 100%, you will have to change your vote on other pools first.
             </TYPE.mediumHeader>
           ) : (
             <>
