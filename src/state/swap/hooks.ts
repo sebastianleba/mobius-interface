@@ -432,7 +432,7 @@ export function useMobiusTradeInfo(): {
   if (underlyingPool && indexTo == -1) {
     indexTo = tokens.length + indexToUnderlying
   }
-  const [input, output, fee] = calcInputOutput(
+  const tradeData = calcInputOutput(
     inputCurrency,
     outputCurrency,
     isExactIn,
@@ -441,9 +441,27 @@ export function useMobiusTradeInfo(): {
     pool,
     underlyingMath
   )
+  const input = tradeData[0]
+  let output = tradeData[1]
+  const fee = tradeData[2]
 
   if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
     inputError = 'Insufficient Balance'
+  }
+
+  if (indexTo >= tokens.length) {
+    const decimalDifference = outputCurrency.decimals - tokens[tokens.length - 1].decimals
+    if (decimalDifference > 0) {
+      output = new TokenAmount(
+        outputCurrency,
+        JSBI.multiply(output?.raw, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(decimalDifference)))
+      )
+    } else if (decimalDifference < 0) {
+      output = new TokenAmount(
+        outputCurrency,
+        JSBI.divide(output?.raw, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(-1 * decimalDifference)))
+      )
+    }
   }
 
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
