@@ -126,14 +126,26 @@ export default function Manage({
   const { valueOfStaked, totalValueDeposited } = getDepositValues(stakingInfo)
 
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-  if (stakingInfo && stakingInfo?.workingPercentage.greaterThan('0')) {
+  if (
+    stakingInfo &&
+    totalStakedAmount &&
+    totalStakedAmount.greaterThan('0') &&
+    stakingInfo?.workingPercentage.greaterThan('0')
+  ) {
     userMobiRate = new TokenAmount(
       mobi,
       stakingInfo?.workingPercentage.multiply(stakingInfo?.mobiRate ?? '0').toFixed(0) ?? '0'
     )
   }
   let userExternalRates: TokenAmount[] = []
-  if (account && stakingInfo && stakingInfo.externalRewardRates) {
+  if (
+    account &&
+    stakingInfo &&
+    stakingInfo.externalRewardRates &&
+    totalStakedAmount &&
+    totalStakedAmount.greaterThan('0') &&
+    stakingInfo?.workingPercentage.greaterThan('0')
+  ) {
     userExternalRates = stakingInfo.externalRewardRates.map(
       (rate) => new TokenAmount(rate.token, stakingInfo.workingPercentage.multiply(rate.raw).toFixed(0))
     )
