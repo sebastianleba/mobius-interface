@@ -282,8 +282,8 @@ function calcInputOutput(
   parsedAmount: TokenAmount | undefined,
   math: StableSwapMath,
   poolInfo: StableSwapPool,
-  underlyingPool?: StableSwapPool,
-  underlyingMath?: StableSwapMath
+  underlyingMath?: StableSwapMath,
+  underlyingPool?: StableSwapPool
 ): readonly [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] {
   if (!input && !output) {
     return [undefined, undefined, undefined]
@@ -295,20 +295,74 @@ function calcInputOutput(
   if (!input) {
     return [undefined, parsedAmount, undefined]
   }
+
   let indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
   let indexTo = tokens.map(({ address }) => address).indexOf(output.address)
 
-  if (indexFrom == -1) {
-    indexFrom = tokens.length - 1
-  } else if (indexTo == -1) {
-    indexTo = tokens.length - 1
-  }
+  console.log('base', poolInfo.name)
+  console.log('underlying', underlyingPool?.name)
 
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
     undefined,
     undefined,
   ]
+  console.log(underlyingPool, underlyingMath, indexFrom)
+
+  if (underlyingPool && underlyingMath) {
+    const underTokens = underlyingPool.tokens
+    if (indexFrom === -1) {
+      if (isExactIn) {
+        const lpInput = underTokens.map(({ address }) =>
+          address === input.address ? parsedAmount?.raw ?? JSBI.BigInt(0) : JSBI.BigInt(0)
+        )
+        const metaexpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
+        indexFrom = tokens.map(({ address }) => address).indexOf(underlyingPool?.lpToken.address)
+        details[0] = parsedAmount
+        const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, metaexpectedOut, math.calc_xp())
+        details[1] = new TokenAmount(output, expectedOut)
+        details[2] = new TokenAmount(input, fee)
+      } else {
+        const lpIndex = tokens.map(({ address }) => address).indexOf(underlyingPool.lpToken.address)
+        const requiredLP = math.get_dx(lpIndex, indexTo, parsedAmount.raw, math.calc_xp())
+        console.log(requiredLP.toString())
+        //withdraw single sided
+        const outIndex = underTokens.map(({ address }) => address).indexOf(input.address)
+        const [expectedIn, fee] = underlyingMath.calculateWithdrawOneToken(outIndex, requiredLP)
+        details[0] = new TokenAmount(input, expectedIn)
+        details[1] = parsedAmount
+        details[2] = new TokenAmount(input, fee)
+      }
+    } else if (indexTo === -1) {
+      if (isExactIn) {
+        const lpIndexTo = underTokens.map(({ address }) => address).indexOf(underlyingPool?.lpToken.address)
+        const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount?.raw, math.calc_xp())
+
+        const metaIndexOut = underTokens.map(({ address }) => address).indexOf(output.address)
+        const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaExpectedOut, metaIndexOut)
+        details[0] = parsedAmount
+        details[1] = new TokenAmount(output, expectedOut)
+        details[2] = new TokenAmount(input, fee)
+      } else {
+        const lpInput = underTokens.map(({ address }) =>
+          address === output.address ? parsedAmount?.raw ?? JSBI.BigInt(0) : JSBI.BigInt(0)
+        )
+        const lpExpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
+        indexTo = tokens.map(({ address }) => address).indexOf(underlyingPool?.lpToken.address)
+        const requiredIn = math.get_dx(indexFrom, indexTo, lpExpectedOut, math.calc_xp())
+        details[0] = new TokenAmount(input, requiredIn)
+        details[1] = parsedAmount
+        details[2] = new TokenAmount(input, JSBI.BigInt('0'))
+      }
+    }
+    return details
+  }
+
+  if (indexFrom == -1) {
+    indexFrom = tokens.length - 1
+  } else if (indexTo == -1) {
+    indexTo = tokens.length - 1
+  }
 
   if (isExactIn) {
     details[0] = parsedAmount
@@ -439,7 +493,8 @@ export function useMobiusTradeInfo(): {
     parsedAmount,
     mathUtil,
     pool,
-    underlyingMath
+    underlyingMath,
+    underlyingPool
   )
   const input = tradeData[0]
   let output = tradeData[1]
@@ -473,7 +528,6 @@ export function useMobiusTradeInfo(): {
       ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta }
       : undefined
 
-  console.log(v2Trade)
   return {
     currencies,
     currencyBalances,
