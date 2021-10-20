@@ -276,6 +276,16 @@ export default function BatchUpdatePools(): null {
           futureWeight,
           lastClaim,
         }
+        if (poolInfo.name === 'Poof USD Meta Pool') {
+          collectedData.balances = [
+            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('22')),
+            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('22')),
+          ]
+          collectedData.lpTotalSupply = JSBI.multiply(
+            JSBI.BigInt('2'),
+            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('22'))
+          )
+        }
         dispatch(
           initPool({
             address: poolInfo.name,

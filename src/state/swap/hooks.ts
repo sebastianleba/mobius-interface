@@ -298,18 +298,15 @@ function calcInputOutput(
 
   let indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
   let indexTo = tokens.map(({ address }) => address).indexOf(output.address)
-
-  console.log('base', poolInfo.name)
-  console.log('underlying', underlyingPool?.name)
+  const isMeta = indexFrom === -1 || indexTo === -1
 
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
     undefined,
     undefined,
   ]
-  console.log(underlyingPool, underlyingMath, indexFrom)
 
-  if (underlyingPool && underlyingMath) {
+  if (underlyingPool && underlyingMath && isMeta) {
     const underTokens = underlyingPool.tokens
     if (indexFrom === -1) {
       if (isExactIn) {
@@ -325,7 +322,6 @@ function calcInputOutput(
       } else {
         const lpIndex = tokens.map(({ address }) => address).indexOf(underlyingPool.lpToken.address)
         const requiredLP = math.get_dx(lpIndex, indexTo, parsedAmount.raw, math.calc_xp())
-        console.log(requiredLP.toString())
         //withdraw single sided
         const outIndex = underTokens.map(({ address }) => address).indexOf(input.address)
         const [expectedIn, fee] = underlyingMath.calculateWithdrawOneToken(outIndex, requiredLP)
@@ -335,14 +331,20 @@ function calcInputOutput(
       }
     } else if (indexTo === -1) {
       if (isExactIn) {
-        const lpIndexTo = underTokens.map(({ address }) => address).indexOf(underlyingPool?.lpToken.address)
-        const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount?.raw, math.calc_xp())
+        const lpIndexTo = poolInfo.tokenAddresses.indexOf(underlyingPool?.lpToken.address)
+        const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount.raw, math.calc_xp())
 
         const metaIndexOut = underTokens.map(({ address }) => address).indexOf(output.address)
-        const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaExpectedOut, metaIndexOut)
+        const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaIndexOut, metaExpectedOut)
         details[0] = parsedAmount
         details[1] = new TokenAmount(output, expectedOut)
-        details[2] = new TokenAmount(input, fee)
+        details[2] = new TokenAmount(
+          input,
+          JSBI.divide(
+            JSBI.multiply(parsedAmount?.raw, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+            (JSBI.BigInt('10'), JSBI.BigInt('10'))
+          )
+        )
       } else {
         const lpInput = underTokens.map(({ address }) =>
           address === output.address ? parsedAmount?.raw ?? JSBI.BigInt(0) : JSBI.BigInt(0)
@@ -518,7 +520,6 @@ export function useMobiusTradeInfo(): {
       )
     }
   }
-
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
   const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
