@@ -220,6 +220,7 @@ export class StableSwapMath {
   }
 
   calculateSwap(indexFrom: number, indexTo: number, dx: JSBI, xp: JSBI[]): [JSBI, JSBI] {
+    console.log({ indexFrom, dx })
     const x = JSBI.add(xp[indexFrom], JSBI.multiply(this.tokenPrecisionMultipliers[indexFrom], dx))
     const y = this.getY(indexFrom, indexTo, x, xp)
     console.log({ xp, indexTo, y, ONE })
@@ -307,7 +308,11 @@ export class StableSwapMath {
       JSBI.divide(JSBI.subtract(xp[index], newY), this.tokenPrecisionMultipliers[index]),
       dy
     )
-    return [dy, swapFee]
+    const fee = JSBI.divide(
+      JSBI.multiply(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      (JSBI.BigInt('10'), JSBI.BigInt('10'))
+    )
+    return [JSBI.subtract(dy, fee), fee]
   }
 
   calculateTokenAmount(originalAmounts: JSBI[], deposit: boolean): JSBI {
@@ -320,7 +325,12 @@ export class StableSwapMath {
     const d1 = this.getD(this.calc_xp_mem(balances1), a)
     const totalSupply = this.lpTotalSupply
     if (deposit) {
-      return JSBI.divide(JSBI.multiply(JSBI.subtract(d1, d0), totalSupply), d0)
+      const expected = JSBI.divide(JSBI.multiply(JSBI.subtract(d1, d0), totalSupply), d0)
+      // const fee = JSBI.divide(
+      //   JSBI.multiply(expected, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      //   (JSBI.BigInt('10'), JSBI.BigInt('10'))
+      // )
+      return expected //JSBI.subtract(expected, fee)
     } else {
       return JSBI.divide(
         JSBI.multiply(JSBI.divide(JSBI.multiply(JSBI.subtract(d0, d1), totalSupply), d0), this.FEE_DENOMINATOR),

@@ -313,10 +313,11 @@ function calcInputOutput(
         const lpInput = underTokens.map(({ address }) =>
           address === input.address ? parsedAmount?.raw ?? JSBI.BigInt(0) : JSBI.BigInt(0)
         )
+        const lpIndexFrom = poolInfo.tokenAddresses.indexOf(underlyingPool?.lpToken.address)
+
         const metaexpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
-        indexFrom = tokens.map(({ address }) => address).indexOf(underlyingPool?.lpToken.address)
         details[0] = parsedAmount
-        const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, metaexpectedOut, math.calc_xp())
+        const [expectedOut, fee] = math.calculateSwap(lpIndexFrom, indexTo, metaexpectedOut, math.calc_xp())
         details[1] = new TokenAmount(output, expectedOut)
         details[2] = new TokenAmount(input, fee)
       } else {
@@ -523,6 +524,13 @@ export function useMobiusTradeInfo(): {
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
   const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
+
+  if (isMeta && indexTo > tokens.length) {
+    indexTo -= 1
+  }
+  if (isMeta && indexFrom > tokens.length) {
+    indexFrom -= 1
+  }
 
   const v2Trade: MobiusTrade | undefined =
     input && output && pool
