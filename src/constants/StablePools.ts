@@ -159,10 +159,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
           []
         ),
       ],
-      address: '0x1049d130926bb66d30B5EC3DB480c9acab6737DF',
+      address: '0x81B6a3d9f725AB5d706d9e552b128bC5bB0B58a1',
       lpToken: new Token(
         ChainId.MAINNET,
-        '0x68095D768B3c78919c6048F52Cc68267aD2b37fd',
+        '0x57f008172cF89b972db3db7dD032e66BE4AF1A8c',
         18,
         'MobLP',
         'Mobius pUSD Meta LP'
@@ -178,7 +178,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       peggedTo: '$',
       pegComesAfter: false,
       displayDecimals: 1,
-      gaugeAddress: '0x1A648004d8AB84eE34d2D1cd2F2A7a7828D6939F',
+      gaugeAddress: '0x1250D6dd3B51D20c14a8ECb10CC2dd713967767e',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
       additionalRewardRate: ['0', '0'],
