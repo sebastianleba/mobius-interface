@@ -237,29 +237,69 @@ export class StableSwapMath {
     return amounts
   }
 
-  // calculateWithdrawOneTokenDY(index: number, amount: JSBI): JSBI {
-  //   let xp = this.calc_xp()
-  //   let preciseA = this.aPrecise
-  //   let d0 = this.getD(xp, preciseA)
-  //   let d1 = JSBI.subtract(d0, JSBI.divide(JSBI.multiply(amount, d0), this.lpTotalSupply))
-  //   const newY = this.getYD(preciseA, index, xp, d1)
-  //   const xpReduced: JSBI[] = new Array(xp.length).fill(JSBI.BigInt('0'))
-  //   for (let i = 0; i < this.N_COINS; i++) {
-  //     let xpi = xp[i]
-  //     const toSubtract =
-  //       i === index
-  //         ? JSBI.subtract(JSBI.divide(JSBI.multiply(xpi, d1), d0), newY)
-  //         : JSBI.subtract(xpi, JSBI.divide(JSBI.multiply(xpi, d1), d0))
-  //     xpReduced[i] = JSBI.subtract(xpi, toSubtract)
-  //   }
-  //   let dy = JSBI.subtract(xpRedcued[index], this.getYD(preciseA, index, xpReduced, ))
-  // }
+  calculateWithdrawOneTokenDY(index: number, amount: JSBI): [JSBI, JSBI] {
+    const xp = this.calc_xp()
+    const preciseA = JSBI.multiply(this.amp, this.A_PRECISION)
+    const d0 = this.getD(xp, preciseA)
+    const d1 = JSBI.subtract(d0, JSBI.divide(JSBI.multiply(amount, d0), this.lpTotalSupply))
+    const newY = this.getYD(preciseA, index, xp, d1)
+    const xpReduced: JSBI[] = new Array(xp.length).fill(JSBI.BigInt('0'))
+    for (let i = 0; i < this.N_COINS; i++) {
+      const xpi = xp[i]
+      const toSubtract =
+        i === index
+          ? JSBI.subtract(JSBI.divide(JSBI.multiply(xpi, d1), d0), newY)
+          : JSBI.subtract(xpi, JSBI.divide(JSBI.multiply(xpi, d1), d0))
+      xpReduced[i] = JSBI.subtract(xpi, toSubtract)
+    }
+    let dy = JSBI.subtract(xpReduced[index], this.getYD(preciseA, index, xpReduced, d1))
+    dy = JSBI.divide(JSBI.subtract(dy, JSBI.BigInt(1)), this.tokenPrecisionMultipliers[index])
+    return [dy, newY]
+  }
 
-  // calculateWithdrawOneToken(amount: JSBI, index: number): JSBI {
-  //   let dy: JSBI
-  //   let newY: JSBI
-  //   return JSBI.BigInt('0')
-  // }
+  getYD(a: JSBI, index: number, xp: JSBI[], d: JSBI): JSBI {
+    const numTokens = xp.length
+    let c: JSBI = d
+    let s: JSBI = JSBI.BigInt(0)
+    const nA: JSBI = JSBI.multiply(a, JSBI.BigInt(numTokens))
+    for (let i = 0; i < numTokens; i += 1) {
+      if (i != index) {
+        s = JSBI.add(s, xp[i])
+        c = JSBI.divide(JSBI.multiply(c, d), JSBI.multiply(xp[i], JSBI.BigInt(numTokens)))
+      }
+    }
+    c = JSBI.divide(JSBI.multiply(JSBI.multiply(c, d), this.A_PRECISION), JSBI.multiply(nA, JSBI.BigInt(numTokens)))
+
+    const b = JSBI.add(s, JSBI.divide(JSBI.multiply(d, this.A_PRECISION), nA))
+    let yPrev: JSBI
+    let y = d
+
+    for (let _i = 0; _i < 255; _i += 1) {
+      yPrev = y
+      y = JSBI.divide(JSBI.add(JSBI.multiply(y, y), c), JSBI.subtract(JSBI.add(JSBI.multiply(TWO, y), b), d))
+
+      if (JSBI.greaterThan(y, yPrev)) {
+        if (JSBI.lessThanOrEqual(JSBI.subtract(y, yPrev), ONE)) {
+          return y
+        }
+      } else {
+        if (JSBI.lessThanOrEqual(JSBI.subtract(yPrev, y), ONE)) {
+          return y
+        }
+      }
+    }
+    return y
+  }
+
+  calculateWithdrawOneToken(index: number, amount: JSBI): [JSBI, JSBI] {
+    const [dy, newY] = this.calculateWithdrawOneTokenDY(index, amount)
+    const xp = this.calc_xp()
+    const swapFee = JSBI.subtract(
+      JSBI.divide(JSBI.subtract(xp[index], newY), this.tokenPrecisionMultipliers[index]),
+      dy
+    )
+    return [dy, swapFee]
+  }
 
   calculateTokenAmount(originalAmounts: JSBI[], deposit: boolean) {
     const amounts = originalAmounts.map((a) => (JSBI.equal(a, ZERO) ? JSBI.BigInt('1') : a))

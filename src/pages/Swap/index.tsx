@@ -91,6 +91,7 @@ export default function Swap() {
   // swap state
   const { independentField, typedValue, recipient } = useSwapState()
   const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMobiusTradeInfo()
+  console.log(swapInputError, 'error')
 
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
