@@ -189,7 +189,12 @@ export function useTokensTradeable(
         tokens: poolMap[pool.metaPool]?.tokens.concat(pool.tokens),
       }
     })
-    .filter(({ tokens }) => tokens.map(({ address }) => address).includes(tokenIn.address))
+    .filter(({ tokens }) =>
+      tokens
+        .filter(({ name }) => name !== 'Mob LP')
+        .map(({ address }) => address)
+        .includes(tokenIn.address)
+    )
     .flatMap(({ tokens }) => tokens)
     .forEach((token) => {
       if (token !== tokenIn) tradeable[token.address] = token
