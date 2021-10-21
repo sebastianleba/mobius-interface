@@ -525,10 +525,10 @@ export function useMobiusTradeInfo(): {
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
   const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
 
-  if (isMeta && indexTo > tokens.length) {
+  if (isMeta && indexTo >= tokens.length) {
     indexTo -= 1
   }
-  if (isMeta && indexFrom > tokens.length) {
+  if (isMeta && indexFrom >= tokens.length) {
     indexFrom -= 1
   }
 

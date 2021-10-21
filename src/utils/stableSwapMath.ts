@@ -302,7 +302,6 @@ export class StableSwapMath {
 
   calculateWithdrawOneToken(index: number, amount: JSBI): [JSBI, JSBI] {
     const [dy, newY] = this.calculateWithdrawOneTokenDY(index, amount)
-    console.log({ dy: dy.toString() })
     const xp = this.calc_xp()
     const swapFee = JSBI.subtract(
       JSBI.divide(JSBI.subtract(xp[index], newY), this.tokenPrecisionMultipliers[index]),
@@ -312,7 +311,7 @@ export class StableSwapMath {
       JSBI.multiply(amount, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
       (JSBI.BigInt('10'), JSBI.BigInt('10'))
     )
-    return [JSBI.subtract(dy, fee), fee]
+    return [JSBI.subtract(dy, swapFee), swapFee]
   }
 
   calculateTokenAmount(originalAmounts: JSBI[], deposit: boolean): JSBI {
