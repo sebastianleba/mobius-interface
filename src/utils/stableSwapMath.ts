@@ -239,6 +239,13 @@ export class StableSwapMath {
     return amounts
   }
 
+  _feePerToken(swapFee: JSBI, numTokens: JSBI): JSBI {
+    return JSBI.divide(
+      JSBI.multiply(swapFee, numTokens),
+      JSBI.multiply(JSBI.subtract(numTokens, JSBI.BigInt(1)), JSBI.BigInt(4))
+    )
+  }
+
   calculateWithdrawOneTokenDY(index: number, amount: JSBI): [JSBI, JSBI, JSBI] {
     const xp = this.calc_xp()
     const preciseA = this.aPrecise //JSBI.multiply(this.amp, this.A_PRECISION)
@@ -247,10 +254,15 @@ export class StableSwapMath {
 
     const newY = this.getYD(preciseA, index, xp, d1)
     const xpReduced: JSBI[] = new Array(xp.length).fill(JSBI.BigInt('0'))
-
+    const feePerToken = this._feePerToken(this.swapFee, JSBI.BigInt(xp.length))
+    console.log(feePerToken.toString(), this.FEE_DENOMINATOR.toString())
     for (let i = 0; i < xp.length; i++) {
       const xpi = xp[i]
-      xpReduced[i] = xpi
+      const toSubtract =
+        i === index
+          ? JSBI.subtract(JSBI.divide(JSBI.multiply(xpi, d1), d0), newY)
+          : JSBI.subtract(xpi, JSBI.divide(JSBI.multiply(xpi, d1), d0))
+      xpReduced[i] = JSBI.subtract(xpi, JSBI.divide(JSBI.multiply(toSubtract, feePerToken), this.FEE_DENOMINATOR))
     }
     const y = this.getYD(preciseA, index, xpReduced, d1)
     let dy = JSBI.subtract(xpReduced[index], y)
@@ -296,8 +308,7 @@ export class StableSwapMath {
   calculateWithdrawOneToken(index: number, amount: JSBI): [JSBI, JSBI] {
     const [dy, newY, currentY] = this.calculateWithdrawOneTokenDY(index, amount)
     const swapFee = JSBI.subtract(JSBI.divide(JSBI.subtract(currentY, newY), this.tokenPrecisionMultipliers[index]), dy)
-    console.log(dy.toString())
-    return [JSBI.subtract(dy, swapFee), swapFee]
+    return [dy, swapFee]
   }
 
   calculateTokenAmount(originalAmounts: JSBI[], deposit: boolean): JSBI {

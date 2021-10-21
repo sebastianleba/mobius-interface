@@ -65,6 +65,9 @@ function useSwapCallArguments(
     const outputRaw = trade.output.raw
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
 
+    console.log(indexFrom.toString())
+    console.log(indexTo.toString())
+
     const swapCallParameters: SwapParameters = {
       methodName: trade.isMeta ? 'swapUnderlying' : 'swap',
       args: [
