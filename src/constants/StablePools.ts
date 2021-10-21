@@ -181,7 +181,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x1250D6dd3B51D20c14a8ECb10CC2dd713967767e',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
-      additionalRewardRate: ['0', '0'],
+      additionalRewardRate: ['11810185180000000', '0'],
       metaPool: 'USDC (Optics Bridge) Pool',
     },
     {
