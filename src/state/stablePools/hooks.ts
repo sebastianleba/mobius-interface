@@ -41,16 +41,24 @@ export interface StablePoolInfo {
   readonly totalPercentage: Percent
   readonly externalRewardRates?: TokenAmount[]
   readonly lastClaim?: Date
+  readonly meta?: string
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
-  const pools = useSelector<AppState, StableSwapPool[]>((state) =>
-    Object.values(state.stablePools.pools)
-      .map(({ pool }) => pool)
-      .filter(({ tokenAddresses }) => {
-        return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
-      })
+  const withMetaPools = useSelector<AppState, StableSwapPool[]>((state) =>
+    Object.values(state.stablePools.pools).map(({ pool }) => {
+      if (!pool.metaPool) return pool
+      const underlying = state.stablePools.pools[pool.metaPool]?.pool
+      return {
+        ...pool,
+        tokenAddresses: pool.tokenAddresses.concat(underlying.tokenAddresses),
+      }
+    })
   )
+  const pools = withMetaPools.filter(({ tokenAddresses }) => {
+    return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
+  })
+
   return [pools.length > 0 ? pools[0] : null]
 }
 
@@ -88,14 +96,14 @@ export const getPoolInfo = (
     JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
   ),
   workingSupply: pool.workingLiquidity,
-  balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i])),
+  balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
   pegComesAfter: pool.pegComesAfter,
   feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
   mobiRate: pool.staking?.totalMobiRate,
   pendingMobi: pool.staking?.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
-  totalStakedAmount: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? '0'),
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
   workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
   totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
   externalRewardRates:
@@ -104,6 +112,7 @@ export const getPoolInfo = (
         tokens[pool.additionalRewards?.[i]] && new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
     ) ?? undefined,
   lastClaim: pool.lastClaim,
+  meta: pool.metaPool,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
@@ -182,6 +191,15 @@ export function useMathUtil(pool: StableSwapPool | string): StableSwapMath | und
   const name = !pool ? '' : typeof pool == 'string' ? pool : pool.name
   const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name]?.math)
   return math
+}
+
+export function useUnderlyingPool(metaPoolName: string): StableSwapPool | undefined {
+  const underlying = useSelector<AppState, StableSwapPool>((state) => {
+    const meta = state.stablePools.pools[metaPoolName]?.pool
+    if (!meta || !meta.metaPool) return meta
+    return state.stablePools.pools[meta.metaPool]?.pool
+  })
+  return underlying
 }
 
 export function usePool(): readonly [StableSwapPool] {

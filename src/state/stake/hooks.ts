@@ -8,6 +8,8 @@ import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
 import { zip } from 'lodash'
 // Hooks
 import { useMemo } from 'react'
+import { MentoConstants } from 'state/mentoPools/reducer'
+import { StableSwapConstants } from 'state/stablePools/reducer'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 import ERC_20_INTERFACE from '../../constants/abis/erc20'
@@ -171,21 +173,28 @@ export function useTokensTradeable(
   tokenIn: Token | null | undefined
 ): readonly [{ [address: string]: Token }] {
   const tradeable: { [address: string]: Token } = {}
-  const pools = mento ? MENTO_POOL_INFO : STATIC_POOL_INFO
+  const poolMap: { [name: string]: StableSwapConstants } = {}
+  const pools: StableSwapConstants[][] | MentoConstants[][] = mento ? MENTO_POOL_INFO : STATIC_POOL_INFO
   const { chainId } = useActiveContractKit()
 
   if (!tokenIn) return [{}]
-  // }
-  // pools[chainId]
-  //   .map(({ tokens }) => tokens)
-  //   .filter((ele) => ele.includes(tokenIn.address))
-  //   .flatMap((tokens) => tokens)
-  //   .forEach(( token )=> {
-  //     if (token !== tokenIn.address) tradeable[token] = token
-  //   }))
+
+  if (!mento) pools[chainId].forEach((pool: StableSwapConstants) => (poolMap[pool.name] = pool))
 
   pools[chainId]
-    .filter(({ tokens }) => tokens.map(({ address }) => address).includes(tokenIn.address))
+    .map((pool) => {
+      if (!pool.metaPool) return pool
+      return {
+        ...pool,
+        tokens: poolMap[pool.metaPool]?.tokens.concat(pool.tokens),
+      }
+    })
+    .filter(({ tokens }) =>
+      tokens
+        .filter(({ name }) => name !== 'Mob LP')
+        .map(({ address }) => address)
+        .includes(tokenIn.address)
+    )
     .flatMap(({ tokens }) => tokens)
     .forEach((token) => {
       if (token !== tokenIn) tradeable[token.address] = token

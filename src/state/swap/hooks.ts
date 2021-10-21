@@ -17,7 +17,7 @@ import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
-import { useCurrentPool, useMathUtil, usePools } from '../stablePools/hooks'
+import { useCurrentPool, useMathUtil, usePools, useUnderlyingPool } from '../stablePools/hooks'
 import { useUserSlippageTolerance } from '../user/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
@@ -272,6 +272,7 @@ export type MobiusTrade = {
   executionPrice: Price
   tradeType: TradeType
   fee: TokenAmount
+  isMeta?: boolean
 }
 
 function calcInputOutput(
@@ -280,7 +281,9 @@ function calcInputOutput(
   isExactIn: boolean,
   parsedAmount: TokenAmount | undefined,
   math: StableSwapMath,
-  poolInfo: StableSwapPool
+  poolInfo: StableSwapPool,
+  underlyingMath?: StableSwapMath,
+  underlyingPool?: StableSwapPool
 ): readonly [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] {
   if (!input && !output) {
     return [undefined, undefined, undefined]
@@ -292,14 +295,81 @@ function calcInputOutput(
   if (!input) {
     return [undefined, parsedAmount, undefined]
   }
-  const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
-  const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
+
+  let indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
+  let indexTo = tokens.map(({ address }) => address).indexOf(output.address)
+  const isMeta = indexFrom === -1 || indexTo === -1
 
   const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
     undefined,
     undefined,
     undefined,
   ]
+
+  if (underlyingPool && underlyingMath && isMeta) {
+    const underTokens = underlyingPool.tokens
+    if (indexFrom === -1) {
+      if (isExactIn) {
+        const lpInput = underTokens.map(({ address }) =>
+          address === input.address ? parsedAmount?.raw ?? JSBI.BigInt(0) : JSBI.BigInt(0)
+        )
+        const lpIndexFrom = poolInfo.tokenAddresses.indexOf(underlyingPool?.lpToken.address)
+
+        const metaexpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
+        console.log('metaExtectedOut', metaexpectedOut.toString())
+        details[0] = parsedAmount
+        const [expectedOut, fee] = math.calculateSwap(lpIndexFrom, indexTo, metaexpectedOut, math.calc_xp())
+        console.log('expected', expectedOut.toString())
+        details[1] = new TokenAmount(output, expectedOut)
+        details[2] = new TokenAmount(input, fee)
+      } else {
+        const lpIndex = tokens.map(({ address }) => address).indexOf(underlyingPool.lpToken.address)
+        const requiredLP = math.get_dx(lpIndex, indexTo, parsedAmount.raw, math.calc_xp())
+        //withdraw single sided
+        const outIndex = underTokens.map(({ address }) => address).indexOf(input.address)
+        const [expectedIn, fee] = underlyingMath.calculateWithdrawOneToken(outIndex, requiredLP)
+        details[0] = new TokenAmount(input, expectedIn)
+        details[1] = parsedAmount
+        details[2] = new TokenAmount(input, fee)
+      }
+    } else if (indexTo === -1) {
+      if (isExactIn) {
+        const lpIndexTo = poolInfo.tokenAddresses.indexOf(underlyingPool?.lpToken.address)
+        const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount.raw, math.calc_xp())
+
+        const metaIndexOut = underTokens.map(({ address }) => address).indexOf(output.address)
+        console.log('djfdia', metaExpectedOut.toString())
+        const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaIndexOut, metaExpectedOut)
+        console.log(expectedOut.toString(), 'expreccc')
+        details[0] = parsedAmount
+        details[1] = new TokenAmount(output, expectedOut)
+        details[2] = new TokenAmount(
+          input,
+          JSBI.divide(
+            JSBI.multiply(parsedAmount?.raw, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+            (JSBI.BigInt('10'), JSBI.BigInt('10'))
+          )
+        )
+      } else {
+        const lpInput = underTokens.map(({ address }) =>
+          address === output.address ? parsedAmount?.raw ?? JSBI.BigInt(0) : JSBI.BigInt(0)
+        )
+        const lpExpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
+        indexTo = tokens.map(({ address }) => address).indexOf(underlyingPool?.lpToken.address)
+        const requiredIn = math.get_dx(indexFrom, indexTo, lpExpectedOut, math.calc_xp())
+        details[0] = new TokenAmount(input, requiredIn)
+        details[1] = parsedAmount
+        details[2] = new TokenAmount(input, JSBI.BigInt('0'))
+      }
+    }
+    return details
+  }
+
+  if (indexFrom == -1) {
+    indexFrom = tokens.length - 1
+  } else if (indexTo == -1) {
+    indexTo = tokens.length - 1
+  }
 
   if (isExactIn) {
     details[0] = parsedAmount
@@ -338,7 +408,9 @@ export function useMobiusTradeInfo(): {
   const pools = usePools()
   const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
+  const underlyingMath = useMathUtil(pool?.metaPool ?? '')
   const mathUtil = useMathUtil(pool)
+  const underlyingPool = useUnderlyingPool(pool?.name ?? '')
 
   const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
@@ -404,10 +476,36 @@ export function useMobiusTradeInfo(): {
   }
   const { tokens = [] } = pool || {}
 
-  const indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
-  const indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
+  let indexFrom = inputCurrency ? tokens.map(({ address }) => address).indexOf(inputCurrency.address) : 0
+  let indexTo = outputCurrency ? tokens.map(({ address }) => address).indexOf(outputCurrency.address) : 0
 
-  const [input, output, fee] = calcInputOutput(inputCurrency, outputCurrency, isExactIn, parsedAmount, mathUtil, pool)
+  const indexFromUnderlying = inputCurrency
+    ? underlyingPool?.tokens.map(({ address }) => address).indexOf(inputCurrency.address) ?? 0
+    : 0
+  const indexToUnderlying = outputCurrency
+    ? underlyingPool?.tokens.map(({ address }) => address).indexOf(outputCurrency.address) ?? 0
+    : 0
+
+  if (underlyingPool && indexFrom == -1) {
+    indexFrom = tokens.length + indexFromUnderlying
+  }
+
+  if (underlyingPool && indexTo == -1) {
+    indexTo = tokens.length + indexToUnderlying
+  }
+  const tradeData = calcInputOutput(
+    inputCurrency,
+    outputCurrency,
+    isExactIn,
+    parsedAmount,
+    mathUtil,
+    pool,
+    underlyingMath,
+    underlyingPool
+  )
+  const input = tradeData[0]
+  const output = tradeData[1]
+  const fee = tradeData[2]
 
   if (currencyBalances[Field.INPUT]?.lessThan(input || JSBI.BigInt('0'))) {
     inputError = 'Insufficient Balance'
@@ -415,9 +513,19 @@ export function useMobiusTradeInfo(): {
 
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+  const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
+
+  if (isMeta && indexTo >= tokens.length) {
+    indexTo -= 1
+  }
+  if (isMeta && indexFrom >= tokens.length) {
+    indexFrom -= 1
+  }
 
   const v2Trade: MobiusTrade | undefined =
-    input && output && pool ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee } : undefined
+    input && output && pool
+      ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta }
+      : undefined
 
   return {
     currencies,
