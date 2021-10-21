@@ -336,7 +336,9 @@ function calcInputOutput(
         const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount.raw, math.calc_xp())
 
         const metaIndexOut = underTokens.map(({ address }) => address).indexOf(output.address)
+        console.log('djfdia', metaExpectedOut.toString())
         const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaIndexOut, metaExpectedOut)
+        console.log(expectedOut.toString(), 'expreccc')
         details[0] = parsedAmount
         details[1] = new TokenAmount(output, expectedOut)
         details[2] = new TokenAmount(
