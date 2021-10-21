@@ -537,7 +537,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
           {
             address: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
             name: 'Celo Euro',
-            symbol: 'cEru',
+            symbol: 'cEUR',
             chainId: 42220,
             decimals: 18,
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cEUR.png',
