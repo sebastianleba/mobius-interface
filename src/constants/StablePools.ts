@@ -133,6 +133,58 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['7302827380000000'],
     },
     {
+      name: 'Poof USD Meta Pool',
+      tokenAddresses: ['0xB4aa2986622249B1F45eb93F28Cfca2b2606d809', '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809',
+            decimals: 18,
+            symbol: 'pUSD',
+            name: 'Poof USD',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4',
+            decimals: 18,
+            symbol: 'Mob LP',
+            name: 'Mobius USDC LP',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x81B6a3d9f725AB5d706d9e552b128bC5bB0B58a1',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x57f008172cF89b972db3db7dD032e66BE4AF1A8c',
+        18,
+        'MobLP',
+        'Mobius pUSD Meta LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 1,
+      gaugeAddress: '0x1250D6dd3B51D20c14a8ECb10CC2dd713967767e',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
+      additionalRewardRate: ['11810185180000000', '0'],
+      metaPool: 'USDC (Optics Bridge) Pool',
+    },
+    {
       name: 'USDC (Solana AllBridge) Pool',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
       tokens: [
@@ -432,6 +484,96 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['730282730000000'],
     },
+    {
+      name: 'pCelo Pool',
+      tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            address: '0x471EcE3750Da237f93B8E339c536989b8978a438',
+            name: 'Celo',
+            symbol: 'CELO',
+            chainId: 42220,
+            decimals: 18,
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            address: '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1',
+            name: 'Poof Celo',
+            symbol: 'pCELO',
+            chainId: 42220,
+            decimals: 18,
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pCELO.png',
+          },
+          []
+        ),
+      ],
+      address: '0x413FfCc28e6cDDE7e93625Ef4742810fE9738578',
+      lpToken: new Token(ChainId.MAINNET, '0x4D6B17828d0173668e8Eb730106444556a98c0F9', 18, 'MobLP', 'Mobius pCelo LP'),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 1,
+      gaugeAddress: '0x5489b2F0A1992b889F47601D71E068Fd15c63f26',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
+      // additionalRewards: [''],
+      // additionalRewardRate: ['730282730000000'],
+    },
+    {
+      name: 'pEuro Pool',
+      tokenAddresses: ['0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73', '0x56072D4832642dB29225dA12d6Fd1290E4744682'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            address: '0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73',
+            name: 'Celo Euro',
+            symbol: 'cEUR',
+            chainId: 42220,
+            decimals: 18,
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cEUR.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            address: '0x56072D4832642dB29225dA12d6Fd1290E4744682',
+            name: 'Poof EUR',
+            symbol: 'pEUR',
+            chainId: 42220,
+            decimals: 18,
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pEUR.png',
+          },
+          []
+        ),
+      ],
+      address: '0x382Ed834c6b7dBD10E4798B08889eaEd1455E820',
+      lpToken: new Token(ChainId.MAINNET, '0x2642Ab16Bfb7A8b36EE42c9CbA2289C4Ca9F33b9', 18, 'MobLP', 'Mobius pEUR LP'),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 1,
+      gaugeAddress: '0xCF34F4ec5DC9E09428A4f4a45475f6277694166c',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
+      // additionalRewards: [''],
+      // additionalRewardRate: ['730282730000000'],
+    },
   ],
   [ChainId.ALFAJORES]: [
     {
@@ -554,6 +696,56 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       relativeGaugeWeight: new Fraction('9', '10'),
       additionalRewards: ['0x2AaF20d89277BF024F463749045964D7e7d3A774', '0x3551d53C9CF91E222D9579A1Ac4B44117E8Ec609'],
       additionalRewardRate: ['10000000000000000', '10000000000000000'],
+    },
+    {
+      name: 'Test Meta Pool',
+      tokenAddresses: ['0x2AaF20d89277BF024F463749045964D7e7d3A774', '0x18B1cC7ac290591853b9728BF0a88085EBc7F981'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.ALFAJORES,
+            address: '0x2AaF20d89277BF024F463749045964D7e7d3A774',
+            decimals: 18,
+            symbol: 'cTC1',
+            name: 'Test Coin 1',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_sCELO.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.ALFAJORES,
+            address: '0x18B1cC7ac290591853b9728BF0a88085EBc7F981',
+            decimals: 18,
+            symbol: 'MobiLP',
+            name: 'Mobius USD LP',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_rCELO.png',
+          },
+          []
+        ),
+      ],
+      address: '0xf1C1a115628B8cFD3ecB0561f947308b160eb553',
+      lpToken: new Token(
+        ChainId.ALFAJORES,
+        '0x21b9213a56d29013B7138e3dB5f73CD0245fD0d6',
+        18,
+        'MobiLP',
+        'Mobius Celo LP'
+      ),
+      swapFee: JSBI.BigInt('50000000'),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.BigInt('10000000000'),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: 'CELO',
+      pegComesAfter: true,
+      gaugeAddress: '0x9f2de5d953174bCfFA96f78d18a93b85BC5b8fc3',
+      relativeGaugeWeight: new Fraction('1', '10'),
+      displayDecimals: 0,
+      metaPool: 'USD Pool',
     },
   ],
   [ChainId.BAKLAVA]: [],

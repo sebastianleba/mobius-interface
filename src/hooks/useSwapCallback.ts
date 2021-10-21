@@ -4,12 +4,13 @@ import { Contract } from '@ethersproject/contracts'
 import { JSBI, SwapParameters } from '@ubeswap/sdk'
 import { ContractTransaction } from 'ethers'
 import { useMemo } from 'react'
+import isZero from 'utils/isZero'
 
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
+import { useStableSwapContract } from '../hooks/useContract'
 import { MobiusTrade } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getStableSwapContract, isAddress, shortenAddress } from '../utils'
-import isZero from '../utils/isZero'
+import { getStableSwapContract, isAddress, shortenAddress } from '../utils'
 import { useActiveContractKit } from './index'
 import useENS from './useENS'
 import useTransactionDeadline from './useTransactionDeadline'
@@ -64,8 +65,11 @@ function useSwapCallArguments(
     const outputRaw = trade.output.raw
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
 
+    console.log(indexFrom.toString())
+    console.log(indexTo.toString())
+
     const swapCallParameters: SwapParameters = {
-      methodName: 'swap',
+      methodName: trade.isMeta ? 'swapUnderlying' : 'swap',
       args: [
         indexFrom.toString(),
         indexTo.toString(),
@@ -93,7 +97,7 @@ export function useSwapCallback(
   const swapCalls = useSwapCallArguments(trade, allowedSlippage, recipientAddressOrName)
 
   const addTransaction = useTransactionAdder()
-
+  const contract = useStableSwapContract(trade?.pool.address)
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
   const getConnectedSigner = useGetConnectedSigner()
@@ -169,14 +173,14 @@ export function useSwapCallback(
         const {
           call: {
             contract: disconnectedContract,
-            parameters: { methodName, args, value },
+            parameters: { methodName, args },
           },
           gasEstimate,
         } = successfulEstimation
 
         const contract = disconnectedContract.connect(await getConnectedSigner())
         return contract[methodName](...args, {
-          gasLimit: calculateGasMargin(gasEstimate),
+          gasLimit: gasEstimate,
         })
           .then((response: ContractTransaction) => {
             const inputSymbol = trade.input.currency.symbol
@@ -206,7 +210,7 @@ export function useSwapCallback(
               throw new Error('Transaction rejected.')
             } else {
               // otherwise, the error was unexpected and we need to convey that
-              console.error(`Swap failed`, error, methodName, args, value)
+              console.error(`Swap failed`)
               throw new Error(`Swap failed: ${error.message}`)
             }
           })

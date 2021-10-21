@@ -17,6 +17,22 @@ export const StableTokens: TokenList = {
   timestamp: '2021-08-10T17:02:02.069Z',
   tokens: [
     {
+      address: '0x00400FcbF0816bebB94654259de7273f4A05c762',
+      name: 'Poof',
+      symbol: 'POOF',
+      chainId: ChainId.MAINNET,
+      decimals: 18,
+      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_POOF.png',
+    },
+    {
+      address: '0x17700282592D6917F6A73D0bF8AcCf4D578c131e',
+      name: 'Moola',
+      symbol: 'MOO',
+      chainId: ChainId.MAINNET,
+      decimals: 18,
+      logoURI: '"https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_MOO.png"',
+    },
+    {
       chainId: ChainId.MAINNET,
       address: '0x471EcE3750Da237f93B8E339c536989b8978a438',
       decimals: 18,
