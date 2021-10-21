@@ -2,6 +2,7 @@ import { CardNoise } from 'components/claim/styled'
 import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
 import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import Toggle from 'components/Toggle'
 import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
@@ -54,15 +55,14 @@ interface GaugeWeightsProps {
 export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
   const votePowerLeft = useVotePowerLeft()
-  const data = summaries
-    .filter(({ currentWeight }) => currentWeight.greaterThan('0'))
-    .map((summary, i) => ({
-      label: summary.pool,
-      angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
-      radius: summary.workingBalance.greaterThan('0') ? 10 : 9.5,
-      subLabel: `${summary.currentWeight.toFixed(2)}%`,
-      color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i % numColors]),
-    }))
+  const [showUserVote, setShowUserVote] = useState(false)
+  const data = summaries.map((summary, i) => ({
+    label: summary.pool,
+    angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
+    radius: summary.workingBalance.greaterThan('0') ? 10 : 9.5,
+    subLabel: `${summary.currentWeight.toFixed(2)}%`,
+    color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i]),
+  }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
   const leftToAllocate = 20
@@ -106,10 +106,14 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
           <AutoRow>
             <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
           </AutoRow>
+          <AutoRow marginTop="0.5rem">
+            <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} /> Show My
+            Votes
+          </AutoRow>
 
           <CardContainer>
             {summaries.map((summary) => (
-              <WeightCard position={summary} key={`weight-card-${summary.pool}`} />
+              <WeightCard showUserVote={showUserVote} position={summary} key={`weight-card-${summary.pool}`} />
             ))}
           </CardContainer>
         </>
@@ -150,7 +154,7 @@ const RowWithGap = styled(RowFixed)`
   gap: 8px;
 `
 
-function WeightCard({ position }: { position: GaugeSummary }) {
+function WeightCard({ position, showUserVote }: { position: GaugeSummary; showUserVote: boolean }) {
   const backgroundColor = useColor(position.firstToken)
   const [voteModalOpen, setVoteModalOpen] = useState(false)
 
@@ -167,10 +171,17 @@ function WeightCard({ position }: { position: GaugeSummary }) {
         <CardNoise />
         <RowBetween>
           <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <RowWithGap gap="4px">
-            <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
-            <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
-          </RowWithGap>
+          {showUserVote ? (
+            <RowWithGap gap="4px">
+              <TYPE.white color="white">Your Vote: </TYPE.white>
+              <TYPE.white color="white">{`${position.powerAllocated.toFixed(2)}%`}</TYPE.white>
+            </RowWithGap>
+          ) : (
+            <RowWithGap gap="4px">
+              <TYPE.white color="white">{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.white>
+              <TYPE.white color="white">{`Future: ${position.futureWeight.toFixed(2)}%`}</TYPE.white>
+            </RowWithGap>
+          )}
         </RowBetween>
       </PositionWrapper>
     </>
