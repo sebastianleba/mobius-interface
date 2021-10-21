@@ -162,6 +162,7 @@ export default function CurrencyList({
   showImportView: () => void
   setImportToken: (token: Token) => void
 }) {
+  currencies = currencies.filter((token) => !token.symbol?.includes('LP'))
   const itemData = currencies
 
   const inactiveTokens: {
