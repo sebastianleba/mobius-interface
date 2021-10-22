@@ -61,7 +61,7 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
     radius: summary.workingBalance.greaterThan('0') ? 10 : 9.5,
     subLabel: `${summary.currentWeight.toFixed(2)}%`,
-    color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i]),
+    color: darken(Math.floor(i / numColors) * 0.2, colorsForChart[i % numColors]),
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
