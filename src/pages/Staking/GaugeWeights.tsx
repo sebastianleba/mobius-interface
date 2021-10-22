@@ -56,7 +56,6 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
   const votePowerLeft = useVotePowerLeft()
   const [showUserVote, setShowUserVote] = useState(false)
-  console.log('color', Math.floor(0 % numColors) * 0.2, colorsForChart[0])
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
