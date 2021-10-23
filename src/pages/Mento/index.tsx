@@ -4,9 +4,7 @@ import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
-import useENS from 'hooks/useENS'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
@@ -23,7 +21,8 @@ import { SwapPoolTabs } from '../../components/NavigationTabs'
 import ProgressSteps from '../../components/ProgressSteps'
 import { AutoRow, RowBetween } from '../../components/Row'
 import ConfirmSwapModal from '../../components/swap/ConfirmSwapModal'
-import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
+import { ArrowWrapper, BottomGrouping, InfoWrapper, SwapCallbackError, Wrapper } from '../../components/swap/styleds'
+import SwapHeader from '../../components/swap/SwapHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
@@ -38,10 +37,10 @@ import {
   useUserSingleHopOnly,
   useUserSlippageTolerance,
 } from '../../state/user/hooks'
-import { ExternalLink, LinkStyledButton, TYPE } from '../../theme'
+import { ExternalLink, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeMentoTradePriceBreakdown, warningSeverity } from '../../utils/prices'
-import { AppBodyNoBackground } from '../AppBody'
+import AppBody from '../AppBody'
 import { ClickableText } from '../Pool/styleds'
 
 const VoteCard = styled(DataCard)`
@@ -59,17 +58,12 @@ export default function Mento() {
     useCurrency(true, loadedUrlParams?.inputCurrencyId),
     useCurrency(true, loadedUrlParams?.outputCurrencyId),
   ]
-  const [dismissTokenWarning, setDismissTokenWarning] = useState<boolean>(false)
   const urlLoadedTokens: Token[] = useMemo(
     () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
     [loadedInputCurrency, loadedOutputCurrency]
   )
-  const handleConfirmTokenWarning = useCallback(() => {
-    setDismissTokenWarning(true)
-  }, [])
 
   // dismiss warning if all imported tokens are in active lists
-  const importTokensNotInDefault = []
 
   const { account } = useActiveContractKit()
   const theme = useContext(ThemeContext)
@@ -84,17 +78,16 @@ export default function Mento() {
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
   // swap state
-  const { independentField, typedValue, recipient } = useSwapState()
+  const { independentField, typedValue } = useSwapState()
   const { v2Trade, currencyBalances, parsedAmount, currencies, inputError: swapInputError } = useMentoTradeInfo()
 
-  const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
 
   const parsedAmounts = {
     [Field.INPUT]: independentField === Field.INPUT ? parsedAmount : trade?.input,
     [Field.OUTPUT]: independentField === Field.OUTPUT ? parsedAmount : trade?.output,
   }
-  const { onSwitchTokens, onCurrencySelection, onUserInput, onChangeRecipient } = useSwapActionHandlers()
+  const { onSwitchTokens, onCurrencySelection, onUserInput } = useSwapActionHandlers()
   const isValid = !swapInputError
   const dependentField: Field = independentField === Field.INPUT ? Field.OUTPUT : Field.INPUT
 
@@ -155,7 +148,7 @@ export default function Mento() {
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(currencyBalances[Field.INPUT])
   const atMaxAmountInput = Boolean(maxAmountInput && parsedAmounts[Field.INPUT]?.equalTo(maxAmountInput))
   // the callback to execute the swap
-  const { callback: swapCallback, error: swapCallbackError } = useMentoTradeCallback(trade, allowedSlippage, recipient)
+  const { callback: swapCallback, error: swapCallbackError } = useMentoTradeCallback(trade, allowedSlippage, null)
   const { priceImpactWithoutFee } = computeMentoTradePriceBreakdown(trade)
 
   const [singleHopOnly] = useUserSingleHopOnly()
@@ -168,12 +161,7 @@ export default function Mento() {
 
         ReactGA.event({
           category: 'Swap',
-          action:
-            recipient === null
-              ? 'Swap w/o Send'
-              : (recipientAddress ?? recipient) === account
-              ? 'Swap w/o Send + recipient'
-              : 'Swap w/ Send',
+          action: 'Swap',
           label: [trade?.input?.currency?.symbol, trade?.output?.currency?.symbol].join('/'),
         })
 
@@ -191,7 +179,7 @@ export default function Mento() {
           txHash: undefined,
         })
       })
-  }, [swapCallback, tradeToConfirm, showConfirm, recipient, recipientAddress, account, trade, singleHopOnly])
+  }, [swapCallback, tradeToConfirm, showConfirm, account, trade, singleHopOnly])
 
   // errors
   const [showInverted, setShowInverted] = useState<boolean>(false)
@@ -245,33 +233,34 @@ export default function Mento() {
   return (
     <>
       <SwapPoolTabs active={'swap'} />
-      <AppBodyNoBackground>
-        {/* <SwapHeader title={actionLabel} /> */}
-        <Wrapper style={{ marginTop: isMobile ? '-1rem' : '3rem' }} id="swap-page">
-          <VoteCard>
-            <CardNoise />
-            <CardSection>
-              <AutoColumn gap="md">
-                <RowBetween>
-                  <TYPE.white fontWeight={600}>Mento Exchange</TYPE.white>
-                </RowBetween>
-                <RowBetween>
-                  <TYPE.white
-                    fontSize={14}
-                  >{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve. This exchange includes a 0.5% fee that is collected by the Celo Reserve.`}</TYPE.white>
-                </RowBetween>
-                <ExternalLink
-                  style={{ color: 'white', textDecoration: 'underline' }}
-                  target="_blank"
-                  href="https://docs.celo.org/celo-codebase/protocol/stability/doto"
-                >
-                  <TYPE.white fontSize={14}>Read more about the Mento exchange</TYPE.white>
-                </ExternalLink>
-              </AutoColumn>
-            </CardSection>
-            <CardNoise />
-          </VoteCard>
-          {/* <img src={MintLogo} /> */}
+      <InfoWrapper>
+        <VoteCard>
+          <CardNoise />
+          <CardSection>
+            <AutoColumn gap="md">
+              <RowBetween>
+                <TYPE.white fontWeight={600}>Mento Exchange</TYPE.white>
+              </RowBetween>
+              <RowBetween>
+                <TYPE.white
+                  fontSize={14}
+                >{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve. This exchange includes a 0.5% fee that is collected by the Celo Reserve.`}</TYPE.white>
+              </RowBetween>
+              <ExternalLink
+                style={{ color: 'white', textDecoration: 'underline' }}
+                target="_blank"
+                href="https://docs.celo.org/celo-codebase/protocol/stability/doto"
+              >
+                <TYPE.white fontSize={14}>Read more about the Mento exchange</TYPE.white>
+              </ExternalLink>
+            </AutoColumn>
+          </CardSection>
+          <CardNoise />
+        </VoteCard>
+      </InfoWrapper>
+      <AppBody>
+        <SwapHeader title={actionLabel} />
+        <Wrapper id="swap-page">
           <ConfirmSwapModal
             isOpen={showConfirm}
             trade={trade}
@@ -279,54 +268,46 @@ export default function Mento() {
             onAcceptChanges={handleAcceptChanges}
             attemptingTxn={attemptingTxn}
             txHash={txHash}
-            recipient={recipient}
+            recipient={null}
             allowedSlippage={allowedSlippage}
             onConfirm={handleSwap}
             swapErrorMessage={swapErrorMessage}
             onDismiss={handleConfirmDismiss}
           />
-
-          <AutoColumn gap={'md'}>
-            <CurrencyInputPanel
-              label={independentField === Field.OUTPUT && trade ? `From${isEstimate ? ' (estimated)' : ''}` : 'From'}
-              value={formattedAmounts[Field.INPUT]}
-              showMaxButton={!atMaxAmountInput}
-              currency={currencies[Field.INPUT]}
-              onUserInput={handleTypeInput}
-              onMax={handleMaxInput}
-              onCurrencySelect={handleInputSelect}
-              otherCurrency={currencies[Field.OUTPUT]}
-              id="swap-currency-input"
-            />
-            <AutoColumn justify="space-between">
-              <AutoRow justify={isExpertMode ? 'space-between' : 'center'} style={{ padding: '0 1rem' }}>
-                <ArrowWrapper clickable>
-                  <ArrowDown
-                    size="16"
-                    onClick={() => {
-                      setApprovalSubmitted(false) // reset 2 step UI for approvals
-                      onSwitchTokens()
-                    }}
-                    color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.primary1 : theme.text2}
-                  />
-                </ArrowWrapper>
-                {recipient === null && isExpertMode ? (
-                  <LinkStyledButton id="add-recipient-button" onClick={() => onChangeRecipient('')}>
-                    + Add a send (optional)
-                  </LinkStyledButton>
-                ) : null}
-              </AutoRow>
-            </AutoColumn>
-            <CurrencyInputPanel
-              value={formattedAmounts[Field.OUTPUT]}
-              onUserInput={handleTypeOutput}
-              label={independentField === Field.INPUT && trade ? `To${isEstimate ? ' (estimated)' : ''}` : 'To'}
-              showMaxButton={false}
-              currency={currencies[Field.OUTPUT]}
-              onCurrencySelect={handleOutputSelect}
-              otherCurrency={currencies[Field.INPUT]}
-              id="swap-currency-output"
-            />
+          <AutoColumn gap={'sm'}>
+            <div style={{ display: 'relative' }}>
+              <CurrencyInputPanel
+                label={independentField === Field.OUTPUT && trade ? `From${isEstimate ? ' (estimated)' : ''}` : 'From'}
+                value={formattedAmounts[Field.INPUT]}
+                showMaxButton={!atMaxAmountInput}
+                currency={currencies[Field.INPUT]}
+                onUserInput={handleTypeInput}
+                onMax={handleMaxInput}
+                onCurrencySelect={handleInputSelect}
+                otherCurrency={currencies[Field.OUTPUT]}
+                id="swap-currency-input"
+              />
+              <ArrowWrapper clickable>
+                <ArrowDown
+                  size="16"
+                  onClick={() => {
+                    setApprovalSubmitted(false) // reset 2 step UI for approvals
+                    onSwitchTokens()
+                  }}
+                  color={currencies[Field.INPUT] && currencies[Field.OUTPUT] ? theme.primary1 : theme.text2}
+                />
+              </ArrowWrapper>
+              <CurrencyInputPanel
+                value={formattedAmounts[Field.OUTPUT]}
+                onUserInput={handleTypeOutput}
+                label={independentField === Field.INPUT && trade ? `To${isEstimate ? ' (estimated)' : ''}` : 'To'}
+                showMaxButton={false}
+                currency={currencies[Field.OUTPUT]}
+                onCurrencySelect={handleOutputSelect}
+                otherCurrency={currencies[Field.INPUT]}
+                id="swap-currency-output"
+              />
+            </div>
             <Card padding={'0px'} borderRadius={'20px'}>
               <AutoColumn gap="8px" style={{ padding: '0 16px' }}>
                 {Boolean(trade) && (
@@ -451,7 +432,7 @@ export default function Mento() {
             <SettingsTab />
           </AutoRow>
         </Wrapper>
-      </AppBodyNoBackground>
+      </AppBody>
     </>
   )
 }

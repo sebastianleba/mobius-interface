@@ -11,6 +11,15 @@ export const Wrapper = styled.div`
   padding: 8px;
 `
 
+export const InfoWrapper = styled.div`
+  position: relative;
+  padding: 8px;
+  margin-top: 3rem;
+  margin-bottom: -4rem;
+  max-width: 436px;
+  width: 100%;
+`
+
 export const ArrowWrapper = styled.div<{ clickable: boolean }>`
   padding: 4px;
   border-radius: 12px;
