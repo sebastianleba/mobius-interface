@@ -58,7 +58,7 @@ const StyledMenuButton = styled.button`
   border: none;
   background-color: transparent;
   margin: 0;
-  margin-top: 1rem;
+  margin-top: 0rem;
   padding: 0;
   height: 35px;
 
@@ -119,7 +119,7 @@ const ModalContentWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 0;
+  padding: 0rem 0;
   background-color: ${({ theme }) => theme.bg2};
   border-radius: 20px;
 `
@@ -197,14 +197,6 @@ export default function SettingsTab() {
             </span>
           </EmojiWrapper>
         ) : null}{' '}
-        <Text
-          style={{ margin: 'auto', marginLeft: '.25rem' }}
-          fontWeight={400}
-          fontSize={16}
-          color={isDarkMode && 'white'}
-        >
-          Advanced Settings
-        </Text>
       </StyledMenuButton>
       {open && (
         <MenuFlyout>

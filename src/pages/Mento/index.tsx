@@ -1,10 +1,10 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
-import SettingsTab from 'components/Settings'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
@@ -258,7 +258,7 @@ export default function Mento() {
           <CardNoise />
         </VoteCard>
       </InfoWrapper>
-      <AppBody>
+      <AppBody mobile={isMobile}>
         <SwapHeader title={actionLabel} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal
@@ -428,9 +428,7 @@ export default function Mento() {
             )}
             {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
           </BottomGrouping>
-          <AutoRow style={{ justifyContent: 'center' }}>
-            <SettingsTab />
-          </AutoRow>
+          <AutoRow style={{ justifyContent: 'center' }}></AutoRow>
         </Wrapper>
       </AppBody>
     </>
