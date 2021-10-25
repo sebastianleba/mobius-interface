@@ -485,7 +485,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['730282730000000'],
     },
     {
-      name: 'pCelo Pool',
+      name: 'Private Celo',
       tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1'],
       tokens: [
         new WrappedTokenInfo(
@@ -528,6 +528,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
+      displayChain: 'Celo',
     },
     {
       name: 'pEuro Pool',
