@@ -82,7 +82,10 @@ const Sel = styled.div<{ selected: boolean }>`
 
 enum Select {
   All,
-  Yours,
+  Celo,
+  Eth,
+  Matic,
+  Sol,
 }
 
 export default function Pool() {
@@ -123,10 +126,19 @@ export default function Pool() {
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <HeaderLinks>
           <Sel onClick={() => setSelection(Select.All)} selected={selection === Select.All}>
-            All Pools
+            All
           </Sel>
-          <Sel onClick={() => setSelection(Select.Yours)} selected={selection === Select.Yours}>
-            Your Pools
+          <Sel onClick={() => setSelection(Select.Celo)} selected={selection === Select.Celo}>
+            Celo
+          </Sel>
+          <Sel onClick={() => setSelection(Select.Eth)} selected={selection === Select.Eth}>
+            Eth
+          </Sel>
+          <Sel onClick={() => setSelection(Select.Matic)} selected={selection === Select.Matic}>
+            Poly
+          </Sel>
+          <Sel onClick={() => setSelection(Select.Sol)} selected={selection === Select.Sol}>
+            Sol
           </Sel>
         </HeaderLinks>
         <PoolSection>
@@ -134,12 +146,7 @@ export default function Pool() {
             <Loader style={{ margin: 'auto' }} />
           ) : (
             stablePools
-              ?.filter(
-                (pool) =>
-                  selection === Select.All ||
-                  pool.amountDeposited?.greaterThan(JSBI.BigInt('0')) ||
-                  pool.stakedAmount.greaterThan('0')
-              )
+              ?.filter(() => selection === Select.All)
               .map((pool) => (
                 <ErrorBoundary key={pool.poolAddress || '000'}>
                   <StablePoolCard poolInfo={pool} />

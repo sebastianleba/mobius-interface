@@ -253,23 +253,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
       )}
       <TopSection>
-        <RowFixed>
+        <RowFixed style={{ gap: '10px' }}>
           <TYPE.black fontWeight={600} fontSize={[18, 24]}>
             {poolInfo.name}
           </TYPE.black>
-          {poolInfo.meta && (
-            <QuestionHelper
-              text={
-                <>
-                  A meta pool pairs one token with the LP token of another pool to build on already-existing liquidity.{' '}
-                  <br />
-                  <br />
-                  This meta pool builds off of {poolInfo.meta}
-                </>
-              }
-            />
-          )}
-          <StyledLogo size={'24px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+          <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
         </RowFixed>
         {apy ? (
           <RowFixed>
@@ -291,26 +279,36 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               {apy.denominator.toString() !== '0' ? `${apy.toFixed(1, { groupSeparator: ',' })}%` : ' -'} Base APR
             </TYPE.subHeader>
           </RowFixed>
-        ) : feesGenerated ? (
-          <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-            Fees Generated: {pegComesAfter ? '' : peggedTo}
-            {feesGenerated.denominator.toString() !== '0'
-              ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
-              : '-'}
-            {pegComesAfter ? peggedTo : ''}
-          </TYPE.subHeader>
         ) : (
-          <TYPE.black fontWeight={600} fontSize={[14, 18]}>
-            Coming Soon!
-          </TYPE.black>
+          feesGenerated && (
+            <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
+              Fees Generated: {pegComesAfter ? '' : peggedTo}
+              {feesGenerated.denominator.toString() !== '0'
+                ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
+                : '-'}
+              {pegComesAfter ? peggedTo : ''}
+            </TYPE.subHeader>
+          )
         )}
       </TopSection>
       <SecondSection>
         <RowFixed>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} margin={true} />
-          <TYPE.black fontWeight={600} fontSize={[14, 24]}>
+          <TYPE.darkGray fontWeight={450} fontSize={[12, 20]}>
             {tokens.map((t) => t.symbol).join(' / ')}
-          </TYPE.black>
+          </TYPE.darkGray>
+          {poolInfo.meta && (
+            <QuestionHelper
+              text={
+                <>
+                  A meta pool pairs one token with the LP token of another pool to build on already-existing liquidity.{' '}
+                  <br />
+                  <br />
+                  This meta pool builds off of {poolInfo.meta}
+                </>
+              }
+            />
+          )}
         </RowFixed>
         {apy ? (
           <RowFixed>
