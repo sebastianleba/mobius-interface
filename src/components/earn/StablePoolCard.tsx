@@ -12,7 +12,7 @@ import { getDepositValues } from 'utils/stableSwaps'
 import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
-import { useColor } from '../../hooks/useColor'
+import { useColor, usePoolColor } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { StyledInternalLink, theme, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
@@ -250,6 +250,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
+  const poolColor = usePoolColor(poolInfo)
   const backgroundGradient = null //generateGradient(tokens.slice())
 
   if (!backgroundColorEnd || backgroundColorEnd === backgroundColorStart) backgroundColorEnd = '#212429'
@@ -293,7 +294,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             />
             <TYPE.subHeader
               style={{ paddingLeft: '.15rem' }}
-              color={backgroundColorStart}
+              color={poolColor}
               className="apr"
               fontWeight={800}
               fontSize={[18, 24]}
@@ -335,7 +336,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         {apy ? (
           <RowFixed>
             <QuestionHelper text={'APR after staking MOBI'} />
-            <StyledNavLink color={backgroundColorStart} to={'/stake'} className="bapr">
+            <StyledNavLink color={poolColor} to={'/stake'} className="bapr">
               {apy.denominator.toString() !== '0'
                 ? `${apy.multiply(new Fraction(JSBI.BigInt(500), JSBI.BigInt(2))).toFixed(1, { groupSeparator: ',' })}%`
                 : ' -'}{' '}
@@ -454,8 +455,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </StatContainer>
             {!openManage && (
               <StyledButton
-                background={backgroundColorStart}
-                backgroundHover={backgroundColorEnd}
+                background={poolColor}
+                backgroundHover={poolColor}
                 onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
                 style={{ width: '30%', marginLeft: 'auto', marginRight: '1rem' }}
               >

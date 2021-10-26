@@ -48,6 +48,9 @@ export interface Colors {
   celoGreen: Color
   celoGold: Color
   celoRed: Color
+  polygon: Color
+  solana: Color
+  ethereum: Color
 }
 
 export interface Grids {
