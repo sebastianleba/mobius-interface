@@ -12,7 +12,7 @@ import { AutoColumn } from '../../components/Column'
 import { StablePoolCard } from '../../components/earn/StablePoolCard'
 import Loader from '../../components/Loader'
 import { Row } from '../../components/Row'
-import { useStablePoolInfo } from '../../state/stablePools/hooks'
+import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
 import { TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
@@ -106,6 +106,13 @@ export default function Pool() {
   const tvlAsTokenAmount = new TokenAmount(cUSD[chainId], tvl)
   const mobiprice = useCUSDPrice(useMobi())
 
+  const sortCallback = (pool1: StablePoolInfo, pool2: StablePoolInfo) => {
+    const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount.greaterThan('0')
+    const isStaking2 = pool2.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool2.stakedAmount.greaterThan('0')
+    if (isStaking1 && !isStaking2) return false
+    return true
+  }
+
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
       {!isGenesisOver && <LaunchCountdown />}
@@ -138,7 +145,8 @@ export default function Pool() {
             <Loader style={{ margin: 'auto' }} />
           ) : (
             stablePools
-              ?.filter((pool) => selection === Chain.All || selection === pool.displayChain)
+              ?.sort(sortCallback)
+              .filter((pool) => selection === Chain.All || selection === pool.displayChain)
               .map((pool) => (
                 <ErrorBoundary key={pool.poolAddress || '000'}>
                   <StablePoolCard poolInfo={pool} />
