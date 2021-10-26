@@ -1,6 +1,6 @@
 import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
-import { Coins, PRICE } from 'constants/StablePools'
+import { Chain, Coins, PRICE } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
@@ -80,14 +80,6 @@ const Sel = styled.div<{ selected: boolean }>`
   background-color: ${({ theme, selected }) => (selected ? theme.bg3 : theme.bg1)};
 `
 
-enum Select {
-  All,
-  Celo,
-  Eth,
-  Matic,
-  Sol,
-}
-
 export default function Pool() {
   const { chainId } = useActiveContractKit()
 
@@ -95,7 +87,7 @@ export default function Pool() {
 
   const stablePools = useStablePoolInfo()
 
-  const [selection, setSelection] = React.useState<Select>(Select.All)
+  const [selection, setSelection] = React.useState<Chain>(Chain.All)
 
   const tvl = stablePools.reduce((accum, poolInfo) => {
     const price =
@@ -125,19 +117,19 @@ export default function Pool() {
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <HeaderLinks>
-          <Sel onClick={() => setSelection(Select.All)} selected={selection === Select.All}>
+          <Sel onClick={() => setSelection(Chain.All)} selected={selection === Chain.All}>
             All
           </Sel>
-          <Sel onClick={() => setSelection(Select.Celo)} selected={selection === Select.Celo}>
+          <Sel onClick={() => setSelection(Chain.Celo)} selected={selection === Chain.Celo}>
             Celo
           </Sel>
-          <Sel onClick={() => setSelection(Select.Eth)} selected={selection === Select.Eth}>
+          <Sel onClick={() => setSelection(Chain.Ethereum)} selected={selection === Chain.Ethereum}>
             Eth
           </Sel>
-          <Sel onClick={() => setSelection(Select.Matic)} selected={selection === Select.Matic}>
+          <Sel onClick={() => setSelection(Chain.Polygon)} selected={selection === Chain.Polygon}>
             Poly
           </Sel>
-          <Sel onClick={() => setSelection(Select.Sol)} selected={selection === Select.Sol}>
+          <Sel onClick={() => setSelection(Chain.Solana)} selected={selection === Chain.Solana}>
             Sol
           </Sel>
         </HeaderLinks>
@@ -146,7 +138,7 @@ export default function Pool() {
             <Loader style={{ margin: 'auto' }} />
           ) : (
             stablePools
-              ?.filter(() => selection === Select.All)
+              ?.filter((pool) => selection === Chain.All || selection === pool.displayChain)
               .map((pool) => (
                 <ErrorBoundary key={pool.poolAddress || '000'}>
                   <StablePoolCard poolInfo={pool} />

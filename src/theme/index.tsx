@@ -87,6 +87,9 @@ export function colors(darkMode: boolean): Colors {
     yellow1: '#FFE270',
     yellow2: '#F3841E',
     blue1: '#35D07F',
+    celoGreen: '#35D07F',
+    celoGold: '#FBCC5C',
+    celoRed: '#FB7C6D',
 
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',

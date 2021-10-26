@@ -5,6 +5,7 @@ import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 import { useEthBtcPrice } from 'state/application/hooks'
 import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
@@ -13,12 +14,12 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor } from '../../hooks/useColor'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
-import { StyledInternalLink, TYPE } from '../../theme'
+import { StyledInternalLink, theme, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
 import Logo from '../Logo'
-import { RowBetween, RowFixed } from '../Row'
+import { Row, RowBetween, RowFixed } from '../Row'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
 
@@ -134,6 +135,27 @@ const DepositWithdrawBtn = styled(StyledButton)`
   width: 40%;
   flex: none;
 `
+
+//TODO: Fix so when open it expands to the whole row
+const ExpandedRow = styled(Row)<{ open: boolean }>`
+  justify-content: ${({ open }) => !open && 'space-between'};
+  width: 100%;
+`
+
+const StyledNavLink = styled(NavLink)<{ color: string }>`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  border-radius: 3rem;
+  outline: none;
+  cursor: pointer;
+  color: ${({ color }) => color};
+  font-size: 20;
+  width: fit-content;
+  font-weight: 800;
+  paddingLeft: '.15rem',
+  textDecoration: underline,
+`
+
 interface Props {
   poolInfo: StablePoolInfo
 }
@@ -274,9 +296,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               color={backgroundColorStart}
               className="apr"
               fontWeight={800}
-              fontSize={[14, 18]}
+              fontSize={[18, 24]}
             >
-              {apy.denominator.toString() !== '0' ? `${apy.toFixed(1, { groupSeparator: ',' })}%` : ' -'} Base APR
+              {apy.denominator.toString() !== '0' ? `${apy.toFixed(1, { groupSeparator: ',' })}%` : ' -'} APR
             </TYPE.subHeader>
           </RowFixed>
         ) : (
@@ -294,7 +316,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       <SecondSection>
         <RowFixed>
           <CurrencyPoolLogo tokens={tokens.slice()} size={24} margin={true} />
-          <TYPE.darkGray fontWeight={450} fontSize={[12, 20]}>
+          <TYPE.darkGray fontWeight={450} fontSize={[14, 20]}>
             {tokens.map((t) => t.symbol).join(' / ')}
           </TYPE.darkGray>
           {poolInfo.meta && (
@@ -313,18 +335,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         {apy ? (
           <RowFixed>
             <QuestionHelper text={'APR after staking MOBI'} />
-            <TYPE.subHeader
-              style={{ paddingLeft: '.15rem' }}
-              color={backgroundColorStart}
-              className="bapr"
-              fontWeight={800}
-              fontSize={[14, 18]}
-            >
+            <StyledNavLink color={backgroundColorStart} to={'/stake'} className="bapr">
               {apy.denominator.toString() !== '0'
                 ? `${apy.multiply(new Fraction(JSBI.BigInt(500), JSBI.BigInt(2))).toFixed(1, { groupSeparator: ',' })}%`
                 : ' -'}{' '}
-              Boosted APR
-            </TYPE.subHeader>
+              with boost
+            </StyledNavLink>
           </RowFixed>
         ) : feesGenerated ? (
           <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
@@ -342,78 +358,79 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       </SecondSection>
       <InfoContainer>
         <div style={{ flex: 3 }}>
-          <StatContainer>
-            <RowBetween>
-              <TYPE.black>Total deposited</TYPE.black>
-              <RowFixed>
-                <QuestionHelper
-                  text={balances
-                    .map(
-                      (balance) =>
-                        `${balance?.toFixed(displayDecimals, { groupSeparator: ',' })} ${balance.token.symbol}`
-                    )
-                    .join(', ')}
-                />
-                <TYPE.black>
-                  {totalValueDeposited
-                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalValueDeposited.toFixed(displayDecimals))} ${
-                        pegComesAfter ? peggedTo : ''
-                      }`
-                    : '-'}
-                </TYPE.black>
-              </RowFixed>
-            </RowBetween>
+          <ExpandedRow open={openManage}>
+            <StatContainer>
+              <RowBetween>
+                <TYPE.black>Total deposited</TYPE.black>
+                <RowFixed>
+                  <QuestionHelper
+                    text={balances
+                      .map(
+                        (balance) =>
+                          `${balance?.toFixed(displayDecimals, { groupSeparator: ',' })} ${balance.token.symbol}`
+                      )
+                      .join(', ')}
+                  />
+                  <TYPE.black>
+                    {totalValueDeposited
+                      ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(
+                          totalValueDeposited.toFixed(displayDecimals)
+                        )} ${pegComesAfter ? peggedTo : ''}`
+                      : '-'}
+                  </TYPE.black>
+                </RowFixed>
+              </RowBetween>
 
-            <RowBetween>
-              <TYPE.black>Total volume</TYPE.black>
-              <RowFixed>
-                <TYPE.black>
-                  {totalVolume
-                    ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(displayDecimals, {
-                        groupSeparator: ',',
-                      })} ${pegComesAfter ? peggedTo : ''}`
-                    : '-'}
-                </TYPE.black>
-              </RowFixed>
-            </RowBetween>
+              <RowBetween>
+                <TYPE.black>Total volume</TYPE.black>
+                <RowFixed>
+                  <TYPE.black>
+                    {totalVolume
+                      ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(displayDecimals, {
+                          groupSeparator: ',',
+                        })} ${pegComesAfter ? peggedTo : ''}`
+                      : '-'}
+                  </TYPE.black>
+                </RowFixed>
+              </RowBetween>
 
-            {openManage && (
-              <>
-                {mobiRate && (
-                  <RowBetween>
-                    <TYPE.black>Mobi rate</TYPE.black>
-                    <TYPE.black>
-                      {totalMobiRate
-                        ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
-                        : '0'}
-                      {' / week'}
-                    </TYPE.black>
-                  </RowBetween>
-                )}
-                {poolInfo.externalRewardRates &&
-                  poolInfo.externalRewardRates.map((rate) => (
-                    <RowBetween key={rate.toExact()}>
-                      <TYPE.black>{rate.token.symbol} rate</TYPE.black>
-                      <TYPE.black
-                        fontSize={16}
-                        fontWeight={500}
-                        marginLeft="auto"
-                        key={`additional-reward-total-${rate.currency.symbol}-${poolInfo.name}`}
-                      >
-                        {rate
-                          ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+              {openManage && (
+                <>
+                  {mobiRate && (
+                    <RowBetween>
+                      <TYPE.black>Mobi rate</TYPE.black>
+                      <TYPE.black>
+                        {totalMobiRate
+                          ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
                           : '0'}
-                        {` / week`}
+                        {' / week'}
                       </TYPE.black>
                     </RowBetween>
-                  ))}
-                {!!account && isStaking && (
-                  <RowBetween>
-                    <TYPE.black fontWeight={500}>
-                      <span>Your share</span>
-                    </TYPE.black>
-                    <RowFixed>
-                      {/* <QuestionHelper
+                  )}
+                  {poolInfo.externalRewardRates &&
+                    poolInfo.externalRewardRates.map((rate) => (
+                      <RowBetween key={rate.toExact()}>
+                        <TYPE.black>{rate.token.symbol} rate</TYPE.black>
+                        <TYPE.black
+                          fontSize={16}
+                          fontWeight={500}
+                          marginLeft="auto"
+                          key={`additional-reward-total-${rate.currency.symbol}-${poolInfo.name}`}
+                        >
+                          {rate
+                            ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                            : '0'}
+                          {` / week`}
+                        </TYPE.black>
+                      </RowBetween>
+                    ))}
+                  {!!account && isStaking && (
+                    <RowBetween>
+                      <TYPE.black fontWeight={500}>
+                        <span>Your share</span>
+                      </TYPE.black>
+                      <RowFixed>
+                        {/* <QuestionHelper
                         text={userBalances
                           .map(
                             (balance) =>
@@ -424,24 +441,35 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                           )
                           .join(', ')}
                       /> */}
-                      <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
-                        {!pegComesAfter && peggedTo}
-                        {valueOfDeposited.toFixed(displayDecimals + 1)}
-                        {pegComesAfter && ` ${peggedTo}`}
-                      </TYPE.black>
-                    </RowFixed>
-                  </RowBetween>
-                )}
-              </>
+                        <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
+                          {!pegComesAfter && peggedTo}
+                          {valueOfDeposited.toFixed(displayDecimals + 1)}
+                          {pegComesAfter && ` ${peggedTo}`}
+                        </TYPE.black>
+                      </RowFixed>
+                    </RowBetween>
+                  )}
+                </>
+              )}
+            </StatContainer>
+            {!openManage && (
+              <StyledButton
+                background={backgroundColorStart}
+                backgroundHover={backgroundColorEnd}
+                onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
+                style={{ width: '30%', marginLeft: 'auto', marginRight: '1rem' }}
+              >
+                {isStaking ? 'Manage' : 'Deposit'}
+              </StyledButton>
             )}
-          </StatContainer>
+          </ExpandedRow>
         </div>
       </InfoContainer>
       {!!account && !isStaking && openManage && (
         <StyledButton
           background={backgroundColorStart}
           backgroundHover={backgroundColorEnd}
-          onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
+          onClick={() => setOpenDeposit(true)}
           style={{ width: '100%', marginLeft: 'auto', marginRight: '1rem' }}
         >
           Deposit
@@ -456,16 +484,16 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           }}
         >
           <DepositWithdrawBtn
-            background={backgroundColorStart}
-            backgroundHover={backgroundColorEnd}
+            background={theme(false).celoGreen}
+            backgroundHover={theme(false).celoGreen}
             onClick={() => setOpenDeposit(true)}
             style={{ width: '30%' }}
           >
             Deposit
           </DepositWithdrawBtn>
           <DepositWithdrawBtn
-            background={backgroundColorStart}
-            backgroundHover={backgroundColorEnd}
+            background={theme(false).celoRed}
+            backgroundHover={theme(false).celoRed}
             onClick={() => setOpenWithdraw(true)}
             style={{ width: '30%' }}
           >
@@ -474,8 +502,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           {poolInfo.gaugeAddress !== undefined && (
             <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
               <DepositWithdrawBtn
-                background={backgroundColorStart}
-                backgroundHover={backgroundColorEnd}
+                background={theme(false).celoGold}
+                backgroundHover={theme(false).celoGold}
                 style={{ width: '100%' }}
               >
                 Farm

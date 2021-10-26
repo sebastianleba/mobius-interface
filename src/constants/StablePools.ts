@@ -46,6 +46,7 @@ export enum Chain {
   Ethereum,
   Polygon,
   Solana,
+  All,
 }
 
 export const ChainLogo: { [c in Chain]: string } = {
@@ -53,6 +54,7 @@ export const ChainLogo: { [c in Chain]: string } = {
   [Chain.Ethereum]: ethLogo,
   [Chain.Polygon]: polygonLogo,
   [Chain.Solana]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_SOL.png',
+  [Chain.All]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
 }
 
 export const PRICE: { [c in Coins]: number } = {
@@ -306,6 +308,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['2190848200000000'],
+      displayChain: Chain.Polygon,
     },
     {
       name: 'wBTC (Optics)',
@@ -355,6 +358,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 3,
       gaugeAddress: '0x1A8938a37093d34581B21bAd2AE7DC1c19150C05',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
+      displayChain: Chain.Ethereum,
     },
     {
       name: 'WETH (Optics)',
@@ -404,6 +408,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 2,
       gaugeAddress: '0xD38e76E17E66b562B61c149Ca0EE53CEa1145733',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
+      displayChain: Chain.Ethereum,
     },
     {
       name: 'USDT (Moss)',
@@ -453,6 +458,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 1,
       gaugeAddress: '0xe2d6095685248F38Ae9fef1b360D772b78Ea19D1',
       totalMobiRate: JSBI.BigInt('146712000000000000'),
+      displayChain: Chain.Ethereum,
     },
     {
       name: 'USDC (Moss)',
@@ -504,6 +510,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['730282730000000'],
+      displayChain: Chain.Ethereum,
     },
     {
       name: 'Private CELO',
@@ -595,6 +602,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
+      displayChain: Chain.Celo,
     },
   ],
   [ChainId.ALFAJORES]: [
