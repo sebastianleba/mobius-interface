@@ -11,6 +11,7 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 import { AutoColumn } from '../../components/Column'
 import { StablePoolCard } from '../../components/earn/StablePoolCard'
 import Loader from '../../components/Loader'
+import { Row } from '../../components/Row'
 import { useStablePoolInfo } from '../../state/stablePools/hooks'
 import { TYPE } from '../../theme'
 import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
@@ -30,7 +31,56 @@ const PoolSection = styled.div`
   justify-self: center;
 `
 
-export default function Earn() {
+const HeaderLinks = styled(Row)`
+  justify-self: center;
+  background-color: ${({ theme }) => theme.bg1};
+  width: fit-content;
+  padding: 4px;
+  border-radius: 16px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 10px;
+  overflow: auto;
+  align-items: center;
+  ${({ theme }) => theme.mediaWidth.upToLarge`
+    justify-self: start;  
+    `};
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    justify-self: center;
+  `};
+  ${({ theme }) => theme.mediaWidth.upToMedium`
+    flex-direction: row;
+    justify-content: space-between;
+    justify-self: center;
+    z-index: 99;
+    position: fixed;
+    bottom: 0; right: 50%;
+    transform: translate(50%,-50%);
+    margin: 0 auto;
+    background-color: ${({ theme }) => theme.bg1};
+    border: 1px solid ${({ theme }) => theme.bg2};
+    box-shadow: 0px 6px 10px rgb(0 0 0 / 2%);
+  `};
+`
+
+const Sel = styled.div<{ selected: boolean }>`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  border-radius: ${({ selected }) => (selected ? '12px' : '3rem')};
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${({ theme }) => theme.text1};
+  font-size: 1rem;
+  font-weight: ${({ selected }) => (selected ? '600' : '500')};
+  padding: 8px 12px;
+  word-break: break-word;
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: ${({ theme, selected }) => (selected ? theme.bg3 : theme.bg1)};
+`
+
+export default function Pool() {
   const { chainId } = useActiveContractKit()
 
   const isGenesisOver = COUNTDOWN_END < new Date().getTime()
@@ -65,13 +115,17 @@ export default function Earn() {
         {mobiprice && <TYPE.price opacity={'.8'}>Latest MOBI Price: ${mobiprice.toFixed(3)}</TYPE.price>}
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
+        <HeaderLinks>
+          <Sel selected={true}>All Pools</Sel>
+          <Sel selected={false}>Your Pools</Sel>
+        </HeaderLinks>
         <PoolSection>
           {sortedStablePools && sortedStablePools?.length === 0 ? (
             <Loader style={{ margin: 'auto' }} />
           ) : (
             sortedStablePools?.map((pool) => (
               <ErrorBoundary key={pool.poolAddress || '000'}>
-                {pool.name === 'Private Celo' && <StablePoolCard poolInfo={pool} />}
+                <StablePoolCard poolInfo={pool} />
               </ErrorBoundary>
             ))
           )}

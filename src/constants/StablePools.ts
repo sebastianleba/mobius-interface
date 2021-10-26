@@ -82,7 +82,7 @@ export const VOTING_ESCROW: { [K in ChainId]: string } = {
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
-      name: 'USDC (Optics Bridge) Pool',
+      name: 'USDC (Optics)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7'],
       tokens: [
         new WrappedTokenInfo(
@@ -133,7 +133,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['7302827380000000'],
     },
     {
-      name: 'Poof USD Meta Pool',
+      name: 'Private cUSD',
       tokenAddresses: ['0xB4aa2986622249B1F45eb93F28Cfca2b2606d809', '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4'],
       tokens: [
         new WrappedTokenInfo(
@@ -185,7 +185,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       metaPool: 'USDC (Optics Bridge) Pool',
     },
     {
-      name: 'USDC (Solana AllBridge) Pool',
+      name: 'USDC (Solana AllBridge)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
       tokens: [
         new WrappedTokenInfo(
@@ -236,7 +236,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['1460565500000000'],
     },
     {
-      name: 'USDC (PoS Optics) Pool',
+      name: 'USDC (Polygon Optics)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
       tokens: [
         new WrappedTokenInfo(
@@ -287,7 +287,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['2190848200000000'],
     },
     {
-      name: 'BTC Pool',
+      name: 'wBTC (Optics)',
       tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
       tokens: [
         new WrappedTokenInfo(
@@ -336,7 +336,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
     },
     {
-      name: 'ETH Pool',
+      name: 'WETH (Optics)',
       tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4'],
       tokens: [
         new WrappedTokenInfo(
@@ -385,7 +385,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
     },
     {
-      name: 'USDT (Moss Bridge) Pool',
+      name: 'USDT (Moss)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D'],
       tokens: [
         new WrappedTokenInfo(
@@ -434,7 +434,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('146712000000000000'),
     },
     {
-      name: 'USDC (Moss Bridge) Pool',
+      name: 'USDC (Moss)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
       tokens: [
         new WrappedTokenInfo(
@@ -485,7 +485,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['730282730000000'],
     },
     {
-      name: 'Private Celo',
+      name: 'Private CELO',
       tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1'],
       tokens: [
         new WrappedTokenInfo(
@@ -531,7 +531,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayChain: 'Celo',
     },
     {
-      name: 'pEuro Pool',
+      name: 'Private cEUR',
       tokenAddresses: ['0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73', '0x56072D4832642dB29225dA12d6Fd1290E4744682'],
       tokens: [
         new WrappedTokenInfo(

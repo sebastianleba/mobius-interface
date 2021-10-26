@@ -1,5 +1,5 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
-import QuestionHelper, { LightQuestionHelper } from 'components/QuestionHelper'
+import QuestionHelper from 'components/QuestionHelper'
 import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
@@ -80,6 +80,7 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>
   ${({ theme }) => theme.mediaWidth.upToSmall`
   padding-left: 0.25rem;
   padding-right: 0.25rem;
+  max-width: 420px;
 `}
 `
 
@@ -98,7 +99,7 @@ const TopSection = styled.div`
 const SecondSection = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 1rem;
   padding-bottom: 0.25rem;
   padding-top: 0;
@@ -143,15 +144,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     totalStakedAmount: totalStakedLPs,
   } = poolInfo
 
-  // console.log(poolInfo.name)
-  // console.log(workingSupply.toString())
-  // console.log(poolInfo.totalStakedAmount.toFixed())
-  // // console.log(totalDeposited.toExact())
-  // 3529370906912529506344093
-  // 7974951.397442721004431525
-  // 3529370.906912529506344093
-
-  const isLive = true
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
@@ -244,6 +236,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       background={backgroundGradient}
       bgColor1={backgroundColorStart}
       bgColor2={backgroundColorEnd}
+      onClick={() => setOpenManage(!openManage)}
     >
       {openDeposit && <DepositModal isOpen={openDeposit} onDismiss={() => setOpenDeposit(false)} poolInfo={poolInfo} />}
       {openWithdraw && (
@@ -302,6 +295,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         )}
       </TopSection>
       <SecondSection>
+        <RowFixed>
+          <CurrencyPoolLogo tokens={tokens.slice()} size={24} margin={true} />
+          <TYPE.black fontWeight={600} fontSize={[14, 24]}>
+            {tokens.map((t) => t.symbol).join(' / ')}
+          </TYPE.black>
+        </RowFixed>
         {apy ? (
           <RowFixed>
             <QuestionHelper text={'APR after staking MOBI'} />
@@ -332,29 +331,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           </TYPE.black>
         )}
       </SecondSection>
-      <SubHeader>
-        <RowBetween>
-          <CurrencyPoolLogo tokens={tokens.slice()} size={24} />
-          <PoolInfo style={{ marginLeft: '8px' }}>
-            <TYPE.black fontWeight={600} fontSize={[14, 24]}>
-              {tokens.map((t) => t.symbol).join(' / ')}
-            </TYPE.black>
-          </PoolInfo>
-        </RowBetween>
-      </SubHeader>
       <InfoContainer>
         <div style={{ flex: 3 }}>
           <StatContainer>
             <RowBetween>
               <TYPE.black>Total deposited</TYPE.black>
               <RowFixed>
-                <TYPE.black>
-                  {totalValueDeposited
-                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalValueDeposited.toFixed(displayDecimals))} ${
-                        pegComesAfter ? peggedTo : ''
-                      }`
-                    : '-'}
-                </TYPE.black>
                 <QuestionHelper
                   text={balances
                     .map(
@@ -363,35 +345,15 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                     )
                     .join(', ')}
                 />
+                <TYPE.black>
+                  {totalValueDeposited
+                    ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(totalValueDeposited.toFixed(displayDecimals))} ${
+                        pegComesAfter ? peggedTo : ''
+                      }`
+                    : '-'}
+                </TYPE.black>
               </RowFixed>
             </RowBetween>
-            {mobiRate && (
-              <RowBetween>
-                <TYPE.black>Pool rate</TYPE.black>
-                <AutoColumn style={{ alignItems: 'end' }}>
-                  <TYPE.black>
-                    {totalMobiRate
-                      ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
-                      : '0'}
-                    {' MOBI / week'}
-                  </TYPE.black>
-                  {poolInfo.externalRewardRates &&
-                    poolInfo.externalRewardRates.map((rate) => (
-                      <TYPE.black
-                        fontSize={16}
-                        fontWeight={500}
-                        marginLeft="auto"
-                        key={`additional-reward-total-${rate.currency.symbol}-${poolInfo.name}`}
-                      >
-                        {rate
-                          ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
-                          : '0'}
-                        {` ${rate.token.symbol} / week`}
-                      </TYPE.black>
-                    ))}
-                </AutoColumn>
-              </RowBetween>
-            )}
 
             <RowBetween>
               <TYPE.black>Total volume</TYPE.black>
@@ -403,163 +365,116 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                       })} ${pegComesAfter ? peggedTo : ''}`
                     : '-'}
                 </TYPE.black>
-                <div style={{ width: '26px' }} />
               </RowFixed>
             </RowBetween>
 
-            {false && apy.greaterThan('0') && (
-              <RowBetween>
-                <RowFixed>
-                  <TYPE.black>APR</TYPE.black>
-                  <LightQuestionHelper
-                    text={
-                      <>
-                        Yield/day: {dpy?.toSignificant(4)}%<br />
-                        APY (weekly compounded): {weeklyAPY}%
-                      </>
-                    }
-                  />
-                </RowFixed>
-                <TYPE.black>
-                  {apy.denominator.toString() !== '0' ? `${apy.toFixed(0, { groupSeparator: ',' })}%` : '-'}
-                </TYPE.black>
-              </RowBetween>
-            )}
-          </StatContainer>
-
-          {isLive && isStaking && (
-            <>
-              <Divider />
-              <BottomSection showBackground={true}>
+            {openManage && (
+              <>
                 {mobiRate && (
                   <RowBetween>
-                    <TYPE.black fontWeight={500}>Your rate</TYPE.black>
-                    <AutoColumn>
-                      <TYPE.black fontSize={16} fontWeight={500}>
-                        <span role="img" aria-label="wizard-icon" style={{ marginRight: '8px ' }}>
-                          ⚡
-                        </span>
-                        {mobiRate
-                          ? userMobiRate
-                              ?.multiply(BIG_INT_SECONDS_IN_WEEK)
-                              ?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
-                          : '0'}
-                        {' MOBI / week'}
-                      </TYPE.black>
-                      {poolInfo.externalRewardRates &&
-                        userExternalRates.map((rate) => (
-                          <TYPE.black
-                            fontSize={16}
-                            fontWeight={500}
-                            key={`additional-reward-${rate.currency.symbol}-${poolInfo.name}`}
-                            marginLeft="auto"
-                          >
-                            {rate
-                              ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ??
-                                '-'
-                              : '0'}
-                            {` ${rate.token.symbol} / week`}
-                          </TYPE.black>
-                        ))}
-                    </AutoColumn>
+                    <TYPE.black>Mobi rate</TYPE.black>
+                    <TYPE.black>
+                      {totalMobiRate
+                        ? totalMobiRate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toFixed(0, { groupSeparator: ',' }) ?? '-'
+                        : '0'}
+                      {' / week'}
+                    </TYPE.black>
                   </RowBetween>
                 )}
-                {isStaking && (
+                {poolInfo.externalRewardRates &&
+                  poolInfo.externalRewardRates.map((rate) => (
+                    <RowBetween key={rate.toExact()}>
+                      <TYPE.black>{rate.token.symbol} rate</TYPE.black>
+                      <TYPE.black
+                        fontSize={16}
+                        fontWeight={500}
+                        marginLeft="auto"
+                        key={`additional-reward-total-${rate.currency.symbol}-${poolInfo.name}`}
+                      >
+                        {rate
+                          ? rate?.multiply(BIG_INT_SECONDS_IN_WEEK)?.toSignificant(4, { groupSeparator: ',' }) ?? '-'
+                          : '0'}
+                        {` / week`}
+                      </TYPE.black>
+                    </RowBetween>
+                  ))}
+                {!!account && isStaking && (
                   <RowBetween>
                     <TYPE.black fontWeight={500}>
                       <span>Your share</span>
                     </TYPE.black>
-
                     <RowFixed>
-                      <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
-                        {!pegComesAfter && peggedTo}
-                        {valueOfDeposited.toFixed(displayDecimals + 1)}
-                        {pegComesAfter && ` ${peggedTo}`}
-                      </TYPE.black>
-                      <QuestionHelper
+                      {/* <QuestionHelper
                         text={userBalances
                           .map(
                             (balance) =>
+                              // eslint-disable-next-line prettier/prettier
                               `${balance?.toFixed(displayDecimals + 1, { groupSeparator: ',' })} ${
                                 balance.token.symbol
                               }`
                           )
                           .join(', ')}
-                      />
+                      /> */}
+                      <TYPE.black style={{ textAlign: 'right' }} fontWeight={500}>
+                        {!pegComesAfter && peggedTo}
+                        {valueOfDeposited.toFixed(displayDecimals + 1)}
+                        {pegComesAfter && ` ${peggedTo}`}
+                      </TYPE.black>
                     </RowFixed>
                   </RowBetween>
                 )}
-              </BottomSection>
-            </>
-          )}
+              </>
+            )}
+          </StatContainer>
         </div>
-        {/* {!!account && !openManage && !isMobile && (
-          <StyledButton
-            background={backgroundColorStart}
-            backgroundHover={backgroundColorEnd}
-            onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
-          >
-            {isStaking ? 'Manage' : 'Deposit'}
-          </StyledButton>
-        )} */}
       </InfoContainer>
-      {!!account && !openManage && (
+      {!!account && !isStaking && openManage && (
         <StyledButton
           background={backgroundColorStart}
           backgroundHover={backgroundColorEnd}
           onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
-          style={{ width: '50%', marginLeft: 'auto', marginRight: '1rem' }}
-        >
-          {isStaking ? 'Manage' : 'Deposit'}
-        </StyledButton>
-      )}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          visibility: openManage ? 'visible' : 'hidden',
-          transition: 'all 0.3s ease-in',
-          height: !openManage ? '0px' : '100%',
-        }}
-      >
-        <DepositWithdrawBtn
-          background={backgroundColorStart}
-          backgroundHover={backgroundColorEnd}
-          onClick={() => setOpenDeposit(true)}
-          style={{ width: '30%' }}
+          style={{ width: '100%', marginLeft: 'auto', marginRight: '1rem' }}
         >
           Deposit
-        </DepositWithdrawBtn>
-        <DepositWithdrawBtn
-          background={backgroundColorStart}
-          backgroundHover={backgroundColorEnd}
-          onClick={() => setOpenWithdraw(true)}
-          style={{ width: '30%' }}
+        </StyledButton>
+      )}
+      {!!account && isStaking && openManage && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            transition: 'all 0.3s ease-in',
+          }}
         >
-          Withdraw
-        </DepositWithdrawBtn>
-        {isLive && poolInfo.gaugeAddress !== undefined && (
-          <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
-            <DepositWithdrawBtn
-              background={backgroundColorStart}
-              backgroundHover={backgroundColorEnd}
-              style={{ width: '100%' }}
-            >
-              Farm
-            </DepositWithdrawBtn>
-          </StyledInternalLink>
-        )}
-      </div>
+          <DepositWithdrawBtn
+            background={backgroundColorStart}
+            backgroundHover={backgroundColorEnd}
+            onClick={() => setOpenDeposit(true)}
+            style={{ width: '30%' }}
+          >
+            Deposit
+          </DepositWithdrawBtn>
+          <DepositWithdrawBtn
+            background={backgroundColorStart}
+            backgroundHover={backgroundColorEnd}
+            onClick={() => setOpenWithdraw(true)}
+            style={{ width: '30%' }}
+          >
+            Withdraw
+          </DepositWithdrawBtn>
+          {poolInfo.gaugeAddress !== undefined && (
+            <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%' }}>
+              <DepositWithdrawBtn
+                background={backgroundColorStart}
+                backgroundHover={backgroundColorEnd}
+                style={{ width: '100%' }}
+              >
+                Farm
+              </DepositWithdrawBtn>
+            </StyledInternalLink>
+          )}
+        </div>
+      )}
     </Wrapper>
   )
 }
-
-const PoolInfo = styled.div`
-  .apr {
-    margin-top: 4px;
-    display: none;
-    ${({ theme }) => theme.mediaWidth.upToSmall`
-  display: block;
-  `}
-  }
-`

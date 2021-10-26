@@ -16,9 +16,9 @@ import Popups from '../components/Popups'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import Claim from './Claim'
-import Earn from './Earn'
-import Manage from './Earn/Manage'
 import Mento from './Mento'
+import Pool from './Pool'
+import Manage from './Pool/Manage'
 import RiskPage from './Risk'
 import Staking from './Staking'
 import Swap from './Swap'
@@ -116,7 +116,7 @@ export default function App() {
               </Route>
               <Route exact strict path="/swap" component={Swap} />
               <Route exact path="/mint" component={Mento} />
-              <Route exact strict path="/pool" component={Earn} />
+              <Route exact strict path="/pool" component={Pool} />
               <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
               <Route exact strict path="/risk" component={RiskPage} />
               <Route path="/claim" component={Claim} />
