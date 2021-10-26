@@ -31,10 +31,3 @@ To run the environment on Alfajores, run
 ```bash
 yarn start:alfajores
 ```
-
-# TODOS
-
-- link the apr with boost: Done
-- sort open positions to the top
-- change manage buttons to multiple colors: Done
-- filter multiple chains

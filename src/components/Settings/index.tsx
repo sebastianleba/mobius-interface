@@ -101,7 +101,8 @@ const MenuFlyout = styled.span`
   flex-direction: column;
   font-size: 1rem;
   position: absolute;
-  bottom: 100%;
+  top: 3rem;
+  right: 0rem;
   z-index: 100;
 
   ${({ theme }) => theme.mediaWidth.upToMedium`
