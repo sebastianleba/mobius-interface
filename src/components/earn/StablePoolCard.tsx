@@ -1,5 +1,6 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper from 'components/QuestionHelper'
+import { ChainLogo } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
@@ -16,6 +17,7 @@ import { StyledInternalLink, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
+import Logo from '../Logo'
 import { RowBetween, RowFixed } from '../Row'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
@@ -118,6 +120,14 @@ const BottomSection = styled.div<{ showBackground: boolean }>`
   justify-content: space-between;
   gap: 12px;
   z-index: 1;
+`
+
+const StyledLogo = styled(Logo)<{ size: string }>`
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
+  border-radius: ${({ size }) => size};
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
+  background-color: ${({ theme }) => theme.white};
 `
 
 const DepositWithdrawBtn = styled(StyledButton)`
@@ -259,6 +269,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               }
             />
           )}
+          <StyledLogo size={'24px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
         </RowFixed>
         {apy ? (
           <RowFixed>

@@ -5,6 +5,10 @@ import { WrappedTokenInfo } from 'state/lists/hooks'
 import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
+import celoLogo from '../assets/images/celo-chain-logo.png'
+import ethLogo from '../assets/images/ethereum-chain-logo.png'
+import polygonLogo from '../assets/images/polygon-chain-logo.png'
+
 const mobiToken = (chainId: number, address: string) =>
   new WrappedTokenInfo(
     {
@@ -35,6 +39,20 @@ export enum Coins {
   Bitcoin,
   Ether,
   USD,
+}
+
+export enum Chain {
+  Celo,
+  Ethereum,
+  Polygon,
+  Solana,
+}
+
+export const ChainLogo: { [c in Chain]: string } = {
+  [Chain.Celo]: celoLogo,
+  [Chain.Ethereum]: ethLogo,
+  [Chain.Polygon]: polygonLogo,
+  [Chain.Solana]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_SOL.png',
 }
 
 export const PRICE: { [c in Coins]: number } = {
@@ -131,6 +149,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['7302827380000000'],
+      displayChain: Chain.Ethereum,
     },
     {
       name: 'Private cUSD',
@@ -183,6 +202,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
       additionalRewardRate: ['11810185180000000', '0'],
       metaPool: 'USDC (Optics Bridge) Pool',
+      displayChain: Chain.Celo,
     },
     {
       name: 'USDC (Solana AllBridge)',
@@ -234,6 +254,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['1460565500000000'],
+      displayChain: Chain.Solana,
     },
     {
       name: 'USDC (Polygon Optics)',
@@ -528,7 +549,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
-      displayChain: 'Celo',
+      displayChain: Chain.Celo,
     },
     {
       name: 'Private cEUR',

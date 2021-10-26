@@ -1,5 +1,6 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
+import { Chain } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useLiquidityGaugeContract, useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,6 +43,7 @@ export interface StablePoolInfo {
   readonly externalRewardRates?: TokenAmount[]
   readonly lastClaim?: Date
   readonly meta?: string
+  readonly displayChain: Chain
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -113,6 +115,7 @@ export const getPoolInfo = (
     ) ?? undefined,
   lastClaim: pool.lastClaim,
   meta: pool.metaPool,
+  displayChain: pool.displayChain,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {

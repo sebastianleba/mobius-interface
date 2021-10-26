@@ -80,13 +80,19 @@ const Sel = styled.div<{ selected: boolean }>`
   background-color: ${({ theme, selected }) => (selected ? theme.bg3 : theme.bg1)};
 `
 
+enum Select {
+  All,
+  Yours,
+}
+
 export default function Pool() {
   const { chainId } = useActiveContractKit()
 
   const isGenesisOver = COUNTDOWN_END < new Date().getTime()
 
   const stablePools = useStablePoolInfo()
-  const sortedStablePools = stablePools
+
+  const [selection, setSelection] = React.useState<Select>(Select.All)
 
   const tvl = stablePools.reduce((accum, poolInfo) => {
     const price =
@@ -116,18 +122,29 @@ export default function Pool() {
       </AutoColumn>
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <HeaderLinks>
-          <Sel selected={true}>All Pools</Sel>
-          <Sel selected={false}>Your Pools</Sel>
+          <Sel onClick={() => setSelection(Select.All)} selected={selection === Select.All}>
+            All Pools
+          </Sel>
+          <Sel onClick={() => setSelection(Select.Yours)} selected={selection === Select.Yours}>
+            Your Pools
+          </Sel>
         </HeaderLinks>
         <PoolSection>
-          {sortedStablePools && sortedStablePools?.length === 0 ? (
+          {stablePools && stablePools?.length === 0 ? (
             <Loader style={{ margin: 'auto' }} />
           ) : (
-            sortedStablePools?.map((pool) => (
-              <ErrorBoundary key={pool.poolAddress || '000'}>
-                <StablePoolCard poolInfo={pool} />
-              </ErrorBoundary>
-            ))
+            stablePools
+              ?.filter(
+                (pool) =>
+                  selection === Select.All ||
+                  pool.amountDeposited?.greaterThan(JSBI.BigInt('0')) ||
+                  pool.stakedAmount.greaterThan('0')
+              )
+              .map((pool) => (
+                <ErrorBoundary key={pool.poolAddress || '000'}>
+                  <StablePoolCard poolInfo={pool} />
+                </ErrorBoundary>
+              ))
           )}
         </PoolSection>
       </AutoColumn>
