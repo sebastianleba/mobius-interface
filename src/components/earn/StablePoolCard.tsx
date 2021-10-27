@@ -128,8 +128,7 @@ const StyledLogo = styled(Logo)<{ size: string }>`
 `
 
 const DepositWithdrawBtn = styled(StyledButton)`
-  width: 40%;
-  flex: none;
+  display: flex;
 `
 
 const ExpandedRow = styled(Row)<{ open: boolean }>`
@@ -484,6 +483,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               display: 'flex',
               justifyContent: 'space-between',
               transition: 'all 0.3s ease-in',
+              gap: '1rem',
             }}
           >
             <DepositWithdrawBtn
@@ -507,7 +507,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 <DepositWithdrawBtn
                   background={theme(false).celoGold}
                   backgroundHover={theme(false).celoGold}
-                  style={{ width: '100%', fontWeight: 700, fontSize: 18 }}
+                  style={{ fontWeight: 700, fontSize: 18 }}
                 >
                   FARM
                 </DepositWithdrawBtn>
