@@ -1,6 +1,6 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import QuestionHelper from 'components/QuestionHelper'
-import { ChainLogo } from 'constants/StablePools'
+import { ChainLogo, Coins } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
@@ -38,12 +38,13 @@ const Divider = styled.div`
   background: ${({ theme }) => theme.bg4};
 `
 
-const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any }>`
+const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any; eth: boolean }>`
   background: ${({ background }) => background};
   flex: 0.6;
   &:hover {
     background: ${({ background }) => darken(0.1, background)};
   }
+  color: ${({ theme, eth }) => eth && theme.text6};
 `
 
 const StatContainer = styled.div<{ isOpen: boolean }>`
@@ -172,6 +173,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
     mobiRate,
     displayDecimals,
     totalStakedAmount: totalStakedLPs,
+    coin,
   } = poolInfo
 
   const [openDeposit, setOpenDeposit] = useState(false)
@@ -261,6 +263,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const formatNumber = (num: string) => {
     return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   }
+
   return (
     <Wrapper
       showBackground={true}
@@ -453,7 +456,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 background={poolColor}
                 backgroundHover={poolColor}
                 onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
-                style={{ width: '10%', fontWeight: 700, fontSize: 18, maxWidth: '150px', marginTop: '-20px' }}
+                eth={coin === Coins.Ether}
+                style={{
+                  width: '10%',
+                  fontWeight: 700,
+                  fontSize: 18,
+                  maxWidth: '150px',
+                  marginTop: '-20px',
+                }}
               >
                 {isStaking ? 'MANAGE' : 'DEPOSIT'}
               </StyledButton>

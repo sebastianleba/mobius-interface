@@ -49,6 +49,7 @@ export function colors(darkMode: boolean): Colors {
     text3: darkMode ? '#6C7284' : '#888D9B',
     text4: darkMode ? '#565A69' : '#C3C5CB',
     text5: darkMode ? '#2C2F36' : '#EDEEF2',
+    text6: darkMode ? '#000000' : '#FFFFFF',
 
     // backgrounds / greys
     bg1: darkMode ? '#212429' : '#FFFFFF',
@@ -78,6 +79,12 @@ export function colors(darkMode: boolean): Colors {
     secondary1: darkMode ? '#00ffbd' : '#ff007a',
     secondary2: darkMode ? '#001715' : '#F6DDE8',
     secondary3: darkMode ? '#001617' : '#FDEAF1',
+
+    cusd: '#35D07F',
+    ceur: '#418EF7',
+    ether: darkMode ? '#FFFFFF' : '#2E3338',
+    bitcoin: '#F59508',
+    celo: '#FBCC5C',
 
     // other
     red1: '#FD4040',

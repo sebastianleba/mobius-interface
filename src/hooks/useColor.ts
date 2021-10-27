@@ -2,7 +2,7 @@ import * as UbeswapDefaultList from '@ubeswap/default-token-list'
 import * as UbeswapExperimentalList from '@ubeswap/default-token-list/ubeswap-experimental.token-list.json'
 import { ChainId, Token } from '@ubeswap/sdk'
 import { MultiChainIds } from 'constants/Optics'
-import { Chain, STATIC_POOL_INFO } from 'constants/StablePools'
+import { Coins, STATIC_POOL_INFO } from 'constants/StablePools'
 import Vibrant from 'node-vibrant'
 import { shade } from 'polished'
 import { useLayoutEffect, useState } from 'react'
@@ -104,11 +104,13 @@ export function generateColorPallete(tokens: Token[]) {
 
 export function usePoolColor(pool: StablePoolInfo) {
   const theme = useTheme()
-  const chain = pool.displayChain
-  if (chain === Chain.Ethereum) return theme.ethereum
-  if (chain === Chain.Polygon) return theme.polygon
-  if (chain === Chain.Solana) return theme.solana
-  else return theme.celoGold
+  const coin = pool.coin
+  if (coin === Coins.USD) return theme.cusd
+  if (coin === Coins.Eur) return theme.ceur
+  if (coin === Coins.Ether) return theme.ether
+  if (coin === Coins.Celo) return theme.celo
+  if (coin === Coins.Bitcoin) return theme.bitcoin
+  else return theme.celoGreen
 }
 
 export function useColor(token?: Token) {

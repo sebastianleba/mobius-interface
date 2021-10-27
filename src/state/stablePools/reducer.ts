@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { Fraction, Percent, Token } from '@ubeswap/sdk'
-import { Chain } from 'constants/StablePools'
+import { Chain, Coins } from 'constants/StablePools'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
@@ -65,6 +65,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   additionalRewardRate?: string[]
   lastClaim?: Date
   displayChain: Chain
+  coin: Coins
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable

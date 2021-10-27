@@ -12,6 +12,7 @@ export interface Colors {
   text3: Color
   text4: Color
   text5: Color
+  text6: Color
 
   // backgrounds / greys
   bg1: Color
@@ -36,6 +37,13 @@ export interface Colors {
   secondary1: Color
   secondary2: Color
   secondary3: Color
+
+  // tokens
+  cusd: Color
+  ceur: Color
+  ether: Color
+  bitcoin: Color
+  celo: Color
 
   // other
   red1: Color
