@@ -13,7 +13,7 @@ const StyledInput = styled.input<{ error?: boolean; white?: boolean; fontSize?: 
   outline: none;
   border: none;
   flex: 1 1 auto;
-  background-color: ${({ theme, white }) => !white && theme.bg2};
+  background-color: rgba(0, 0, 0, 0);
   font-size: ${({ fontSize }) => fontSize ?? '24px'};
   text-align: ${({ align }) => align && align};
   white-space: nowrap;
