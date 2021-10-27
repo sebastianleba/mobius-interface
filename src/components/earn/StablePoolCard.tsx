@@ -48,7 +48,7 @@ const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: a
 `
 
 const StatContainer = styled.div<{ isOpen: boolean }>`
-  width: ${({ isOpen }) => (isOpen ? '100%' : '50%')};
+  width: ${({ isOpen }) => (isOpen ? '100%' : '45%')};
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -74,9 +74,6 @@ const Bottom = styled.div`
   padding-left: 1rem;
   padding-right: 1rem;
 `
-
-// background: ${({ bgColor1, bgColor2 }) =>
-// `radial-gradient(91.85% 100% at 1.84% 0%, ${bgColor1} 0%, ${bgColor2} 100%) `};
 
 const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>`
   border-radius: 20px;
