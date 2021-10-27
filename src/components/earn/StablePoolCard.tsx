@@ -132,7 +132,6 @@ const DepositWithdrawBtn = styled(StyledButton)`
   flex: none;
 `
 
-//TODO: Fix so when open it expands to the whole row
 const ExpandedRow = styled(Row)<{ open: boolean }>`
   justify-content: ${({ open }) => !open && 'space-between'};
   width: 100%;
