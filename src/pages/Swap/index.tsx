@@ -4,7 +4,6 @@ import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade
 import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
@@ -221,7 +220,7 @@ export default function Swap() {
   return (
     <>
       <SwapPoolTabs active={'swap'} />
-      <AppBody mobile={isMobile}>
+      <AppBody>
         <SwapHeader title={actionLabel} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal

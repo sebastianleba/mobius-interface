@@ -233,7 +233,7 @@ export default function Mento() {
   return (
     <>
       <SwapPoolTabs active={'swap'} />
-      <InfoWrapper>
+      <InfoWrapper mobile={isMobile}>
         <VoteCard>
           <CardNoise />
           <CardSection>
@@ -258,7 +258,7 @@ export default function Mento() {
           <CardNoise />
         </VoteCard>
       </InfoWrapper>
-      <AppBody mobile={isMobile}>
+      <AppBody>
         <SwapHeader title={actionLabel} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal

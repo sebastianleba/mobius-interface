@@ -11,10 +11,10 @@ export const Wrapper = styled.div`
   padding: 8px;
 `
 
-export const InfoWrapper = styled.div`
+export const InfoWrapper = styled.div<{ mobile: boolean }>`
   position: relative;
   padding: 8px;
-  margin-top: 3rem;
+  margin-top: ${({ mobile }) => (mobile ? '0rem' : '3rem')};
   margin-bottom: -4rem;
   max-width: 436px;
   width: 100%;
