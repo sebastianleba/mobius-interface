@@ -14,7 +14,6 @@ import Loader from '../../components/Loader'
 import { Row } from '../../components/Row'
 import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
 import { TYPE } from '../../theme'
-import { COUNTDOWN_END, LaunchCountdown } from './LaunchCountdown'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -83,8 +82,6 @@ const Sel = styled.div<{ selected: boolean }>`
 export default function Pool() {
   const { chainId } = useActiveContractKit()
 
-  const isGenesisOver = COUNTDOWN_END < new Date().getTime()
-
   const stablePools = useStablePoolInfo()
 
   const [selection, setSelection] = React.useState<Chain>(Chain.All)
@@ -115,7 +112,6 @@ export default function Pool() {
 
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
-      {!isGenesisOver && <LaunchCountdown />}
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
         <TYPE.tvlHeader>TVL: ${tvlAsTokenAmount.toFixed(0, { groupSeparator: ',' })}</TYPE.tvlHeader>
       </AutoColumn>
