@@ -46,7 +46,8 @@ const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: a
   }
 `
 
-const StatContainer = styled.div`
+const StatContainer = styled.div<{ isOpen: boolean }>`
+  ${({ isOpen }) => isOpen && 'width: 100%;'}
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -54,8 +55,7 @@ const StatContainer = styled.div`
   margin-bottom: 1rem;
   margin-right: 1rem;
   margin-left: 1rem;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-  
+  ${({ theme }) => theme.mediaWidth.upToSmall`;
 `};
 `
 
@@ -358,7 +358,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       <InfoContainer>
         <div style={{ flex: 3, width: '100%' }}>
           <ExpandedRow open={openManage}>
-            <StatContainer>
+            <StatContainer isOpen={openManage}>
               <RowBetween>
                 <TYPE.darkGray>Total deposited</TYPE.darkGray>
                 <RowFixed>
