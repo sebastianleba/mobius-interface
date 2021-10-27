@@ -70,14 +70,14 @@ const Sel = styled.div<{ selected: boolean }>`
   outline: none;
   cursor: pointer;
   text-decoration: none;
-  color: ${({ theme }) => theme.text1};
+  color: ${({ theme, selected }) => (selected ? theme.white : theme.text1)};
   font-size: 1rem;
-  font-weight: ${({ selected }) => (selected ? '600' : '500')};
+  font-weight: ${({ selected }) => (selected ? '999' : '300')};
   padding: 8px 12px;
   word-break: break-word;
   overflow: hidden;
   white-space: nowrap;
-  background-color: ${({ theme, selected }) => (selected ? theme.bg3 : theme.bg1)};
+  background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
 `
 
 export default function Pool() {
@@ -125,19 +125,19 @@ export default function Pool() {
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <HeaderLinks>
           <Sel onClick={() => setSelection(Chain.All)} selected={selection === Chain.All}>
-            All
+            ALL
           </Sel>
           <Sel onClick={() => setSelection(Chain.Celo)} selected={selection === Chain.Celo}>
-            Celo
+            CELO
           </Sel>
           <Sel onClick={() => setSelection(Chain.Ethereum)} selected={selection === Chain.Ethereum}>
-            Eth
+            ETH
           </Sel>
           <Sel onClick={() => setSelection(Chain.Polygon)} selected={selection === Chain.Polygon}>
-            Poly
+            POLY
           </Sel>
           <Sel onClick={() => setSelection(Chain.Solana)} selected={selection === Chain.Solana}>
-            Sol
+            SOL
           </Sel>
         </HeaderLinks>
         <PoolSection>

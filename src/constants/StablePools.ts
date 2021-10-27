@@ -595,7 +595,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
-      peggedTo: '$',
+      peggedTo: '€',
       pegComesAfter: false,
       displayDecimals: 1,
       gaugeAddress: '0xCF34F4ec5DC9E09428A4f4a45475f6277694166c',

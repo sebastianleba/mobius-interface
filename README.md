@@ -31,3 +31,11 @@ To run the environment on Alfajores, run
 ```bash
 yarn start:alfajores
 ```
+
+token colors
+
+text expanding out
+more padding between total deposited and number
+
+deposit shortcut
+celo sign for amount deposited

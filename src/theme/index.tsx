@@ -91,8 +91,9 @@ export function colors(darkMode: boolean): Colors {
     celoGold: '#FBCC5C',
     celoRed: '#FB7C6D',
     polygon: '#BF97FF',
-    ethereum: '#ABADAF',
+    ethereum: '#2E3338',
     solana: '#9DB6FF',
+    white: '#FFFFFF',
 
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',
@@ -199,7 +200,7 @@ export const TYPE = {
 
 export const FixedGlobalStyle = createGlobalStyle`
 html, input, textarea, button {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Avenir', sans-serif;
   font-display: fallback;
 }
 

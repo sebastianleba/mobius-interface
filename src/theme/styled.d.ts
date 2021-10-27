@@ -51,6 +51,7 @@ export interface Colors {
   polygon: Color
   solana: Color
   ethereum: Color
+  white: Color
 }
 
 export interface Grids {
