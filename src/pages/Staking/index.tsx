@@ -29,6 +29,10 @@ const PositionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 `
 
 const OuterContainer = styled.div`

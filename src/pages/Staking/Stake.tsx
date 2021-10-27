@@ -20,7 +20,6 @@ const Container = styled.div`
   background: ${({ theme }) => theme.bg1};
   border-radius: 1rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-  width: 100%;
   margin-bottom: 1rem;
 `}
 `

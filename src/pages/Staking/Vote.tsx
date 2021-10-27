@@ -13,7 +13,7 @@ import Logo from '../../components/Logo'
 import { useStablePoolInfo } from '../../state/stablePools/hooks'
 import GaugeVoteModal from './GaugeVoteModal'
 
-const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>`
+const Wrapper = styled(AutoColumn)`
   border-radius: 12px;
   gap: 1rem;
   width: 100%;

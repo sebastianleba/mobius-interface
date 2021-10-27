@@ -24,8 +24,7 @@ import { CurrencyRow } from './IncreaseLockAmount'
 
 const Container = styled.div`
   margin-top: 1rem;
-  width: 100%;
-  max-width: 720px;
+  width: 49%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
