@@ -16,7 +16,7 @@ import GaugeVoteModal from './GaugeVoteModal'
 
 const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>`
   border-radius: 12px;
-  width: 100%;
+  width: 49%;
   overflow: hidden;
   position: relative;
   padding: 1rem;
@@ -96,25 +96,6 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
               style={{ margin: 0 }}
             />
           </WrappedRow>
-          {/* <AutoRow marginTop="1rem">
-            <TYPE.mediumHeader>Vote for Pool Weights!</TYPE.mediumHeader>
-          </AutoRow>
-          <AutoRow>
-            <TYPE.subHeader>Allocate your vote power to affect the MOBI distribution of each pool</TYPE.subHeader>
-          </AutoRow>
-          <AutoRow>
-            <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
-          </AutoRow>
-          <AutoRow marginTop="0.5rem">
-            <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} /> Show My
-            Votes
-          </AutoRow>
-
-          <CardContainer>
-            {summaries.map((summary) => (
-              <WeightCard showUserVote={showUserVote} position={summary} key={`weight-card-${summary.pool}`} />
-            ))}
-          </CardContainer> */}
         </>
       )}
     </Wrapper>
