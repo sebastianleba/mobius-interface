@@ -2,7 +2,6 @@ import { CardNoise } from 'components/claim/styled'
 import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
 import { AutoRow, RowBetween, RowFixed } from 'components/Row'
-import Toggle from 'components/Toggle'
 import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
@@ -97,7 +96,7 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
               style={{ margin: 0 }}
             />
           </WrappedRow>
-          <AutoRow marginTop="1rem">
+          {/* <AutoRow marginTop="1rem">
             <TYPE.mediumHeader>Vote for Pool Weights!</TYPE.mediumHeader>
           </AutoRow>
           <AutoRow>
@@ -115,7 +114,7 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
             {summaries.map((summary) => (
               <WeightCard showUserVote={showUserVote} position={summary} key={`weight-card-${summary.pool}`} />
             ))}
-          </CardContainer>
+          </CardContainer> */}
         </>
       )}
     </Wrapper>
