@@ -48,7 +48,7 @@ const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: a
 `
 
 const StatContainer = styled.div<{ isOpen: boolean }>`
-  ${({ isOpen }) => isOpen && 'width: 100%;'}
+  width: ${({ isOpen }) => (isOpen ? '100%' : '50%')};
   display: flex;
   justify-content: space-between;
   flex-direction: column;
