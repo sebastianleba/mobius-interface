@@ -42,6 +42,7 @@ const Divider = styled.div`
   margin-bottom: 2rem;
   opacity: 0.2;
 `
+
 export default function Staking() {
   const stakingInfo = useMobiStakingInfo()
   const priceOfDeposits = usePriceOfDeposits()
