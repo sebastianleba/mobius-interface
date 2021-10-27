@@ -258,7 +258,7 @@ export default function Mento() {
           <CardNoise />
         </VoteCard>
       </InfoWrapper>
-      <AppBody>
+      <AppBody mobile={false}>
         <SwapHeader title={actionLabel} />
         <Wrapper id="swap-page">
           <ConfirmSwapModal

@@ -1,5 +1,4 @@
 import React from 'react'
-import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
 
 export const BodyWrapper = styled.div<{ mobile: boolean }>`
@@ -25,8 +24,8 @@ export const BodyWrapperNoBackground = styled.div`
 /**
  * The styled container element that wraps the content of most pages and the tabs.
  */
-export default function AppBody({ children }: { children: React.ReactNode }) {
-  return <BodyWrapper mobile={isMobile}>{children}</BodyWrapper>
+export default function AppBody({ children, mobile }: { children: React.ReactNode; mobile: boolean }) {
+  return <BodyWrapper mobile={mobile}>{children}</BodyWrapper>
 }
 
 /**

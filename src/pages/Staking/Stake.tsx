@@ -12,7 +12,7 @@ import { useTransactionAdder } from '../../state/transactions/hooks'
 import LockModal, { LockType } from './LockModal'
 
 const Container = styled.div`
-  width: 49%;
+  width: 100%;
   height: fit-content;
   display: flex;
   flex-direction: column;
