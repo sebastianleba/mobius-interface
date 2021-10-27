@@ -16,7 +16,7 @@ import GaugeVoteModal from './GaugeVoteModal'
 
 const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>`
   border-radius: 12px;
-  width: 49%;
+  width: 100%;
   overflow: hidden;
   position: relative;
   padding: 1rem;
@@ -125,9 +125,6 @@ const PositionWrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: a
 `}
   &:hover {
     opacity: 1;
-  }
-  @media (min-width: 899px) {
-    width: 49%;
   }
 `
 const RowWithGap = styled(RowFixed)`

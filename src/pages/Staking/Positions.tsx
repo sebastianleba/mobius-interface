@@ -16,7 +16,7 @@ import ClaimAllMobiModal from './ClaimAllMobiModal'
 import GaugeVoteModal from './GaugeVoteModal'
 
 const Container = styled.div`
-  width: 49%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 1rem;

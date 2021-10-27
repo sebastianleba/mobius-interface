@@ -25,7 +25,7 @@ const TextContainer = styled.div`
 `
 
 const PositionsContainer = styled.div`
-  width: 100%;
+  width: 49%;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;

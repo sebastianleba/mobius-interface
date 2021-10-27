@@ -88,7 +88,6 @@ const PositionWrapper = styled(AutoColumn)`
   padding-right: 0.25rem;
   padding-top: 1rem;
   margin-top: 1rem;
-  max-width: 240px;
 `}
 `
 
