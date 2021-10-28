@@ -10,7 +10,7 @@ import { zip } from 'lodash'
 import { useMemo } from 'react'
 import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
-import useCUSDPrice from 'utils/useCUSDPrice'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import ERC_20_INTERFACE from '../../constants/abis/erc20'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'

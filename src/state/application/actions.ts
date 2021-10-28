@@ -1,4 +1,5 @@
 import { createAction } from '@reduxjs/toolkit'
+import { Fraction } from '@ubeswap/sdk'
 import { TokenList } from '@uniswap/token-lists'
 
 export type PopupContent =
@@ -35,3 +36,5 @@ export const addPopup =
   createAction<{ key?: string; removeAfterMs?: number | null; content: PopupContent }>('application/addPopup')
 export const removePopup = createAction<{ key: string }>('application/removePopup')
 export const btcEthPrice = createAction<{ ethPrice: string; btcPrice: string }>('application/btcEthPrice')
+export const addPrice = createAction<{ token: string; price: Fraction }>('application/addPrice')
+export const addPrices = createAction<{ prices: { [address: string]: string } }>('application/addPrices')

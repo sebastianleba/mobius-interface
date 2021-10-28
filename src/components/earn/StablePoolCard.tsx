@@ -4,10 +4,9 @@ import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
-import { useEthBtcPrice } from 'state/application/hooks'
 import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
-import useCUSDPrice from 'utils/useCUSDPrice'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor } from '../../hooks/useColor'
@@ -160,12 +159,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
-  const coinPrice = useEthBtcPrice(poolInfo.poolAddress)
+  const coinPrice = useCUSDPrice(tokens) //useEthBtcPrice(poolInfo.poolAddress)
+
   const totalStakedAmount = totalValueStaked
-    ? new Fraction(
-        JSBI.multiply(totalValueStaked.raw, coinPrice),
-        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-      )
+    ? totalValueStaked.multiply(new Fraction(coinPrice?.numerator ?? '1', coinPrice?.denominator ?? '1'))
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
@@ -304,7 +301,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       <SecondSection>
         {apy ? (
           <RowFixed>
-            <QuestionHelper text={'APR after staking'} />
+            <QuestionHelper text={'APR after staking sufficient MOBI'} />
             <TYPE.subHeader
               style={{ paddingLeft: '.15rem' }}
               color={backgroundColorStart}

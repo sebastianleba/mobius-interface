@@ -1,5 +1,6 @@
 import './i18n'
 
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { ContractKitProvider } from '@celo-tools/use-contractkit'
 import * as Sentry from '@sentry/react'
 import { Integrations } from '@sentry/tracing'
@@ -17,7 +18,7 @@ import StakingUpdater from 'state/staking/updater'
 import mobiusIcon from './assets/svg/mobius.svg'
 import App from './pages/App'
 import store from './state'
-import ApplicationUpdater from './state/application/updater'
+import ApplicationUpdater, { PriceData } from './state/application/updater'
 import ListsUpdater from './state/lists/updater'
 import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
@@ -48,6 +49,11 @@ if (process.env.REACT_APP_SENTRY_DSN) {
   console.warn(`REACT_APP_SENTRY_DSN not found. Sentry will not be loaded.`)
 }
 
+const client = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap-backup',
+  cache: new InMemoryCache(),
+})
+
 function Updaters() {
   return (
     <>
@@ -59,6 +65,7 @@ function Updaters() {
       <UpdatePools />
       <StakingUpdater />
       <UpdateMento />
+      <PriceData />
     </>
   )
 }
@@ -96,15 +103,17 @@ ReactDOM.render(
         },
       }}
     >
-      <Provider store={store}>
-        <Updaters />
-        <ThemeProvider>
-          <ThemedGlobalStyle />
-          <HashRouter>
-            <App />
-          </HashRouter>
-        </ThemeProvider>
-      </Provider>
+      <ApolloProvider client={client}>
+        <Provider store={store}>
+          <Updaters />
+          <ThemeProvider>
+            <ThemedGlobalStyle />
+            <HashRouter>
+              <App />
+            </HashRouter>
+          </ThemeProvider>
+        </Provider>
+      </ApolloProvider>
     </ContractKitProvider>
   </StrictMode>,
   document.getElementById('root')

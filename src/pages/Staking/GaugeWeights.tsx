@@ -49,10 +49,11 @@ const colorsForChart = ['#35D07F', '#73DDFF', '#BF97FF', '#3488EC', '#FB7C6D', '
 
 interface GaugeWeightsProps {
   summaries: GaugeSummary[]
+  lockDate: Date
 }
 
 // TO DO: Account for Vote Power Allocations
-export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
+export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
   const votePowerLeft = useVotePowerLeft()
   const [showUserVote, setShowUserVote] = useState(false)
@@ -65,7 +66,7 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
-  const leftToAllocate = 20
+  const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
 
   return (
     <Wrapper>
@@ -103,17 +104,32 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
           <AutoRow>
             <TYPE.subHeader>Allocate your vote power to affect the MOBI distribution of each pool</TYPE.subHeader>
           </AutoRow>
-          <AutoRow>
-            <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
-          </AutoRow>
-          <AutoRow marginTop="0.5rem">
-            <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} /> Show My
-            Votes
-          </AutoRow>
+          {tooLateToVote ? (
+            <AutoRow>
+              <TYPE.subHeader color="red" fontSize={20}>
+                Your lock date must be further than a week away to vote on pool weights
+              </TYPE.subHeader>
+            </AutoRow>
+          ) : (
+            <>
+              <AutoRow>
+                <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
+              </AutoRow>
+              <AutoRow marginTop="0.5rem">
+                <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} />{' '}
+                Show My Votes
+              </AutoRow>
+            </>
+          )}
 
           <CardContainer>
             {summaries.map((summary) => (
-              <WeightCard showUserVote={showUserVote} position={summary} key={`weight-card-${summary.pool}`} />
+              <WeightCard
+                disabled={tooLateToVote}
+                showUserVote={showUserVote}
+                position={summary}
+                key={`weight-card-${summary.pool}`}
+              />
             ))}
           </CardContainer>
         </>
@@ -122,7 +138,12 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   )
 }
 
-const PositionWrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any; activated: boolean }>`
+const PositionWrapper = styled(AutoColumn)<{
+  showBackground: boolean
+  bgColor: any
+  activated: boolean
+  disabled: boolean
+}>`
   border-radius: 12px;
   width: 100%;
   height: fit-content;
@@ -130,7 +151,7 @@ const PositionWrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: a
   position: relative;
   margin-bottom: 1rem;
   padding: 1rem;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   opacity: ${({ activated }) => (activated ? 1 : 0.9)};
   overflow: hidden;
   position: relative;
@@ -154,7 +175,15 @@ const RowWithGap = styled(RowFixed)`
   gap: 8px;
 `
 
-function WeightCard({ position, showUserVote }: { position: GaugeSummary; showUserVote: boolean }) {
+function WeightCard({
+  position,
+  showUserVote,
+  disabled,
+}: {
+  position: GaugeSummary
+  showUserVote: boolean
+  disabled: boolean
+}) {
   const backgroundColor = useColor(position.firstToken)
   const [voteModalOpen, setVoteModalOpen] = useState(false)
 
@@ -166,7 +195,8 @@ function WeightCard({ position, showUserVote }: { position: GaugeSummary; showUs
         activated={voteModalOpen}
         showBackground={true}
         bgColor={backgroundColor}
-        onClick={() => setVoteModalOpen(true)}
+        disabled={disabled}
+        onClick={() => !disabled && setVoteModalOpen(true)}
       >
         <CardNoise />
         <RowBetween>

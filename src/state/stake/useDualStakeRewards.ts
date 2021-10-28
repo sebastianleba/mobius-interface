@@ -6,7 +6,7 @@ import { useActiveContractKit } from 'hooks'
 import { useToken } from 'hooks/Tokens'
 import { useDualStakingContract } from 'hooks/useContract'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import useCUSDPrice from 'utils/useCUSDPrice'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import { StakingInfo } from './hooks'
 
