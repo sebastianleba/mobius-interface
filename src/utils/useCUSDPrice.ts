@@ -22,13 +22,11 @@ export function useCUSDPrice(tokens?: Token[] | Token): Price | undefined {
 
   const p1 = useTokenPrice(tokens?.[0]?.address)
   const p2 = useTokenPrice(tokens?.[1]?.address)
-  const val = p1
+  return p1
     ? new Price(tokens?.[0], CUSD, p1.denominator, p1.numerator)
     : p2
     ? new Price(tokens?.[1], CUSD, p2.denominator, p2.numerator)
     : undefined
-  console.log(val?.toFixed(2))
-  return val
 
   // const CUSD = cUSD[chainId as unknown as UbeswapChainId]
   // const celo = CELO[chainId as unknown as UbeswapChainId]

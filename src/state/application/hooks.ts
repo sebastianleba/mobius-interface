@@ -115,6 +115,5 @@ export function useTokenPrice(address: string | undefined): Fraction | undefined
   if (!priceString) return undefined
   const price = parseFloat(priceString) * 10 ** 4
   const asFraction = new Fraction(price.toFixed(0), '10000')
-  console.log(priceString, price, asFraction.toFixed(2))
   return asFraction ?? undefined
 }

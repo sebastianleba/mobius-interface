@@ -105,7 +105,7 @@ export default function Staking() {
           outerChartData={outerPieData}
         /> */}
       </PositionsContainer>
-      <GaugeWeights summaries={stakingInfo.positions ?? []} />
+      <GaugeWeights summaries={stakingInfo.positions ?? []} lockDate={stakingInfo.lockEnd} />
     </OuterContainer>
   )
 }
