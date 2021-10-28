@@ -341,7 +341,7 @@ export default function Mento() {
                 <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
               </ButtonPrimary>
             ) : !account ? (
-              <ButtonError disabled={true} onClick={toggleWalletModal}>
+              <ButtonError disabledStyle={true} onClick={toggleWalletModal}>
                 Connect Wallet
               </ButtonError>
             ) : noRoute && userHasSpecifiedInputOutput ? (
