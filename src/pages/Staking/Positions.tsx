@@ -3,7 +3,8 @@ import { ButtonOutlined, ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardNoise } from 'components/earn/styled'
 import Loader from 'components/Loader'
-import { AutoRow, RowBetween } from 'components/Row'
+import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import { ChainLogo } from 'constants/StablePools'
 import { usePoolColor } from 'hooks/useColor'
 import React, { useState } from 'react'
 import { usePriceOfLp } from 'state/stablePools/hooks'
@@ -12,6 +13,7 @@ import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { calcBoost } from 'utils/calcExpectedVeMobi'
 
+import Logo from '../../components/Logo'
 import { useStablePoolInfo } from '../../state/stablePools/hooks'
 import ClaimAllMobiModal from './ClaimAllMobiModal'
 import GaugeVoteModal from './GaugeVoteModal'
@@ -34,7 +36,6 @@ const SmallButton = styled(ButtonOutlined)`
   border-color: ${({ theme }) => theme.primary1};
 `
 const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
-  border-radius: 12px;
   width: 100%;
   overflow: hidden;
   position: relative;
@@ -42,26 +43,20 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
   padding: 1rem;
   overflow: hidden;
   position: relative;
-  border-width: medium;
-  border-style: solid;
-  border-color: ${({ bgColor }) => bgColor};
-  color: ${({ theme }) => theme.white};
-  ${({ showBackground }) =>
-    showBackground &&
-    `  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.01);`}
+  background: ${({ theme }) => theme.bg1};
   ${({ theme }) => theme.mediaWidth.upToSmall`
 `}
   &:hover {
     opacity: 1;
   }
 `
-const Divider = styled.div<{ bg?: string }>`
-  width: 100%;
-  height: 1px;
-  background: ${({ theme, bg }) => (bg ? bg : theme.primary1)};
-  margin-top: 0.25rem;
-  margin-bottom: 1.5rem;
+
+const StyledLogo = styled(Logo)<{ size: string }>`
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
+  border-radius: ${({ size }) => size};
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
+  background-color: ${({ theme }) => theme.white};
 `
 
 type PositionsProps = {
@@ -110,13 +105,6 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
   )
 }
 
-const ButtonGroup = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-`
-
 function PositionCard({
   position,
   votingPower,
@@ -141,16 +129,20 @@ function PositionCard({
       <Wrapper showBackground={true} bgColor={poolColor}>
         <CardNoise />
         <RowBetween>
-          <TYPE.mediumHeader color={'black'}>{position.pool}</TYPE.mediumHeader>
-          <TYPE.black>{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.black>
-        </RowBetween>
-        <RowBetween>
-          <TYPE.black>Unclaimed MOBI</TYPE.black>
-          <TYPE.black>{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.black>
-        </RowBetween>
-        <RowBetween>
-          <TYPE.black>Your Boost</TYPE.black>
-          <TYPE.black>{`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}</TYPE.black>
+          <RowFixed style={{ gap: '10px' }}>
+            <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+            <TYPE.largeHeader>{position.pool}</TYPE.largeHeader>
+            <TYPE.darkGray fontSize={20}>{`  -  $${lpAsUsd?.toSignificant(4)}`}</TYPE.darkGray>
+          </RowFixed>
+          <TYPE.subHeader
+            style={{ alignContent: 'right', alignItems: 'right' }}
+            color={poolColor}
+            className="apr"
+            fontWeight={800}
+            fontSize={[18, 24]}
+          >
+            {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+          </TYPE.subHeader>
         </RowBetween>
       </Wrapper>
     </>
