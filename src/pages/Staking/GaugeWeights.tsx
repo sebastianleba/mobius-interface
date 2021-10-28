@@ -66,7 +66,7 @@ export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps)
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
-  const tooLateToVote = lockDate.valueOf() - Date.now() > 7 * 24 * 60 * 60 * 1000
+  const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
 
   return (
     <Wrapper>
