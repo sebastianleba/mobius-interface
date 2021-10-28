@@ -213,7 +213,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'USDC (Solana AllBridge)',
+      name: 'USDC (AllBridge)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
       tokens: [
         new WrappedTokenInfo(
@@ -266,7 +266,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'USDC (Polygon Optics)',
+      name: 'USDC (Optics)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
       tokens: [
         new WrappedTokenInfo(
