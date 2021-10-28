@@ -40,10 +40,11 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
   position: relative;
   margin-bottom: 1rem;
   padding: 1rem;
-  cursor: pointer;
   overflow: hidden;
   position: relative;
-  background: ${({ bgColor }) => bgColor};
+  border-width: medium;
+  border-style: solid;
+  border-color: ${({ bgColor }) => bgColor};
   color: ${({ theme }) => theme.white};
   ${({ showBackground }) =>
     showBackground &&
@@ -77,20 +78,12 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
   return (
     <Container>
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
-      <RowBetween>
+      <RowBetween style={{ marginBottom: '1rem' }}>
         <TYPE.largeHeader>Your Positions</TYPE.largeHeader>
         <TYPE.green style={{ paddingLeft: '.15rem' }} className="apr" fontWeight={800} fontSize={[18, 24]}>
           {unclaimedMobi.toSignificant(4)} Unclaimed MOBI
         </TYPE.green>
       </RowBetween>
-      {JSBI.greaterThan(unclaimedMobi.raw, JSBI.BigInt(0)) && (
-        <ButtonPrimary
-          onClick={() => setOpenModal(true)}
-          style={{ fontWeight: 700, fontSize: 18, marginTop: '1rem', marginBottom: '1rem' }}
-        >
-          CLAIM MOBI
-        </ButtonPrimary>
-      )}
       {loading ? (
         <AutoRow>
           <Loader style={{ margin: 'auto' }} />
@@ -104,6 +97,14 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
             totalVotingPower={stakingInfo.totalVotingPower.raw}
           />
         ))
+      )}
+      {JSBI.greaterThan(unclaimedMobi.raw, JSBI.BigInt(0)) && (
+        <ButtonPrimary
+          onClick={() => setOpenModal(true)}
+          style={{ fontWeight: 700, fontSize: 18, marginBottom: '1rem' }}
+        >
+          CLAIM MOBI
+        </ButtonPrimary>
       )}
     </Container>
   )
@@ -137,19 +138,19 @@ function PositionCard({
     <>
       <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
 
-      <Wrapper showBackground={true} bgColor={poolColor} onClick={() => setShowMore(!showMore)}>
+      <Wrapper showBackground={true} bgColor={poolColor}>
         <CardNoise />
         <RowBetween>
-          <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <TYPE.white color="white">{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.white>
+          <TYPE.mediumHeader color={'black'}>{position.pool}</TYPE.mediumHeader>
+          <TYPE.black>{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.black>
         </RowBetween>
         <RowBetween>
-          <TYPE.white>Unclaimed MOBI</TYPE.white>
-          <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.white>
+          <TYPE.black>Unclaimed MOBI</TYPE.black>
+          <TYPE.black>{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.black>
         </RowBetween>
         <RowBetween>
-          <TYPE.white>Your Boost</TYPE.white>
-          <TYPE.white>{`${boost.toFixed(2)}x`}</TYPE.white>
+          <TYPE.black>Your Boost</TYPE.black>
+          <TYPE.black>{`${boost.toFixed(2)}x`}</TYPE.black>
         </RowBetween>
       </Wrapper>
     </>

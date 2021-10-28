@@ -158,6 +158,7 @@ export default function Staking() {
         <PositionsContainer>
           <Stake stakingInfo={stakingInfo} />
           <CalcBoost stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
+          <Positions stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
         </PositionsContainer>
       ) : view === View.Vote ? (
         <PositionsContainer>
@@ -165,7 +166,6 @@ export default function Staking() {
         </PositionsContainer>
       ) : (
         <PositionsContainer>
-          <Positions stakingInfo={stakingInfo} unclaimedMobi={unclaimedMobi} />
           <GaugeWeights summaries={stakingInfo.positions ?? []} />
         </PositionsContainer>
       )}

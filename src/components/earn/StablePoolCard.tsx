@@ -289,7 +289,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               }
             />
             <TYPE.subHeader
-              style={{ paddingLeft: '.15rem' }}
+              style={{ alignContent: 'right', alignItems: 'right' }}
               color={poolColor}
               className="apr"
               fontWeight={800}
@@ -331,7 +331,12 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         </RowFixed>
         {apy ? (
           <RowFixed>
-            <StyledNavLink color={poolColor} to={'/stake'} className="bapr">
+            <StyledNavLink
+              style={{ alignContent: 'right', alignItems: 'right' }}
+              color={poolColor}
+              to={'/stake'}
+              className="bapr"
+            >
               {apy.denominator.toString() !== '0'
                 ? `${apy.multiply(new Fraction(JSBI.BigInt(500), JSBI.BigInt(2))).toFixed(1, { groupSeparator: ',' })}%`
                 : ' -'}{' '}
