@@ -1,9 +1,181 @@
 [
   {
+    "type": "constructor",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "inputs": [{ "type": "bool", "name": "test", "internalType": "bool" }]
+  },
+  {
+    "type": "event",
+    "name": "BucketsUpdated",
+    "inputs": [
+      { "type": "uint256", "name": "goldBucket", "internalType": "uint256", "indexed": false },
+      { "type": "uint256", "name": "stableBucket", "internalType": "uint256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Exchanged",
+    "inputs": [
+      { "type": "address", "name": "exchanger", "internalType": "address", "indexed": true },
+      { "type": "uint256", "name": "sellAmount", "internalType": "uint256", "indexed": false },
+      { "type": "uint256", "name": "buyAmount", "internalType": "uint256", "indexed": false },
+      { "type": "bool", "name": "soldGold", "internalType": "bool", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "MinimumReportsSet",
+    "inputs": [{ "type": "uint256", "name": "minimumReports", "internalType": "uint256", "indexed": false }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      { "type": "address", "name": "previousOwner", "internalType": "address", "indexed": true },
+      { "type": "address", "name": "newOwner", "internalType": "address", "indexed": true }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RegistrySet",
+    "inputs": [{ "type": "address", "name": "registryAddress", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ReserveFractionSet",
+    "inputs": [{ "type": "uint256", "name": "reserveFraction", "internalType": "uint256", "indexed": false }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SpreadSet",
+    "inputs": [{ "type": "uint256", "name": "spread", "internalType": "uint256", "indexed": false }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "StableTokenSet",
+    "inputs": [{ "type": "address", "name": "stable", "internalType": "address", "indexed": true }],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UpdateFrequencySet",
+    "inputs": [{ "type": "uint256", "name": "updateFrequency", "internalType": "uint256", "indexed": false }],
+    "anonymous": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "buy",
+    "inputs": [
+      { "type": "uint256", "name": "buyAmount", "internalType": "uint256" },
+      { "type": "uint256", "name": "maxSellAmount", "internalType": "uint256" },
+      { "type": "bool", "name": "buyGold", "internalType": "bool" }
+    ],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "exchange",
+    "inputs": [
+      { "type": "uint256", "name": "sellAmount", "internalType": "uint256" },
+      { "type": "uint256", "name": "minBuyAmount", "internalType": "uint256" },
+      { "type": "bool", "name": "sellGold", "internalType": "bool" }
+    ],
+    "constant": false
+  },
+  {
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [{ "type": "bool", "name": "" }],
+    "outputs": [
+      { "type": "uint256", "name": "", "internalType": "uint256" },
+      { "type": "uint256", "name": "", "internalType": "uint256" }
+    ],
+    "name": "getBuyAndSellBuckets",
+    "inputs": [{ "type": "bool", "name": "sellGold", "internalType": "bool" }],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "getBuyTokenAmount",
+    "inputs": [
+      { "type": "uint256", "name": "sellAmount", "internalType": "uint256" },
+      { "type": "bool", "name": "sellGold", "internalType": "bool" }
+    ],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "getSellTokenAmount",
+    "inputs": [
+      { "type": "uint256", "name": "buyAmount", "internalType": "uint256" },
+      { "type": "bool", "name": "sellGold", "internalType": "bool" }
+    ],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "pure",
+    "payable": false,
+    "outputs": [
+      { "type": "uint256", "name": "", "internalType": "uint256" },
+      { "type": "uint256", "name": "", "internalType": "uint256" },
+      { "type": "uint256", "name": "", "internalType": "uint256" },
+      { "type": "uint256", "name": "", "internalType": "uint256" }
+    ],
+    "name": "getVersionNumber",
+    "inputs": [],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "goldBucket",
+    "inputs": [],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [],
+    "name": "initialize",
+    "inputs": [
+      { "type": "address", "name": "registryAddress", "internalType": "address" },
+      { "type": "address", "name": "stableToken", "internalType": "address" },
+      { "type": "uint256", "name": "_spread", "internalType": "uint256" },
+      { "type": "uint256", "name": "_reserveFraction", "internalType": "uint256" },
+      { "type": "uint256", "name": "_updateFrequency", "internalType": "uint256" },
+      { "type": "uint256", "name": "_minimumReports", "internalType": "uint256" }
+    ],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
     "name": "initialized",
     "inputs": [],
     "constant": true
@@ -12,7 +184,25 @@
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
+    "outputs": [{ "type": "bool", "name": "", "internalType": "bool" }],
+    "name": "isOwner",
+    "inputs": [],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "lastBucketUpdate",
+    "inputs": [],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
     "name": "minimumReports",
     "inputs": [],
     "constant": true
@@ -21,8 +211,8 @@
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [{ "type": "address", "name": "" }],
-    "name": "stable",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "owner",
     "inputs": [],
     "constant": true
   },
@@ -30,80 +220,10 @@
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "stableBucket",
+    "outputs": [{ "type": "address", "name": "", "internalType": "contract IRegistry" }],
+    "name": "registry",
     "inputs": [],
     "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "exchange",
-    "inputs": [
-      { "type": "uint256", "name": "sellAmount" },
-      { "type": "uint256", "name": "minBuyAmount" },
-      { "type": "bool", "name": "sellGold" }
-    ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "setUpdateFrequency",
-    "inputs": [{ "type": "uint256", "name": "newUpdateFrequency" }],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "getSellTokenAmount",
-    "inputs": [
-      { "type": "uint256", "name": "buyAmount" },
-      { "type": "bool", "name": "sellGold" }
-    ],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "value" }],
-    "name": "spread",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "goldBucket",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "updateFrequency",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "setReserveFraction",
-    "inputs": [{ "type": "uint256", "name": "newReserveFraction" }],
-    "constant": false
   },
   {
     "type": "function",
@@ -118,20 +238,8 @@
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [
-      { "type": "uint256", "name": "" },
-      { "type": "uint256", "name": "" }
-    ],
-    "name": "getBuyAndSellBuckets",
-    "inputs": [{ "type": "bool", "name": "sellGold" }],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "address", "name": "" }],
-    "name": "registry",
+    "outputs": [{ "type": "uint256", "name": "value", "internalType": "uint256" }],
+    "name": "reserveFraction",
     "inputs": [],
     "constant": true
   },
@@ -139,64 +247,13 @@
     "type": "function",
     "stateMutability": "nonpayable",
     "payable": false,
-    "outputs": [],
-    "name": "initialize",
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "sell",
     "inputs": [
-      { "type": "address", "name": "registryAddress" },
-      { "type": "address", "name": "stableToken" },
-      { "type": "uint256", "name": "_spread" },
-      { "type": "uint256", "name": "_reserveFraction" },
-      { "type": "uint256", "name": "_updateFrequency" },
-      { "type": "uint256", "name": "_minimumReports" }
+      { "type": "uint256", "name": "sellAmount", "internalType": "uint256" },
+      { "type": "uint256", "name": "minBuyAmount", "internalType": "uint256" },
+      { "type": "bool", "name": "sellGold", "internalType": "bool" }
     ],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "address", "name": "" }],
-    "name": "owner",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "bool", "name": "" }],
-    "name": "isOwner",
-    "inputs": [],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "view",
-    "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "getBuyTokenAmount",
-    "inputs": [
-      { "type": "uint256", "name": "sellAmount" },
-      { "type": "bool", "name": "sellGold" }
-    ],
-    "constant": true
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "setRegistry",
-    "inputs": [{ "type": "address", "name": "registryAddress" }],
-    "constant": false
-  },
-  {
-    "type": "function",
-    "stateMutability": "nonpayable",
-    "payable": false,
-    "outputs": [],
-    "name": "setSpread",
-    "inputs": [{ "type": "uint256", "name": "newSpread" }],
     "constant": false
   },
   {
@@ -205,7 +262,34 @@
     "payable": false,
     "outputs": [],
     "name": "setMinimumReports",
-    "inputs": [{ "type": "uint256", "name": "newMininumReports" }],
+    "inputs": [{ "type": "uint256", "name": "newMininumReports", "internalType": "uint256" }],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [],
+    "name": "setRegistry",
+    "inputs": [{ "type": "address", "name": "registryAddress", "internalType": "address" }],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [],
+    "name": "setReserveFraction",
+    "inputs": [{ "type": "uint256", "name": "newReserveFraction", "internalType": "uint256" }],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [],
+    "name": "setSpread",
+    "inputs": [{ "type": "uint256", "name": "newSpread", "internalType": "uint256" }],
     "constant": false
   },
   {
@@ -214,15 +298,24 @@
     "payable": false,
     "outputs": [],
     "name": "setStableToken",
-    "inputs": [{ "type": "address", "name": "newStableToken" }],
+    "inputs": [{ "type": "address", "name": "newStableToken", "internalType": "address" }],
+    "constant": false
+  },
+  {
+    "type": "function",
+    "stateMutability": "nonpayable",
+    "payable": false,
+    "outputs": [],
+    "name": "setUpdateFrequency",
+    "inputs": [{ "type": "uint256", "name": "newUpdateFrequency", "internalType": "uint256" }],
     "constant": false
   },
   {
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [{ "type": "uint256", "name": "value" }],
-    "name": "reserveFraction",
+    "outputs": [{ "type": "uint256", "name": "value", "internalType": "uint256" }],
+    "name": "spread",
     "inputs": [],
     "constant": true
   },
@@ -230,8 +323,17 @@
     "type": "function",
     "stateMutability": "view",
     "payable": false,
-    "outputs": [{ "type": "uint256", "name": "" }],
-    "name": "lastBucketUpdate",
+    "outputs": [{ "type": "address", "name": "", "internalType": "address" }],
+    "name": "stable",
+    "inputs": [],
+    "constant": true
+  },
+  {
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "stableBucket",
     "inputs": [],
     "constant": true
   },
@@ -241,72 +343,16 @@
     "payable": false,
     "outputs": [],
     "name": "transferOwnership",
-    "inputs": [{ "type": "address", "name": "newOwner" }],
+    "inputs": [{ "type": "address", "name": "newOwner", "internalType": "address" }],
     "constant": false
   },
   {
-    "type": "event",
-    "name": "Exchanged",
-    "inputs": [
-      { "type": "address", "name": "exchanger", "indexed": true },
-      { "type": "uint256", "name": "sellAmount", "indexed": false },
-      { "type": "uint256", "name": "buyAmount", "indexed": false },
-      { "type": "bool", "name": "soldGold", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "UpdateFrequencySet",
-    "inputs": [{ "type": "uint256", "name": "updateFrequency", "indexed": false }],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "MinimumReportsSet",
-    "inputs": [{ "type": "uint256", "name": "minimumReports", "indexed": false }],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "StableTokenSet",
-    "inputs": [{ "type": "address", "name": "stable", "indexed": true }],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "SpreadSet",
-    "inputs": [{ "type": "uint256", "name": "spread", "indexed": false }],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "ReserveFractionSet",
-    "inputs": [{ "type": "uint256", "name": "reserveFraction", "indexed": false }],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "BucketsUpdated",
-    "inputs": [
-      { "type": "uint256", "name": "goldBucket", "indexed": false },
-      { "type": "uint256", "name": "stableBucket", "indexed": false }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RegistrySet",
-    "inputs": [{ "type": "address", "name": "registryAddress", "indexed": true }],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "OwnershipTransferred",
-    "inputs": [
-      { "type": "address", "name": "previousOwner", "indexed": true },
-      { "type": "address", "name": "newOwner", "indexed": true }
-    ],
-    "anonymous": false
+    "type": "function",
+    "stateMutability": "view",
+    "payable": false,
+    "outputs": [{ "type": "uint256", "name": "", "internalType": "uint256" }],
+    "name": "updateFrequency",
+    "inputs": [],
+    "constant": true
   }
 ]

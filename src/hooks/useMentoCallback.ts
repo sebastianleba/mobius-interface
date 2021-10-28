@@ -65,8 +65,12 @@ function useSwapCallArguments(
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
 
     const swapCallParameters: SwapParameters = {
-      methodName: 'exchange',
-      args: [trade.input.raw.toString(), minDy.toString(), trade.input.currency === CELO[chainId] ? '1' : '0'],
+      methodName: 'sell',
+      args: [
+        trade.input.raw.toString(),
+        minDy.toString(),
+        trade.input.currency.address.toLowerCase() === CELO[chainId].address.toLowerCase() ? 'true' : '',
+      ],
       value: '0',
     }
     const swapMethods = [swapCallParameters]
