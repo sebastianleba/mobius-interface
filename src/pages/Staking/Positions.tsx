@@ -150,7 +150,7 @@ function PositionCard({
         </RowBetween>
         <RowBetween>
           <TYPE.black>Your Boost</TYPE.black>
-          <TYPE.black>{`${boost.toFixed(2)}x`}</TYPE.black>
+          <TYPE.black>{`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}</TYPE.black>
         </RowBetween>
       </Wrapper>
     </>

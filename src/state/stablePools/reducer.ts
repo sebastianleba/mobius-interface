@@ -102,13 +102,13 @@ export default createReducer<PoolState>(initialState, (builder) =>
       if (!state.pools[pool]) return
       state.pools[pool].pool.externalRewards = externalRewards
     })
-    .addCase(updateVariableData, (state, { payload: { name, variableData } }) => {
-      const pool = state.pools[name]
+    .addCase(updateVariableData, (state, { payload: { address, variableData } }) => {
+      const pool = state.pools[address]
       return {
         ...state,
         pools: {
           ...state.pools,
-          [name]: {
+          [address]: {
             ...pool,
             pool: {
               ...pool.pool,

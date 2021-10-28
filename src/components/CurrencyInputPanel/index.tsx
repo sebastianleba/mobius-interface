@@ -40,12 +40,12 @@ import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
 // 95% { background: #52D07F;}`
 
 const ColorShift = keyframes`
-0% { background: red;}
-10% { background: blue;}
-35% { background: purple; color: black !important;}
-60% { background: orange;}
-85% { background: green;}
-100% { background: red;}`
+0% { background: #FB7C6D;}
+10% { background: #FBCC5C;}
+35% { background: #35D07F; color: #2E3338 !important;}
+60% { background: #3488EC;}
+85% { background: #73DDFF;}
+100% { background: #FB7C6D;}`
 
 const ColorShiftAnimation = css`
   animation: ${ColorShift} 8s linear infinite;

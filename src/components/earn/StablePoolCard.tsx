@@ -13,6 +13,7 @@ import useCUSDPrice from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor, usePoolColor } from '../../hooks/useColor'
+import { useWalletModalToggle } from '../../state/application/hooks'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { StyledInternalLink, theme, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
@@ -258,6 +259,22 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const formatNumber = (num: string) => {
     return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   }
+  const toggleWalletModal = useWalletModalToggle()
+
+  const totalDisplay = (amount: TokenAmount): string => {
+    if (coin === Coins.Bitcoin || coin === Coins.Ether) {
+      if (JSBI.lessThan(amount.raw, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(19))) || openManage) {
+        return amount.toFixed(2)
+      } else return amount.toFixed(0)
+    } else {
+      if (JSBI.lessThan(amount.raw, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(23))) || openManage) {
+        return formatNumber(amount.toFixed(0))
+      } else {
+        const collapsed = JSBI.divide(amount.raw, JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(23))).toString()
+        return formatNumber(String((Number(collapsed) / 10).toFixed(1))).concat('M')
+      }
+    }
+  }
 
   return (
     <Wrapper
@@ -374,9 +391,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                   />
                   <TYPE.black fontWeight={800}>
                     {totalValueDeposited
-                      ? `${!pegComesAfter ? peggedTo : ''}${formatNumber(
-                          totalValueDeposited.toFixed(displayDecimals)
-                        )} ${pegComesAfter ? peggedTo : ''}`
+                      ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(totalValueDeposited)} ${
+                          pegComesAfter ? peggedTo : ''
+                        }`
                       : '-'}
                   </TYPE.black>
                 </RowFixed>
@@ -387,9 +404,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 <RowFixed>
                   <TYPE.black fontWeight={800}>
                     {totalVolume
-                      ? `${!pegComesAfter ? peggedTo : ''}${totalVolume.toFixed(displayDecimals, {
-                          groupSeparator: ',',
-                        })} ${pegComesAfter ? peggedTo : ''}`
+                      ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(totalVolume)} ${pegComesAfter ? peggedTo : ''}`
                       : '-'}
                   </TYPE.black>
                 </RowFixed>
@@ -441,7 +456,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                       /> */}
                         <TYPE.black fontWeight={800}>
                           {!pegComesAfter && peggedTo}
-                          {valueOfDeposited.toFixed(displayDecimals + 1)}
+                          {valueOfDeposited.toFixed(displayDecimals + 2)}
                           {pegComesAfter && ` ${peggedTo}`}
                         </TYPE.black>
                       </RowFixed>
@@ -454,7 +469,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <StyledButton
                 background={poolColor}
                 backgroundHover={poolColor}
-                onClick={() => (isStaking ? setOpenManage(true) : setOpenDeposit(true))}
+                onClick={account ? () => (isStaking ? setOpenManage(true) : setOpenDeposit(true)) : toggleWalletModal}
                 eth={coin === Coins.Ether}
                 style={{
                   width: '10%',
@@ -471,11 +486,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         </div>
       </InfoContainer>
       <Bottom>
-        {!!account && !isStaking && openManage && (
+        {!isStaking && openManage && (
           <StyledButton
             background={poolColor}
             backgroundHover={poolColor}
-            onClick={() => setOpenDeposit(true)}
+            onClick={account ? () => setOpenDeposit(true) : toggleWalletModal}
             style={{ fontWeight: 700, fontSize: 18 }}
           >
             DEPOSIT

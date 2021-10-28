@@ -49,7 +49,7 @@ const Sel = styled.div<{ selected: boolean }>`
   outline: none;
   cursor: pointer;
   text-decoration: none;
-  color: ${({ theme, selected }) => (selected ? theme.text6 : theme.text1)};
+  color: ${({ theme, selected }) => (selected ? theme.white : theme.text1)};
   font-size: 1rem;
   font-weight: ${({ selected }) => (selected ? '999' : '300')};
   padding: 8px 12px;
