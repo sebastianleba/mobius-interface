@@ -2,6 +2,8 @@ import { createReducer, nanoid } from '@reduxjs/toolkit'
 
 import {
   addPopup,
+  addPrice,
+  addPrices,
   ApplicationModal,
   btcEthPrice,
   PopupContent,
@@ -11,6 +13,9 @@ import {
 } from './actions'
 
 type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>
+type TokenPrices = {
+  [address: string]: string
+}
 
 export interface ApplicationState {
   readonly blockNumber: { readonly [chainId: number]: number }
@@ -18,6 +23,7 @@ export interface ApplicationState {
   readonly openModal: ApplicationModal | null
   readonly btcPrice: string
   readonly ethPrice: string
+  readonly tokenPrices: TokenPrices
 }
 
 const initialState: ApplicationState = {
@@ -26,6 +32,7 @@ const initialState: ApplicationState = {
   openModal: null,
   btcPrice: '41000',
   ethPrice: '2700',
+  tokenPrices: {},
 }
 
 export default createReducer(initialState, (builder) =>
@@ -61,5 +68,14 @@ export default createReducer(initialState, (builder) =>
           p.show = false
         }
       })
+    })
+    .addCase(addPrice, (state, { payload: { token, price } }) => {
+      state.tokenPrices = {
+        ...state.tokenPrices,
+        [token]: price,
+      }
+    })
+    .addCase(addPrices, (state, { payload: { prices } }) => {
+      state.tokenPrices = prices
     })
 )

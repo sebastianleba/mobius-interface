@@ -1,3 +1,4 @@
+import { gql, useQuery } from '@apollo/client'
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
@@ -5,7 +6,7 @@ import { useDispatch } from 'react-redux'
 
 import useDebounce from '../../hooks/useDebounce'
 import useIsWindowVisible from '../../hooks/useIsWindowVisible'
-import { btcEthPrice, updateBlockNumber } from './actions'
+import { addPrices, btcEthPrice, updateBlockNumber } from './actions'
 
 const fetchEthBtcPrices = async (dispatch: any) => {
   const resp = await axios.get(
@@ -14,6 +15,30 @@ const fetchEthBtcPrices = async (dispatch: any) => {
   const btcPrice: string = resp.data['0x2260fac5e5542a773aa44fbcfedf7c193bc2c599']?.['usd']
   const ethPrice: string = resp.data['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']?.['usd']
   dispatch(btcEthPrice({ btcPrice: parseInt(btcPrice).toFixed(0), ethPrice: parseInt(ethPrice).toFixed(0) }))
+}
+
+export function PriceData(): null {
+  const graphQl = gql`
+    {
+      tokens(where: { derivedCUSD_gt: "0" }) {
+        id
+        derivedCUSD
+      }
+    }
+  `
+  const dispatch = useDispatch()
+  const { data, loading, error } = useQuery(graphQl)
+  useEffect(() => {
+    if (!loading && !error && data) {
+      const prices: { [address: string]: string } = data.tokens.reduce(
+        (accum, cur) => ({ ...accum, [cur.id.toLowerCase()]: cur.derivedCUSD }),
+        {}
+      )
+
+      dispatch(addPrices({ prices }))
+    }
+  }, [data, loading])
+  return null
 }
 
 export default function Updater(): null {
