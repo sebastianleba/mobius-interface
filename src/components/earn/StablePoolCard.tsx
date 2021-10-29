@@ -369,7 +369,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               {apy.denominator.toString() !== '0'
                 ? `${apy.multiply(new Fraction(JSBI.BigInt(500), JSBI.BigInt(2))).toFixed(1, { groupSeparator: ',' })}%`
                 : ' -'}{' '}
-              with boost
+              w/ boost
             </StyledNavLink>
           </RowFixed>
         ) : feesGenerated ? (
@@ -503,6 +503,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             background={!isMobile ? poolColor : 'transparent'}
             backgroundHover={!isMobile ? poolColor : 'transparent'}
             onClick={account ? () => setOpenDeposit(true) : toggleWalletModal}
+            eth={coin === Coins.Ether}
             style={{ fontWeight: 700, fontSize: 18, color: isMobile && poolColor }}
           >
             DEPOSIT
