@@ -5,6 +5,8 @@ import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import { useEthBtcPrice } from 'state/application/hooks'
 import styled from 'styled-components'
@@ -15,7 +17,7 @@ import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constant
 import { useColor, usePoolColor } from '../../hooks/useColor'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
-import { StyledInternalLink, theme, TYPE } from '../../theme'
+import { theme, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import CurrencyPoolLogo from '../CurrencyPoolLogo'
@@ -128,8 +130,16 @@ const StyledLogo = styled(Logo)<{ size: string }>`
   background-color: ${({ theme }) => theme.white};
 `
 
-const DepositWithdrawBtn = styled(StyledButton)`
+const DepositWithdrawBtn = styled(StyledButton)<{ background: string; backgroundHover: string }>`
   display: flex;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 12px;
+    background: transparent;
+    color: ${({ background }) => background};
+    font-size: 12px;
+    padding-top: 0.5rem;
+    flex: 0;
+  `}
 `
 
 const ExpandedRow = styled(Row)<{ open: boolean }>`
@@ -175,6 +185,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
+  const history = useHistory()
 
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
@@ -310,7 +321,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               color={poolColor}
               className="apr"
               fontWeight={800}
-              fontSize={[18, 24]}
+              fontSize={[16, 24]}
+              textAlign="right"
             >
               {apy.denominator.toString() !== '0' ? `${apy.toFixed(1, { groupSeparator: ',' })}%` : ' -'} APR
             </TYPE.subHeader>
@@ -349,7 +361,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         {apy ? (
           <RowFixed>
             <StyledNavLink
-              style={{ alignContent: 'right', alignItems: 'right' }}
+              style={{ fontSize: 15, textAlign: 'right' }}
               color={poolColor}
               to={'/stake'}
               className="bapr"
@@ -377,7 +389,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       <InfoContainer>
         <div style={{ flex: 3, width: '100%' }}>
           <ExpandedRow open={openManage}>
-            <StatContainer isOpen={openManage}>
+            <StatContainer isOpen={openManage || isMobile}>
               <RowBetween>
                 <TYPE.darkGray>Total deposited</TYPE.darkGray>
                 <RowFixed>
@@ -465,7 +477,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 </>
               )}
             </StatContainer>
-            {!openManage && (
+            {!openManage && !isMobile && (
               <StyledButton
                 background={poolColor}
                 backgroundHover={poolColor}
@@ -502,14 +514,19 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               display: 'flex',
               justifyContent: 'space-between',
               transition: 'all 0.3s ease-in',
-              gap: '1rem',
+              gap: !isMobile && '1rem',
+              flexWrap: 'wrap',
+              padding: isMobile && '1rem',
+              paddingBottom: isMobile && '0',
+              marginLeft: 'auto',
+              marginRight: 'auto',
             }}
           >
             <DepositWithdrawBtn
               background={theme(false).celoGreen}
               backgroundHover={theme(false).celoGreen}
               onClick={() => setOpenDeposit(true)}
-              style={{ width: '30%', fontWeight: 700, fontSize: 18 }}
+              style={{ fontWeight: 700, fontSize: 18 }}
             >
               DEPOSIT
             </DepositWithdrawBtn>
@@ -517,20 +534,19 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               background={theme(false).celoRed}
               backgroundHover={theme(false).celoRed}
               onClick={() => setOpenWithdraw(true)}
-              style={{ width: '30%', fontWeight: 700, fontSize: 18 }}
+              style={{ fontWeight: 700, fontSize: 18 }}
             >
               WITHDRAW
             </DepositWithdrawBtn>
             {poolInfo.gaugeAddress !== undefined && (
-              <StyledInternalLink to={`/farm/${poolInfo.name}`} style={{ width: '30%', textDecoration: 'none' }}>
-                <DepositWithdrawBtn
-                  background={theme(false).celoGold}
-                  backgroundHover={theme(false).celoGold}
-                  style={{ fontWeight: 700, fontSize: 18 }}
-                >
-                  FARM
-                </DepositWithdrawBtn>
-              </StyledInternalLink>
+              <DepositWithdrawBtn
+                background={theme(false).celoGold}
+                backgroundHover={theme(false).celoGold}
+                style={{ fontWeight: 700, fontSize: 18 }}
+                onClick={() => history.push(`/farm/${poolInfo.name}`)}
+              >
+                FARM
+              </DepositWithdrawBtn>
             )}
           </div>
         )}
