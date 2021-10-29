@@ -498,17 +498,17 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         </div>
       </InfoContainer>
       <Bottom>
-        {!isStaking && openManage && (
+        {!isStaking && (openManage || isMobile) && (
           <StyledButton
-            background={poolColor}
-            backgroundHover={poolColor}
+            background={!isMobile ? poolColor : 'transparent'}
+            backgroundHover={!isMobile ? poolColor : 'transparent'}
             onClick={account ? () => setOpenDeposit(true) : toggleWalletModal}
-            style={{ fontWeight: 700, fontSize: 18 }}
+            style={{ fontWeight: 700, fontSize: 18, color: isMobile && poolColor }}
           >
             DEPOSIT
           </StyledButton>
         )}
-        {!!account && isStaking && openManage && (
+        {!!account && isStaking && (openManage || isMobile) && (
           <div
             style={{
               display: 'flex',
