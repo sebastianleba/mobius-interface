@@ -63,6 +63,8 @@ const HeaderLinks = styled(Row)`
   grid-auto-flow: column;
   grid-gap: 10px;
   align-items: center;
+  margin-right: auto;
+  margin-left: auto;
 `
 
 const Sel = styled.div<{ selected: boolean }>`
@@ -141,7 +143,7 @@ export default function Staking() {
           />
         ))}
       </TextContainer>
-      <div style={{ alignItems: 'center', marginBottom: '1rem', marginTop: '1rem', display: 'flex' }}>
+      <div style={{ alignItems: 'center', marginBottom: '1rem', marginTop: '1rem', display: 'flex', width: '100%' }}>
         <HeaderLinks>
           <Sel onClick={() => setView(View.Lock)} selected={view === View.Lock}>
             Lock
