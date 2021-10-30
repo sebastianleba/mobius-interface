@@ -25,14 +25,17 @@ const TextContainer = styled.div`
 `
 
 const PositionsContainer = styled.div`
-  width: 49%;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  flex-direction: column;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    width: 100%;
+  `}
+  flex-wrap: wrap;
 `
 
 const OuterContainer = styled.div`

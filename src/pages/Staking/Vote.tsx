@@ -138,6 +138,7 @@ function WeightCard({ position }: { position: GaugeSummary }) {
               className="apr"
               fontWeight={800}
               fontSize={[18, 24]}
+              textAlign="right"
             >
               {`Future: ${position.futureWeight.toFixed(2)}%`}
             </TYPE.subHeader>
@@ -151,12 +152,18 @@ function WeightCard({ position }: { position: GaugeSummary }) {
             </TYPE.darkGray>
           </RowFixed>
           <div>
-            <TYPE.black fontSize={16} fontWeight={800} color={poolColor}>{`Current: ${position.currentWeight.toFixed(
-              2
-            )}%`}</TYPE.black>
-            <TYPE.black fontSize={16} fontWeight={800} color={poolColor}>{`My Vote: ${position.powerAllocated.toFixed(
-              2
-            )}%`}</TYPE.black>
+            <TYPE.black
+              textAlign="right"
+              fontSize={16}
+              fontWeight={800}
+              color={poolColor}
+            >{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.black>
+            <TYPE.black
+              textAlign="right"
+              fontSize={16}
+              fontWeight={800}
+              color={poolColor}
+            >{`My Vote: ${position.powerAllocated.toFixed(2)}%`}</TYPE.black>
           </div>
         </SecondSection>
       </PositionWrapper>

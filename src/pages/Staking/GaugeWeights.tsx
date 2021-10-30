@@ -6,6 +6,7 @@ import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { RadialChart } from 'react-vis'
 import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
 import { useIsDarkMode } from 'state/user/hooks'
@@ -42,6 +43,15 @@ const CardContainer = styled.div`
   flex-wrap: wrap;
   margin-top: 1rem;
   justify-content: space-between;
+`
+
+const ColorBox = styled.div<{ color: string }>`
+  background: ${({ color }) => color};
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  margin-right: 1rem;
+  margin-bottom: 0.25rem;
 `
 
 const colorsForChart = ['#35D07F', '#73DDFF', '#BF97FF', '#3488EC', '#FB7C6D', '#FBCC5C', '#FEF2D6']
@@ -88,14 +98,28 @@ export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
               data={data}
               width={Math.min((width ?? 0) * 0.8, 600)}
               height={Math.min((width ?? 0) * 0.8, 600)}
-              showLabels={true}
-              labelsStyle={{ color: isDarkMode ? 'white' : 'black' }}
-              labelsAboveChildren={true}
-              labelsRadiusMultiplier={0.9}
               margin={0}
-              style={{ margin: 0 }}
+              style={{ marginLeft: 'auto' }}
             />
+            {!isMobile && (
+              <RowBetween style={{ flexWrap: 'wrap', maxWidth: '20rem' }}>
+                {data.map(({ label, subLabel, color }) => (
+                  <RowFixed key={`legend-${label}`} style={{ width: '49%' }}>
+                    <ColorBox color={color} /> <TYPE.subHeader>{label}</TYPE.subHeader>
+                  </RowFixed>
+                ))}
+              </RowBetween>
+            )}
           </WrappedRow>
+          {isMobile && (
+            <RowBetween style={{ flexWrap: 'wrap', maxWidth: '20rem', marginRight: 'auto', marginLeft: 'auto' }}>
+              {data.map(({ label, subLabel, color }) => (
+                <RowFixed key={`legend-${label}`} style={{ width: '49%' }}>
+                  <ColorBox color={color} /> <TYPE.subHeader>{label}</TYPE.subHeader>
+                </RowFixed>
+              ))}
+            </RowBetween>
+          )}
         </>
       )}
     </Wrapper>

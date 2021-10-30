@@ -23,8 +23,7 @@ import ClaimAllMobiModal from './ClaimAllMobiModal'
 import { CurrencyRow } from './IncreaseLockAmount'
 
 const Container = styled.div`
-  margin-top: 1rem;
-  width: 100%;
+  width: 49%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -32,7 +31,9 @@ const Container = styled.div`
   border-radius: 1rem;
   margin-bottom: 1rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    width: 100%
+    width: 100%;
+    margin-top: 1rem;
+
 `}
 `
 

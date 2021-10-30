@@ -7,6 +7,8 @@ import { AutoRow, RowBetween, RowFixed } from 'components/Row'
 import { ChainLogo } from 'constants/StablePools'
 import { usePoolColor } from 'hooks/useColor'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import { ChevronDown, ChevronUp } from 'react-feather'
 import { usePriceOfLp } from 'state/stablePools/hooks'
 import { GaugeSummary, MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
@@ -45,6 +47,9 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
   position: relative;
   background: ${({ theme }) => theme.bg1};
   ${({ theme }) => theme.mediaWidth.upToSmall`
+    box-shadow: 1px 1px 3px ${({ theme }) => theme.bg4};
+    border-radius: 10px;
+
 `}
   &:hover {
     opacity: 1;
@@ -57,6 +62,12 @@ const StyledLogo = styled(Logo)<{ size: string }>`
   border-radius: ${({ size }) => size};
   box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
   background-color: ${({ theme }) => theme.white};
+`
+const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  background: ${({ theme }) => theme.bg4};
 `
 
 type PositionsProps = {
@@ -75,7 +86,12 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
       <RowBetween style={{ marginBottom: '1rem' }}>
         <TYPE.largeHeader>Your Positions</TYPE.largeHeader>
-        <TYPE.green style={{ paddingLeft: '.15rem' }} className="apr" fontWeight={800} fontSize={[18, 24]}>
+        <TYPE.green
+          style={{ paddingLeft: '.15rem', textAlign: 'right' }}
+          className="apr"
+          fontWeight={800}
+          fontSize={[18, 24]}
+        >
           {unclaimedMobi.toSignificant(4)} Unclaimed MOBI
         </TYPE.green>
       </RowBetween>
@@ -121,21 +137,24 @@ function PositionCard({
   const stablePools = useStablePoolInfo()
   const poolInfo = stablePools.filter((x) => x.name === position.pool)[0]
   const poolColor = usePoolColor(poolInfo)
+  const [expand, setExpand] = useState(false)
 
-  return (
-    <>
-      <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
-
-      <Wrapper showBackground={true} bgColor={poolColor}>
-        <CardNoise />
-        <RowBetween>
-          <RowFixed style={{ gap: '10px' }}>
-            <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
-            <TYPE.largeHeader>{position.pool}</TYPE.largeHeader>
-            <TYPE.darkGray fontSize={20}>{`  -  $${lpAsUsd?.toSignificant(4)}`}</TYPE.darkGray>
-          </RowFixed>
+  const mobileView = (
+    <div>
+      <RowBetween>
+        <RowFixed style={{ gap: '10px' }}>
+          <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+          <TYPE.mediumHeader>{position.pool}</TYPE.mediumHeader>
+        </RowFixed>
+        {expand ? <ChevronUp /> : <ChevronDown />}
+      </RowBetween>
+      {expand && (
+        <div style={{ width: '100%' }}>
+          <TYPE.darkGray style={{ width: '100%', textAlign: 'right' }} fontSize={20}>
+            {`$${lpAsUsd?.toSignificant(4)}`}
+          </TYPE.darkGray>
           <TYPE.subHeader
-            style={{ alignContent: 'right', alignItems: 'right' }}
+            style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
             color={poolColor}
             className="apr"
             fontWeight={800}
@@ -143,7 +162,53 @@ function PositionCard({
           >
             {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
           </TYPE.subHeader>
-        </RowBetween>
+        </div>
+      )}
+    </div>
+    // <RowBetween>
+    // <RowFixed style={{ gap: '10px' }}>
+    //   <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+    //   <TYPE.mediumHeader>{position.pool}</TYPE.mediumHeader>
+    //   <TYPE.darkGray fontSize={20}>{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.darkGray>
+    //  </RowFixed>
+    // <TYPE.subHeader
+    //   style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
+    //   color={poolColor}
+    //   className="apr"
+    //   fontWeight={800}
+    //   fontSize={[18, 24]}
+    // >
+    //   {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+    // </TYPE.subHeader>
+    // </RowBetween>
+  )
+
+  return (
+    <>
+      <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
+
+      <Wrapper showBackground={true} bgColor={poolColor} onClick={() => setExpand(!expand)}>
+        <CardNoise />
+        {isMobile ? (
+          mobileView
+        ) : (
+          <RowBetween>
+            <RowFixed style={{ gap: '10px' }}>
+              <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+              <TYPE.mediumHeader>{position.pool}</TYPE.mediumHeader>
+              <TYPE.darkGray fontSize={20}>{`  -  $${lpAsUsd?.toSignificant(4)}`}</TYPE.darkGray>
+            </RowFixed>
+            <TYPE.subHeader
+              style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
+              color={poolColor}
+              className="apr"
+              fontWeight={800}
+              fontSize={[18, 24]}
+            >
+              {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+            </TYPE.subHeader>
+          </RowBetween>
+        )}{' '}
       </Wrapper>
     </>
   )
