@@ -155,29 +155,15 @@ function WeightCard({ position }: { position: GaugeSummary }) {
         {isMobile ? (
           <SecondSection mobile={isMobile}>
             <RowBetween>
-              <TYPE.subHeader
-                style={{ paddingLeft: '.15rem' }}
-                color={poolColor}
-                className="apr"
-                fontWeight={800}
-                fontSize={[18, 24]}
-                textAlign="right"
-              >
+              <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[18, 24]} textAlign="right">
                 Future
               </TYPE.subHeader>
-              <TYPE.subHeader
-                style={{ paddingLeft: '.15rem' }}
-                color={poolColor}
-                className="apr"
-                fontWeight={800}
-                fontSize={[18, 24]}
-                textAlign="right"
-              >
+              <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[18, 24]} textAlign="right">
                 {position.futureWeight.toFixed(2)}%
               </TYPE.subHeader>
             </RowBetween>
             <RowBetween>
-              <TYPE.black textAlign="right" fontSize={16} fontWeight={800} color={poolColor}>
+              <TYPE.black fontSize={16} fontWeight={800} color={poolColor}>
                 Current:
               </TYPE.black>
               <TYPE.black textAlign="right" fontSize={16} fontWeight={800} color={poolColor}>
@@ -185,7 +171,7 @@ function WeightCard({ position }: { position: GaugeSummary }) {
               </TYPE.black>
             </RowBetween>
             <RowBetween>
-              <TYPE.black textAlign="right" fontSize={16} fontWeight={800} color={poolColor}>
+              <TYPE.black fontSize={16} fontWeight={800} color={poolColor}>
                 My Vote:
               </TYPE.black>
               <TYPE.black textAlign="right" fontSize={16} fontWeight={800} color={poolColor}>
