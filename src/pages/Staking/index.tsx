@@ -7,12 +7,12 @@ import { useMobiStakingInfo, usePriceOfDeposits } from 'state/staking/hooks'
 import styled from 'styled-components'
 
 import { Row } from '../../components/Row'
-import GradientTextBox from '../../components/Visx/GradientTextBox'
 import CalcBoost from './CalcBoost'
 import { getAllUnclaimedMobi } from './ClaimAllMobiModal'
 import GaugeWeights from './GaugeWeights'
 import Positions from './Positions'
 import Stake from './Stake'
+import StatsHeader from './StatsHeader'
 import Vote from './Vote'
 
 const TextContainer = styled.div`
@@ -40,7 +40,7 @@ const PositionsContainer = styled.div`
 
 const OuterContainer = styled.div`
   width: min(1280px, 100%);
-  margin-top: ${!isMobile ? '3rem' : '-2rem'};
+  margin-top: ${!isMobile ? '3rem' : '-1rem'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -135,17 +135,7 @@ export default function Staking() {
   }
   return (
     <OuterContainer>
-      <TextContainer>
-        {displayData.map(({ label, value }, i) => (
-          <GradientTextBox
-            i={i}
-            label={label}
-            value={value}
-            id={`staking-info-text-${i}`}
-            key={`staking-info-text-${i}`}
-          />
-        ))}
-      </TextContainer>
+      <StatsHeader stakingInfo={stakingInfo} />
       <div style={{ alignItems: 'center', marginBottom: '1rem', marginTop: '1rem', display: 'flex', width: '100%' }}>
         <HeaderLinks>
           <Sel onClick={() => setView(View.Lock)} selected={view === View.Lock}>
