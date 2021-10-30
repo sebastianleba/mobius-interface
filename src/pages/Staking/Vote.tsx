@@ -1,6 +1,6 @@
 import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
-import { RowBetween, RowFixed } from 'components/Row'
+import { RowFixed } from 'components/Row'
 import { ChainLogo } from 'constants/StablePools'
 import { usePoolColor } from 'hooks/useColor'
 import React, { useState } from 'react'
@@ -130,79 +130,39 @@ function WeightCard({ position }: { position: GaugeSummary }) {
       <PositionWrapper onClick={() => setVoteModalOpen(true)}>
         <TopSection>
           <RowFixed style={{ gap: '10px' }}>
-            <TYPE.black fontWeight={600} fontSize={[18, 24]}>
+            <TYPE.black fontWeight={600} fontSize={[17, 24]}>
               {position.pool}
             </TYPE.black>
-            {!isMobile && <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />}
+            <StyledLogo size={'26px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
           </RowFixed>
-          {isMobile ? (
-            <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
-          ) : (
-            <RowFixed>
-              <TYPE.subHeader
-                style={{ paddingLeft: '.15rem' }}
-                color={poolColor}
-                className="apr"
-                fontWeight={800}
-                fontSize={[18, 24]}
-                textAlign="right"
-              >
-                {`Future: ${position.futureWeight.toFixed(2)}%`}
-              </TYPE.subHeader>
-            </RowFixed>
-          )}
+          <RowFixed>
+            <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[17, 24]} textAlign="right">
+              {`Future: ${position.futureWeight.toFixed(2)}%`}
+            </TYPE.subHeader>
+          </RowFixed>
         </TopSection>
-        {isMobile ? (
-          <SecondSection mobile={isMobile}>
-            <RowBetween>
-              <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[18, 24]} textAlign="right">
-                Future
-              </TYPE.subHeader>
-              <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[18, 24]} textAlign="right">
-                {position.futureWeight.toFixed(2)}%
-              </TYPE.subHeader>
-            </RowBetween>
-            <RowBetween>
-              <TYPE.black fontSize={16} fontWeight={800} color={poolColor}>
-                Current:
-              </TYPE.black>
-              <TYPE.black textAlign="right" fontSize={16} fontWeight={800} color={poolColor}>
-                {position.currentWeight.toFixed(2)}%
-              </TYPE.black>
-            </RowBetween>
-            <RowBetween>
-              <TYPE.black fontSize={16} fontWeight={800} color={poolColor}>
-                My Vote:
-              </TYPE.black>
-              <TYPE.black textAlign="right" fontSize={16} fontWeight={800} color={poolColor}>
-                {position.powerAllocated.toFixed(2)}%
-              </TYPE.black>
-            </RowBetween>
-          </SecondSection>
-        ) : (
-          <SecondSection mobile={isMobile}>
-            <RowFixed style={{ marginTop: 10 }}>
-              <CurrencyPoolLogo tokens={poolInfo.tokens.slice()} size={24} margin={true} />
-              <TYPE.darkGray fontWeight={450} fontSize={[14, 20]}>
-                {poolInfo.tokens.map((t) => t.symbol).join(' / ')}
-              </TYPE.darkGray>
-            </RowFixed>
-            <div>
-              <TYPE.black
-                textAlign="right"
-                fontSize={16}
-                fontWeight={800}
-                color={poolColor}
-              >{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.black>
-              <TYPE.black
-                textAlign="right"
-                fontSize={16}
-                fontWeight={800}
-                color={poolColor}
-              >{`My Vote: ${position.powerAllocated.toFixed(2)}%`}</TYPE.black>
-            </div>
-          </SecondSection>
-        )}
+        <SecondSection mobile={isMobile}>
+          <RowFixed style={{ marginTop: 10 }}>
+            <CurrencyPoolLogo tokens={poolInfo.tokens.slice()} size={24} margin={true} />
+            <TYPE.darkGray fontWeight={450} fontSize={[16, 20]}>
+              {poolInfo.tokens.map((t) => t.symbol).join(' / ')}
+            </TYPE.darkGray>
+          </RowFixed>
+          <div>
+            <TYPE.black
+              textAlign="right"
+              fontSize={[14, 16]}
+              fontWeight={800}
+              color={poolColor}
+            >{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.black>
+            <TYPE.black
+              textAlign="right"
+              fontSize={[14, 16]}
+              fontWeight={800}
+              color={poolColor}
+            >{`My Vote: ${position.powerAllocated.toFixed(2)}%`}</TYPE.black>
+          </div>
+        </SecondSection>
       </PositionWrapper>
     </>
   )
