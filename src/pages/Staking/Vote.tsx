@@ -79,6 +79,10 @@ export default function Vote({ summaries }: GaugeWeightsProps) {
 }
 
 const PositionWrapper = styled(AutoColumn)`
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.01);
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
   border-radius: 20px;
   width: 100%;
   overflow: hidden;
