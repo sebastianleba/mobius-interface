@@ -4,6 +4,7 @@ import { RowFixed } from 'components/Row'
 import { ChainLogo } from 'constants/StablePools'
 import { usePoolColor } from 'hooks/useColor'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
@@ -35,9 +36,12 @@ const CardContainer = styled.div`
   column-gap: 10px;
   row-gap: 15px;
   justify-self: center;
+  width: 100%;
+  max-width: 720px;
 `
 
 const TopSection = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -55,7 +59,6 @@ interface GaugeWeightsProps {
 }
 
 export default function Vote({ summaries }: GaugeWeightsProps) {
-  const [showUserVote, setShowUserVote] = useState(false)
   const votePowerLeft = useVotePowerLeft()
 
   return summaries.length === 0 ? (
@@ -68,7 +71,7 @@ export default function Vote({ summaries }: GaugeWeightsProps) {
       <TYPE.darkGray>{votePowerLeft}% Left to Allocate</TYPE.darkGray>
       <CardContainer>
         {summaries.map((summary) => (
-          <WeightCard showUserVote={showUserVote} position={summary} key={`weight-card-${summary.pool}`} />
+          <WeightCard position={summary} key={`weight-card-${summary.pool}`} />
         ))}
       </CardContainer>
     </Wrapper>
@@ -76,6 +79,10 @@ export default function Vote({ summaries }: GaugeWeightsProps) {
 }
 
 const PositionWrapper = styled(AutoColumn)`
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.01);
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
   border-radius: 20px;
   width: 100%;
   overflow: hidden;
@@ -99,7 +106,7 @@ const StyledLogo = styled(Logo)<{ size: string }>`
   background-color: ${({ theme }) => theme.white};
 `
 
-const SecondSection = styled.div`
+const SecondSection = styled.div<{ mobile: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -107,6 +114,7 @@ const SecondSection = styled.div`
   padding-bottom: 0.25rem;
   padding-top: 0;
   z-index: 1;
+  width: 100%;
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 48px 1fr 96px;
   `};
@@ -125,42 +133,35 @@ function WeightCard({ position }: { position: GaugeSummary }) {
 
       <PositionWrapper onClick={() => setVoteModalOpen(true)}>
         <TopSection>
-          <RowFixed style={{ gap: '10px' }}>
-            <TYPE.black fontWeight={600} fontSize={[18, 24]}>
+          <RowFixed style={{ gap: '6px' }}>
+            <TYPE.black fontWeight={600} fontSize={[16, 24]}>
               {position.pool}
             </TYPE.black>
-            <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+            <StyledLogo size={'26px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
           </RowFixed>
           <RowFixed>
-            <TYPE.subHeader
-              style={{ paddingLeft: '.15rem' }}
-              color={poolColor}
-              className="apr"
-              fontWeight={800}
-              fontSize={[18, 24]}
-              textAlign="right"
-            >
+            <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[16, 24]} textAlign="right">
               {`Future: ${position.futureWeight.toFixed(2)}%`}
             </TYPE.subHeader>
           </RowFixed>
         </TopSection>
-        <SecondSection>
+        <SecondSection mobile={isMobile}>
           <RowFixed style={{ marginTop: 10 }}>
             <CurrencyPoolLogo tokens={poolInfo.tokens.slice()} size={24} margin={true} />
-            <TYPE.darkGray fontWeight={450} fontSize={[14, 20]}>
+            <TYPE.darkGray fontWeight={450} fontSize={[15, 20]}>
               {poolInfo.tokens.map((t) => t.symbol).join(' / ')}
             </TYPE.darkGray>
           </RowFixed>
           <div>
             <TYPE.black
               textAlign="right"
-              fontSize={16}
+              fontSize={[13, 16]}
               fontWeight={800}
               color={poolColor}
             >{`Current: ${position.currentWeight.toFixed(2)}%`}</TYPE.black>
             <TYPE.black
               textAlign="right"
-              fontSize={16}
+              fontSize={[13, 16]}
               fontWeight={800}
               color={poolColor}
             >{`My Vote: ${position.powerAllocated.toFixed(2)}%`}</TYPE.black>
