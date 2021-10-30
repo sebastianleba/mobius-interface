@@ -129,7 +129,7 @@ function WeightCard({ position }: { position: GaugeSummary }) {
 
       <PositionWrapper onClick={() => setVoteModalOpen(true)}>
         <TopSection>
-          <RowFixed style={{ gap: '10px' }}>
+          <RowFixed style={{ gap: '6px' }}>
             <TYPE.black fontWeight={600} fontSize={[16, 24]}>
               {position.pool}
             </TYPE.black>
