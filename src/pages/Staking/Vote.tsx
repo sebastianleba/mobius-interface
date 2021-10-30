@@ -36,9 +36,11 @@ const CardContainer = styled.div`
   column-gap: 10px;
   row-gap: 15px;
   justify-self: center;
+  width: 100%;
 `
 
 const TopSection = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -107,6 +109,7 @@ const SecondSection = styled.div<{ mobile: boolean }>`
   padding-bottom: 0.25rem;
   padding-top: 0;
   z-index: 1;
+  width: 100%;
   ${({ mobile }) => mobile && 'flex-direction: column;'}
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 48px 1fr 96px;
