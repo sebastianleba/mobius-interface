@@ -5,7 +5,7 @@ import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { X } from 'react-feather'
 import styled from 'styled-components'
-import useCUSDPrice from 'utils/useCUSDPrice'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import tokenLogo from '../../assets/images/MOBI-200.png'
 import { UBE } from '../../constants'
@@ -122,6 +122,13 @@ export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowU
             ) : null}
             {ube && ube.chainId === ChainId.MAINNET ? (
               <ExternalLink href={`https://nomics.com/assets/mobi3-mobius-money`}>View MOBI on Nomics</ExternalLink>
+            ) : null}
+            {ube && ube.chainId === ChainId.MAINNET ? (
+              <ExternalLink
+                href={`https://app.ubeswap.org/#/swap?outputCurrency=0x73a210637f6f6b7005512677ba6b3c96bb4aa44b`}
+              >
+                Trade MOBI on Ubeswap
+              </ExternalLink>
             ) : null}
           </AutoColumn>
         </CardSection>

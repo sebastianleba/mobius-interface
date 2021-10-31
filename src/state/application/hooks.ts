@@ -1,4 +1,5 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
+import { Fraction } from '@ubeswap/sdk'
 import JSBI from 'jsbi'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -105,4 +106,14 @@ export function useEthBtcPrice(address: string): JSBI {
       address === '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4'
     ? JSBI.BigInt(prices.ethPrice)
     : JSBI.BigInt('1')
+}
+
+export function useTokenPrice(address: string | undefined): Fraction | undefined {
+  const priceString = useSelector((state: AppState) => {
+    return state.application.tokenPrices[address?.toLowerCase()]
+  })
+  if (!priceString) return undefined
+  const price = parseFloat(priceString) * 10 ** 4
+  const asFraction = new Fraction(price.toFixed(0), '10000')
+  return asFraction ?? undefined
 }

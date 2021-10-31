@@ -8,10 +8,9 @@ import React, { useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
-import { useEthBtcPrice } from 'state/application/hooks'
 import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
-import useCUSDPrice from 'utils/useCUSDPrice'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor, usePoolColor } from '../../hooks/useColor'
@@ -191,12 +190,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
-  const coinPrice = useEthBtcPrice(poolInfo.poolAddress)
+  const coinPrice = useCUSDPrice(tokens) //useEthBtcPrice(poolInfo.poolAddress)
+
   const totalStakedAmount = totalValueStaked
-    ? new Fraction(
-        JSBI.multiply(totalValueStaked.raw, coinPrice),
-        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-      )
+    ? totalValueStaked.multiply(new Fraction(coinPrice?.numerator ?? '1', coinPrice?.denominator ?? '1'))
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
   let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))

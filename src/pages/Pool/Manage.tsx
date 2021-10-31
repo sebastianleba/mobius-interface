@@ -222,7 +222,7 @@ export default function Manage({
                 <TYPE.body style={{ margin: 0 }}>Total deposits</TYPE.body>
                 <TYPE.body fontSize={24} fontWeight={500}>
                   {totalValueDeposited
-                    ? `${stakingInfo.peggedTo}${
+                    ? `${stakingInfo.pegComesAfter ? '' : stakingInfo.peggedTo}${
                         totalValueDeposited.lessThan('1')
                           ? totalValueDeposited.toFixed(stakingInfo.displayDecimals, {
                               groupSeparator: ',',
@@ -230,7 +230,7 @@ export default function Manage({
                           : totalValueDeposited.toFixed(stakingInfo.displayDecimals, {
                               groupSeparator: ',',
                             })
-                      }`
+                      } ${stakingInfo.pegComesAfter ? stakingInfo.peggedTo : ''}`
                     : '-'}
                 </TYPE.body>
               </AutoColumn>
