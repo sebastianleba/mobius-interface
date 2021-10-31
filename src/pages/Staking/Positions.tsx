@@ -149,9 +149,9 @@ function PositionCard({
         {expand ? <ChevronUp /> : <ChevronDown />}
       </RowBetween>
       {expand && (
-        <div style={{ width: '100%' }}>
+        <div style={{ width: '100%', display: 'flex' }}>
           <TYPE.darkGray style={{ width: '100%', textAlign: 'right' }} fontSize={20}>
-            {`$${lpAsUsd?.toSignificant(4)}`}
+            {`Value: $${lpAsUsd?.toSignificant(4)}`}
           </TYPE.darkGray>
           <TYPE.subHeader
             style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
@@ -160,7 +160,7 @@ function PositionCard({
             fontWeight={800}
             fontSize={[18, 24]}
           >
-            {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+            {`Boost: ${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
           </TYPE.subHeader>
         </div>
       )}
