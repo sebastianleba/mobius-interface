@@ -6,7 +6,7 @@ import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
 import styled from 'styled-components'
-import useCUSDPrice from 'utils/useCUSDPrice'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import { AutoColumn } from '../../components/Column'
 import { StablePoolCard } from '../../components/earn/StablePoolCard'
