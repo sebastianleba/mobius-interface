@@ -13,7 +13,7 @@ import {
 } from './actions'
 
 type PopupList = Array<{ key: string; show: boolean; content: PopupContent; removeAfterMs: number | null }>
-type TokenPrices = {
+export type TokenPrices = {
   [address: string]: string
 }
 

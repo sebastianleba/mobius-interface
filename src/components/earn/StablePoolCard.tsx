@@ -10,11 +10,11 @@ import { useHistory } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
-import { useCUSDPrice } from 'utils/useCUSDPrice'
+import { getCUSDPrices, useCUSDPrice } from 'utils/useCUSDPrice'
 
 import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
 import { useColor, usePoolColor } from '../../hooks/useColor'
-import { useWalletModalToggle } from '../../state/application/hooks'
+import { useTokenPrices, useWalletModalToggle } from '../../state/application/hooks'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
 import { theme, TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
@@ -184,35 +184,38 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const [openDeposit, setOpenDeposit] = useState(false)
   const [openWithdraw, setOpenWithdraw] = useState(false)
   const [openManage, setOpenManage] = useState(false)
+  const tokenPrices = getCUSDPrices(useTokenPrices())
   const history = useHistory()
 
   const mobi = useMobi()
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
-  const coinPrice = useCUSDPrice(tokens) //useEthBtcPrice(poolInfo.poolAddress)
+  const coinPrice = tokens.reduce(
+    (accum: Fraction | undefined, { address }) => accum ?? tokenPrices[address],
+    undefined
+  )
 
   const totalStakedAmount = totalValueStaked
     ? totalValueStaked.multiply(new Fraction(coinPrice?.numerator ?? '1', coinPrice?.denominator ?? '1'))
     : new Fraction(JSBI.BigInt(0))
   const totalMobiRate = new TokenAmount(mobi, mobiRate ?? JSBI.BigInt('0'))
-  let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
-  if (account && mobiRate && totalStakedLPs && totalStakedLPs.greaterThan('0')) {
-    userMobiRate = new TokenAmount(mobi, poolInfo.workingPercentage.multiply(mobiRate ?? '0').toFixed(0))
-  }
-  let userExternalRates: TokenAmount[] = []
-  if (account && poolInfo.externalRewardRates && totalStakedLPs && totalStakedLPs.greaterThan('0')) {
-    userExternalRates = poolInfo.externalRewardRates.map(
-      (rate) => new TokenAmount(rate.token, poolInfo.workingPercentage.multiply(rate.raw).toFixed(0))
-    )
-  }
+  // let userMobiRate = new TokenAmount(mobi, JSBI.BigInt('0'))
+  // if (account && mobiRate && totalStakedLPs && totalStakedLPs.greaterThan('0')) {
+  //   userMobiRate = new TokenAmount(mobi, poolInfo.workingPercentage.multiply(mobiRate ?? '0').toFixed(0))
+  // }
+  // let userExternalRates: TokenAmount[] = []
+  // if (account && poolInfo.externalRewardRates && totalStakedLPs && totalStakedLPs.greaterThan('0')) {
+  //   userExternalRates = poolInfo.externalRewardRates.map(
+  //     (rate) => new TokenAmount(rate.token, poolInfo.workingPercentage.multiply(rate.raw).toFixed(0))
+  //   )
+  // }
   let rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
   for (let i = 0; i < 8; i++) {
     const rate = poolInfo.externalRewardRates?.[i] ?? totalMobiRate
-    // eslint-disable-next-line
-    const priceOfToken = useCUSDPrice(rate.token)
+    const priceOfToken = tokenPrices[rate.token.address.toLowerCase()]
     if (poolInfo.externalRewardRates && i < poolInfo.externalRewardRates.length) {
-      rewardPerYear = rewardPerYear.add(priceOfToken?.raw.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0')
+      rewardPerYear = rewardPerYear.add(priceOfToken?.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0')
     }
   }
   const apyFraction =
