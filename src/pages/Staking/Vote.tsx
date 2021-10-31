@@ -21,6 +21,8 @@ const Wrapper = styled(AutoColumn)`
   overflow: hidden;
   position: relative;
   padding: 1rem;
+  padding-left: 0rem;
+  padding-right: 0rem;
   display: flex;
   align-items: center;
   justify-content: center;
