@@ -8,7 +8,7 @@ import { darken } from 'polished'
 import React, { useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { RadialChart } from 'react-vis'
-import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
+import { GaugeSummary } from 'state/staking/hooks'
 import { useIsDarkMode } from 'state/user/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
@@ -64,8 +64,6 @@ interface GaugeWeightsProps {
 // TO DO: Account for Vote Power Allocations
 export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
-  const votePowerLeft = useVotePowerLeft()
-  const [showUserVote, setShowUserVote] = useState(false)
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
@@ -75,7 +73,7 @@ export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps)
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
-  const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
+  // const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
 
   return (
     <Wrapper>
