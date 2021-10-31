@@ -58,10 +58,12 @@ const TopSection = styled.div`
 
 interface GaugeWeightsProps {
   summaries: GaugeSummary[]
+  lockDate: Date
 }
 
-export default function Vote({ summaries }: GaugeWeightsProps) {
+export default function Vote({ summaries, lockDate }: GaugeWeightsProps) {
   const votePowerLeft = useVotePowerLeft()
+  const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
 
   return summaries.length === 0 ? (
     <Wrapper>
@@ -71,16 +73,21 @@ export default function Vote({ summaries }: GaugeWeightsProps) {
     <Wrapper>
       <TYPE.darkGray>Allocate your voting power to affect the MOBI distribution of each pool.</TYPE.darkGray>
       <TYPE.darkGray>{votePowerLeft}% Left to Allocate</TYPE.darkGray>
+      {tooLateToVote && (
+        <TYPE.red>
+          Your lock period must be greater than a week in order to vote. Extend your lock date to vote.
+        </TYPE.red>
+      )}
       <CardContainer>
         {summaries.map((summary) => (
-          <WeightCard position={summary} key={`weight-card-${summary.pool}`} />
+          <WeightCard position={summary} key={`weight-card-${summary.pool}`} disabled={tooLateToVote} />
         ))}
       </CardContainer>
     </Wrapper>
   )
 }
 
-const PositionWrapper = styled(AutoColumn)`
+const PositionWrapper = styled(AutoColumn)<{ disabled: string }>`
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
   padding-left: 0.25rem;
@@ -90,6 +97,7 @@ const PositionWrapper = styled(AutoColumn)`
   overflow: hidden;
   position: relative;
   padding: 1rem;
+  ${({ disabled }) => disabled && `cursor: not-allowed;`}
   background: ${({ theme }) => theme.bg1};
   color: ${({ theme }) => theme.text1} !important;
   ${({ theme }) => theme.mediaWidth.upToSmall`
@@ -122,7 +130,7 @@ const SecondSection = styled.div<{ mobile: boolean }>`
   `};
 `
 
-function WeightCard({ position }: { position: GaugeSummary }) {
+function WeightCard({ position, disabled }: { position: GaugeSummary; disabled: boolean }) {
   const [voteModalOpen, setVoteModalOpen] = useState(false)
   const stablePools = useStablePoolInfo()
   const poolInfo = stablePools.filter((x) => x.name === position.pool)[0]
@@ -133,7 +141,7 @@ function WeightCard({ position }: { position: GaugeSummary }) {
     <>
       <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
 
-      <PositionWrapper onClick={() => setVoteModalOpen(true)}>
+      <PositionWrapper disabled={disabled} onClick={() => !disabled && setVoteModalOpen(true)}>
         <TopSection>
           <RowFixed style={{ gap: '6px' }}>
             <TYPE.black fontWeight={600} fontSize={[16, 24]}>

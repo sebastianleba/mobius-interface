@@ -157,7 +157,7 @@ export default function Staking() {
         </PositionsContainer>
       ) : view === View.Vote ? (
         <PositionsContainer>
-          <Vote summaries={stakingInfo.positions ?? []} />
+          <Vote summaries={stakingInfo.positions ?? []} lockDate={stakingInfo.lockEnd ?? new Date()} />
         </PositionsContainer>
       ) : (
         <PositionsContainer>

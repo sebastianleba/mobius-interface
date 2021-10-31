@@ -58,11 +58,10 @@ const colorsForChart = ['#35D07F', '#73DDFF', '#BF97FF', '#3488EC', '#FB7C6D', '
 
 interface GaugeWeightsProps {
   summaries: GaugeSummary[]
-  lockDate: Date
 }
 
 // TO DO: Account for Vote Power Allocations
-export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps) {
+export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
@@ -73,7 +72,6 @@ export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps)
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
-  // const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
 
   return (
     <Wrapper>
