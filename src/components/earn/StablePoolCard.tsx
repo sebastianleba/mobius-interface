@@ -131,14 +131,6 @@ const StyledLogo = styled(Logo)<{ size: string }>`
 
 const DepositWithdrawBtn = styled(StyledButton)<{ background: string; backgroundHover: string }>`
   display: flex;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: 12px;
-    background: transparent;
-    color: ${({ background }) => background};
-    font-size: 12px;
-    padding-top: 0.5rem;
-    flex: 0;
-  `}
 `
 
 const ExpandedRow = styled(Row)<{ open: boolean }>`
@@ -500,11 +492,11 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       <Bottom>
         {!isStaking && (openManage || isMobile) && (
           <StyledButton
-            background={!isMobile ? poolColor : 'transparent'}
-            backgroundHover={!isMobile ? poolColor : 'transparent'}
+            background={poolColor}
+            backgroundHover={poolColor}
             onClick={account ? () => setOpenDeposit(true) : toggleWalletModal}
             eth={coin === Coins.Ether}
-            style={{ fontWeight: 700, fontSize: 18, color: isMobile && poolColor }}
+            style={{ fontWeight: 700, fontSize: 18 }}
           >
             DEPOSIT
           </StyledButton>
@@ -515,9 +507,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               display: 'flex',
               justifyContent: 'space-between',
               transition: 'all 0.3s ease-in',
-              gap: !isMobile && '1rem',
+              gap: isMobile ? '0.25rem' : '1rem',
               flexWrap: 'wrap',
-              padding: isMobile && '1rem',
+              padding: isMobile ? 0 : '1rem',
               paddingBottom: isMobile && '0',
               marginLeft: 'auto',
               marginRight: 'auto',
@@ -527,7 +519,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               background={theme(false).celoGreen}
               backgroundHover={theme(false).celoGreen}
               onClick={() => setOpenDeposit(true)}
-              style={{ fontWeight: 700, fontSize: 18 }}
+              style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18 }}
             >
               DEPOSIT
             </DepositWithdrawBtn>
@@ -535,7 +527,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               background={theme(false).celoRed}
               backgroundHover={theme(false).celoRed}
               onClick={() => setOpenWithdraw(true)}
-              style={{ fontWeight: 700, fontSize: 18 }}
+              style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18 }}
             >
               WITHDRAW
             </DepositWithdrawBtn>
@@ -543,7 +535,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <DepositWithdrawBtn
                 background={theme(false).celoGold}
                 backgroundHover={theme(false).celoGold}
-                style={{ fontWeight: 700, fontSize: 18 }}
+                style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18 }}
                 onClick={() => history.push(`/farm/${poolInfo.name}`)}
               >
                 FARM
