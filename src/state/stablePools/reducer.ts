@@ -1,5 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { Fraction, Percent, Token } from '@ubeswap/sdk'
+import { Chain, Coins } from 'constants/StablePools'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
@@ -63,6 +64,8 @@ export type StableSwapConstants = StableSwapMathConstants & {
   additionalRewards?: string[]
   additionalRewardRate?: string[]
   lastClaim?: Date
+  displayChain: Chain
+  coin: Coins
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
@@ -99,13 +102,13 @@ export default createReducer<PoolState>(initialState, (builder) =>
       if (!state.pools[pool]) return
       state.pools[pool].pool.externalRewards = externalRewards
     })
-    .addCase(updateVariableData, (state, { payload: { name, variableData } }) => {
-      const pool = state.pools[name]
+    .addCase(updateVariableData, (state, { payload: { address, variableData } }) => {
+      const pool = state.pools[address]
       return {
         ...state,
         pools: {
           ...state.pools,
-          [name]: {
+          [address]: {
             ...pool,
             pool: {
               ...pool.pool,

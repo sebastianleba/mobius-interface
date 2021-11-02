@@ -5,6 +5,10 @@ import { WrappedTokenInfo } from 'state/lists/hooks'
 import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
+import celoLogo from '../assets/images/celo-chain-logo.png'
+import ethLogo from '../assets/images/ethereum-chain-logo.png'
+import polygonLogo from '../assets/images/polygon-chain-logo.png'
+
 const mobiToken = (chainId: number, address: string) =>
   new WrappedTokenInfo(
     {
@@ -35,12 +39,32 @@ export enum Coins {
   Bitcoin,
   Ether,
   USD,
+  Celo,
+  Eur,
+}
+
+export enum Chain {
+  Celo,
+  Ethereum,
+  Polygon,
+  Solana,
+  All,
+}
+
+export const ChainLogo: { [c in Chain]: string } = {
+  [Chain.Celo]: celoLogo,
+  [Chain.Ethereum]: ethLogo,
+  [Chain.Polygon]: polygonLogo,
+  [Chain.Solana]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_SOL.png',
+  [Chain.All]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
 }
 
 export const PRICE: { [c in Coins]: number } = {
   [Coins.Bitcoin]: 42295,
   [Coins.Ether]: 2909,
   [Coins.USD]: 1,
+  [Coins.Celo]: 6,
+  [Coins.Eur]: 1.17,
 }
 
 export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
@@ -82,7 +106,7 @@ export const VOTING_ESCROW: { [K in ChainId]: string } = {
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
-      name: 'USDC (Optics Bridge) Pool',
+      name: 'USDC (Optics)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7'],
       tokens: [
         new WrappedTokenInfo(
@@ -126,14 +150,16 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['7302827380000000'],
+      displayChain: Chain.Ethereum,
+      coin: Coins.USD,
     },
     {
-      name: 'Poof USD Meta Pool',
+      name: 'Private cUSD',
       tokenAddresses: ['0xB4aa2986622249B1F45eb93F28Cfca2b2606d809', '0xd7Bf6946b740930c60131044bD2F08787e1DdBd4'],
       tokens: [
         new WrappedTokenInfo(
@@ -177,15 +203,17 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0x1250D6dd3B51D20c14a8ECb10CC2dd713967767e',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
       additionalRewardRate: ['11810185180000000', '16534391530000000'],
-      metaPool: 'USDC (Optics Bridge) Pool',
+      metaPool: 'USDC (Optics)',
+      displayChain: Chain.Celo,
+      coin: Coins.USD,
     },
     {
-      name: 'USDC (Solana AllBridge) Pool',
+      name: 'USDC (AllBridge)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
       tokens: [
         new WrappedTokenInfo(
@@ -229,14 +257,16 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0x27D9Bfa5F864862BeDC23cFab7e00b6b94488CC6',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['1460565500000000'],
+      displayChain: Chain.Solana,
+      coin: Coins.USD,
     },
     {
-      name: 'USDC (PoS Optics) Pool',
+      name: 'pUSDC (Optics)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
       tokens: [
         new WrappedTokenInfo(
@@ -285,9 +315,11 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['2190848200000000'],
+      displayChain: Chain.Polygon,
+      coin: Coins.USD,
     },
     {
-      name: 'BTC Pool',
+      name: 'wBTC (Optics)',
       tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
       tokens: [
         new WrappedTokenInfo(
@@ -331,12 +363,14 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('8')],
       peggedTo: '₿',
       pegComesAfter: true,
-      displayDecimals: 3,
+      displayDecimals: 2,
       gaugeAddress: '0x1A8938a37093d34581B21bAd2AE7DC1c19150C05',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
+      displayChain: Chain.Ethereum,
+      coin: Coins.Bitcoin,
     },
     {
-      name: 'ETH Pool',
+      name: 'WETH (Optics)',
       tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4'],
       tokens: [
         new WrappedTokenInfo(
@@ -383,9 +417,11 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 2,
       gaugeAddress: '0xD38e76E17E66b562B61c149Ca0EE53CEa1145733',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
+      displayChain: Chain.Ethereum,
+      coin: Coins.Ether,
     },
     {
-      name: 'USDT (Moss Bridge) Pool',
+      name: 'USDT (Moss)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcFFfE0c89a779c09Df3DF5624f54cDf7EF5fDd5D'],
       tokens: [
         new WrappedTokenInfo(
@@ -429,12 +465,14 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0xe2d6095685248F38Ae9fef1b360D772b78Ea19D1',
       totalMobiRate: JSBI.BigInt('146712000000000000'),
+      displayChain: Chain.Ethereum,
+      coin: Coins.USD,
     },
     {
-      name: 'USDC (Moss Bridge) Pool',
+      name: 'USDC (Moss)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x93DB49bE12B864019dA9Cb147ba75cDC0506190e'],
       tokens: [
         new WrappedTokenInfo(
@@ -478,14 +516,16 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: '$',
       pegComesAfter: false,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
       additionalRewardRate: ['730282730000000'],
+      displayChain: Chain.Ethereum,
+      coin: Coins.USD,
     },
     {
-      name: 'pCelo Pool',
+      name: 'Private CELO',
       tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1'],
       tokens: [
         new WrappedTokenInfo(
@@ -523,16 +563,18 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
       peggedTo: 'Celo',
       pegComesAfter: true,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0x5489b2F0A1992b889F47601D71E068Fd15c63f26',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
       additionalRewardRate: ['11810185180000000', '8267195760000000'],
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
+      displayChain: Chain.Celo,
+      coin: Coins.Celo,
     },
     {
-      name: 'pEuro Pool',
+      name: 'Private cEUR',
       tokenAddresses: ['0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73', '0x56072D4832642dB29225dA12d6Fd1290E4744682'],
       tokens: [
         new WrappedTokenInfo(
@@ -568,15 +610,17 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       feeIndex: 0,
       decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
-      peggedTo: '$',
+      peggedTo: '€',
       pegComesAfter: false,
-      displayDecimals: 1,
+      displayDecimals: 0,
       gaugeAddress: '0xCF34F4ec5DC9E09428A4f4a45475f6277694166c',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
       additionalRewardRate: ['11810185180000000', '8267195760000000'],
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
+      displayChain: Chain.Celo,
+      coin: Coins.Eur,
     },
   ],
   [ChainId.ALFAJORES]: [

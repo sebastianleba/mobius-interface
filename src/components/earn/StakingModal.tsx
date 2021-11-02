@@ -34,6 +34,7 @@ const HypotheticalRewardRate = styled.div<{ dim: boolean }>`
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
   padding: 1rem;
+  paddingright: 2rem;
 `
 
 interface StakingModalProps {
@@ -57,7 +58,6 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
   const parsedAmountWrapped = parsedAmount
 
   let hypotheticalMobiRewardRate: TokenAmount = new TokenAmount(mobi, '0')
-  const hypotheticalRewardRate: TokenAmount = new TokenAmount(mobi, '0')
   if (parsedAmountWrapped?.greaterThan('0')) {
     if (stakingInfo.totalStakedAmount && stakingInfo.totalStakedAmount.equalTo('0')) {
       hypotheticalMobiRewardRate = new TokenAmount(mobi, stakingInfo.mobiRate)
@@ -70,18 +70,6 @@ export default function StakingModal({ isOpen, onDismiss, stakingInfo, userLiqui
       )
     }
   }
-  // if (parsedAmountWrapped?.greaterThan('0')) {
-  //   hypotheticalMobiRewardRate = stakingInfo.getHypotheticalRewardRate(
-  //     stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
-  //     stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
-  //     stakingInfo.totalUBERewardRate
-  //   )
-  //   hypotheticalRewardRate = stakingInfo.getHypotheticalRewardRate(
-  //     stakingInfo.stakedAmount ? parsedAmountWrapped.add(stakingInfo.stakedAmount) : parsedAmountWrapped,
-  //     stakingInfo.totalStakedAmount.add(parsedAmountWrapped),
-  //     stakingInfo.totalRewardRate
-  //   )
-  // }
 
   // state for pending and submitted txn views
   const [attempting, setAttempting] = useState<boolean>(false)

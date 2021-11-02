@@ -1,11 +1,11 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { ButtonOutlined, ButtonPrimary } from 'components/Button'
+import { ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
-import { RowBetween, RowFixed } from 'components/Row'
+import { RowBetween } from 'components/Row'
 import React, { useState } from 'react'
 import { MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
-import { TYPE } from 'theme'
+import { theme, TYPE } from 'theme'
 
 import { useVotingEscrowContract } from '../../hooks/useContract'
 import { useTransactionAdder } from '../../state/transactions/hooks'
@@ -17,8 +17,10 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   padding: 1rem;
+  padding-top: 0;
   background: ${({ theme }) => theme.bg1};
   border-radius: 1rem;
+  margin: 0.25rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
   width: 100%;
   margin-bottom: 1rem;
@@ -40,16 +42,6 @@ const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 `}
-`
-const ButtonGroup = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-`
-
-const SmallButton = styled(ButtonOutlined)`
-  padding: 0.5rem;
 `
 
 type PropTypes = {
@@ -84,42 +76,57 @@ export default function Stake({ stakingInfo }: PropTypes) {
   return (
     <Container>
       <LockModal isOpen={lockType > -1} onDismiss={() => setLockType(-1)} lockType={lockType} />
-      {mobiLocked && mobiLocked.greaterThan('0') ? (
-        <Wrapper>
-          <RowBetween marginBottom="1rem">
-            <TYPE.mediumHeader>MOBI Locked:</TYPE.mediumHeader>
-            <RowFixed width="33%">
-              <TYPE.mediumHeader>{mobiLocked.toFixed(2)}</TYPE.mediumHeader>
-              <div style={{ marginLeft: '1rem' }}>
-                <SmallButton onClick={() => setLockType(LockType.increase)}>Lock More</SmallButton>
-              </div>
-            </RowFixed>
-          </RowBetween>
+      <Wrapper>
+        <RowBetween marginBottom="1rem">
+          <TYPE.largeHeader>Your Locked MOBI:</TYPE.largeHeader>
+          <TYPE.green fontWeight={600} fontSize={24}>
+            {mobiLocked ? mobiLocked.toFixed(2) : '0.00'}
+          </TYPE.green>
+        </RowBetween>
+        {mobiLocked && mobiLocked.greaterThan('0') && (
           <RowBetween>
             <TYPE.mediumHeader>You can claim on: </TYPE.mediumHeader>
-            <RowFixed width="33%">
-              <TYPE.mediumHeader>{lockEnd?.toLocaleDateString() ?? '--'}</TYPE.mediumHeader>
-              <div style={{ marginLeft: '1rem' }}>
-                <SmallButton onClick={() => setLockType(LockType.extend)}>Extend</SmallButton>
-              </div>
-            </RowFixed>
+            <TYPE.mediumHeader>{lockEnd?.toLocaleDateString() ?? '--'}</TYPE.mediumHeader>
           </RowBetween>
-          {Date.now() > (lockEnd?.valueOf() ?? 0) && (
-            <ButtonGroup>
-              <ButtonPrimary onClick={onClaim} disabled={attempting || Date.now() < (lockEnd?.valueOf() ?? 0)}>
-                {attempting ? 'Claiming...' : 'Claim Locked Mobi'}
+        )}
+        {true && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: '1rem',
+              gap: '1rem',
+            }}
+          >
+            <ButtonPrimary
+              onClick={() =>
+                mobiLocked && mobiLocked.greaterThan('0')
+                  ? setLockType(LockType.increase)
+                  : setLockType(LockType.initial)
+              }
+              style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoGreen }}
+            >
+              DEPOSIT
+            </ButtonPrimary>
+            {mobiLocked && mobiLocked.greaterThan('0') && (
+              <ButtonPrimary
+                onClick={() => setLockType(LockType.extend)}
+                style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoGold }}
+              >
+                EXTEND
               </ButtonPrimary>
-            </ButtonGroup>
-          )}
-        </Wrapper>
-      ) : (
-        <Wrapper>
-          <RowBetween marginBottom="1rem">
-            <TYPE.mediumHeader fontSize={[16, 24]}>You currently do not have any locked MOBI</TYPE.mediumHeader>
-          </RowBetween>
-          <ButtonPrimary onClick={() => setLockType(LockType.initial)}>Lock MOBI</ButtonPrimary>
-        </Wrapper>
-      )}
+            )}
+            {Date.now() > (lockEnd?.valueOf() ?? 0) && (
+              <ButtonPrimary
+                onClick={onClaim}
+                style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoRed }}
+              >
+                {attempting ? 'CLAIMING...' : 'CLAIM'}
+              </ButtonPrimary>
+            )}
+          </div>
+        )}
+      </Wrapper>
     </Container>
   )
 }

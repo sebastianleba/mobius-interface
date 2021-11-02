@@ -12,6 +12,7 @@ export interface Colors {
   text3: Color
   text4: Color
   text5: Color
+  text6: Color
 
   // backgrounds / greys
   bg1: Color
@@ -37,6 +38,13 @@ export interface Colors {
   secondary2: Color
   secondary3: Color
 
+  // tokens
+  cusd: Color
+  ceur: Color
+  ether: Color
+  bitcoin: Color
+  celo: Color
+
   // other
   red1: Color
   red2: Color
@@ -45,6 +53,13 @@ export interface Colors {
   yellow1: Color
   yellow2: Color
   blue1: Color
+  celoGreen: Color
+  celoGold: Color
+  celoRed: Color
+  polygon: Color
+  solana: Color
+  ethereum: Color
+  white: Color
 }
 
 export interface Grids {

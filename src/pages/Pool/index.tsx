@@ -1,211 +1,136 @@
-import { Pair } from '@ubeswap/sdk'
-import React, { useContext, useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { Text } from 'rebass'
-import UpdatePools from 'state/stablePools/updater'
-import styled, { ThemeContext } from 'styled-components'
+import { ErrorBoundary } from '@sentry/react'
+import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
+import { Chain, Coins, PRICE } from 'constants/StablePools'
+import { useActiveContractKit } from 'hooks'
+import { useMobi } from 'hooks/Tokens'
+import React from 'react'
+import { isMobile } from 'react-device-detect'
+import styled from 'styled-components'
+import { useCUSDPrice } from 'utils/useCUSDPrice'
 
-import { ButtonPrimary, ButtonSecondary } from '../../components/Button'
-import Card from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
-import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
-import { SwapPoolTabs } from '../../components/NavigationTabs'
-import FullPositionCard from '../../components/PositionCard'
-import { RowBetween, RowFixed } from '../../components/Row'
-import { Dots } from '../../components/swap/styleds'
-import { usePairs } from '../../data/Reserves'
-import { useActiveContractKit } from '../../hooks'
-import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
-import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
-import { ExternalLink, HideSmall, StyledInternalLink, TYPE } from '../../theme'
+import { StablePoolCard } from '../../components/earn/StablePoolCard'
+import Loader from '../../components/Loader'
+import { Row } from '../../components/Row'
+import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
+import { TYPE } from '../../theme'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
   width: 100%;
+  margin-top: 3rem;
 `
 
-const VoteCard = styled(DataCard)`
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #27ae60 0%, #222 100%);
-  overflow: hidden;
+const PoolSection = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  column-gap: 10px;
+  row-gap: 15px;
+  width: 100%;
+  justify-self: center;
 `
 
-const TitleRow = styled(RowBetween)`
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    flex-wrap: wrap;
-    gap: 12px;
-    width: 100%;
-    flex-direction: column-reverse;
-  `};
-`
-
-const ButtonRow = styled(RowFixed)`
-  gap: 8px;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    width: 100%;
-    flex-direction: row-reverse;
-    justify-content: space-between;
-  `};
-`
-
-const ResponsiveButtonPrimary = styled(ButtonPrimary)`
+const HeaderLinks = styled(Row)`
+  justify-self: center;
+  background-color: ${({ theme }) => theme.bg1};
   width: fit-content;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    width: 48%;
-  `};
-`
-
-const ResponsiveButtonSecondary = styled(ButtonSecondary)`
-  width: fit-content;
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    width: 48%;
-  `};
-`
-
-const EmptyProposals = styled.div`
-  border: 1px solid ${({ theme }) => theme.text4};
-  padding: 16px 12px;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  padding: 4px;
+  border-radius: 16px;
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: 10px;
   align-items: center;
 `
 
+const Sel = styled.div<{ selected: boolean }>`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  border-radius: ${({ selected }) => (selected ? '12px' : '3rem')};
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${({ theme, selected }) => (selected ? theme.white : theme.text1)};
+  font-size: 1rem;
+  font-weight: ${({ selected }) => (selected ? '999' : '300')};
+  padding: 8px 12px;
+  word-break: break-word;
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
+`
+
 export default function Pool() {
-  const theme = useContext(ThemeContext)
-  const test = useActiveContractKit()
-  const { account } = test
+  const { chainId } = useActiveContractKit()
 
-  // fetch the user's balances of all tracked V2 LP tokens
-  UpdatePools()
-  const trackedTokenPairs = useTrackedTokenPairs()
-  const tokenPairsWithLiquidityTokens = useMemo(
-    () => trackedTokenPairs.map((tokens) => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
-    [trackedTokenPairs]
-  )
-  const liquidityTokens = useMemo(
-    () => tokenPairsWithLiquidityTokens.map((tpwlt) => tpwlt.liquidityToken),
-    [tokenPairsWithLiquidityTokens]
-  )
-  const [v2PairsBalances, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(
-    account ?? undefined,
-    liquidityTokens
-  )
+  const stablePools = useStablePoolInfo()
 
-  // fetch the reserves for all V2 pools in which the user has a balance
-  const liquidityTokensWithBalances = useMemo(
-    () =>
-      tokenPairsWithLiquidityTokens.filter(({ liquidityToken }) =>
-        v2PairsBalances[liquidityToken.address]?.greaterThan('0')
-      ),
-    [tokenPairsWithLiquidityTokens, v2PairsBalances]
-  )
+  const [selection, setSelection] = React.useState<Chain>(Chain.All)
 
-  const v2Pairs = usePairs(liquidityTokensWithBalances.map(({ tokens }) => tokens))
-  const v2IsLoading =
-    fetchingV2PairBalances || v2Pairs?.length < liquidityTokensWithBalances.length || v2Pairs?.some((V2Pair) => !V2Pair)
+  const tvl = stablePools.reduce((accum, poolInfo) => {
+    const price =
+      poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+        ? JSBI.BigInt(PRICE[Coins.Bitcoin])
+        : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+        ? JSBI.BigInt(PRICE[Coins.Ether])
+        : JSBI.BigInt(PRICE[Coins.USD])
+    const lpPrice = JSBI.divide(
+      JSBI.multiply(price, poolInfo.virtualPrice),
+      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+    )
+    const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
+    return JSBI.add(accum, priceDeposited)
+  }, JSBI.BigInt('0'))
+  const tvlAsTokenAmount = new TokenAmount(cUSD[chainId], tvl)
+  const mobiprice = useCUSDPrice(useMobi())
 
-  const allV2PairsWithLiquidity = v2Pairs.map(([, pair]) => pair).filter((v2Pair): v2Pair is Pair => Boolean(v2Pair))
+  const sortCallback = (pool1: StablePoolInfo, pool2: StablePoolInfo) => {
+    const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount.greaterThan('0')
+    const isStaking2 = pool2.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool2.stakedAmount.greaterThan('0')
+    if (isStaking1 && !isStaking2) return false
+    return true
+  }
 
   return (
-    <>
-      <PageWrapper>
-        <SwapPoolTabs active={'pool'} />
-        <VoteCard>
-          <CardNoise />
-          <CardSection>
-            <AutoColumn gap="md">
-              <RowBetween>
-                <TYPE.white fontWeight={600}>Liquidity provider rewards</TYPE.white>
-              </RowBetween>
-              <RowBetween>
-                <TYPE.white fontSize={14}>
-                  {`Liquidity providers earn a 0.3% fee on all trades proportional to their share of the pool. Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity.`}
-                </TYPE.white>
-              </RowBetween>
-              <ExternalLink
-                style={{ color: 'white', textDecoration: 'underline' }}
-                target="_blank"
-                href="https://docs.ubeswap.org/tutorial/providing-liquidity"
-              >
-                <TYPE.white fontSize={14}>Read more about providing liquidity</TYPE.white>
-              </ExternalLink>
-            </AutoColumn>
-          </CardSection>
-          <CardNoise />
-        </VoteCard>
-
-        <AutoColumn gap="lg" justify="center">
-          <AutoColumn gap="lg" style={{ width: '100%' }}>
-            <TitleRow style={{ marginTop: '1rem' }} padding={'0'}>
-              <HideSmall>
-                <TYPE.mediumHeader style={{ marginTop: '0.5rem', justifySelf: 'flex-start' }}>
-                  Your liquidity
-                </TYPE.mediumHeader>
-              </HideSmall>
-              <ButtonRow>
-                <ResponsiveButtonSecondary as={Link} padding="6px 8px" to="/create/ETH">
-                  Create a pair
-                </ResponsiveButtonSecondary>
-                <ResponsiveButtonPrimary
-                  id="join-pool-button"
-                  as={Link}
-                  padding="6px 8px"
-                  borderRadius="12px"
-                  to="/add/ETH"
-                >
-                  <Text fontWeight={500} fontSize={16}>
-                    Add Liquidity
-                  </Text>
-                </ResponsiveButtonPrimary>
-              </ButtonRow>
-            </TitleRow>
-
-            {!account ? (
-              <Card padding="40px">
-                <TYPE.body color={theme.text3} textAlign="center">
-                  Connect to a wallet to view your liquidity.
-                </TYPE.body>
-              </Card>
-            ) : v2IsLoading ? (
-              <EmptyProposals>
-                <TYPE.body color={theme.text3} textAlign="center">
-                  <Dots>Loading</Dots>
-                </TYPE.body>
-              </EmptyProposals>
-            ) : allV2PairsWithLiquidity?.length > 0 ? (
-              <>
-                <ButtonSecondary>
-                  <RowBetween>
-                    <ExternalLink href={'https://info.ubeswap.org/account/' + account}>
-                      Account analytics and accrued fees
-                    </ExternalLink>
-                    <span> ↗</span>
-                  </RowBetween>
-                </ButtonSecondary>
-                {allV2PairsWithLiquidity.map((v2Pair) => (
-                  <FullPositionCard key={v2Pair.liquidityToken.address} pair={v2Pair} />
-                ))}
-              </>
-            ) : (
-              <EmptyProposals>
-                <TYPE.body color={theme.text3} textAlign="center">
-                  No liquidity found.
-                </TYPE.body>
-              </EmptyProposals>
-            )}
-
-            <AutoColumn justify={'center'} gap="md">
-              <Text textAlign="center" fontSize={14} style={{ padding: '.5rem 0 .5rem 0' }}>
-                {"Don't see a pool you joined?"}{' '}
-                <StyledInternalLink id="import-pool-link" to={'/find'}>
-                  {'Import it.'}
-                </StyledInternalLink>
-              </Text>
-            </AutoColumn>
-          </AutoColumn>
-        </AutoColumn>
-      </PageWrapper>
-    </>
+    <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
+      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
+        <TYPE.tvlHeader>TVL: ${tvlAsTokenAmount.toFixed(0, { groupSeparator: ',' })}</TYPE.tvlHeader>
+      </AutoColumn>
+      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center', alignItems: 'center' }}>
+        {mobiprice && <TYPE.price opacity={'.8'}>Latest MOBI Price: ${mobiprice.toFixed(3)}</TYPE.price>}
+      </AutoColumn>
+      <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
+        <HeaderLinks>
+          <Sel onClick={() => setSelection(Chain.All)} selected={selection === Chain.All}>
+            ALL
+          </Sel>
+          <Sel onClick={() => setSelection(Chain.Celo)} selected={selection === Chain.Celo}>
+            CELO
+          </Sel>
+          <Sel onClick={() => setSelection(Chain.Ethereum)} selected={selection === Chain.Ethereum}>
+            ETH
+          </Sel>
+          <Sel onClick={() => setSelection(Chain.Polygon)} selected={selection === Chain.Polygon}>
+            POLY
+          </Sel>
+          <Sel onClick={() => setSelection(Chain.Solana)} selected={selection === Chain.Solana}>
+            SOL
+          </Sel>
+        </HeaderLinks>
+        <PoolSection>
+          {stablePools && stablePools?.length === 0 ? (
+            <Loader style={{ margin: 'auto' }} />
+          ) : (
+            stablePools
+              ?.sort(sortCallback)
+              .filter((pool) => selection === Chain.All || selection === pool.displayChain)
+              .map((pool) => (
+                <ErrorBoundary key={pool.poolAddress || '000'}>
+                  <StablePoolCard poolInfo={pool} />
+                </ErrorBoundary>
+              ))
+          )}
+        </PoolSection>
+      </AutoColumn>
+    </PageWrapper>
   )
 }

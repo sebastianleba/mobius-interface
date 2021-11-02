@@ -46,9 +46,10 @@ export function colors(darkMode: boolean): Colors {
     // text
     text1: darkMode ? '#FFFFFF' : '#000000',
     text2: darkMode ? '#C3C5CB' : '#565A69',
-    text3: darkMode ? '#6C7284' : '#888D9B',
+    text3: darkMode ? '#D3D3D3' : '#888D9B',
     text4: darkMode ? '#565A69' : '#C3C5CB',
     text5: darkMode ? '#2C2F36' : '#EDEEF2',
+    text6: darkMode ? '#000000' : '#FFFFFF',
 
     // backgrounds / greys
     bg1: darkMode ? '#212429' : '#FFFFFF',
@@ -79,6 +80,12 @@ export function colors(darkMode: boolean): Colors {
     secondary2: darkMode ? '#001715' : '#F6DDE8',
     secondary3: darkMode ? '#001617' : '#FDEAF1',
 
+    cusd: '#35D07F',
+    ceur: '#418EF7',
+    ether: darkMode ? '#FFFFFF' : '#2E3338',
+    bitcoin: '#F59508',
+    celo: '#FBCC5C',
+
     // other
     red1: '#FD4040',
     red2: '#F82D3A',
@@ -87,6 +94,13 @@ export function colors(darkMode: boolean): Colors {
     yellow1: '#FFE270',
     yellow2: '#F3841E',
     blue1: '#35D07F',
+    celoGreen: '#35D07F',
+    celoGold: '#FBCC5C',
+    celoRed: '#FB7C6D',
+    polygon: '#BF97FF',
+    ethereum: '#2E3338',
+    solana: '#9DB6FF',
+    white: '#FFFFFF',
 
     // dont wanna forget these blue yet
     // blue4: darkMode ? '#153d6f70' : '#C4D9F8',
@@ -144,6 +158,9 @@ export const TYPE = {
   black(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'text1'} {...props} />
   },
+  green(props: TextProps) {
+    return <TextWrapper fontWeight={500} color={'celoGreen'} {...props} />
+  },
   white(props: TextProps) {
     return <TextWrapper fontWeight={500} color={'white'} {...props} />
   },
@@ -193,7 +210,7 @@ export const TYPE = {
 
 export const FixedGlobalStyle = createGlobalStyle`
 html, input, textarea, button {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Avenir', Nunito, 'Inter';
   font-display: fallback;
 }
 

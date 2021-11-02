@@ -16,13 +16,20 @@ const fetchEthBtcPrices = async (dispatch: any) => {
   const ethPrice: string = resp.data['0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2']?.['usd']
   dispatch(btcEthPrice({ btcPrice: parseInt(btcPrice).toFixed(0), ethPrice: parseInt(ethPrice).toFixed(0) }))
 }
+// 0x17700282592d6917f6a73d0bf8accf4d578c131e
 
 export function PriceData(): null {
   const graphQl = gql`
     {
-      tokens(where: { derivedCUSD_gt: "0" }) {
+      tokens {
         id
         derivedCUSD
+      }
+      token(id: "0x7D00cd74FF385c955EA3d79e47BF06bD7386387D") {
+        symbol
+        name
+        derivedCUSD
+        pairQuote
       }
     }
   `
@@ -30,6 +37,7 @@ export function PriceData(): null {
   const { data, loading, error } = useQuery(graphQl)
   useEffect(() => {
     if (!loading && !error && data) {
+      console.log(data)
       const prices: { [address: string]: string } = data.tokens.reduce(
         (accum, cur) => ({ ...accum, [cur.id.toLowerCase()]: cur.derivedCUSD }),
         {}

@@ -1,5 +1,6 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
+import { Chain, Coins } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useLiquidityGaugeContract, useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,6 +43,8 @@ export interface StablePoolInfo {
   readonly externalRewardRates?: TokenAmount[]
   readonly lastClaim?: Date
   readonly meta?: string
+  readonly displayChain: Chain
+  readonly coin: Coins
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -80,45 +83,42 @@ export const getPoolInfo = (
       list: TokenList
     }
   } = {}
-): StablePoolInfo => {
-  return {
-    name: pool.name,
-    poolAddress: pool.address,
-    lpToken: pool.lpToken,
-    tokens: pool.tokens,
-    amountDeposited: new TokenAmount(
-      pool.lpToken,
-      JSBI.add(pool.lpOwned, pool.staking?.userStaked ?? JSBI.BigInt('0'))
-    ),
-    totalDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
-    stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
-    apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
-    peggedTo: pool.peggedTo,
-    virtualPrice: pool.virtualPrice,
-    priceOfStaked: tokenAmountScaled(
-      pool.lpToken,
-      JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
-    ),
-    workingSupply: pool.workingLiquidity,
-    balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
-    pegComesAfter: pool.pegComesAfter,
-    feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
-    mobiRate: pool.staking?.totalMobiRate,
-    pendingMobi: pool.staking?.pendingMobi,
-    gaugeAddress: pool.gaugeAddress,
-    displayDecimals: pool.displayDecimals,
-    totalStakedAmount: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
-    workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
-    totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
-    externalRewardRates:
-      pool.additionalRewardRate?.map(
-        (rate, i) =>
-          tokens[pool.additionalRewards?.[i]] && new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
-      ) ?? undefined,
-    lastClaim: pool.lastClaim,
-    meta: pool.metaPool,
-  }
-}
+): StablePoolInfo => ({
+  name: pool.name,
+  poolAddress: pool.address,
+  lpToken: pool.lpToken,
+  tokens: pool.tokens,
+  amountDeposited: new TokenAmount(pool.lpToken, JSBI.add(pool.lpOwned, pool.staking?.userStaked ?? JSBI.BigInt('0'))),
+  totalDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
+  stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
+  apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
+  peggedTo: pool.peggedTo,
+  virtualPrice: pool.virtualPrice,
+  priceOfStaked: tokenAmountScaled(
+    pool.lpToken,
+    JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
+  ),
+  workingSupply: pool.workingLiquidity,
+  balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
+  pegComesAfter: pool.pegComesAfter,
+  feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
+  mobiRate: pool.staking?.totalMobiRate,
+  pendingMobi: pool.staking?.pendingMobi,
+  gaugeAddress: pool.gaugeAddress,
+  displayDecimals: pool.displayDecimals,
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
+  workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
+  totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
+  externalRewardRates:
+    pool.additionalRewardRate?.map(
+      (rate, i) =>
+        tokens[pool.additionalRewards?.[i]] && new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
+    ) ?? undefined,
+  lastClaim: pool.lastClaim,
+  meta: pool.metaPool,
+  displayChain: pool.displayChain,
+  coin: pool.coin,
+})
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
   const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)

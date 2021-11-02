@@ -112,8 +112,16 @@ export function useTokenPrice(address: string | undefined): Fraction | undefined
   const priceString = useSelector((state: AppState) => {
     return state.application.tokenPrices[address?.toLowerCase()]
   })
+  return priceStringToFraction(priceString)
+}
+
+export function priceStringToFraction(priceString: string | undefined): Fraction | undefined {
   if (!priceString) return undefined
   const price = parseFloat(priceString) * 10 ** 4
   const asFraction = new Fraction(price.toFixed(0), '10000')
   return asFraction ?? undefined
+}
+
+export function useTokenPrices() {
+  return useSelector((state: AppState) => state.application.tokenPrices)
 }
