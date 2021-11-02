@@ -210,7 +210,7 @@ export const TYPE = {
 
 export const FixedGlobalStyle = createGlobalStyle`
 html, input, textarea, button {
-  font-family: 'Avenir', sans-serif;
+  font-family: 'Avenir', Nunito, 'Inter';
   font-display: fallback;
 }
 
