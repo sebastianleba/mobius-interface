@@ -1,22 +1,27 @@
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
-import { ButtonOutlined } from 'components/Button'
+import { ButtonOutlined, ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardNoise } from 'components/earn/styled'
 import Loader from 'components/Loader'
-import { AutoRow, RowBetween } from 'components/Row'
-import { useColor } from 'hooks/useColor'
+import { AutoRow, RowBetween, RowFixed } from 'components/Row'
+import { ChainLogo } from 'constants/StablePools'
+import { usePoolColor } from 'hooks/useColor'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
+import { ChevronDown, ChevronUp } from 'react-feather'
 import { usePriceOfLp } from 'state/stablePools/hooks'
 import { GaugeSummary, MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 import { calcBoost } from 'utils/calcExpectedVeMobi'
 
+import Logo from '../../components/Logo'
+import { useStablePoolInfo } from '../../state/stablePools/hooks'
 import ClaimAllMobiModal from './ClaimAllMobiModal'
 import GaugeVoteModal from './GaugeVoteModal'
 
 const Container = styled.div`
-  width: 49%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -32,36 +37,37 @@ const SmallButton = styled(ButtonOutlined)`
   width: 8rem;
   border-color: ${({ theme }) => theme.primary1};
 `
-const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any; activated: boolean }>`
-  border-radius: 12px;
+const Wrapper = styled(AutoColumn)<{ showBackground: boolean; bgColor: any }>`
   width: 100%;
   overflow: hidden;
   position: relative;
   margin-bottom: 1rem;
   padding: 1rem;
-  cursor: pointer;
-  opacity: ${({ activated }) => (activated ? 1 : 0.9)};
   overflow: hidden;
   position: relative;
-  background: ${({ bgColor, theme }) =>
-    `radial-gradient(91.85% 100% at 1.84% 0%, ${bgColor} 0%, ${theme.black} 100%) `};
-  color: ${({ theme, showBackground }) => (showBackground ? theme.white : theme.text1)} !important;
-  ${({ showBackground }) =>
-    showBackground &&
-    `  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
-    0px 24px 32px rgba(0, 0, 0, 0.01);`}
+  background: ${({ theme }) => theme.bg1};
   ${({ theme }) => theme.mediaWidth.upToSmall`
+    box-shadow: 1px 1px 3px ${({ theme }) => theme.bg4};
+    border-radius: 10px;
+
 `}
   &:hover {
     opacity: 1;
   }
 `
-const Divider = styled.div<{ bg?: string }>`
+
+const StyledLogo = styled(Logo)<{ size: string }>`
+  width: ${({ size }) => size};
+  height: ${({ size }) => size};
+  border-radius: ${({ size }) => size};
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
+  background-color: ${({ theme }) => theme.white};
+`
+const Divider = styled.div`
   width: 100%;
   height: 1px;
-  background: ${({ theme, bg }) => (bg ? bg : theme.primary1)};
-  margin-top: 0.25rem;
-  margin-bottom: 1.5rem;
+  margin: 0;
+  background: ${({ theme }) => theme.bg4};
 `
 
 type PositionsProps = {
@@ -78,19 +84,22 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
   return (
     <Container>
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
-      <RowBetween>
+      <RowBetween style={{ marginBottom: '1rem' }}>
         <TYPE.largeHeader>Your Positions</TYPE.largeHeader>
-        <SmallButton onClick={() => setOpenModal(true)}>Claim MOBI</SmallButton>
+        <TYPE.green
+          style={{ paddingLeft: '.15rem', textAlign: 'right' }}
+          className="apr"
+          fontWeight={800}
+          fontSize={[18, 24]}
+        >
+          {unclaimedMobi.toSignificant(4)} Unclaimed MOBI
+        </TYPE.green>
       </RowBetween>
-      <RowBetween>
-        <TYPE.subHeader>{unclaimedMobi.toSignificant(4)} Unclaimed MOBI</TYPE.subHeader>
-      </RowBetween>
-      <Divider />
       {loading ? (
         <AutoRow>
           <Loader style={{ margin: 'auto' }} />
         </AutoRow>
-      ) : greaterThanZero.length > 0 ? (
+      ) : (
         greaterThanZero.map((position) => (
           <PositionCard
             key={`positions-card-${position.pool}`}
@@ -99,19 +108,18 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
             totalVotingPower={stakingInfo.totalVotingPower.raw}
           />
         ))
-      ) : (
-        <TYPE.largeHeader>You do not have any deposits</TYPE.largeHeader>
+      )}
+      {JSBI.greaterThan(unclaimedMobi.raw, JSBI.BigInt(0)) && (
+        <ButtonPrimary
+          onClick={() => setOpenModal(true)}
+          style={{ fontWeight: 700, fontSize: 18, marginBottom: '1rem' }}
+        >
+          CLAIM MOBI
+        </ButtonPrimary>
       )}
     </Container>
   )
 }
-
-const ButtonGroup = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-`
 
 function PositionCard({
   position,
@@ -122,48 +130,85 @@ function PositionCard({
   votingPower: JSBI
   totalVotingPower: JSBI
 }) {
-  const backgroundColor = useColor(position.firstToken)
   const lpAsUsd = usePriceOfLp(position.pool, position.baseBalance)
-  const [showMore, setShowMore] = useState(false)
   const [voteModalOpen, setVoteModalOpen] = useState(false)
   const boost = calcBoost(position, votingPower, totalVotingPower)
+
+  const stablePools = useStablePoolInfo()
+  const poolInfo = stablePools.filter((x) => x.name === position.pool)[0]
+  const poolColor = usePoolColor(poolInfo)
+  const [expand, setExpand] = useState(false)
+
+  const mobileView = (
+    <div>
+      <RowBetween>
+        <RowFixed style={{ gap: '10px' }}>
+          <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+          <TYPE.mediumHeader>{position.pool}</TYPE.mediumHeader>
+        </RowFixed>
+        {expand ? <ChevronUp /> : <ChevronDown />}
+      </RowBetween>
+      {expand && (
+        <div style={{ width: '100%', display: 'flex' }}>
+          <TYPE.darkGray style={{ width: '100%', textAlign: 'right' }} fontSize={20}>
+            {`Value: $${lpAsUsd?.toSignificant(4)}`}
+          </TYPE.darkGray>
+          <TYPE.subHeader
+            style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
+            color={poolColor}
+            className="apr"
+            fontWeight={800}
+            fontSize={[18, 24]}
+          >
+            {`Boost: ${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+          </TYPE.subHeader>
+        </div>
+      )}
+    </div>
+    // <RowBetween>
+    // <RowFixed style={{ gap: '10px' }}>
+    //   <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+    //   <TYPE.mediumHeader>{position.pool}</TYPE.mediumHeader>
+    //   <TYPE.darkGray fontSize={20}>{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.darkGray>
+    //  </RowFixed>
+    // <TYPE.subHeader
+    //   style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
+    //   color={poolColor}
+    //   className="apr"
+    //   fontWeight={800}
+    //   fontSize={[18, 24]}
+    // >
+    //   {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+    // </TYPE.subHeader>
+    // </RowBetween>
+  )
 
   return (
     <>
       <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
 
-      <Wrapper
-        activated={showMore}
-        showBackground={true}
-        bgColor={backgroundColor}
-        onClick={() => setShowMore(!showMore)}
-      >
+      <Wrapper showBackground={true} bgColor={poolColor} onClick={() => setExpand(!expand)}>
         <CardNoise />
-        <RowBetween>
-          <TYPE.mediumHeader color="white">{position.pool}</TYPE.mediumHeader>
-          <TYPE.white color="white">{`$${lpAsUsd?.toSignificant(4)}`}</TYPE.white>
-        </RowBetween>
-        {showMore && (
-          <>
-            <Divider bg="grey" />
-            <RowBetween>
-              <TYPE.white>Unclaimed MOBI</TYPE.white>
-              <TYPE.white color="white">{`${position.unclaimedMobi.toFixed(2)} MOBI`}</TYPE.white>
-            </RowBetween>
-            {/* <RowBetween>
-              <TYPE.white>Your actual share</TYPE.white>
-              <TYPE.white>{`${position.actualPercentage.toSignificant(4)}%`}</TYPE.white>
-            </RowBetween>
-            <RowBetween>
-              <TYPE.white>Your share, accounted for boosts</TYPE.white>
-              <TYPE.white>{`${position.workingPercentage.toSignificant(4)}%`}</TYPE.white>
-            </RowBetween> */}
-            <RowBetween>
-              <TYPE.white>Your Boost</TYPE.white>
-              <TYPE.white>{`${boost.toFixed(2)}x`}</TYPE.white>
-            </RowBetween>
-          </>
-        )}
+        {isMobile ? (
+          mobileView
+        ) : (
+          <RowBetween>
+            <RowFixed style={{ gap: '10px' }}>
+              <StyledLogo size={'32px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+              <TYPE.mediumHeader>{position.pool}</TYPE.mediumHeader>
+              <TYPE.darkGray fontSize={20}>{`  -  $${lpAsUsd?.toSignificant(4)}`}</TYPE.darkGray>
+            </RowFixed>
+            <TYPE.subHeader
+              style={{ alignContent: 'right', alignItems: 'right', textAlign: 'right' }}
+              color={poolColor}
+              className="apr"
+              fontWeight={800}
+              fontSize={[18, 24]}
+            >
+              {`${boost.greaterThan(JSBI.BigInt(0)) ? boost.toFixed(2) : '1'}x`}
+            </TYPE.subHeader>
+          </RowBetween>
+        )}{' '}
       </Wrapper>
     </>
   )

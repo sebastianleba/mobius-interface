@@ -2,13 +2,13 @@ import { CardNoise } from 'components/claim/styled'
 import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
 import { AutoRow, RowBetween, RowFixed } from 'components/Row'
-import Toggle from 'components/Toggle'
 import { useColor } from 'hooks/useColor'
 import { useWindowSize } from 'hooks/useWindowSize'
 import { darken } from 'polished'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { RadialChart } from 'react-vis'
-import { GaugeSummary, useVotePowerLeft } from 'state/staking/hooks'
+import { GaugeSummary } from 'state/staking/hooks'
 import { useIsDarkMode } from 'state/user/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
@@ -45,18 +45,24 @@ const CardContainer = styled.div`
   justify-content: space-between;
 `
 
+const ColorBox = styled.div<{ color: string }>`
+  background: ${({ color }) => color};
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  margin-right: 1rem;
+  margin-bottom: 0.25rem;
+`
+
 const colorsForChart = ['#35D07F', '#73DDFF', '#BF97FF', '#3488EC', '#FB7C6D', '#FBCC5C', '#FEF2D6']
 
 interface GaugeWeightsProps {
   summaries: GaugeSummary[]
-  lockDate: Date
 }
 
 // TO DO: Account for Vote Power Allocations
-export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps) {
+export default function GaugeWeights({ summaries }: GaugeWeightsProps) {
   const numColors = colorsForChart.length
-  const votePowerLeft = useVotePowerLeft()
-  const [showUserVote, setShowUserVote] = useState(false)
   const data = summaries.map((summary, i) => ({
     label: summary.pool,
     angle: parseInt(summary.currentWeight.multiply('360').toFixed(0)),
@@ -66,7 +72,6 @@ export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps)
   }))
   const isDarkMode = useIsDarkMode()
   const { width, height } = useWindowSize()
-  const tooLateToVote = lockDate.valueOf() - Date.now() <= 7 * 24 * 60 * 60 * 1000
 
   return (
     <Wrapper>
@@ -90,48 +95,28 @@ export default function GaugeWeights({ summaries, lockDate }: GaugeWeightsProps)
               data={data}
               width={Math.min((width ?? 0) * 0.8, 600)}
               height={Math.min((width ?? 0) * 0.8, 600)}
-              showLabels={true}
-              labelsStyle={{ color: isDarkMode ? 'white' : 'black' }}
-              labelsAboveChildren={true}
-              labelsRadiusMultiplier={0.9}
               margin={0}
-              style={{ margin: 0 }}
+              style={{ marginLeft: 'auto' }}
             />
+            {!isMobile && (
+              <RowBetween style={{ flexWrap: 'wrap', maxWidth: '20rem' }}>
+                {data.map(({ label, subLabel, color }) => (
+                  <RowFixed key={`legend-${label}`} style={{ width: '49%' }}>
+                    <ColorBox color={color} /> <TYPE.subHeader>{label}</TYPE.subHeader>
+                  </RowFixed>
+                ))}
+              </RowBetween>
+            )}
           </WrappedRow>
-          <AutoRow marginTop="1rem">
-            <TYPE.mediumHeader>Vote for Pool Weights!</TYPE.mediumHeader>
-          </AutoRow>
-          <AutoRow>
-            <TYPE.subHeader>Allocate your vote power to affect the MOBI distribution of each pool</TYPE.subHeader>
-          </AutoRow>
-          {tooLateToVote ? (
-            <AutoRow>
-              <TYPE.subHeader color="red" fontSize={20}>
-                Your lock date must be further than a week away to vote on pool weights
-              </TYPE.subHeader>
-            </AutoRow>
-          ) : (
-            <>
-              <AutoRow>
-                <TYPE.subHeader>{votePowerLeft}% Left to Allocate</TYPE.subHeader>
-              </AutoRow>
-              <AutoRow marginTop="0.5rem">
-                <Toggle id="show-user-vote" isActive={showUserVote} toggle={() => setShowUserVote(!showUserVote)} />{' '}
-                Show My Votes
-              </AutoRow>
-            </>
+          {isMobile && (
+            <RowBetween style={{ flexWrap: 'wrap', maxWidth: '20rem', marginRight: 'auto', marginLeft: 'auto' }}>
+              {data.map(({ label, subLabel, color }) => (
+                <RowFixed key={`legend-${label}`} style={{ width: '49%' }}>
+                  <ColorBox color={color} /> <TYPE.subHeader>{label}</TYPE.subHeader>
+                </RowFixed>
+              ))}
+            </RowBetween>
           )}
-
-          <CardContainer>
-            {summaries.map((summary) => (
-              <WeightCard
-                disabled={tooLateToVote}
-                showUserVote={showUserVote}
-                position={summary}
-                key={`weight-card-${summary.pool}`}
-              />
-            ))}
-          </CardContainer>
         </>
       )}
     </Wrapper>
@@ -166,9 +151,6 @@ const PositionWrapper = styled(AutoColumn)<{
 `}
   &:hover {
     opacity: 1;
-  }
-  @media (min-width: 899px) {
-    width: 49%;
   }
 `
 const RowWithGap = styled(RowFixed)`

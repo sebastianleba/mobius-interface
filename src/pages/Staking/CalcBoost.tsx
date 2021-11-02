@@ -1,5 +1,6 @@
 import { Fraction, JSBI, TokenAmount } from '@ubeswap/sdk'
 import { AutoColumn } from 'components/Column'
+import QuestionHelper from 'components/QuestionHelper'
 import { RowBetween } from 'components/Row'
 import { useMobi, useVeMobi } from 'hooks/Tokens'
 import { useColor } from 'hooks/useColor'
@@ -22,8 +23,7 @@ import ClaimAllMobiModal from './ClaimAllMobiModal'
 import { CurrencyRow } from './IncreaseLockAmount'
 
 const Container = styled.div`
-  margin-top: 1rem;
-  width: 100%;
+  width: 49%;
   display: flex;
   flex-direction: column;
   padding: 1rem;
@@ -31,7 +31,9 @@ const Container = styled.div`
   border-radius: 1rem;
   margin-bottom: 1rem;
   ${({ theme }) => theme.mediaWidth.upToSmall`
-    width: 100%
+    width: 100%;
+    margin-top: 1rem;
+
 `}
 `
 
@@ -181,6 +183,9 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
       <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
       <RowBetween style={{ flexWrap: 'wrap' }}>
         <TYPE.largeHeader>Calculate Boosts</TYPE.largeHeader>
+        <QuestionHelper text={<>Calculate how much MOBI you need to stake</>} />
+      </RowBetween>
+      <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
         <CurrencySelect
           isDarkMode={isDarkMode}
           bgColor={color}
@@ -191,6 +196,7 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
           onClick={() => {
             setModalOpen(true)
           }}
+          style={{ width: '100%' }}
         >
           <Aligner>
             {pool ? (
@@ -206,21 +212,20 @@ export default function CalcBoost({ stakingInfo }: PositionsProps) {
             <StyledDropDown selected={true} />
           </Aligner>
         </CurrencySelect>
-      </RowBetween>
-      <CurrencySearchModal
-        isOpen={modalOpen}
-        onDismiss={handleDismissSearch}
-        onCurrencySelect={onCurrencySelect}
-        selectedCurrency={pool ? pool.lpToken : undefined}
-      />
-      <Divider />
+        <CurrencySearchModal
+          isOpen={modalOpen}
+          onDismiss={handleDismissSearch}
+          onCurrencySelect={onCurrencySelect}
+          selectedCurrency={pool ? pool.lpToken : undefined}
+        />
+      </div>
       {!pool ? (
         <TYPE.mediumHeader>Select a Pool</TYPE.mediumHeader>
       ) : (
         <div>
-          <TYPE.mediumHeader marginBottom={0}>Enter amount</TYPE.mediumHeader>
+          {/* <TYPE.mediumHeader marginBottom={-20}>Enter amount</TYPE.mediumHeader> */}
           <CurrencyRow val={lpInput} token={pool.lpToken} balance={lpBalance} setTokenAmount={setLPInput} pool={pool} />
-          <TYPE.mediumHeader marginBottom={0}>Enter amount</TYPE.mediumHeader>
+          {/* <TYPE.mediumHeader marginBottom={-20}>Enter amount</TYPE.mediumHeader> */}
           <CurrencyRow val={veInput} token={vemobi} balance={veBalance} setTokenAmount={setVEInput} />
           <Divider />
           <Wrapper>

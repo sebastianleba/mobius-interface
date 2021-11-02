@@ -1,11 +1,12 @@
 import * as UbeswapDefaultList from '@ubeswap/default-token-list'
 import * as UbeswapExperimentalList from '@ubeswap/default-token-list/ubeswap-experimental.token-list.json'
 import { ChainId, Token } from '@ubeswap/sdk'
-import { MultiChainIds, OpticsDomainInfo } from 'constants/Optics'
-import { STATIC_POOL_INFO } from 'constants/StablePools'
+import { MultiChainIds } from 'constants/Optics'
+import { Coins, STATIC_POOL_INFO } from 'constants/StablePools'
 import Vibrant from 'node-vibrant'
 import { shade } from 'polished'
 import { useLayoutEffect, useState } from 'react'
+import { StablePoolInfo } from 'state/stablePools/hooks'
 import { useTheme } from 'styled-components'
 import uriToHttp from 'utils/uriToHttp'
 import { hex } from 'wcag-contrast'
@@ -23,8 +24,6 @@ export const networkColors: { [id in MultiChainIds]: string } = {
   [MultiChainIds.RINKEBY]: ethColor,
   [MultiChainIds.ALFAJORES]: celoColor,
 }
-
-const getNetworkColor = (network: OpticsDomainInfo) => networkColors[network.chainId] as any as string
 
 const images: Record<string, string> = {}
 
@@ -101,6 +100,17 @@ export function generateColorPallete(tokens: Token[]) {
   colors = colors.map((color, i) => `${i * increment}% { background: ${color};}`)
 
   return colors.join('\n')
+}
+
+export function usePoolColor(pool: StablePoolInfo) {
+  const theme = useTheme()
+  const coin = pool.coin
+  if (coin === Coins.USD) return theme.cusd
+  if (coin === Coins.Eur) return theme.ceur
+  if (coin === Coins.Ether) return theme.ether
+  if (coin === Coins.Celo) return theme.celo
+  if (coin === Coins.Bitcoin) return theme.bitcoin
+  else return theme.celoGreen
 }
 
 export function useColor(token?: Token) {

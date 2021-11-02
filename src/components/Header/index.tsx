@@ -382,9 +382,6 @@ export default function Header() {
           </AccountElement>
         </HeaderElement>
         <RowFixed>
-          <StyledMenuButton onClick={() => window.open('https://bridge.mobius.money/#/', '_blank')}>
-            {darkMode ? '🌉' : '🌁'}
-          </StyledMenuButton>
           <StyledMenuButton onClick={() => toggleDarkMode()}>
             {darkMode ? <Moon size={20} /> : <Sun size={20} />}
           </StyledMenuButton>

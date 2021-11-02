@@ -1,11 +1,21 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { CELO, ChainId as UbeswapChainId, currencyEquals, cUSD, Fraction, Price, Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
+import { TokenPrices } from 'state/application/reducer'
 
 import { usePairs } from '../data/Reserves'
-import { useTokenPrice } from '../state/application/hooks'
+import { priceStringToFraction, useTokenPrice } from '../state/application/hooks'
 
 type TokenPair = [Token | undefined, Token | undefined]
+
+export function getCUSDPrices(prices?: TokenPrices): { [address: string]: Fraction } {
+  return (
+    Object.entries(prices ?? {})?.reduce(
+      (accum, [address, price]) => ({ ...accum, [address]: priceStringToFraction(price) }),
+      {}
+    ) ?? {}
+  )
+}
 
 /**
  * Returns the price in cUSD of the input currency

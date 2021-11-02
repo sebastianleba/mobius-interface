@@ -11,6 +11,7 @@ const Base = styled(RebassButton)<{
   width?: string
   borderRadius?: string
   altDisabledStyle?: boolean
+  disabledStyle?: boolean
 }>`
   padding: ${({ padding }) => (padding ? padding : '18px')};
   width: ${({ width }) => (width ? width : '100%')};
@@ -39,18 +40,18 @@ const Base = styled(RebassButton)<{
 `
 
 export const ButtonPrimary = styled(Base)`
-  background-color: ${({ theme }) => theme.primary1};
-  color: white;
+  background-color: ${({ theme, disabledStyle }) => (disabledStyle ? theme.bg3 : theme.primary1)};
+  color: ${({ theme, disabledStyle }) => (disabledStyle ? theme.text3 : 'white')};
   &:focus {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.05, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
+    box-shadow: 0 0 0 1pt ${({ theme, disabledStyle }) => !disabledStyle && darken(0.05, theme.primary1)};
+    background-color: ${({ theme, disabledStyle }) => !disabledStyle && darken(0.05, theme.primary1)};
   }
   &:hover {
-    background-color: ${({ theme }) => darken(0.05, theme.primary1)};
+    background-color: ${({ theme, disabledStyle }) => !disabledStyle && darken(0.05, theme.primary1)};
   }
   &:active {
-    box-shadow: 0 0 0 1pt ${({ theme }) => darken(0.1, theme.primary1)};
-    background-color: ${({ theme }) => darken(0.1, theme.primary1)};
+    box-shadow: 0 0 0 1pt ${({ theme, disabledStyle }) => !disabledStyle && darken(0.1, theme.primary1)};
+    background-color: ${({ theme, disabledStyle }) => !disabledStyle && darken(0.1, theme.primary1)};
   }
   &:disabled {
     background-color: ${({ theme, altDisabledStyle, disabled }) =>
