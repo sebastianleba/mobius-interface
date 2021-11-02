@@ -34,6 +34,7 @@ const HypotheticalRewardRate = styled.div<{ dim: boolean }>`
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
   padding: 1rem;
+  paddingright: 2rem;
 `
 
 interface StakingModalProps {
