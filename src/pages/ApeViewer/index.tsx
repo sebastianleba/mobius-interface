@@ -1,4 +1,5 @@
 import { ButtonConfirmed } from 'components/Button'
+import Card from 'components/Card'
 import React from 'react'
 import Countdown from 'react-countdown'
 import { NavLink } from 'react-router-dom'
@@ -135,15 +136,15 @@ const Image = styled.img`
   height: 5rem;
 `}
 `
-const ImageContainer = styled.div`
+const ImageContainer = styled(Card)`
   display: flex;
+  width: fit-content;
   flex-direction: column;
   align-items: center;
   align-content: center;
   padding: 2.5rem;
   margin: 1rem;
   border-radius: 1rem;
-  box-shadow: 1px 1px 10 grey;
   background: ${({ theme }) => theme.bg1};
   ${({ theme }) => theme.mediaWidth.upToSmall`
   padding: 1rem;
@@ -197,18 +198,18 @@ export default function ApeViewer() {
   // for (let i = 293; i < 393; i++) apeIDs.push(i)
   const addApes = () => {
     const val: string = id
+    const add: string[] = []
     val.split(',').forEach((num) => {
       const split = num
         .trim()
         .split(':')
         .map((s) => s.trim())
       if (split.length === 1) {
-        setApeIDs([...apeIDs, ...split])
+        add.push(split[0])
       } else if (split.length > 1) {
-        const toAdd: string[] = []
-        for (let i = parseInt(split[0]); i < parseInt(split[1]); i++) toAdd.push(i.toString())
-        setApeIDs([...apeIDs, ...toAdd])
+        for (let i = parseInt(split[0]); i <= parseInt(split[1]); i++) add.push(i.toString())
       }
+      setApeIDs([...apeIDs, ...add])
       setId('')
     })
   }
