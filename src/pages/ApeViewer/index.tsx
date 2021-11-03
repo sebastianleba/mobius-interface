@@ -14,6 +14,7 @@ const StyledCountdown = styled(Countdown)`
 `
 
 const Container = styled.div`
+  width: 100vw;
   padding-top: 4rem;
   display: flex;
   flex-wrap: wrap;
@@ -156,7 +157,7 @@ const InputApes = styled.div`
 `
 const Input = styled.input<{ error?: boolean }>`
   font-size: 1.25rem;
-  margin-bottom: 0.5rem;
+  margin: 0.5rem;
   outline: none;
   border: none;
   flex: 1 1 auto;
