@@ -129,6 +129,10 @@ export const ComingSoon = styled.a`
 const Image = styled.img`
   width: 10rem;
   height: 10rem;
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  width: 5rem;
+  height: 5rem;
+`}
 `
 const ImageContainer = styled.div`
   display: flex;
@@ -140,11 +144,14 @@ const ImageContainer = styled.div`
   border-radius: 1rem;
   box-shadow: 1px 1px 10 grey;
   background: ${({ theme }) => theme.bg1};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding: 1rem;
+`}
 `
 const InputApes = styled.div`
   display: flex;
   align-items: center;
-  width: min(90%, 1080px);
+  width: min(100%, 100rem);
   flex-wrap: wrap;
 `
 const Input = styled.input<{ error?: boolean }>`
@@ -159,7 +166,7 @@ const Input = styled.input<{ error?: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
-  width: 50rem;
+  width: min(50rem, 100%);
   height: 3rem;
   border-radius: 0.5rem;
   ::placeholder {
