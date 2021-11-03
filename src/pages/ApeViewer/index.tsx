@@ -144,7 +144,7 @@ const ImageContainer = styled.div`
 const InputApes = styled.div`
   display: flex;
   align-items: center;
-  width: 100%;
+  width: min(90%, 1080px);
   flex-wrap: wrap;
 `
 const Input = styled.input<{ error?: boolean }>`
@@ -159,7 +159,7 @@ const Input = styled.input<{ error?: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
-  width: 100rem;
+  width: 50rem;
   height: 3rem;
   border-radius: 0.5rem;
   ::placeholder {
@@ -208,14 +208,16 @@ export default function ApeViewer() {
   console.log(apeIDs)
   return (
     <Container>
-      <InputApes>
-        <Input
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          placeholder="Type your ape IDs! Separate individual IDs with ' , ' or specify a range using ' : '"
-        />
-        <MyButton onClick={addApes}>View Apes!</MyButton>
-      </InputApes>
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+        <InputApes>
+          <Input
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            placeholder="Type your ape IDs! Separate individual IDs with ' , ' or specify a range using ' : '"
+          />
+          <MyButton onClick={addApes}>View Apes!</MyButton>
+        </InputApes>
+      </div>
       {apeIDs.map((id) => (
         <ImageContainer key={id}>
           <Image src={`${baseUrl}${id}.png`} />
