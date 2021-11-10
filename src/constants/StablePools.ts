@@ -160,19 +160,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     },
     {
       name: 'Private cUSD',
-      tokenAddresses: ['0xB4aa2986622249B1F45eb93F28Cfca2b2606d809', '0x765DE816845861e75A25fCA122bb6898B8B1282a'],
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809'],
       tokens: [
-        new WrappedTokenInfo(
-          {
-            chainId: ChainId.MAINNET,
-            address: '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809',
-            decimals: 18,
-            symbol: 'pUSD',
-            name: 'Poof USD',
-            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
-          },
-          []
-        ),
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
@@ -181,6 +170,17 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             symbol: 'cUSD',
             name: 'Celo Dollar',
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809',
+            decimals: 18,
+            symbol: 'pUSD',
+            name: 'Poof USD',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
           },
           []
         ),
