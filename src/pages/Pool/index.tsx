@@ -57,6 +57,9 @@ const Sel = styled.div<{ selected: boolean }>`
   overflow: hidden;
   white-space: nowrap;
   background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 0.7rem;
+  `}
 `
 
 export default function Pool() {
