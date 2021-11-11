@@ -3,6 +3,7 @@ import { ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { RowBetween } from 'components/Row'
 import React, { useState } from 'react'
+import { isMobile } from 'react-device-detect'
 import { MobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 import { theme, TYPE } from 'theme'
@@ -107,27 +108,26 @@ export default function Stake({ stakingInfo }: PropTypes) {
                   ? setLockType(LockType.increase)
                   : setLockType(LockType.initial)
               }
-              style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoGreen }}
+              style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18, backgroundColor: theme(false).celoGreen }}
             >
               DEPOSIT
             </ButtonPrimary>
             {mobiLocked && mobiLocked.greaterThan('0') && (
               <ButtonPrimary
                 onClick={() => setLockType(LockType.extend)}
-                style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoGold }}
+                style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18, backgroundColor: theme(false).celoGold }}
               >
                 EXTEND
               </ButtonPrimary>
             )}
-            {Date.now() > (lockEnd?.valueOf() ?? 0) ||
-              (true && (
-                <ButtonPrimary
-                  onClick={onClaim}
-                  style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoRed }}
-                >
-                  {attempting ? 'CLAIMING...' : 'CLAIM'}
-                </ButtonPrimary>
-              ))}
+            {Date.now() > (lockEnd?.valueOf() ?? 0) && (
+              <ButtonPrimary
+                onClick={onClaim}
+                style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18, backgroundColor: theme(false).celoRed }}
+              >
+                {attempting ? 'CLAIMING...' : 'CLAIM'}
+              </ButtonPrimary>
+            )}
           </div>
         )}
       </Wrapper>
