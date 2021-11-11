@@ -100,6 +100,9 @@ export default function Stake({ stakingInfo }: PropTypes) {
               marginTop: '1rem',
               flexDirection: 'row',
               alignItems: 'center',
+              marginLeft: 'auto',
+              marginRight: 'auto',
+              flexWrap: 'wrap',
             }}
           >
             <ButtonPrimary
