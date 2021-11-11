@@ -94,8 +94,11 @@ export default function Stake({ stakingInfo }: PropTypes) {
             style={{
               display: 'flex',
               justifyContent: 'space-between',
+              transition: 'all 0.3s ease-in',
+              gap: '0.25rem',
               marginTop: '1rem',
-              gap: '1rem',
+              flexDirection: 'row',
+              alignItems: 'center',
             }}
           >
             <ButtonPrimary
@@ -116,14 +119,15 @@ export default function Stake({ stakingInfo }: PropTypes) {
                 EXTEND
               </ButtonPrimary>
             )}
-            {Date.now() > (lockEnd?.valueOf() ?? 0) && (
-              <ButtonPrimary
-                onClick={onClaim}
-                style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoRed }}
-              >
-                {attempting ? 'CLAIMING...' : 'CLAIM'}
-              </ButtonPrimary>
-            )}
+            {Date.now() > (lockEnd?.valueOf() ?? 0) ||
+              (true && (
+                <ButtonPrimary
+                  onClick={onClaim}
+                  style={{ fontWeight: 700, fontSize: 18, backgroundColor: theme(false).celoRed }}
+                >
+                  {attempting ? 'CLAIMING...' : 'CLAIM'}
+                </ButtonPrimary>
+              ))}
           </div>
         )}
       </Wrapper>
