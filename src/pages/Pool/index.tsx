@@ -57,6 +57,9 @@ const Sel = styled.div<{ selected: boolean }>`
   overflow: hidden;
   white-space: nowrap;
   background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 0.7rem;
+  `}
 `
 
 export default function Pool() {
@@ -114,6 +117,9 @@ export default function Pool() {
           </Sel>
           <Sel onClick={() => setSelection(Chain.Solana)} selected={selection === Chain.Solana}>
             SOL
+          </Sel>
+          <Sel onClick={() => setSelection(Chain.Avax)} selected={selection === Chain.Avax}>
+            AVAX
           </Sel>
         </HeaderLinks>
         <PoolSection>

@@ -48,6 +48,7 @@ export enum Chain {
   Ethereum,
   Polygon,
   Solana,
+  Avax,
   All,
 }
 
@@ -56,6 +57,7 @@ export const ChainLogo: { [c in Chain]: string } = {
   [Chain.Ethereum]: ethLogo,
   [Chain.Polygon]: polygonLogo,
   [Chain.Solana]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_SOL.png',
+  [Chain.Avax]: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png',
   [Chain.All]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
 }
 
@@ -159,6 +161,57 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
+      name: 'aaUSDC (Allbridge)',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xb70e0a782b058BFdb0d109a3599BEc1f19328E36'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xb70e0a782b058BFdb0d109a3599BEc1f19328E36',
+            decimals: 18,
+            symbol: 'aaUSDC',
+            name: 'US Dollar Coin (Avalanche Allbridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x0986B42F5f9C42FeEef66fC23eba9ea1164C916D',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x730e677f39C4Ca96012c394B9Da09A025E922F81',
+        18,
+        'MobLP',
+        'Mobius cUSD/aaUSDC LP'
+      ),
+      swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 0,
+      gaugeAddress: '0xF2ae5c2D2D2eD13dd324C0942163054fc4A3D4d9',
+      totalMobiRate: JSBI.BigInt('146712000000000000'),
+      displayChain: Chain.Avax,
+      coin: Coins.USD,
+    },
+    {
       name: 'Private cUSD',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809'],
       tokens: [
@@ -201,12 +254,12 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x2459BDb59a3BF6Ab6C412Ac0b220e7CDA1D4ea26',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
-      additionalRewardRate: ['0', '0'],
+      additionalRewardRate: ['11810185180000000', '16534391530000000'],
       displayChain: Chain.Celo,
       coin: Coins.USD,
     },
     {
-      name: 'USDC (AllBridge)',
+      name: 'asUSDC (AllBridge)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xCD7D7Ff64746C1909E44Db8e95331F9316478817'],
       tokens: [
         new WrappedTokenInfo(
@@ -663,8 +716,6 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayDecimals: 0,
       gaugeAddress: '0x1250D6dd3B51D20c14a8ECb10CC2dd713967767e',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
-      additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
-      additionalRewardRate: ['11810185180000000', '16534391530000000'],
       metaPool: 'USDC (Optics)',
       displayChain: Chain.Celo,
       coin: Coins.USD,
