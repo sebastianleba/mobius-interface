@@ -19,6 +19,7 @@ import Claim from './Claim'
 import Mento from './Mento'
 import Pool from './Pool'
 import Manage from './Pool/Manage'
+import Reset from './Reset'
 import RiskPage from './Risk'
 import Staking from './Staking'
 import Swap from './Swap'
@@ -122,6 +123,7 @@ export default function App() {
               <Route path="/claim" component={Claim} />
               <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
               <Route exact strict path="/stake" component={Staking} />
+              <Route exact strict path="/reset" component={Reset} />
               {/* <Route exact strict path="/optics" component={Optics} /> */}
             </Switch>
           </ErrorBoundary>
