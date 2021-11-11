@@ -33,8 +33,9 @@ export function useSwappableTokens(mento?: boolean): { [address: string]: Token 
   const pools = mento ? MENTO_POOL_INFO[chainId] ?? [] : STATIC_POOL_INFO[chainId] ?? []
   const swappableTokens: { [address: string]: Token } = {}
   pools
-    .flatMap(({ tokens }) => tokens)
-    .forEach((token) => {
+    .flatMap(({ tokens, disabled }) => (disabled ? null : tokens))
+    .filter((t) => t !== null)
+    .forEach((token: Token) => {
       if (swappableTokens[token.address] || token.name === 'Mob LP') return
       swappableTokens[token.address] = token
     })

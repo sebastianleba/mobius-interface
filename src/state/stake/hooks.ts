@@ -28,11 +28,12 @@ export function useTokensTradeable(
         tokens: poolMap[pool.metaPool]?.tokens.concat(pool.tokens),
       }
     })
-    .filter(({ tokens }) =>
-      tokens
-        .filter(({ name }) => name !== 'Mob LP')
-        .map(({ address }) => address)
-        .includes(tokenIn.address)
+    .filter(
+      ({ tokens, disabled }) =>
+        tokens
+          .filter(({ name }) => name !== 'Mob LP')
+          .map(({ address }) => address)
+          .includes(tokenIn.address) && !disabled
     )
     .flatMap(({ tokens }) => tokens)
     .forEach((token) => {
