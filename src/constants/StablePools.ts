@@ -48,6 +48,7 @@ export enum Chain {
   Ethereum,
   Polygon,
   Solana,
+  Avax,
   All,
 }
 
@@ -56,6 +57,7 @@ export const ChainLogo: { [c in Chain]: string } = {
   [Chain.Ethereum]: ethLogo,
   [Chain.Polygon]: polygonLogo,
   [Chain.Solana]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_SOL.png',
+  [Chain.Avax]: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png',
   [Chain.All]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
 }
 

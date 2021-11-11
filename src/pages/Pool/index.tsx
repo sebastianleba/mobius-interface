@@ -115,6 +115,9 @@ export default function Pool() {
           <Sel onClick={() => setSelection(Chain.Solana)} selected={selection === Chain.Solana}>
             SOL
           </Sel>
+          <Sel onClick={() => setSelection(Chain.Avax)} selected={selection === Chain.Avax}>
+            AVAX
+          </Sel>
         </HeaderLinks>
         <PoolSection>
           {stablePools && stablePools?.length === 0 ? (
