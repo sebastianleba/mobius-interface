@@ -21,15 +21,9 @@ const fetchEthBtcPrices = async (dispatch: any) => {
 export function PriceData(): null {
   const graphQl = gql`
     {
-      tokens {
+      tokens(where: { derivedCUSD_gt: "0" }) {
         id
         derivedCUSD
-      }
-      token(id: "0x7D00cd74FF385c955EA3d79e47BF06bD7386387D") {
-        symbol
-        name
-        derivedCUSD
-        pairQuote
       }
     }
   `

@@ -184,7 +184,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
   const coinPrice = tokens.reduce(
-    (accum: Fraction | undefined, { address }) => accum ?? tokenPrices[address],
+    (accum: Fraction | undefined, { address }) => accum ?? tokenPrices[address.toLowerCase()],
     undefined
   )
 
@@ -205,7 +205,8 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   let rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
   for (let i = 0; i < 8; i++) {
     const rate = poolInfo.externalRewardRates?.[i] ?? totalMobiRate
-    const priceOfToken = tokenPrices[rate.token.address.toLowerCase()]
+    const priceOfToken =
+      tokenPrices[rate.token.address.toLowerCase()] ?? tokenPrices['0x00be915b9dcf56a3cbe739d9b9c202ca692409ec']
     if (poolInfo.externalRewardRates && i < poolInfo.externalRewardRates.length) {
       rewardPerYear = rewardPerYear.add(priceOfToken?.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0')
     }

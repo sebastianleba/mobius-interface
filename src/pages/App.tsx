@@ -15,6 +15,7 @@ import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
+import ApeViewer from './ApeViewer'
 import Claim from './Claim'
 import Mento from './Mento'
 import Pool from './Pool'
@@ -124,6 +125,7 @@ export default function App() {
               <Route exact strict path="/farm/:poolName" component={Manage} />{' '}
               <Route exact strict path="/stake" component={Staking} />
               <Route exact strict path="/reset" component={Reset} />
+              <Route exact strict path="/ape-mode" component={ApeViewer} />
               {/* <Route exact strict path="/optics" component={Optics} /> */}
             </Switch>
           </ErrorBoundary>

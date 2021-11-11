@@ -60,7 +60,7 @@ const InputRow = styled.div<{ selected: boolean }>`
 
 const InputDiv = styled.div`
   display: flex;
-  min-width: 20%;
+  min-width: 30%;
   background-color: ${({ theme }) => theme.bg2};
 `
 
