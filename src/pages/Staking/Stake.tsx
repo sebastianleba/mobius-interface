@@ -100,8 +100,6 @@ export default function Stake({ stakingInfo }: PropTypes) {
               marginTop: '1rem',
               flexDirection: 'row',
               alignItems: 'center',
-              marginLeft: 'auto',
-              marginRight: 'auto',
               flexWrap: 'wrap',
             }}
           >
@@ -111,14 +109,26 @@ export default function Stake({ stakingInfo }: PropTypes) {
                   ? setLockType(LockType.increase)
                   : setLockType(LockType.initial)
               }
-              style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18, backgroundColor: theme(false).celoGreen }}
+              style={{
+                display: 'flex',
+                flex: '0.6',
+                fontWeight: 700,
+                fontSize: isMobile ? 15 : 18,
+                backgroundColor: theme(false).celoGreen,
+              }}
             >
               DEPOSIT
             </ButtonPrimary>
             {mobiLocked && mobiLocked.greaterThan('0') && (
               <ButtonPrimary
                 onClick={() => setLockType(LockType.extend)}
-                style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18, backgroundColor: theme(false).celoGold }}
+                style={{
+                  display: 'flex',
+                  flex: '0.6',
+                  fontWeight: 700,
+                  fontSize: isMobile ? 15 : 18,
+                  backgroundColor: theme(false).celoGold,
+                }}
               >
                 EXTEND
               </ButtonPrimary>
@@ -126,7 +136,13 @@ export default function Stake({ stakingInfo }: PropTypes) {
             {Date.now() > (lockEnd?.valueOf() ?? 0) && (
               <ButtonPrimary
                 onClick={onClaim}
-                style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18, backgroundColor: theme(false).celoRed }}
+                style={{
+                  display: 'flex',
+                  flex: '0.6',
+                  fontWeight: 700,
+                  fontSize: isMobile ? 15 : 18,
+                  backgroundColor: theme(false).celoRed,
+                }}
               >
                 {attempting ? 'CLAIMING...' : 'CLAIM'}
               </ButtonPrimary>
