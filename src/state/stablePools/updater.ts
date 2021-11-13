@@ -256,7 +256,7 @@ export default function BatchUpdatePools(): null {
         const powerAllocated: number = parseInt((slopes?.[i]?.result?.[1] ?? BigInt('0')).toString() ?? '0')
 
         const totalMobiRate = JSBI.divide(
-          JSBI.multiply(mobiRate, weight),
+          poolInfo.disabled ? JSBI.BigInt('0') : JSBI.multiply(mobiRate, weight),
           JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
         )
 

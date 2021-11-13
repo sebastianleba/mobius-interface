@@ -87,7 +87,7 @@ export default function Vote({ summaries, lockDate }: GaugeWeightsProps) {
   )
 }
 
-const PositionWrapper = styled(AutoColumn)<{ disabled: string }>`
+const PositionWrapper = styled(AutoColumn)<{ disabled: boolean }>`
   box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
     0px 24px 32px rgba(0, 0, 0, 0.01);
   padding-left: 0.25rem;
@@ -97,7 +97,12 @@ const PositionWrapper = styled(AutoColumn)<{ disabled: string }>`
   overflow: hidden;
   position: relative;
   padding: 1rem;
-  ${({ disabled }) => disabled && `cursor: not-allowed;`}
+  ${({ disabled }) =>
+    disabled &&
+    `
+  cursor: not-allowed;
+  opacity: 0.7;
+  `}
   background: ${({ theme }) => theme.bg1};
   color: ${({ theme }) => theme.text1} !important;
   ${({ theme }) => theme.mediaWidth.upToSmall`
@@ -136,6 +141,7 @@ function WeightCard({ position, disabled }: { position: GaugeSummary; disabled: 
   const poolInfo = stablePools.filter((x) => x.name === position.pool)[0]
 
   const poolColor = usePoolColor(poolInfo)
+  disabled = disabled || (poolInfo.isDisabled ?? false)
 
   return (
     <>
