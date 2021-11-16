@@ -149,7 +149,12 @@ function WeightCard({ position, disabled }: { position: GaugeSummary; disabled: 
 
   return (
     <>
-      <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
+      <GaugeVoteModal
+        summary={position}
+        isOpen={voteModalOpen}
+        onDismiss={() => setVoteModalOpen(false)}
+        disabled={poolInfo.isDisabled}
+      />
 
       <PositionWrapper disabled={disabled} onClick={() => !disabled && setVoteModalOpen(true)}>
         <TopSection>
