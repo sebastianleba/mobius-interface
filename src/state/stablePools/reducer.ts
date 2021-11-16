@@ -1,10 +1,11 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { Fraction, Percent, Token } from '@ubeswap/sdk'
-import { Chain, Coins } from 'constants/StablePools'
+import { NETWORK_CHAIN_ID } from 'connectors'
+import { Chain, Coins, STATIC_POOL_INFO } from 'constants/StablePools'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { initPool, updateExternalRewards, updateGauges, updatePools, updateVariableData } from './actions'
+import { updateExternalRewards, updateGauges, updatePools } from './actions'
 
 export type ExternalRewards = {
   token: string
@@ -41,12 +42,12 @@ export type GaugeOnlyInfo = {
   externalRewards?: ExternalRewards[]
   gaugeAddress?: string
   relativeGaugeWeight?: Fraction
+  lastClaim: Date
 }
 
 export type StableSwapVariable = PoolOnlyInfo & GaugeOnlyInfo
 
 export type StableSwapMathConstants = {
-  totalMobiRate: JSBI
   name: string
   rates: JSBI[]
   lendingPrecision: JSBI
@@ -62,67 +63,56 @@ export type StableSwapConstants = StableSwapMathConstants & {
   tokens: Token[]
   tokenAddresses: string[]
   address: string
+  gaugeAddress: string
   lpToken: Token
   peggedTo: string
   pegComesAfter: boolean | undefined
   displayDecimals: number
-  metaPool?: string
   additionalRewards?: string[]
   additionalRewardRate?: string[]
   lastClaim?: Date
   displayChain: Chain
   coin: Coins
   disabled?: boolean
+  metaPool?: string
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
 export interface PoolState {
   readonly pools: {
     [address: string]: {
-      pool: StableSwapPool
-      math: StableSwapMath
+      pool: StableSwapPool | StableSwapConstants
+      math: StableSwapMath | undefined
     }
   }
 }
 
 const initialState: PoolState = {
-  pools: {},
+  pools: Object.values(STATIC_POOL_INFO[NETWORK_CHAIN_ID]).reduce(
+    (
+      accum: {
+        [address: string]: {
+          pool: StableSwapConstants
+          math: StableSwapMath | undefined
+        }
+      },
+      cur: StableSwapConstants
+    ) => ({
+      ...accum,
+      [cur.address]: {
+        pool: cur,
+        math: undefined,
+      },
+    }),
+    {}
+  ),
 }
 
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
-    .addCase(initPool, (state, { payload: { address, pool } }) => {
-      const mathModel = new StableSwapMath(pool)
-      return {
-        ...state,
-        pools: {
-          ...state.pools,
-          [address]: {
-            pool,
-            math: mathModel,
-          },
-        },
-      }
-    })
     .addCase(updateExternalRewards, (state, { payload: { pool, externalRewards } }) => {
       if (!state.pools[pool]) return
       state.pools[pool].pool.externalRewards = externalRewards
-    })
-    .addCase(updateVariableData, (state, { payload: { address, variableData } }) => {
-      const pool = state.pools[address]
-      return {
-        ...state,
-        pools: {
-          ...state.pools,
-          [address]: {
-            ...pool,
-            pool: {
-              ...pool.pool,
-              ...variableData,
-            },
-          },
-        },
-      }
     })
     .addCase(updatePools, (state, { payload: { info } }) => {
       info.forEach((pool) => {

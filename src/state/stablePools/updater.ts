@@ -24,8 +24,8 @@ import {
   useStableSwapContract,
 } from '../../hooks/useContract'
 import { AppDispatch } from '../index'
-import { initPool, updatePools } from './actions'
-import { PoolOnlyInfo, StableSwapConstants, StableSwapPool } from './reducer'
+import { initPool, updateGauges, updatePools } from './actions'
+import { GaugeOnlyInfo, PoolOnlyInfo, StableSwapConstants } from './reducer'
 
 const SECONDS_PER_BLOCK = JSBI.BigInt('5')
 const SwapInterface = new Interface(SWAP.abi)
@@ -201,24 +201,16 @@ export function useUpdateVariablePoolInfo(): void {
   }, [data, loading, error, dispatch])
 }
 
-export default function BatchUpdatePools(): null {
+export function BatchUpdateGauges(): null {
   const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
   const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId] ?? []
-  const poolAddresses = pools.map(({ address }) => address)
-  const lpTokenAddresses = pools.map(({ lpToken: { address } }) => address)
   const gaugeAddresses = pools.map(({ gaugeAddress }) => gaugeAddress)
   const gaugeController = useGaugeControllerContract()
   const mobiContract = useMobiContract()
 
-  const lpTotalSupplies = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'totalSupply')
-  const lpOwned_multiple = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'balanceOf', [
-    account ?? undefined,
-  ])
   const totalStakedAmount_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'totalSupply')
-  const feesOne = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAdminBalance', [0])
-  const feesTwo = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAdminBalance', [1])
   const lpStaked_multi = useMultipleContractSingleData(gaugeAddresses, gaugeInterface, 'balanceOf', [
     account ?? undefined,
   ])
@@ -257,66 +249,51 @@ export default function BatchUpdatePools(): null {
   )
 
   useMemo(() => {
-    pools
-      .filter((_, i) => !(totalStakedAmount_multi?.[i]?.loading ?? true))
-      .forEach((poolInfo, i) => {
-        const lpTotalSupply: JSBI = BigIntToJSBI((lpTotalSupplies?.[i]?.result?.[0] as BigInt) ?? '0')
-        const lpOwned: JSBI = BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0')
-        const effectiveBalance: JSBI = BigIntToJSBI((effectiveBalances?.[i]?.result?.[0] as BigInt) ?? '0')
-        const totalEffectiveBalance: JSBI = BigIntToJSBI((totalEffectiveBalances?.[i]?.result?.[0] as BigInt) ?? '1')
-        const fees: JSBI = JSBI.add(
-          JSBI.multiply(
-            BigIntToJSBI((feesOne?.[i]?.result?.[0] as BigInt) ?? '0'),
-            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(18 - poolInfo.tokens[0].decimals))
-          ),
-          JSBI.multiply(
-            BigIntToJSBI((feesTwo?.[i]?.result?.[0] as BigInt) ?? '0'),
-            JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(18 - poolInfo.tokens[0].decimals))
-          )
-        )
-        const lpStaked: JSBI = BigIntToJSBI((lpStaked_multi?.[i]?.result?.[0] as BigInt) ?? '0')
-        const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
-        const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
-        const futureWeight: JSBI = BigIntToJSBI((futureWeights?.[i]?.result?.[0] as BigInt) ?? '0')
-        const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
-        const workingLiquidity: JSBI = BigIntToJSBI((workingLiquidityMulti?.[i]?.result?.[0] as BigInt) ?? '0')
-        const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0')
-        const lastClaim: Date = new Date(
-          parseInt((lastClaims?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0') * 1000
-        )
-        const powerAllocated: number = parseInt((slopes?.[i]?.result?.[1] ?? BigInt('0')).toString() ?? '0')
+    dispatch(
+      updateGauges({
+        info: pools
+          .filter((_, i) => !(totalStakedAmount_multi?.[i]?.loading ?? true))
+          .map((poolInfo, i) => {
+            const effectiveBalance: JSBI = BigIntToJSBI((effectiveBalances?.[i]?.result?.[0] as BigInt) ?? '0')
+            const totalEffectiveBalance: JSBI = BigIntToJSBI(
+              (totalEffectiveBalances?.[i]?.result?.[0] as BigInt) ?? '1'
+            )
+            const lpStaked: JSBI = BigIntToJSBI((lpStaked_multi?.[i]?.result?.[0] as BigInt) ?? '0')
+            const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
+            const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
+            const futureWeight: JSBI = BigIntToJSBI((futureWeights?.[i]?.result?.[0] as BigInt) ?? '0')
+            const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
+            const workingLiquidity: JSBI = BigIntToJSBI((workingLiquidityMulti?.[i]?.result?.[0] as BigInt) ?? '0')
+            const lastUserVote: number = parseInt((lastUserVotes?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0')
+            const lastClaim: Date = new Date(
+              parseInt((lastClaims?.[i]?.result?.[0] ?? BigInt('0')).toString() ?? '0') * 1000
+            )
+            const powerAllocated: number = parseInt((slopes?.[i]?.result?.[1] ?? BigInt('0')).toString() ?? '0')
 
-        const totalMobiRate = JSBI.divide(
-          poolInfo.disabled ? JSBI.BigInt('0') : JSBI.multiply(mobiRate, weight),
-          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-        )
+            const totalMobiRate = JSBI.divide(
+              poolInfo.disabled ? JSBI.BigInt('0') : JSBI.multiply(mobiRate, weight),
+              JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+            )
 
-        const collectedData: StableSwapPool = {
-          lpTotalSupply,
-          lpOwned,
-          feesGenerated: fees,
-          poolWeight: new Percent(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
-          staking: {
-            userStaked: lpStaked,
-            pendingMobi,
-            totalMobiRate,
-            totalStakedAmount,
-          },
-          workingLiquidity,
-          effectiveBalance,
-          totalEffectiveBalance,
-          lastUserVote,
-          futureWeight,
-          lastClaim,
-          powerAllocated: powerAllocated / 100,
-        }
-        dispatch(
-          initPool({
-            address: poolInfo.name,
-            pool: collectedData,
-          })
-        )
+            const collectedData: GaugeOnlyInfo = {
+              id: poolInfo.address,
+              poolWeight: new Percent(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
+              userStaked: lpStaked,
+              pendingMobi,
+              totalMobiRate,
+              totalStakedAmount,
+              workingLiquidity,
+              effectiveBalance,
+              totalEffectiveBalance,
+              lastUserVote,
+              futureWeight,
+              lastClaim,
+              powerAllocated: powerAllocated / 100,
+            }
+            return collectedData
+          }),
       })
+    )
   }, [blockNumber, library, account, dispatch])
   return null
 }
