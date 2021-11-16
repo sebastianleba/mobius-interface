@@ -1,4 +1,3 @@
-import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
 import { Chain, Coins, PRICE } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
@@ -123,11 +122,7 @@ export default function Pool() {
             stablePools
               ?.sort(sortCallback)
               .filter((pool) => selection === Chain.All || selection === pool.displayChain)
-              .map((pool) => (
-                <ErrorBoundary key={pool.poolAddress || '000'}>
-                  <StablePoolCard poolInfo={pool} />
-                </ErrorBoundary>
-              ))
+              .map((pool) => <StablePoolCard key={pool.address || '000'} poolInfo={pool} />)
           )}
         </PoolSection>
       </AutoColumn>

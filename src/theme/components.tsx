@@ -1,7 +1,6 @@
 import { darken } from 'polished'
 import React, { HTMLProps, useCallback } from 'react'
 import { ArrowLeft, ExternalLink as LinkIconFeather, Trash, X } from 'react-feather'
-import ReactGA from 'react-ga'
 import { Link } from 'react-router-dom'
 import styled, { keyframes } from 'styled-components'
 
@@ -181,24 +180,11 @@ export const TrashIcon = styled(Trash)`
   }
 `
 
-const rotateImg = keyframes`
-  0% {
-    transform: perspective(1000px) rotateY(0deg);
-  }
-
-  100% {
-    transform: perspective(1000px) rotateY(360deg);
-  }
-`
-
 export const UbeTokenAnimated = styled.img`
   padding: 2rem 0 1rem 0;
   filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.15));
 `
 
-/**
- * Outbound link that handles firing google analytics events
- */
 export function ExternalLink({
   target = '_blank',
   href,
@@ -208,19 +194,11 @@ export function ExternalLink({
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       // don't prevent default, don't redirect if it's a new tab
-      if (target === '_blank' || event.ctrlKey || event.metaKey) {
-        ReactGA.outboundLink({ label: href }, () => {
-          console.debug('Fired outbound link event', href)
-        })
-      } else {
+      if (target !== '_blank' && !event.ctrlKey && !event.metaKey) {
         event.preventDefault()
-        // send a ReactGA event and then trigger a location change
-        ReactGA.outboundLink({ label: href }, () => {
-          window.location.href = href
-        })
       }
     },
-    [href, target]
+    [target]
   )
   return <StyledLink target={target} rel={rel} href={href} onClick={handleClick} {...rest} />
 }
@@ -234,19 +212,11 @@ export function ExternalLinkIcon({
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement>) => {
       // don't prevent default, don't redirect if it's a new tab
-      if (target === '_blank' || event.ctrlKey || event.metaKey) {
-        ReactGA.outboundLink({ label: href }, () => {
-          console.debug('Fired outbound link event', href)
-        })
-      } else {
+      if (target !== '_blank' && !event.ctrlKey && !event.metaKey) {
         event.preventDefault()
-        // send a ReactGA event and then trigger a location change
-        ReactGA.outboundLink({ label: href }, () => {
-          window.location.href = href
-        })
       }
     },
-    [href, target]
+    [target]
   )
   return (
     <LinkIconWrapper target={target} rel={rel} href={href} onClick={handleClick} {...rest}>

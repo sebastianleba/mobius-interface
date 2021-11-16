@@ -1,4 +1,3 @@
-import { ErrorBoundary } from '@sentry/react'
 import React from 'react'
 import { useLocation } from 'react-router'
 import { useClaimInfo } from 'state/claim/hooks'
@@ -14,11 +13,6 @@ const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
   width: 100%;
   margin-top: 3rem;
-`
-
-const TopSection = styled(AutoColumn)`
-  max-width: 720px;
-  width: 100%;
 `
 
 const PoolSection = styled.div`
@@ -52,9 +46,7 @@ export default function Earn() {
       <UpdateClaim />
       <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px' }}>
         <PoolSection>
-          <ErrorBoundary key={'000'}>
-            <ClaimCard info={claim} type={type} />
-          </ErrorBoundary>
+          <ClaimCard info={claim} type={type} />
         </PoolSection>
       </AutoColumn>
     </PageWrapper>

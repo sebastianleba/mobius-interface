@@ -17,7 +17,6 @@ import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
 import Row, { RowBetween } from '../Row'
-import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { filterTokens } from './filtering'
 import { useTokenComparator } from './sorting'
@@ -46,7 +45,6 @@ export function CurrencySearch({
   selectedCurrency,
   onCurrencySelect,
   otherSelectedCurrency,
-  showCommonBases,
   onDismiss,
   isOpen,
   showImportView,
@@ -174,9 +172,6 @@ export function CurrencySearch({
               onKeyDown={handleEnter}
             />
           </Row>
-        )}
-        {showCommonBases && (
-          <CommonBases chainId={chainId} onSelect={handleCurrencySelect} selectedCurrency={selectedCurrency} />
         )}
       </PaddedColumn>
       <Separator />

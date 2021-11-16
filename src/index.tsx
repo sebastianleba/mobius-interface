@@ -2,8 +2,6 @@ import './i18n'
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { ContractKitProvider } from '@celo-tools/use-contractkit'
-import * as Sentry from '@sentry/react'
-import { Integrations } from '@sentry/tracing'
 import { ChainId } from '@ubeswap/sdk'
 import { NETWORK_CHAIN_ID } from 'connectors/index'
 import { DevNetworks, MainnetNetworks } from 'constants/NetworkInfo'
@@ -29,24 +27,6 @@ if (window.celo) {
 }
 
 const networks = NETWORK_CHAIN_ID === ChainId.MAINNET ? MainnetNetworks : DevNetworks
-
-if (process.env.REACT_APP_SENTRY_DSN) {
-  const sentryCfg = {
-    environment: `${process.env.REACT_APP_VERCEL_ENV ?? 'unknown'}`,
-    release: `${process.env.REACT_APP_VERCEL_GIT_COMMIT_REF?.replace(/\//g, '--') ?? 'unknown'}-${
-      process.env.REACT_APP_VERCEL_GIT_COMMIT_SHA ?? 'unknown'
-    }`,
-  }
-  Sentry.init({
-    dsn: process.env.REACT_APP_SENTRY_DSN,
-    integrations: [new Integrations.BrowserTracing()],
-    tracesSampleRate: 0.2,
-    ...sentryCfg,
-  })
-  console.log(`Initializing Sentry environment at release ${sentryCfg.release} in environment ${sentryCfg.environment}`)
-} else {
-  console.warn(`REACT_APP_SENTRY_DSN not found. Sentry will not be loaded.`)
-}
 
 const client = new ApolloClient({
   uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap-backup',

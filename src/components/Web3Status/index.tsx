@@ -1,14 +1,12 @@
 import { useContractKit, WalletTypes } from '@celo-tools/use-contractkit'
-import * as Sentry from '@sentry/react'
 import useAccountSummary from 'hooks/useAccountSummary'
 import { darken, lighten } from 'polished'
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Activity } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 import { isAddress } from 'web3-utils'
 
-import { NETWORK_CHAIN_NAME } from '../../connectors'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
 import { TransactionDetails } from '../../state/transactions/reducer'
@@ -170,7 +168,7 @@ function Web3StatusInner() {
 }
 
 export default function Web3Status() {
-  const { address: account, walletType } = useContractKit()
+  const { address: account } = useContractKit()
   const allTransactions = useAllTransactions()
 
   const sortedRecentTransactions = useMemo(() => {
@@ -181,12 +179,6 @@ export default function Web3Status() {
   const pending = sortedRecentTransactions.filter((tx) => !tx.receipt).map((tx) => tx.hash)
   const confirmed = sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash)
   const { summary } = useAccountSummary(account ?? undefined)
-
-  useEffect(() => {
-    Sentry.setUser({ id: account ?? undefined })
-    Sentry.setTag('connector', walletType)
-    Sentry.setTag('network', NETWORK_CHAIN_NAME)
-  }, [walletType, account])
 
   return (
     <>

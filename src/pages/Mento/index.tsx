@@ -4,7 +4,6 @@ import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCall
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
-import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { useDefaultsFromURLSearch, useMentoTradeInfo, useSwapActionHandlers, useSwapState } from 'state/mento/hooks'
 import styled, { ThemeContext } from 'styled-components'
@@ -146,12 +145,6 @@ export default function Mento() {
     swapCallback()
       .then((hash) => {
         setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
-
-        ReactGA.event({
-          category: 'Swap',
-          action: 'Swap',
-          label: [trade?.input?.currency?.symbol, trade?.output?.currency?.symbol].join('/'),
-        })
       })
       .catch((error) => {
         setSwapState({
@@ -227,7 +220,7 @@ export default function Mento() {
               <RowBetween>
                 <TYPE.white
                   fontSize={14}
-                >{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve. This exchange includes a 0.5% fee that is collected by the Celo Reserve.`}</TYPE.white>
+                >{`Mint cUSD and cEUR by depositing CELO to the Celo Reserve. This exchange includes a 0.25% fee that is collected by the Celo Reserve.`}</TYPE.white>
               </RowBetween>
               <ExternalLink
                 style={{ color: 'white', textDecoration: 'underline' }}
