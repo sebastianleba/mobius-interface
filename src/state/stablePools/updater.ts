@@ -29,7 +29,7 @@ export const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
   return JSBI.BigInt(num?.toString() ?? fallBack)
 }
 
-export function useUpdateVariablePoolInfo(): void {
+export function UpdateVariablePoolInfo(): null {
   const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
@@ -62,7 +62,8 @@ export function useUpdateVariablePoolInfo(): void {
   `
   const { data, loading, error } = useQuery(query)
 
-  const lpInfo: { [address: string]: [JSBI, JSBI] } = lpTotalSupplies
+  const lpInfo: { [address: string]: { total: JSBI; user: JSBI } } = lpTotalSupplies
+    .filter((total, i) => !(total?.loading || lpOwned_multiple[i]?.loading))
     .map((total, i) => [
       BigIntToJSBI((total?.result?.[0] as BigInt) ?? '0'),
       BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0'),
@@ -71,29 +72,39 @@ export function useUpdateVariablePoolInfo(): void {
     .reduce(
       (accum, [total, user, address]) => ({
         ...accum,
-        [(address as any as string).toLowerCase()]: [total, user],
+        [(address as any as string).toLowerCase()]: { total, user },
       }),
       {}
     )
-  useMemo(() => {
+  console.log(lpInfo)
+  return useMemo(() => {
     if (error) console.log(error)
-    if (loading) return
-    const poolInfo: PoolOnlyInfo[] = data.swaps.map((pool) => ({
-      id: pool.id,
-      volume: {
-        day: JSBI.BigInt(pool.dailyVolumes[0]),
-        week: JSBI.BigInt(pool.weeklyVolumes[1]),
-      },
-      balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
-      amp: JSBI.BigInt(pool.A),
-      aPrecise: JSBI.BigInt(pool.A),
-      virtualPrice: JSBI.BigInt(pool.virtualPrice),
-      lpTotalSupply: lpInfo[pool.id][0],
-      lpOwned: lpInfo[pool.id][1],
-    }))
+    if (loading) return null
+    console.log(
+      lpInfo,
+      data.swaps.map(({ id }) => !!lpInfo[id])
+    )
+
+    const poolInfo: PoolOnlyInfo[] = data.swaps
+      .filter(({ id }) => !!lpInfo[id])
+      .map((pool) => ({
+        id: pool.id,
+        volume: {
+          day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
+          week: parseFloat(pool.weeklyVolumes[1]?.volume ?? '0'),
+        },
+        balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
+        amp: JSBI.BigInt(pool.A),
+        aPrecise: JSBI.BigInt(pool.A),
+        virtualPrice: JSBI.BigInt(pool.virtualPrice),
+        lpTotalSupply: lpInfo[pool.id].total,
+        lpOwned: lpInfo[pool.id].user,
+      }))
+    console.log(poolInfo)
 
     dispatch(updatePools({ info: poolInfo }))
-  }, [data, loading, error, dispatch, blockNumber, library, chainId, account])
+    return null
+  }, [data, loading, error, dispatch, blockNumber, library, chainId, account, lpInfo])
 }
 
 export function BatchUpdateGauges(): null {

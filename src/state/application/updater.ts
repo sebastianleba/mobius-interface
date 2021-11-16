@@ -60,7 +60,7 @@ export default function Updater(): null {
     chainId,
     blockNumber: null,
   })
-  fetchEthBtcPrices(dispatch)
+  //fetchEthBtcPrices(dispatch)
 
   const blockNumberCallback = useCallback(
     (blockNumber: number) => {

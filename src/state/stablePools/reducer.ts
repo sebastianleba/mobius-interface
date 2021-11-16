@@ -1,4 +1,4 @@
-import { createReducer } from '@reduxjs/toolkit'
+import { createReducer, current } from '@reduxjs/toolkit'
 import { Fraction, Percent, Token } from '@ubeswap/sdk'
 import { NETWORK_CHAIN_ID } from 'connectors'
 import { Chain, Coins, STATIC_POOL_INFO } from 'constants/StablePools'
@@ -111,23 +111,28 @@ const initialState: PoolState = {
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
     .addCase(updateExternalRewards, (state, { payload: { pool, externalRewards } }) => {
-      if (!state.pools[pool]) return
+      if (!state.pools[pool].math) return
       state.pools[pool].pool.externalRewards = externalRewards
     })
     .addCase(updatePools, (state, { payload: { info } }) => {
+      const copiedState = current(state)
       info.forEach((pool) => {
-        const cur = state.pools[pool.id].pool as any as StableSwapPool
+        const cur = copiedState.pools[pool.id].pool as any as StableSwapPool
         const newPool = { ...cur, ...pool }
+
         const math = new StableSwapMath(newPool)
         state.pools[pool.id] = {
           pool: newPool,
           math,
         }
       })
+      console.log(state)
+      console.log('Done')
     })
     .addCase(updateGauges, (state, { payload: { info } }) => {
+      const copiedState = current(state)
       info.forEach((gauge) => {
-        const cur = state.pools[gauge.id].pool as any as StableSwapPool
+        const cur = copiedState.pools[gauge.id].pool as any as StableSwapPool
         const newPool = { ...cur, ...gauge }
         state.pools[gauge.id] = {
           pool: newPool,
