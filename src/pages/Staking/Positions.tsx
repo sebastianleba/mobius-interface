@@ -130,7 +130,7 @@ function PositionCard({
   votingPower: JSBI
   totalVotingPower: JSBI
 }) {
-  const lpAsUsd = usePriceOfLp(position.pool, position.baseBalance)
+  const lpAsUsd = usePriceOfLp(position.poolAddress, position.baseBalance)
   const [voteModalOpen, setVoteModalOpen] = useState(false)
   const boost = calcBoost(position, votingPower, totalVotingPower)
 

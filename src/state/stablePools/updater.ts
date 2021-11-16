@@ -1,7 +1,7 @@
 import { gql, useQuery } from '@apollo/client'
 import { Interface } from '@ethersproject/abi'
-import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
-import { useEffect, useMemo } from 'react'
+import { JSBI, Percent } from '@ubeswap/sdk'
+import { useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
 import {
@@ -14,17 +14,10 @@ import GAUGE_V3 from '../../constants/abis/LiquidityGaugeV3.json'
 import LP from '../../constants/abis/LPToken.json'
 import SWAP from '../../constants/abis/Swap.json'
 import { STATIC_POOL_INFO } from '../../constants/StablePools'
-import { Erc20, LiquidityGaugeV3, Swap } from '../../generated'
 import { useActiveContractKit } from '../../hooks'
-import {
-  useGaugeControllerContract,
-  useLiquidityGaugeContract,
-  useLpTokenContract,
-  useMobiContract,
-  useStableSwapContract,
-} from '../../hooks/useContract'
+import { useGaugeControllerContract, useMobiContract } from '../../hooks/useContract'
 import { AppDispatch } from '../index'
-import { initPool, updateGauges, updatePools } from './actions'
+import { updateGauges, updatePools } from './actions'
 import { GaugeOnlyInfo, PoolOnlyInfo, StableSwapConstants } from './reducer'
 
 const SECONDS_PER_BLOCK = JSBI.BigInt('5')
@@ -36,131 +29,18 @@ export const BigIntToJSBI = (num: BigInt | undefined, fallBack = '0') => {
   return JSBI.BigInt(num?.toString() ?? fallBack)
 }
 
-export function UpdatePools(): null {
+export function useUpdateVariablePoolInfo(): void {
   const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
   const dispatch = useDispatch<AppDispatch>()
-  const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId]
-  const poolContract = useStableSwapContract(pools[0].address)
-  const lpTokenContract = useLpTokenContract(pools[0].lpToken.address)
-  const gaugeContract = useLiquidityGaugeContract('0x1A8938a37093d34581B21bAd2AE7DC1c19150C05')
-  const mobiContract = useMobiContract()
-  const gaugeController = useGaugeControllerContract()
+  const pools: StableSwapConstants[] = STATIC_POOL_INFO[chainId] ?? []
+  const poolAddresses = pools.map(({ address }) => address)
+  const lpTokenAddresses = pools.map(({ lpToken: { address } }) => address)
+  const lpTotalSupplies = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'totalSupply')
+  const lpOwned_multiple = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'balanceOf', [
+    account ?? undefined,
+  ])
 
-  // automatically update lists if versions are minor/patch
-  useEffect(() => {
-    const updatePool = async (
-      poolInfo: StableSwapConstants,
-      contract: Swap | undefined,
-      lpToken: Erc20 | undefined,
-      gauge: LiquidityGaugeV3 | undefined
-    ) => {
-      if (!contract || !lpToken || !gauge) return
-
-      try {
-        const amp = JSBI.BigInt(await contract.getA({ gasLimit: 350000 }))
-        const balances = (await contract.getBalances({ gasLimit: 350000 })).map((num) => JSBI.BigInt(num))
-        //const swapFee = JSBI.BigInt(await contract.getSwapFee({ gasLimit: 350000 }))
-        const virtualPrice = JSBI.BigInt(await contract.getVirtualPrice({ gasLimit: 350000 }))
-        const aPrecise = JSBI.BigInt(await contract.getAPrecise())
-
-        const lpTotalSupply = JSBI.BigInt(await lpToken.totalSupply({ gasLimit: 350000 }))
-        const lpOwned = JSBI.BigInt(!account ? '0' : await lpToken.balanceOf(account))
-
-        const fees = await Promise.all(
-          poolInfo.tokens.map(async (_, i) => JSBI.BigInt((await contract.getAdminBalance(i)).toString()))
-        )
-
-        const feesGenerated = new TokenAmount(
-          poolInfo.tokens[0],
-          fees.reduce((accum, cur, i) =>
-            JSBI.add(
-              accum,
-              JSBI.multiply(cur, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(18 - poolInfo.tokens[i].decimals)))
-            )
-          )
-        )
-        const lpStaked = account ? JSBI.BigInt(((await gauge?.balanceOf(account)) ?? '0').toString()) : undefined
-        const workingLiquidity = JSBI.BigInt(((await gauge?.working_supply()) ?? '0').toString())
-
-        const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
-        const weight = JSBI.BigInt(
-          (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
-        )
-        const pendingMobi = account
-          ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
-          : undefined
-
-        const totalMobiPerBlock = JSBI.divide(
-          JSBI.multiply(totalMobiRate, weight),
-          JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-        )
-
-        const futureWeight = JSBI.BigInt(
-          ((await gaugeController?.get_gauge_weight(poolInfo.gaugeAddress)) ?? '0').toString()
-        )
-
-        dispatch(
-          initPool({
-            address: poolInfo.name,
-            pool: {
-              ...poolInfo,
-              virtualPrice,
-              balances,
-              amp,
-              lpTotalSupply,
-              workingLiquidity,
-              lpOwned,
-              aPrecise,
-              feesGenerated: feesGenerated.raw,
-              staking: {
-                userStaked: lpStaked,
-                totalMobiRate: totalMobiPerBlock,
-                pendingMobi,
-              },
-              futureWeight,
-            },
-          })
-        )
-        // } else {
-        //   dispatch(
-        //     initPool({
-        //       address: poolInfo.name,
-        //       pool: {
-        //         ...poolInfo,
-        //         virtualPrice,
-        //         balances,
-        //         amp,
-        //         lpTotalSupply,
-        //         lpOwned,
-        //         aPrecise,
-        //         feesGenerated,
-        //       },
-        //     })
-        //   )
-        // }
-      } catch (error) {
-        console.error(error)
-      }
-    }
-
-    pools.forEach((pool, i) => {
-      //const swapContract = getContract(pool.address, SwapInterface, library) as any
-      updatePool(
-        pool,
-        poolContract?.attach(pool.address),
-        lpTokenContract?.attach(pool.lpToken.address),
-        gaugeContract?.attach(pool.gaugeAddress)
-      )
-    })
-  }, [blockNumber, library, account, dispatch])
-
-  return null
-}
-
-//export const UpdatePendingMobi
-
-export function useUpdateVariablePoolInfo(): void {
   const query = gql`
     {
       swaps {
@@ -180,9 +60,21 @@ export function useUpdateVariablePoolInfo(): void {
       }
     }
   `
-  const dispatch = useDispatch()
   const { data, loading, error } = useQuery(query)
 
+  const lpInfo: { [address: string]: [JSBI, JSBI] } = lpTotalSupplies
+    .map((total, i) => [
+      BigIntToJSBI((total?.result?.[0] as BigInt) ?? '0'),
+      BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0'),
+      poolAddresses[i],
+    ])
+    .reduce(
+      (accum, [total, user, address]) => ({
+        ...accum,
+        [(address as any as string).toLowerCase()]: [total, user],
+      }),
+      {}
+    )
   useMemo(() => {
     if (error) console.log(error)
     if (loading) return
@@ -196,9 +88,12 @@ export function useUpdateVariablePoolInfo(): void {
       amp: JSBI.BigInt(pool.A),
       aPrecise: JSBI.BigInt(pool.A),
       virtualPrice: JSBI.BigInt(pool.virtualPrice),
+      lpTotalSupply: lpInfo[pool.id][0],
+      lpOwned: lpInfo[pool.id][1],
     }))
+
     dispatch(updatePools({ info: poolInfo }))
-  }, [data, loading, error, dispatch])
+  }, [data, loading, error, dispatch, blockNumber, library, chainId, account])
 }
 
 export function BatchUpdateGauges(): null {
@@ -276,7 +171,7 @@ export function BatchUpdateGauges(): null {
             )
 
             const collectedData: GaugeOnlyInfo = {
-              id: poolInfo.address,
+              id: poolInfo.address.toLowerCase(),
               poolWeight: new Percent(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
               userStaked: lpStaked,
               pendingMobi,

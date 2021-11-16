@@ -13,7 +13,7 @@ import { tryParseAmount } from 'state/swap/hooks'
 
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
-import { StableSwapPool } from './reducer'
+import { StableSwapConstants, StableSwapPool } from './reducer'
 import { BigIntToJSBI } from './updater'
 
 export interface StablePoolInfo {
@@ -35,7 +35,6 @@ export interface StablePoolInfo {
   readonly priceOfStaked: TokenAmount
   readonly balances: TokenAmount[]
   readonly pegComesAfter: boolean | undefined
-  readonly feesGenerated: TokenAmount
   readonly mobiRate: JSBI | undefined
   readonly pendingMobi: JSBI | undefined
   readonly gaugeAddress?: string
@@ -49,8 +48,8 @@ export interface StablePoolInfo {
   readonly isDisabled?: boolean
 }
 
-export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
-  const withMetaPools = useSelector<AppState, StableSwapPool[]>((state) =>
+export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool | undefined] {
+  const withMetaPools = useSelector<AppState, (StableSwapPool | StableSwapConstants)[]>((state) =>
     Object.values(state.stablePools.pools).map(({ pool }) => {
       if (!pool.metaPool) return pool
       const underlying = state.stablePools.pools[pool.metaPool]?.pool
@@ -90,27 +89,26 @@ export const getPoolInfo = (
   poolAddress: pool.address,
   lpToken: pool.lpToken,
   tokens: pool.tokens,
-  amountDeposited: new TokenAmount(pool.lpToken, JSBI.add(pool.lpOwned, pool.staking?.userStaked ?? JSBI.BigInt('0'))),
+  amountDeposited: new TokenAmount(pool.lpToken, JSBI.add(pool.lpOwned, pool.userStaked ?? JSBI.BigInt('0'))),
   totalDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
-  stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
+  stakedAmount: new TokenAmount(pool.lpToken, pool.userStaked || JSBI.BigInt('0')),
   apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
   peggedTo: pool.peggedTo,
   virtualPrice: pool.virtualPrice,
   priceOfStaked: tokenAmountScaled(
     pool.lpToken,
-    JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
+    JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.userStaked || JSBI.BigInt('0')))
   ),
   workingSupply: pool.workingLiquidity,
   balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
   pegComesAfter: pool.pegComesAfter,
-  feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
-  mobiRate: pool.staking?.totalMobiRate,
-  pendingMobi: pool.staking?.pendingMobi,
+  mobiRate: pool.totalMobiRate,
+  pendingMobi: pool.pendingMobi,
   gaugeAddress: pool.gaugeAddress,
   displayDecimals: pool.displayDecimals,
-  totalStakedAmount: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
+  totalStakedAmount: new TokenAmount(pool.lpToken, pool.totalStakedAmount ?? '0'),
   workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
-  totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
+  totalPercentage: new Percent(pool.userStaked ?? '0', pool.totalStakedAmount ?? '1'),
   externalRewardRates:
     pool.additionalRewardRate?.map(
       (rate, i) =>
@@ -124,7 +122,7 @@ export const getPoolInfo = (
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
-  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name.toLowerCase()]?.pool)
   const { chainId } = useActiveContractKit()
   const tokens = useDefaultTokenList()[chainId]
   return !pool ? undefined : { ...getPoolInfo(pool, tokens) }
@@ -165,7 +163,7 @@ export function useExpectedLpTokens(
   input: (string | undefined)[],
   isDeposit = true
 ): [TokenAmount, TokenAmount[]] {
-  const mathUtil = useMathUtil(pool.name)
+  const mathUtil = useMathUtil(pool.poolAddress ?? pool.address)
   const tokenAmounts = useMemo(
     () => tokens.map((t, i) => tryParseAmount(input[i], t) ?? new TokenAmount(t, '0')),
     [input]
@@ -196,8 +194,8 @@ export function useExpectedLpTokens(
 }
 
 export function useMathUtil(pool: StableSwapPool | string): StableSwapMath | undefined {
-  const name = !pool ? '' : typeof pool == 'string' ? pool : pool.name
-  const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name]?.math)
+  const name = !pool ? '' : typeof pool == 'string' ? pool : pool.address
+  const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name.toLowerCase()]?.math)
   return math
 }
 
@@ -218,8 +216,8 @@ export function usePool(): readonly [StableSwapPool] {
   return useCurrentPool(tok1, tok2)
 }
 
-export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAmount | undefined {
-  const pool = useStablePoolInfoByName(poolName)
+export function usePriceOfLp(address: string, amountOfLp: TokenAmount): TokenAmount | undefined {
+  const pool = useStablePoolInfoByName(address)
   const price = useEthBtcPrice(pool?.poolAddress ?? '')
   return pool && price && amountOfLp
     ? new TokenAmount(
@@ -232,8 +230,8 @@ export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAm
     : undefined
 }
 
-export function useExternalRewards({ poolName }: { poolName: string }): TokenAmount[] {
-  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[poolName]?.pool)
+export function useExternalRewards({ address }: { address: string }): TokenAmount[] {
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[address.toLowerCase()]?.pool)
   const gauge = useLiquidityGaugeContract(pool?.gaugeAddress ?? undefined)
   const { account, chainId } = useActiveContractKit()
   gauge?.claimable_reward_write

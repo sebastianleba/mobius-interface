@@ -99,7 +99,7 @@ const initialState: PoolState = {
       cur: StableSwapConstants
     ) => ({
       ...accum,
-      [cur.address]: {
+      [cur.address.toLowerCase()]: {
         pool: cur,
         math: undefined,
       },
