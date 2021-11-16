@@ -76,22 +76,16 @@ export function UpdateVariablePoolInfo(): null {
       }),
       {}
     )
-  console.log(lpInfo)
   return useMemo(() => {
     if (error) console.log(error)
     if (loading) return null
-    console.log(
-      lpInfo,
-      data.swaps.map(({ id }) => !!lpInfo[id])
-    )
-
     const poolInfo: PoolOnlyInfo[] = data.swaps
       .filter(({ id }) => !!lpInfo[id])
       .map((pool) => ({
         id: pool.id,
         volume: {
-          day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
-          week: parseFloat(pool.weeklyVolumes[1]?.volume ?? '0'),
+          day: pool.dailyVolumes[0]?.volume ?? '0',
+          week: pool.weeklyVolumes[1]?.volume ?? '0',
         },
         balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
         amp: JSBI.BigInt(pool.A),

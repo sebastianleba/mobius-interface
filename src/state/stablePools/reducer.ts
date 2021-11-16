@@ -7,6 +7,8 @@ import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { updateExternalRewards, updateGauges, updatePools } from './actions'
 
+const ZERO = JSBI.BigInt('0')
+
 export type ExternalRewards = {
   token: string
   unclaimed: JSBI
@@ -15,8 +17,8 @@ export type ExternalRewards = {
 export type PoolOnlyInfo = {
   id: string
   volume: {
-    day: JSBI
-    week: JSBI
+    day: string
+    week: string
   }
   balances: JSBI[]
   amp: JSBI
@@ -24,6 +26,7 @@ export type PoolOnlyInfo = {
   aPrecise: JSBI
   lpTotalSupply: JSBI
   lpOwned: JSBI
+  loadingPool: boolean
 }
 
 export type GaugeOnlyInfo = {
@@ -43,6 +46,7 @@ export type GaugeOnlyInfo = {
   gaugeAddress?: string
   relativeGaugeWeight?: Fraction
   lastClaim: Date
+  loadingGauge: boolean
 }
 
 export type StableSwapVariable = PoolOnlyInfo & GaugeOnlyInfo
@@ -100,7 +104,28 @@ const initialState: PoolState = {
     ) => ({
       ...accum,
       [cur.address.toLowerCase()]: {
-        pool: cur,
+        pool: {
+          ...cur,
+          balances: Array(cur.tokenAddresses.length).fill(ZERO),
+          userStaked: ZERO,
+          totalStakedAmount: ZERO,
+          totalMobiRate: ZERO,
+          pendingMobi: ZERO,
+          workingLiquidity: ZERO,
+          virtualPrice: ZERO,
+          poolWeight: new Percent('0', '1'),
+          effectiveBalance: ZERO,
+          totalEffectiveBalance: ZERO,
+          futureWeight: ZERO,
+          lpTotalSupply: ZERO,
+          lpOwned: ZERO,
+          loadingGauge: true,
+          loadingPool: true,
+          volume: {
+            day: '0',
+            week: '0',
+          },
+        },
         math: undefined,
       },
     }),
@@ -118,7 +143,7 @@ export default createReducer<PoolState>(initialState, (builder) =>
       const copiedState = current(state)
       info.forEach((pool) => {
         const cur = copiedState.pools[pool.id].pool as any as StableSwapPool
-        const newPool = { ...cur, ...pool }
+        const newPool = { ...cur, ...pool, loadingPool: false }
 
         const math = new StableSwapMath(newPool)
         state.pools[pool.id] = {
@@ -126,14 +151,12 @@ export default createReducer<PoolState>(initialState, (builder) =>
           math,
         }
       })
-      console.log(state)
-      console.log('Done')
     })
     .addCase(updateGauges, (state, { payload: { info } }) => {
       const copiedState = current(state)
       info.forEach((gauge) => {
         const cur = copiedState.pools[gauge.id].pool as any as StableSwapPool
-        const newPool = { ...cur, ...gauge }
+        const newPool = { ...cur, ...gauge, loadingGauge: false }
         state.pools[gauge.id] = {
           pool: newPool,
           math: state.pools[gauge.id].math,

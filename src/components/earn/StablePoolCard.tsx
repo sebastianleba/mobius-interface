@@ -237,15 +237,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   } catch (e) {
     console.error('Weekly apy overflow', e)
   }
-  let userBalances: TokenAmount[] = []
-  if (totalDeposited.greaterThan('0')) {
-    userBalances = balances.map((amount) => {
-      const fraction = new Fraction(userLP ? userLP.raw : JSBI.BigInt(0), totalDeposited.raw)
-      const ratio = fraction.multiply(amount.raw)
-      return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
-    })
-  }
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -405,11 +396,13 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               </RowBetween>
 
               <RowBetween>
-                <TYPE.darkGray>Total volume</TYPE.darkGray>
+                <TYPE.darkGray>Weekly volume</TYPE.darkGray>
                 <RowFixed>
                   <TYPE.black fontWeight={800}>
-                    {totalVolume
-                      ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(totalVolume)} ${pegComesAfter ? peggedTo : ''}`
+                    {poolInfo.weeklyVolume
+                      ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(poolInfo.weeklyVolume)} ${
+                          pegComesAfter ? peggedTo : ''
+                        }`
                       : '-'}
                   </TYPE.black>
                 </RowFixed>

@@ -69,24 +69,27 @@ export default function Pool() {
 
   const [selection, setSelection] = React.useState<Chain>(Chain.All)
 
-  const tvl = stablePools.reduce((accum, poolInfo) => {
-    const price =
-      poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
-        ? JSBI.BigInt(PRICE[Coins.Bitcoin])
-        : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
-        ? JSBI.BigInt(PRICE[Coins.Ether])
-        : JSBI.BigInt(PRICE[Coins.USD])
-    const lpPrice = JSBI.divide(
-      JSBI.multiply(price, poolInfo.virtualPrice),
-      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-    )
-    const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
-    return JSBI.add(accum, priceDeposited)
-  }, JSBI.BigInt('0'))
+  const tvl = stablePools
+    .filter((pool) => pool && pool.virtualPrice)
+    .reduce((accum, poolInfo) => {
+      const price =
+        poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+          ? JSBI.BigInt(PRICE[Coins.Bitcoin])
+          : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+          ? JSBI.BigInt(PRICE[Coins.Ether])
+          : JSBI.BigInt(PRICE[Coins.USD])
+      const lpPrice = JSBI.divide(
+        JSBI.multiply(price, poolInfo.virtualPrice),
+        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+      )
+      const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
+      return JSBI.add(accum, priceDeposited)
+    }, JSBI.BigInt('0'))
   const tvlAsTokenAmount = new TokenAmount(cUSD[chainId], tvl)
   const mobiprice = useCUSDPrice(useMobi())
 
   const sortCallback = (pool1: StablePoolInfo, pool2: StablePoolInfo) => {
+    if (!pool1 || !pool2) return true
     const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount.greaterThan('0')
     const isStaking2 = pool2.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool2.stakedAmount.greaterThan('0')
     if (isStaking1 && !isStaking2) return false
