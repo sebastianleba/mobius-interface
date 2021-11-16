@@ -10,17 +10,13 @@ import {
   removeSerializedToken,
   SerializedPair,
   SerializedToken,
-  setUseUbeswap,
   setValoraAccount,
   toggleURLWarning,
   updateMatchesDarkMode,
-  updateUserAllowMoolaWithdrawal,
   updateUserDarkMode,
   updateUserDeadline,
-  updateUserDisableSmartRouting,
   updateUserExpertMode,
   updateUserMinApprove,
-  updateUserSingleHopOnly,
   updateUserSlippageTolerance,
 } from './actions'
 
@@ -35,18 +31,13 @@ export interface UserState {
 
   userExpertMode: boolean
 
-  userSingleHopOnly: boolean // only allow swaps on direct pairs
   userMinApprove: boolean // require approving each transaction
-  userAllowMoolaWithdrawal: boolean // allows the user to withdraw from Moola
-  userDisableSmartRouting: boolean // enables smart order routing
 
   // user defined slippage tolerance in bips, used in all txns
   userSlippageTolerance: number
 
   // deadline set by user in minutes, used in all txns
   userDeadline: number
-
-  useUbeswap?: boolean
 
   tokens: {
     [chainId: number]: {
@@ -79,10 +70,7 @@ export const initialState: UserState = {
   userDarkMode: null,
   matchesDarkMode: false,
   userExpertMode: false,
-  userSingleHopOnly: false,
   userMinApprove: false,
-  userAllowMoolaWithdrawal: false,
-  userDisableSmartRouting: false,
   userSlippageTolerance: INITIAL_ALLOWED_SLIPPAGE,
   userDeadline: DEFAULT_DEADLINE_FROM_NOW,
   tokens: {},
@@ -90,7 +78,6 @@ export const initialState: UserState = {
   timestamp: currentTimestamp(),
   URLWarningVisible: true,
   valoraAccount: null,
-  useUbeswap: false,
 }
 
 export default createReducer(initialState, (builder) =>
@@ -130,17 +117,8 @@ export default createReducer(initialState, (builder) =>
       state.userDeadline = action.payload.userDeadline
       state.timestamp = currentTimestamp()
     })
-    .addCase(updateUserSingleHopOnly, (state, action) => {
-      state.userSingleHopOnly = action.payload.userSingleHopOnly
-    })
     .addCase(updateUserMinApprove, (state, action) => {
       state.userMinApprove = action.payload.userMinApprove
-    })
-    .addCase(updateUserAllowMoolaWithdrawal, (state, action) => {
-      state.userAllowMoolaWithdrawal = action.payload.userAllowMoolaWithdrawal
-    })
-    .addCase(updateUserDisableSmartRouting, (state, action) => {
-      state.userDisableSmartRouting = action.payload.userDisableSmartRouting
     })
     .addCase(addSerializedToken, (state, { payload: { serializedToken } }) => {
       state.tokens[serializedToken.chainId] = state.tokens[serializedToken.chainId] || {}
@@ -179,8 +157,5 @@ export default createReducer(initialState, (builder) =>
     })
     .addCase(clearValoraAccount, (state) => {
       state.valoraAccount = null
-    })
-    .addCase(setUseUbeswap, (state, { payload }) => {
-      state.useUbeswap = payload.useUbeswap
     })
 )

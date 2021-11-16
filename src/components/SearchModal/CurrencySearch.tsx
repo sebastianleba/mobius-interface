@@ -3,7 +3,6 @@ import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
 import useToggle from 'hooks/useToggle'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import ReactGA from 'react-ga'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router'
 import AutoSizer from 'react-virtualized-auto-sizer'
@@ -12,7 +11,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import { useActiveContractKit } from '../../hooks'
-import { useFoundOnInactiveList, useSwappableTokens } from '../../hooks/Tokens'
+import { useSwappableTokens } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
@@ -66,19 +65,9 @@ export function CurrencySearch({
 
   const allTokens = useSwappableTokens(location.pathname.includes('mint'))
   // if they input an address, use it
-  const isAddressSearch = isAddress(searchQuery)
   const [tokensInSamePool] = useTokensTradeable(location.pathname.includes('mint'), otherSelectedCurrency)
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-  useEffect(() => {
-    if (isAddressSearch) {
-      ReactGA.event({
-        category: 'Currency Select',
-        action: 'Search by address',
-        label: isAddressSearch,
-      })
-    }
-  }, [isAddressSearch])
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -163,17 +152,6 @@ export function CurrencySearch({
   const node = useRef<HTMLDivElement>()
   useOnClickOutside(node, open ? toggle : undefined)
 
-  // if no results on main list, show option to expand into inactive
-  const [showExpanded, setShowExpanded] = useState(false)
-  const inactiveTokens = useFoundOnInactiveList(searchQuery)
-
-  // reset expanded results on query reset
-  useEffect(() => {
-    if (searchQuery === '') {
-      setShowExpanded(false)
-    }
-  }, [setShowExpanded, searchQuery])
-
   return (
     <ContentWrapper>
       <PaddedColumn gap="16px">
@@ -209,9 +187,7 @@ export function CurrencySearch({
               <CurrencyList
                 height={height}
                 showETH={false}
-                currencies={
-                  showExpanded && inactiveTokens ? filteredSortedTokens.concat(inactiveTokens) : filteredSortedTokens
-                }
+                currencies={filteredSortedTokens}
                 onCurrencySelect={handleCurrencySelect}
                 otherCurrency={otherSelectedCurrency}
                 selectedCurrency={selectedCurrency}

@@ -6,11 +6,9 @@ import styled from 'styled-components'
 
 import checkedLogo from '../../assets/svg/mobius.svg'
 import { useActiveContractKit } from '../../hooks'
-import { useIsUserAddedToken } from '../../hooks/Tokens'
-import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
+import { WrappedTokenInfo } from '../../state/lists/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
-import { isTokenOnList } from '../../utils'
 import Column from '../Column'
 import CurrencyLogo from '../CurrencyLogo'
 import Loader from '../Loader'
@@ -105,9 +103,6 @@ function CurrencyRow({
 }) {
   const { account } = useActiveContractKit()
   const key = currencyKey(currency)
-  const selectedTokenList = useCombinedActiveList()
-  const isOnSelectedList = isTokenOnList(selectedTokenList, currency)
-  const customAdded = useIsUserAddedToken(currency)
   const balance = useCurrencyBalance(account ?? undefined, currency)
   if (isSelected || otherSelected)
     currency = {
@@ -130,7 +125,7 @@ function CurrencyRow({
           {currency.symbol}
         </Text>
         <TYPE.darkGray ml="0px" fontSize={'12px'} fontWeight={300}>
-          {currency.name} {!isOnSelectedList && customAdded && '• Added by user'}
+          {currency.name}
         </TYPE.darkGray>
       </Column>
       <TokenTags currency={currency} />

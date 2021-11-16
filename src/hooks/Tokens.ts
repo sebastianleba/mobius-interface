@@ -3,30 +3,11 @@ import { parseBytes32String } from '@ethersproject/strings'
 import { Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
 
-import { filterTokens } from '../components/SearchModal/filtering'
 import { MENTO_POOL_INFO, MOBI_TOKEN, STATIC_POOL_INFO, veMOBI_TOKEN } from '../constants/StablePools'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { isAddress } from '../utils'
-import { TokenAddressMap } from './../state/lists/hooks'
 import { useActiveContractKit } from './index'
 import { useBytes32TokenContract, useTokenContract } from './useContract'
-
-// reduce token map into standard address <-> Token mapping, optionally include user added tokens
-function useTokensFromMap(tokenMap: TokenAddressMap, includeUserAdded: boolean): { [address: string]: Token } {
-  const { chainId } = useActiveContractKit()
-
-  return useMemo(() => {
-    if (!chainId) return {}
-
-    // reduce to just tokens
-    const mapWithoutUrls = Object.keys(tokenMap[chainId]).reduce<{ [address: string]: Token }>((newMap, address) => {
-      newMap[address] = tokenMap[chainId][address].token
-      return newMap
-    }, {})
-
-    return mapWithoutUrls
-  }, [chainId, tokenMap, includeUserAdded])
-}
 
 export function useSwappableTokens(mento?: boolean): { [address: string]: Token } {
   const { chainId } = useActiveContractKit()
@@ -41,50 +22,12 @@ export function useSwappableTokens(mento?: boolean): { [address: string]: Token 
   return swappableTokens
 }
 
-export function useDefaultTokens(): { [address: string]: Token } {
-  return {}
-}
-
 export function useAllTokens(): { [address: string]: Token } {
   return {}
 }
 
 export function useUnsupportedTokens(): { [address: string]: Token } {
   return {}
-}
-
-export function useIsTokenActive(token: Token | undefined | null): boolean {
-  const activeTokens = useAllTokens()
-
-  if (!activeTokens || !token) {
-    return false
-  }
-
-  return !!activeTokens[token.address]
-}
-
-// used to detect extra search results
-export function useFoundOnInactiveList(searchQuery: string): Token[] | undefined {
-  const { chainId } = useActiveContractKit()
-  const inactiveTokens = useAllInactiveTokens()
-
-  return useMemo(() => {
-    if (!chainId || searchQuery === '') {
-      return undefined
-    } else {
-      const tokens = filterTokens(Object.values(inactiveTokens), searchQuery)
-      return tokens
-    }
-  }, [chainId, inactiveTokens, searchQuery])
-}
-
-// Check if currency is included in custom list from user storage
-export function useIsUserAddedToken(currency: Token | undefined | null): boolean {
-  if (!currency) {
-    return false
-  }
-
-  return false
 }
 
 // parse a name or symbol from a token response
