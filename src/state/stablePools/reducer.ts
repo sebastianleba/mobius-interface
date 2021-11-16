@@ -17,8 +17,8 @@ export type ExternalRewards = {
 export type PoolOnlyInfo = {
   id: string
   volume: {
-    day: string
-    week: string
+    day: number
+    week: number
   }
   balances: JSBI[]
   amp: JSBI
@@ -122,8 +122,8 @@ const initialState: PoolState = {
           loadingGauge: true,
           loadingPool: true,
           volume: {
-            day: '0',
-            week: '0',
+            day: 0,
+            week: 0,
           },
         },
         math: undefined,

@@ -133,7 +133,7 @@ export const getPoolInfo = (
         displayChain: pool.displayChain,
         coin: pool.coin,
         isDisabled: pool.disabled,
-        weeklyVolume: tryParseAmount(pool.volume.week, pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
+        weeklyVolume: tryParseAmount(pool.volume.week.toFixed(6), pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
         poolLoading: pool.loadingPool,
         gaugeLoading: pool.loadingGauge,
       }

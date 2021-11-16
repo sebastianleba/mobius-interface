@@ -86,8 +86,8 @@ export function UpdateVariablePoolInfo(): null {
       .map((pool) => ({
         id: pool.id,
         volume: {
-          day: pool.dailyVolumes[0]?.volume ?? '0',
-          week: pool.weeklyVolumes[1]?.volume ?? '0',
+          day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
+          week: parseFloat(pool.weeklyVolumes[1]?.volume ?? '0'),
         },
         balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
         amp: JSBI.BigInt(pool.A),
