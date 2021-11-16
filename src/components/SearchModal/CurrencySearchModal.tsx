@@ -1,6 +1,4 @@
 import { Token } from '@ubeswap/sdk'
-import { TokenList } from '@uniswap/token-lists'
-import usePrevious from 'hooks/usePrevious'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useLast from '../../hooks/useLast'
@@ -48,15 +46,8 @@ export default function CurrencySearchModal({
     [onDismiss, onCurrencySelect]
   )
 
-  // for token import view
-  const prevView = usePrevious(modalView)
-
   // used for import token flow
   const [importToken, setImportToken] = useState<Token | undefined>()
-
-  // used for import list
-  const [importList, setImportList] = useState<TokenList | undefined>()
-  const [listURL, setListUrl] = useState<string | undefined>()
 
   // change min height if not searching
   const minHeight = modalView === CurrencyModalView.importToken || modalView === CurrencyModalView.importList ? 40 : 80
@@ -77,40 +68,3 @@ export default function CurrencySearchModal({
     </Modal>
   )
 }
-
-/*
-      {modalView === CurrencyModalView.search ? (
-        <CurrencySearch
-          isOpen={isOpen}
-          onDismiss={onDismiss}
-          onCurrencySelect={handleCurrencySelect}
-          selectedCurrency={selectedCurrency}
-          otherSelectedCurrency={otherSelectedCurrency}
-          showCommonBases={showCommonBases}
-          showImportView={() => setModalView(CurrencyModalView.importToken)}
-          setImportToken={setImportToken}
-          showManageView={() => setModalView(CurrencyModalView.manage)}
-        />
-      ) : modalView === CurrencyModalView.importToken && importToken ? (
-        <ImportToken
-          tokens={[importToken]}
-          onDismiss={onDismiss}
-          onBack={() =>
-            setModalView(prevView && prevView !== CurrencyModalView.importToken ? prevView : CurrencyModalView.search)
-          }
-          handleCurrencySelect={handleCurrencySelect}
-        />
-      ) : modalView === CurrencyModalView.importList && importList && listURL ? (
-        <ImportList list={importList} listURL={listURL} onDismiss={onDismiss} setModalView={setModalView} />
-      ) : modalView === CurrencyModalView.manage ? (
-        <Manage
-          onDismiss={onDismiss}
-          setModalView={setModalView}
-          setImportToken={setImportToken}
-          setImportList={setImportList}
-          setListUrl={setListUrl}
-        />
-      ) : (
-        ''
-      )}
-*/

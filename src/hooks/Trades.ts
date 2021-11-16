@@ -10,12 +10,15 @@ export function useIsTransactionUnsupported(currencyIn?: Token, currencyOut?: To
 
   // if unsupported list loaded & either token on list, mark as unsupported
   if (unsupportedToken) {
+    console.log('her')
     if (tokenIn && Object.keys(unsupportedToken).includes(tokenIn.address)) {
       return true
     }
     if (tokenOut && Object.keys(unsupportedToken).includes(tokenOut.address)) {
       return true
     }
+  } else {
+    console.log('hdh')
   }
 
   return false

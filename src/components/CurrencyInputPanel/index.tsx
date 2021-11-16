@@ -17,28 +17,6 @@ import { Input as NumericalInput } from '../NumericalInput'
 import { RowBetween } from '../Row'
 import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
 
-// const ColorShift = keyframes`
-// 0% { background: #1b09f5;}
-// 5% { background: #8879bf;}
-// 10% { background: #0792f7;}
-// 15% { background: #348cec;}
-// 20% { background: #ab9325;}
-// 25% { background: #ab9325;}
-// 30% { background: #7f22dc;}
-// 35% { background: #989858;}
-// 40% { background: #ac9406;}
-// 45% { background: #ab9325;}
-// 50% { background: #23a963;}
-// 55% { background: #ab9325;}
-// 60% { background: #23a963;}
-// 65% { background: #00a2c6;}
-// 70% { background: #d38219;}
-// 75% { background: #27a966;}
-// 80% { background: #d2830b;}
-// 85% { background: #23a963;}
-// 90% { background: #52D07F;}
-// 95% { background: #52D07F;}`
-
 const ColorShift = keyframes`
 0% { background: #FB7C6D;}
 10% { background: #FBCC5C;}

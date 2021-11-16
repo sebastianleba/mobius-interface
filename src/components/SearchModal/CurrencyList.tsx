@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import checkedLogo from '../../assets/svg/mobius.svg'
 import { useActiveContractKit } from '../../hooks'
-import { useAllInactiveTokens, useIsUserAddedToken } from '../../hooks/Tokens'
+import { useIsUserAddedToken } from '../../hooks/Tokens'
 import { useCombinedActiveList, WrappedTokenInfo } from '../../state/lists/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
@@ -16,7 +16,6 @@ import CurrencyLogo from '../CurrencyLogo'
 import Loader from '../Loader'
 import { RowFixed } from '../Row'
 import { MouseoverTooltip } from '../Tooltip'
-import ImportRow from './ImportRow'
 import { MenuItem } from './styleds'
 
 function currencyKey(currency: Token): string {
@@ -149,8 +148,6 @@ export default function CurrencyList({
   onCurrencySelect,
   otherCurrency,
   fixedListRef,
-  showImportView,
-  setImportToken,
 }: {
   height: number
   currencies: Token[]
@@ -165,10 +162,6 @@ export default function CurrencyList({
   currencies = currencies.filter((token) => !token.symbol?.includes('LP'))
   const itemData = currencies
 
-  const inactiveTokens: {
-    [address: string]: Token
-  } = useAllInactiveTokens()
-
   const Row = useCallback(
     ({ data, index, style }) => {
       const currency: Token = data[index]
@@ -176,31 +169,15 @@ export default function CurrencyList({
       const otherSelected = Boolean(otherCurrency && currencyEquals(otherCurrency, currency))
       const handleSelect = () => onCurrencySelect(currency)
 
-      const token = currency
-
-      const showImport = inactiveTokens && token && Object.keys(inactiveTokens).includes(token.address)
-
-      if (showImport && token) {
-        return (
-          <ImportRow
-            style={style}
-            token={token}
-            showImportView={showImportView}
-            setImportToken={setImportToken}
-            dim={true}
-          />
-        )
-      } else {
-        return (
-          <CurrencyRow
-            style={style}
-            currency={currency}
-            isSelected={isSelected}
-            onSelect={handleSelect}
-            otherSelected={otherSelected}
-          />
-        )
-      }
+      return (
+        <CurrencyRow
+          style={style}
+          currency={currency}
+          isSelected={isSelected}
+          onSelect={handleSelect}
+          otherSelected={otherSelected}
+        />
+      )
     },
     [onCurrencySelect, otherCurrency, selectedCurrency]
   )

@@ -1,5 +1,4 @@
 import { cUSD, Token } from '@ubeswap/sdk'
-import { ButtonLight } from 'components/Button'
 import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import useTheme from 'hooks/useTheme'
 import useToggle from 'hooks/useToggle'
@@ -13,7 +12,7 @@ import { Text } from 'rebass'
 import styled from 'styled-components'
 
 import { useActiveContractKit } from '../../hooks'
-import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
+import { useFoundOnInactiveList, useSwappableTokens } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
@@ -51,7 +50,6 @@ export function CurrencySearch({
   showCommonBases,
   onDismiss,
   isOpen,
-  showManageView,
   showImportView,
   setImportToken,
 }: CurrencySearchProps) {
@@ -69,7 +67,6 @@ export function CurrencySearch({
   const allTokens = useSwappableTokens(location.pathname.includes('mint'))
   // if they input an address, use it
   const isAddressSearch = isAddress(searchQuery)
-  const searchToken = useToken(location.pathname.includes('mint'), searchQuery)
   const [tokensInSamePool] = useTokensTradeable(location.pathname.includes('mint'), otherSelectedCurrency)
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
@@ -82,8 +79,6 @@ export function CurrencySearch({
       })
     }
   }, [isAddressSearch])
-
-  const showETH = false
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -207,13 +202,13 @@ export function CurrencySearch({
         )}
       </PaddedColumn>
       <Separator />
-      {filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
+      {filteredSortedTokens?.length > 0 ? (
         <div style={{ flex: '1' }}>
           <AutoSizer disableWidth>
             {({ height }) => (
               <CurrencyList
                 height={height}
-                showETH={showETH}
+                showETH={false}
                 currencies={
                   showExpanded && inactiveTokens ? filteredSortedTokens.concat(inactiveTokens) : filteredSortedTokens
                 }
@@ -232,47 +227,8 @@ export function CurrencySearch({
           <TYPE.main color={theme.text3} textAlign="center" mb="20px">
             No results found in active pools.
           </TYPE.main>
-          {inactiveTokens &&
-            inactiveTokens.length > 0 &&
-            !searchToken &&
-            searchQuery.length > 1 &&
-            filteredSortedTokens?.length === 0 && (
-              // expand button in line with no results
-              <Row align="center" width="100%" justify="center">
-                <ButtonLight
-                  width="fit-content"
-                  borderRadius="12px"
-                  padding="8px 12px"
-                  onClick={() => setShowExpanded(!showExpanded)}
-                >
-                  {!showExpanded
-                    ? `Show ${inactiveTokens.length} more inactive ${inactiveTokens.length === 1 ? 'token' : 'tokens'}`
-                    : 'Hide expanded search'}
-                </ButtonLight>
-              </Row>
-            )}
         </Column>
       )}
-
-      {inactiveTokens &&
-        inactiveTokens.length > 0 &&
-        !searchToken &&
-        (searchQuery.length > 1 || showExpanded) &&
-        (filteredSortedTokens?.length !== 0 || showExpanded) && (
-          // button fixed to bottom
-          <Row align="center" width="100%" justify="center" style={{ position: 'absolute', bottom: '80px', left: 0 }}>
-            <ButtonLight
-              width="fit-content"
-              borderRadius="12px"
-              padding="8px 12px"
-              onClick={() => setShowExpanded(!showExpanded)}
-            >
-              {!showExpanded
-                ? `Show ${inactiveTokens.length} more inactive ${inactiveTokens.length === 1 ? 'token' : 'tokens'}`
-                : 'Hide expanded search'}
-            </ButtonLight>
-          </Row>
-        )}
     </ContentWrapper>
   )
 }

@@ -49,10 +49,6 @@ export function useAllTokens(): { [address: string]: Token } {
   return {}
 }
 
-export function useAllInactiveTokens(): { [address: string]: Token } {
-  return {}
-}
-
 export function useUnsupportedTokens(): { [address: string]: Token } {
   return {}
 }
