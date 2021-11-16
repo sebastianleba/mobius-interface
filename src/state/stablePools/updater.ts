@@ -40,6 +40,7 @@ export function UpdateVariablePoolInfo(): null {
   const lpOwned_multiple = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'balanceOf', [
     account ?? undefined,
   ])
+  const virtualPrices = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getVirtualPrice')
 
   const query = gql`
     {
@@ -62,17 +63,18 @@ export function UpdateVariablePoolInfo(): null {
   `
   const { data, loading, error } = useQuery(query)
 
-  const lpInfo: { [address: string]: { total: JSBI; user: JSBI } } = lpTotalSupplies
+  const lpInfo: { [address: string]: { total: JSBI; user: JSBI; virtualPrice: JSBI } } = lpTotalSupplies
     .filter((total, i) => !(total?.loading || lpOwned_multiple[i]?.loading))
     .map((total, i) => [
       BigIntToJSBI((total?.result?.[0] as BigInt) ?? '0'),
       BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0'),
+      BigIntToJSBI((virtualPrices?.[i]?.result?.[0] as BigInt) ?? '0'),
       poolAddresses[i],
     ])
     .reduce(
-      (accum, [total, user, address]) => ({
+      (accum, [total, user, virtualPrice, address]) => ({
         ...accum,
-        [(address as any as string).toLowerCase()]: { total, user },
+        [(address as any as string).toLowerCase()]: { total, user, virtualPrice },
       }),
       {}
     )
@@ -90,7 +92,7 @@ export function UpdateVariablePoolInfo(): null {
         balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
         amp: JSBI.BigInt(pool.A),
         aPrecise: JSBI.BigInt(pool.A),
-        virtualPrice: JSBI.BigInt(pool.virtualPrice),
+        virtualPrice: lpInfo[pool.id].virtualPrice,
         lpTotalSupply: lpInfo[pool.id].total,
         lpOwned: lpInfo[pool.id].user,
       }))

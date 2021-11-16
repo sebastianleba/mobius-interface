@@ -47,6 +47,8 @@ export interface StablePoolInfo {
   readonly coin: Coins
   readonly isDisabled?: boolean
   readonly weeklyVolume: TokenAmount
+  readonly poolLoading: boolean
+  readonly gaugeLoading: boolean
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool | undefined] {
@@ -132,6 +134,8 @@ export const getPoolInfo = (
         coin: pool.coin,
         isDisabled: pool.disabled,
         weeklyVolume: tryParseAmount(pool.volume.week, pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
+        poolLoading: pool.loadingPool,
+        gaugeLoading: pool.loadingGauge,
       }
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
