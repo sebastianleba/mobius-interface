@@ -1,7 +1,6 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCallback'
-import { useIsTransactionUnsupported } from 'hooks/Trades'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
@@ -209,7 +208,7 @@ export default function Mento() {
     [onCurrencySelection]
   )
 
-  const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
+  const swapIsUnsupported = false
 
   const { isEstimate, makeLabel } = describeTrade(true)
   const actionLabel = makeLabel(independentField !== Field.INPUT)

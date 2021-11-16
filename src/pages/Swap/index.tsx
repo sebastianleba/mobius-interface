@@ -1,11 +1,9 @@
-import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
-import { useIsTransactionUnsupported } from 'hooks/Trades'
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
-import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 
@@ -50,10 +48,10 @@ export default function Swap() {
     useCurrency(false, loadedUrlParams?.outputCurrencyId),
   ]
 
-  const urlLoadedTokens: Token[] = useMemo(
-    () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
-    [loadedInputCurrency, loadedOutputCurrency]
-  )
+  // const urlLoadedTokens: Token[] = useMemo(
+  //   () => [loadedInputCurrency, loadedOutputCurrency]?.filter((c): c is Token => c instanceof Token) ?? [],
+  //   [loadedInputCurrency, loadedOutputCurrency]
+  // )
 
   const { account } = useActiveContractKit()
   const theme = useContext(ThemeContext)
@@ -147,12 +145,6 @@ export default function Swap() {
     swapCallback()
       .then((hash) => {
         setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
-
-        ReactGA.event({
-          category: 'Swap',
-          action: 'Swap',
-          label: [trade?.input?.currency?.symbol, trade?.output?.currency?.symbol].join('/'),
-        })
       })
       .catch((error) => {
         setSwapState({
@@ -209,7 +201,7 @@ export default function Swap() {
     [onCurrencySelection]
   )
 
-  const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
+  const swapIsUnsupported = false
 
   const { isEstimate, makeLabel } = describeTrade()
   const actionLabel = makeLabel(independentField !== Field.INPUT)

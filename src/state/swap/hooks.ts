@@ -9,7 +9,6 @@ import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
-import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
@@ -149,19 +148,16 @@ export function useDerivedStableSwapInfo(): {
   inputError?: string
 } {
   const { account, chainId } = useActiveContractKit()
-  const ONE = JSBI.BigInt(1)
 
   const {
     typedValue,
     [Field.INPUT]: { currencyId: inputCurrencyId },
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
-    recipient,
   } = useSwapState()
 
   const inputCurrency = useCurrency(false, inputCurrencyId)
   const outputCurrency = useCurrency(false, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
+  const to = account
   const [poolInfo] = POOLS_TO_TOKENS[chainId].filter(
     ({ tokens }) => tokens.includes(inputCurrency?.address || '') && tokens.includes(outputCurrency?.address || '')
   )

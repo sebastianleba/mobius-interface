@@ -9,10 +9,9 @@ import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
 import { CELO } from '../constants/tokens'
 import { MentoTrade } from '../state/mento/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getMentoContract, isAddress, shortenAddress } from '../utils'
+import { calculateGasMargin, getMentoContract } from '../utils'
 import isZero from '../utils/isZero'
 import { useActiveContractKit } from './index'
-import useENS from './useENS'
 import useTransactionDeadline from './useTransactionDeadline'
 
 export enum SwapCallbackState {
@@ -46,15 +45,13 @@ type EstimatedSwapCall = SuccessfulCall | FailedCall
  */
 function useSwapCallArguments(
   trade: MentoTrade | undefined, // trade to execute, required
-  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
-  recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
 ): SwapCall[] {
   const { address: account, network } = useContractKit()
   const library = useProvider()
   const chainId = network.chainId
 
-  const { address: recipientAddress } = useENS(recipientAddressOrName)
-  const recipient = recipientAddressOrName === null ? account : recipientAddress
+  const recipient = account
   const deadline = useTransactionDeadline()
 
   return useMemo(() => {
@@ -83,17 +80,15 @@ function useSwapCallArguments(
 // and the user has approved the slippage adjusted input amount for the trade
 export function useSwapCallback(
   trade: MentoTrade | undefined, // trade to execute, required
-  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
-  recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } {
   const { account, chainId, library } = useActiveContractKit()
 
-  const swapCalls = useSwapCallArguments(trade, allowedSlippage, recipientAddressOrName)
+  const swapCalls = useSwapCallArguments(trade, allowedSlippage)
 
   const addTransaction = useTransactionAdder()
 
-  const { address: recipientAddress } = useENS(recipientAddressOrName)
-  const recipient = recipientAddressOrName === null ? account : recipientAddress
+  const recipient = account
   const getConnectedSigner = useGetConnectedSigner()
 
   return useMemo(() => {
@@ -101,11 +96,7 @@ export function useSwapCallback(
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Missing dependencies' }
     }
     if (!recipient) {
-      if (recipientAddressOrName !== null) {
-        return { state: SwapCallbackState.INVALID, callback: null, error: 'Invalid recipient' }
-      } else {
-        return { state: SwapCallbackState.LOADING, callback: null, error: null }
-      }
+      return { state: SwapCallbackState.LOADING, callback: null, error: null }
     }
 
     return {
@@ -182,17 +173,9 @@ export function useSwapCallback(
             const outputAmount = trade.output.toSignificant(6)
 
             const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
-            const withRecipient =
-              recipient === account
-                ? base
-                : `${base} to ${
-                    recipientAddressOrName && isAddress(recipientAddressOrName)
-                      ? shortenAddress(recipientAddressOrName)
-                      : recipientAddressOrName
-                  }`
 
             addTransaction(response, {
-              summary: withRecipient,
+              summary: base,
             })
 
             return response.hash
@@ -210,15 +193,5 @@ export function useSwapCallback(
       },
       error: null,
     }
-  }, [
-    trade,
-    library,
-    account,
-    chainId,
-    recipient,
-    recipientAddressOrName,
-    swapCalls,
-    getConnectedSigner,
-    addTransaction,
-  ])
+  }, [trade, library, account, chainId, recipient, swapCalls, getConnectedSigner, addTransaction])
 }

@@ -1,9 +1,5 @@
 import { ChainId, Token } from '@ubeswap/sdk'
 import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
-import { useSelector } from 'react-redux'
-
-import { AppState } from '../index'
-import { UNSUPPORTED_LIST_URLS } from './../../constants/lists'
 
 type TagDetails = Tags[keyof Tags]
 export interface TagInfo extends TagDetails {
@@ -150,24 +146,6 @@ export function listToTokenMap(list: TokenList): TokenAddressMap {
   )
   listCache?.set(list, map)
   return map
-}
-
-export function useAllLists(): {
-  readonly [url: string]: {
-    readonly current: TokenList | null
-    readonly pendingUpdate: TokenList | null
-    readonly loadingRequestId: string | null
-    readonly error: string | null
-  }
-} {
-  return useSelector<AppState, AppState['lists']['byUrl']>((state) => state.lists.byUrl)
-}
-
-// filter out unsupported lists
-export function useActiveListUrls(): string[] | undefined {
-  return useSelector<AppState, AppState['lists']['activeListUrls']>((state) => state.lists.activeListUrls)?.filter(
-    (url) => !UNSUPPORTED_LIST_URLS.includes(url)
-  )
 }
 
 // used to hide warnings on import for default tokens

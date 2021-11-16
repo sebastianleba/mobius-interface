@@ -9,7 +9,6 @@ import { MentoMath } from 'utils/mentoMath'
 import { ROUTER_ADDRESS } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
-import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
@@ -173,17 +172,15 @@ export function useMentoTradeInfo(): {
     typedValue,
     [Field.INPUT]: { currencyId: inputCurrencyId },
     [Field.OUTPUT]: { currencyId: outputCurrencyId },
-    recipient,
   } = useSwapState()
   const inputCurrency = useCurrency(true, inputCurrencyId)
   const outputCurrency = useCurrency(true, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
   const pools = usePools()
   const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
   const mathUtil = useMathUtil(pool)
 
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
+  const to = account
   const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,
