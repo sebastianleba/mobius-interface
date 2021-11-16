@@ -1,6 +1,5 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { describeTrade } from 'components/swap/routing/describeTrade'
-import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -114,10 +113,7 @@ export default function Swap() {
 
   const formattedAmounts = {
     [independentField]: typedValue,
-    [dependentField]:
-      (trade instanceof MoolaDirectTrade
-        ? parsedAmounts[dependentField]?.toExact()
-        : parsedAmounts[dependentField]?.toSignificant(6)) ?? '',
+    [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? '',
   }
 
   const userHasSpecifiedInputOutput = Boolean(
@@ -396,11 +392,6 @@ export default function Swap() {
           <AutoRow style={{ justifyContent: 'center' }}></AutoRow>
         </Wrapper>
       </AppBody>
-      {/* {!swapIsUnsupported ? (
-        <AdvancedSwapDetailsDropdown trade={trade} />
-      ) : (
-        <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )} */}
     </>
   )
 }

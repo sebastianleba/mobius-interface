@@ -34,13 +34,6 @@ const VoteCard = styled(DataCard)`
   margin-bottom: 2rem;
 `
 
-const VerticalDivider = styled.div`
-  width: 1px;
-  height: 100%;
-  margin-right: 0.5rem;
-  background: ${({ theme }) => theme.bg4};
-`
-
 const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any }>`
   background: ${({ background }) => background};
   flex: 0.6;
@@ -68,8 +61,6 @@ const InfoContainer = styled.div`
   width: 100%;
   padding: 8px;
 `
-// background: ${({ bgColor1, bgColor2 }) =>
-// `radial-gradient(91.85% 100% at 1.84% 0%, ${bgColor1} 0%, ${bgColor2} 100%) `};
 
 const Wrapper = styled(AutoColumn)<{ showBackground: boolean; background: any }>`
   border-radius: 12px;
@@ -100,22 +91,6 @@ const TopSection = styled.div`
   ${({ theme }) => theme.mediaWidth.upToSmall`
     grid-template-columns: 48px 1fr 96px;
   `};
-`
-
-const BottomSection = styled.div<{ showBackground: boolean }>`
-  padding: 12px 16px;
-  opacity: ${({ showBackground }) => (showBackground ? '1' : '0.4')};
-  border-radius: 0 0 12px 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 12px;
-  z-index: 1;
-`
-
-const DepositWithdrawBtn = styled(StyledButton)`
-  width: 40%;
-  flex: none;
 `
 
 interface Props {

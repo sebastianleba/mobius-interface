@@ -8,7 +8,6 @@ import {
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
-import BRIDGE_ROUTER from '../constants/abis/BridgeRouter.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
@@ -27,7 +26,6 @@ import VESTING_ABI from '../constants/abis/VestingEscrow.json'
 import VOTING_ESCROW from '../constants/abis/VotingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
-  BridgeRouter,
   Erc20,
   ERC20MOBI,
   Exchange,
@@ -73,10 +71,6 @@ export function useENSRegistrarContract(withSignerIfPossible?: boolean): Contrac
 
 export function useLiquidityGaugeContract(address?: string, withSignerIfPossible?: boolean): LiquidityGaugeV3 | null {
   return useContract(address, LIQUIDITY_GAUGE_V3.abi, withSignerIfPossible) as LiquidityGaugeV3
-}
-
-export function useBridgeRouterContract(address?: string, withSignerIfPossible?: boolean): BridgeRouter | null {
-  return useContract(address, BRIDGE_ROUTER.abi, withSignerIfPossible) as BridgeRouter
 }
 
 export function useMobiContract(address?: string, withSignerIfPossible?: boolean): ERC20MOBI | null {

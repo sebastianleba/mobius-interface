@@ -15,7 +15,7 @@ import { ButtonEmpty, ButtonPrimary } from '../../components/Button'
 import { AutoColumn } from '../../components/Column'
 import ClaimRewardModal from '../../components/earn/ClaimRewardModal'
 import StakingModal from '../../components/earn/StakingModal'
-import { CardBGImage, CardNoise, CardSection, DataCard } from '../../components/earn/styled'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import UnstakingModal from '../../components/earn/UnstakingModal'
 import { AutoRow, RowBetween, RowFixed } from '../../components/Row'
 import { BIG_INT_SECONDS_IN_WEEK } from '../../constants'
@@ -261,7 +261,6 @@ export default function Manage({
 
       {stakingInfo && showAddLiquidityButton && (
         <VoteCard>
-          <CardBGImage />
           <CardNoise />
           <CardSection>
             <AutoColumn gap="md">
@@ -278,7 +277,6 @@ export default function Manage({
               </ButtonPrimary>
             </AutoColumn>
           </CardSection>
-          <CardBGImage />
           <CardNoise />
         </VoteCard>
       )}

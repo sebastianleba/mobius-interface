@@ -1,6 +1,5 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { describeTrade } from 'components/swap/routing/describeTrade'
-import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useMentoTradeCallback } from 'components/swap/routing/useMentoTradeCallback'
 import { useIsTransactionUnsupported } from 'hooks/Trades'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
@@ -121,10 +120,7 @@ export default function Mento() {
 
   const formattedAmounts = {
     [independentField]: typedValue,
-    [dependentField]:
-      (trade instanceof MoolaDirectTrade
-        ? parsedAmounts[dependentField]?.toExact()
-        : parsedAmounts[dependentField]?.toSignificant(6)) ?? '',
+    [dependentField]: parsedAmounts[dependentField]?.toSignificant(6) ?? '',
   }
 
   const userHasSpecifiedInputOutput = Boolean(

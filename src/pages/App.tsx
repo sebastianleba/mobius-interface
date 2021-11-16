@@ -44,7 +44,6 @@ const BodyWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  ${({ giveSpace }) => giveSpace && `padding-top: 100px;`}
   align-items: center;
   flex: 1;
   overflow-y: auto;
@@ -69,7 +68,7 @@ export default function App() {
   const location = useLocation()
   const { network, updateNetwork } = useContractKit()
   const chainId = network.chainId as unknown as ChainId
-  const wrongNetwork = !location.pathname.includes('optics') && chainId !== NETWORK_CHAIN_ID
+  const wrongNetwork = chainId !== NETWORK_CHAIN_ID
   React.useEffect(() => {
     // Close window if search params from Valora redirect are present (handles Valora connection issue)
     if (typeof window !== 'undefined') {
@@ -95,7 +94,7 @@ export default function App() {
   return (
     <Suspense fallback={null}>
       <Route component={DarkModeQueryParamReader} />
-      <AppWrapper giveSpace={location.pathname !== '/'}>
+      <AppWrapper>
         {location.pathname !== '/' && (
           <>
             <URLWarning />
@@ -126,7 +125,6 @@ export default function App() {
               <Route exact strict path="/stake" component={Staking} />
               <Route exact strict path="/reset" component={Reset} />
               <Route exact strict path="/ape-mode" component={ApeViewer} />
-              {/* <Route exact strict path="/optics" component={Optics} /> */}
             </Switch>
           </ErrorBoundary>
           {location.pathname !== '/' && <Marginer />}

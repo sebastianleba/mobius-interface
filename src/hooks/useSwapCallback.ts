@@ -7,12 +7,10 @@ import { useMemo } from 'react'
 import isZero from 'utils/isZero'
 
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
-import { useStableSwapContract } from '../hooks/useContract'
 import { MobiusTrade } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { getStableSwapContract, isAddress, shortenAddress } from '../utils'
+import { getStableSwapContract } from '../utils'
 import { useActiveContractKit } from './index'
-import useENS from './useENS'
 import useTransactionDeadline from './useTransactionDeadline'
 
 export enum SwapCallbackState {
@@ -42,19 +40,16 @@ type EstimatedSwapCall = SuccessfulCall | FailedCall
  * Returns the swap calls that can be used to make the trade
  * @param trade trade to execute
  * @param allowedSlippage user allowed slippage
- * @param recipientAddressOrName
  */
 function useSwapCallArguments(
   trade: MobiusTrade | undefined, // trade to execute, required
-  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
-  recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
 ): SwapCall[] {
   const { address: account, network } = useContractKit()
   const library = useProvider()
   const chainId = network.chainId
 
-  const { address: recipientAddress } = useENS(recipientAddressOrName)
-  const recipient = recipientAddressOrName === null ? account : recipientAddress
+  const recipient = account
   const deadline = useTransactionDeadline()
 
   return useMemo(() => {
@@ -64,9 +59,6 @@ function useSwapCallArguments(
     const { indexFrom = 0, indexTo = 0 } = trade || {}
     const outputRaw = trade.output.raw
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
-
-    console.log(indexFrom.toString())
-    console.log(indexTo.toString())
 
     const swapCallParameters: SwapParameters = {
       methodName: trade.isMeta ? 'swapUnderlying' : 'swap',
@@ -89,17 +81,14 @@ function useSwapCallArguments(
 // and the user has approved the slippage adjusted input amount for the trade
 export function useSwapCallback(
   trade: MobiusTrade | undefined, // trade to execute, required
-  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
-  recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
+  allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE // in bips
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } {
   const { account, chainId, library } = useActiveContractKit()
 
-  const swapCalls = useSwapCallArguments(trade, allowedSlippage, recipientAddressOrName)
+  const swapCalls = useSwapCallArguments(trade, allowedSlippage)
 
   const addTransaction = useTransactionAdder()
-  const contract = useStableSwapContract(trade?.pool.address)
-  const { address: recipientAddress } = useENS(recipientAddressOrName)
-  const recipient = recipientAddressOrName === null ? account : recipientAddress
+  const recipient = account
   const getConnectedSigner = useGetConnectedSigner()
 
   return useMemo(() => {
@@ -107,11 +96,7 @@ export function useSwapCallback(
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Missing dependencies' }
     }
     if (!recipient) {
-      if (recipientAddressOrName !== null) {
-        return { state: SwapCallbackState.INVALID, callback: null, error: 'Invalid recipient' }
-      } else {
-        return { state: SwapCallbackState.LOADING, callback: null, error: null }
-      }
+      return { state: SwapCallbackState.LOADING, callback: null, error: null }
     }
 
     return {
@@ -189,17 +174,9 @@ export function useSwapCallback(
             const outputAmount = trade.output.toSignificant(6)
 
             const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
-            const withRecipient =
-              recipient === account
-                ? base
-                : `${base} to ${
-                    recipientAddressOrName && isAddress(recipientAddressOrName)
-                      ? shortenAddress(recipientAddressOrName)
-                      : recipientAddressOrName
-                  }`
 
             addTransaction(response, {
-              summary: withRecipient,
+              summary: base,
             })
 
             return response.hash
@@ -217,15 +194,5 @@ export function useSwapCallback(
       },
       error: null,
     }
-  }, [
-    trade,
-    library,
-    account,
-    chainId,
-    recipient,
-    recipientAddressOrName,
-    swapCalls,
-    getConnectedSigner,
-    addTransaction,
-  ])
+  }, [trade, library, account, chainId, recipient, swapCalls, getConnectedSigner, addTransaction])
 }
