@@ -4,30 +4,34 @@ import { Chain, Coins } from 'constants/StablePools'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { initPool, updateExternalRewards, updateVariableData } from './actions'
-
-export type StableStakingInfo = {
-  userStaked: JSBI
-  totalStakedAmount: JSBI
-  totalMobiRate: JSBI
-  pendingMobi: JSBI
-}
+import { initPool, updateExternalRewards, updateGauges, updatePools, updateVariableData } from './actions'
 
 export type ExternalRewards = {
   token: string
   unclaimed: JSBI
 }
 
-export type StableSwapVariable = {
+export type PoolOnlyInfo = {
+  id: string
+  volume: {
+    day: JSBI
+    week: JSBI
+  }
   balances: JSBI[]
   amp: JSBI
-  lpTotalSupply: JSBI
-  workingLiquidity: JSBI
-  lpOwned: JSBI
   virtualPrice: JSBI
   aPrecise: JSBI
-  feesGenerated: JSBI
-  staking?: StableStakingInfo
+  lpTotalSupply: JSBI
+  lpOwned: JSBI
+}
+
+export type GaugeOnlyInfo = {
+  id: string
+  userStaked: JSBI
+  totalStakedAmount: JSBI
+  totalMobiRate: JSBI
+  pendingMobi: JSBI
+  workingLiquidity: JSBI
   poolWeight: Percent
   effectiveBalance: JSBI
   totalEffectiveBalance: JSBI
@@ -35,7 +39,11 @@ export type StableSwapVariable = {
   powerAllocated: number
   futureWeight: JSBI
   externalRewards?: ExternalRewards[]
+  gaugeAddress?: string
+  relativeGaugeWeight?: Fraction
 }
+
+export type StableSwapVariable = PoolOnlyInfo & GaugeOnlyInfo
 
 export type StableSwapMathConstants = {
   totalMobiRate: JSBI
@@ -58,8 +66,6 @@ export type StableSwapConstants = StableSwapMathConstants & {
   peggedTo: string
   pegComesAfter: boolean | undefined
   displayDecimals: number
-  gaugeAddress?: string
-  relativeGaugeWeight?: Fraction
   metaPool?: string
   additionalRewards?: string[]
   additionalRewardRate?: string[]
@@ -70,7 +76,6 @@ export type StableSwapConstants = StableSwapMathConstants & {
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
-
 export interface PoolState {
   readonly pools: {
     [address: string]: {
@@ -118,5 +123,26 @@ export default createReducer<PoolState>(initialState, (builder) =>
           },
         },
       }
+    })
+    .addCase(updatePools, (state, { payload: { info } }) => {
+      info.forEach((pool) => {
+        const cur = state.pools[pool.id].pool as any as StableSwapPool
+        const newPool = { ...cur, ...pool }
+        const math = new StableSwapMath(newPool)
+        state.pools[pool.id] = {
+          pool: newPool,
+          math,
+        }
+      })
+    })
+    .addCase(updateGauges, (state, { payload: { info } }) => {
+      info.forEach((gauge) => {
+        const cur = state.pools[gauge.id].pool as any as StableSwapPool
+        const newPool = { ...cur, ...gauge }
+        state.pools[gauge.id] = {
+          pool: newPool,
+          math: state.pools[gauge.id].math,
+        }
+      })
     })
 )

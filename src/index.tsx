@@ -50,7 +50,7 @@ if (process.env.REACT_APP_SENTRY_DSN) {
 }
 
 const client = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap-backup',
+  uri: 'https://api.thegraph.com/subgraphs/name/d-mooers/mobius',
   cache: new InMemoryCache(),
 })
 

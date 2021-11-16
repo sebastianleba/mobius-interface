@@ -1,3 +1,4 @@
+import { gql, useQuery } from '@apollo/client'
 import { Interface } from '@ethersproject/abi'
 import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
 import { useEffect, useMemo } from 'react'
@@ -23,8 +24,8 @@ import {
   useStableSwapContract,
 } from '../../hooks/useContract'
 import { AppDispatch } from '../index'
-import { initPool } from './actions'
-import { StableSwapConstants, StableSwapPool } from './reducer'
+import { initPool, updatePools } from './actions'
+import { PoolOnlyInfo, StableSwapConstants, StableSwapPool } from './reducer'
 
 const SECONDS_PER_BLOCK = JSBI.BigInt('5')
 const SwapInterface = new Interface(SWAP.abi)
@@ -159,6 +160,47 @@ export function UpdatePools(): null {
 
 //export const UpdatePendingMobi
 
+export function useUpdateVariablePoolInfo(): void {
+  const query = gql`
+    {
+      swaps {
+        id
+        A
+        balances
+        virtualPrice
+        hourlyVolumes(first: 2) {
+          volume
+        }
+        dailyVolumes(first: 2) {
+          volume
+        }
+        weeklyVolumes(first: 2) {
+          volume
+        }
+      }
+    }
+  `
+  const dispatch = useDispatch()
+  const { data, loading, error } = useQuery(query)
+
+  useMemo(() => {
+    if (error) console.log(error)
+    if (loading) return
+    const poolInfo: PoolOnlyInfo[] = data.swaps.map((pool) => ({
+      id: pool.id,
+      volume: {
+        day: JSBI.BigInt(pool.dailyVolumes[0]),
+        week: JSBI.BigInt(pool.weeklyVolumes[1]),
+      },
+      balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
+      amp: JSBI.BigInt(pool.A),
+      aPrecise: JSBI.BigInt(pool.A),
+      virtualPrice: JSBI.BigInt(pool.virtualPrice),
+    }))
+    dispatch(updatePools({ info: poolInfo }))
+  }, [data, loading, error, dispatch])
+}
+
 export default function BatchUpdatePools(): null {
   const { library, chainId, account } = useActiveContractKit()
   const blockNumber = useBlockNumber()
@@ -170,10 +212,6 @@ export default function BatchUpdatePools(): null {
   const gaugeController = useGaugeControllerContract()
   const mobiContract = useMobiContract()
 
-  const ampConstants = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getA')
-  const balances = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getBalances')
-  const virtualPrices = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getVirtualPrice')
-  const ampPrecises = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getAPrecise')
   const lpTotalSupplies = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'totalSupply')
   const lpOwned_multiple = useMultipleContractSingleData(lpTokenAddresses, lpInterface, 'balanceOf', [
     account ?? undefined,
@@ -222,13 +260,6 @@ export default function BatchUpdatePools(): null {
     pools
       .filter((_, i) => !(totalStakedAmount_multi?.[i]?.loading ?? true))
       .forEach((poolInfo, i) => {
-        const virtualPrice: JSBI = BigIntToJSBI((virtualPrices?.[i]?.result?.[0] as BigInt) ?? '0')
-        const amp: JSBI = BigIntToJSBI((ampConstants?.[i]?.result?.[0] as BigInt) ?? '0')
-        const totalBalances: JSBI[] =
-          balances?.[i]?.result?.[0].map((amt: BigInt): JSBI => {
-            return BigIntToJSBI(amt)
-          }) ?? new Array(poolInfo.tokens.length).fill(JSBI.BigInt('0'))
-        const aPrecise: JSBI = BigIntToJSBI((ampPrecises?.[i]?.result?.[0] as BigInt) ?? '1')
         const lpTotalSupply: JSBI = BigIntToJSBI((lpTotalSupplies?.[i]?.result?.[0] as BigInt) ?? '0')
         const lpOwned: JSBI = BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0')
         const effectiveBalance: JSBI = BigIntToJSBI((effectiveBalances?.[i]?.result?.[0] as BigInt) ?? '0')
@@ -261,13 +292,8 @@ export default function BatchUpdatePools(): null {
         )
 
         const collectedData: StableSwapPool = {
-          ...poolInfo,
-          virtualPrice,
-          balances: totalBalances,
-          amp,
           lpTotalSupply,
           lpOwned,
-          aPrecise,
           feesGenerated: fees,
           poolWeight: new Percent(weight, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))),
           staking: {

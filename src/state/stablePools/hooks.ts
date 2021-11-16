@@ -1,12 +1,13 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
+import { TokenList } from '@uniswap/token-lists'
 import { Chain, Coins } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useLiquidityGaugeContract, useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useEthBtcPrice } from 'state/application/hooks'
-import { useDefaultTokenList } from 'state/lists/hooks'
+import { useDefaultTokenList, WrappedTokenInfo } from 'state/lists/hooks'
 import { useSingleContractMultipleData } from 'state/multicall/hooks'
 import { tryParseAmount } from 'state/swap/hooks'
 

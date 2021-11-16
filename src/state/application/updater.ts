@@ -1,4 +1,4 @@
-import { gql, useQuery } from '@apollo/client'
+import { ApolloClient, gql, InMemoryCache, useQuery } from '@apollo/client'
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
@@ -19,6 +19,11 @@ const fetchEthBtcPrices = async (dispatch: any) => {
 // 0x17700282592d6917f6a73d0bf8accf4d578c131e
 
 export function PriceData(): null {
+  const client = new ApolloClient({
+    uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap-backup',
+    cache: new InMemoryCache(),
+  })
+
   const graphQl = gql`
     {
       tokens(where: { derivedCUSD_gt: "0" }) {
@@ -28,7 +33,7 @@ export function PriceData(): null {
     }
   `
   const dispatch = useDispatch()
-  const { data, loading, error } = useQuery(graphQl)
+  const { data, loading, error } = useQuery(graphQl, { client })
   useEffect(() => {
     if (!loading && !error && data) {
       console.log(data)
