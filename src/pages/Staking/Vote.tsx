@@ -94,9 +94,14 @@ const PositionWrapper = styled(AutoColumn)<{ disabled: boolean }>`
   padding-right: 0.25rem;
   border-radius: 20px;
   width: 100%;
+  opacity: 0.85;
   overflow: hidden;
   position: relative;
+  cursor: pointer;
   padding: 1rem;
+  &:hover {
+    opacity: 1;
+  }
   ${({ disabled }) =>
     disabled &&
     `
@@ -141,19 +146,25 @@ function WeightCard({ position, disabled }: { position: GaugeSummary; disabled: 
   const poolInfo = stablePools.filter((x) => x.name === position.pool)[0]
 
   const poolColor = usePoolColor(poolInfo)
-  disabled = disabled || (poolInfo.isDisabled ?? false)
 
   return (
     <>
-      <GaugeVoteModal summary={position} isOpen={voteModalOpen} onDismiss={() => setVoteModalOpen(false)} />
+      <GaugeVoteModal
+        summary={position}
+        isOpen={voteModalOpen}
+        onDismiss={() => setVoteModalOpen(false)}
+        disabled={poolInfo.isDisabled}
+      />
 
       <PositionWrapper disabled={disabled} onClick={() => !disabled && setVoteModalOpen(true)}>
         <TopSection>
           <RowFixed style={{ gap: '6px' }}>
             <TYPE.black fontWeight={600} fontSize={[16, 24]}>
-              {position.pool}
+              {poolInfo.isDisabled ? 'BURN' : position.pool}
             </TYPE.black>
-            <StyledLogo size={'26px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+            {!poolInfo.isDisabled && (
+              <StyledLogo size={'26px'} srcs={[ChainLogo[poolInfo.displayChain]]} alt={'logo'} />
+            )}
           </RowFixed>
           <RowFixed>
             <TYPE.subHeader color={poolColor} className="apr" fontWeight={800} fontSize={[16, 24]} textAlign="right">
@@ -183,6 +194,13 @@ function WeightCard({ position, disabled }: { position: GaugeSummary; disabled: 
             >{`My Vote: ${position.powerAllocated.toFixed(2)}%`}</TYPE.black>
           </div>
         </SecondSection>
+        {poolInfo.isDisabled && (
+          <SecondSection mobile={isMobile}>
+            <TYPE.red fontWeight={600} fontSize={[12, 16]}>
+              Any inflation allocated toward this gauge will be burnt.
+            </TYPE.red>
+          </SecondSection>
+        )}
       </PositionWrapper>
     </>
   )
