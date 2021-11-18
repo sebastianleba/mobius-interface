@@ -1,7 +1,7 @@
 import './i18n'
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
-import { ContractKitProvider } from '@celo-tools/use-contractkit'
+import { CeloMainnet, ContractKitProvider } from '@celo-tools/use-contractkit'
 import { ChainId } from '@ubeswap/sdk'
 import { NETWORK_CHAIN_ID } from 'connectors/index'
 import { DevNetworks, MainnetNetworks } from 'constants/NetworkInfo'
@@ -52,6 +52,7 @@ ReactDOM.render(
   <StrictMode>
     <FixedGlobalStyle />
     <ContractKitProvider
+      network={CeloMainnet}
       networks={networks}
       dapp={{
         name: 'Mobius',
