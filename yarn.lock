@@ -3644,10 +3644,10 @@
   resolved "https://registry.npmjs.org/@ubeswap/core/-/core-1.0.2.tgz"
   integrity sha512-NjVhCrIej5p+0G2AdPGzWZZW96XjY12s+Qq9dkqxziqcPpJy3EMTMfuLINPxP3uzRyjsPp6mUIFwWJGlTX0qog==
 
-"@ubeswap/default-token-list@^3.3.10":
-  version "3.3.11"
-  resolved "https://registry.yarnpkg.com/@ubeswap/default-token-list/-/default-token-list-3.3.11.tgz#ee69629dc5c4cd177568a6a3ffc0310d0141f4a2"
-  integrity sha512-QES4ylRRR0+m3N+14FIDfXfezrplYUWoqXxFbXl3c3D1mwFHQA4RrZttOfNvJtBCuqCztb4xhB5tPokwyzHxYA==
+"@ubeswap/default-token-list@^4.0.29":
+  version "4.0.29"
+  resolved "https://registry.yarnpkg.com/@ubeswap/default-token-list/-/default-token-list-4.0.29.tgz#ae5659126da231a98712eaef85856cef08e18afc"
+  integrity sha512-0GgBptMAz5XxB6cHrnM/eNVA/w1FUfuZl1OVrAiw2KFmLHeRDy2KbJMoal/OTRnW402CCMETvYjWYLTWDwn3iQ==
 
 "@ubeswap/injected-connector@^6.1.0":
   version "6.1.0"
