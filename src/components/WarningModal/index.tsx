@@ -30,7 +30,7 @@ export default function WarningModal({ isOpen, onDismiss }: ModalProps) {
           recovery manager has complete control over Optics, including but not limited to burning all funds. It is
           advised to bridge your Optics assets back to their native chain and wait for a resolution from cLabs.
         </TYPE.body>
-        <ExternalLink href="https://t.co/v6669QhTo2?amp=1">Read more here</ExternalLink>
+        <ExternalLink href="https://forum.celo.org/t/optics-recovery-mode/2452">Read more here</ExternalLink>
       </ContentWrapper>
     </Modal>
   )
