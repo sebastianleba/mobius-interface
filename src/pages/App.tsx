@@ -4,8 +4,9 @@ import { DappKitResponseStatus } from '@celo/utils'
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ErrorBoundary } from '@sentry/react'
 import { ChainId } from '@ubeswap/sdk'
+import WarningModal from 'components/WarningModal'
 import { NETWORK, NETWORK_CHAIN_ID } from 'connectors'
-import React, { Suspense } from 'react'
+import React, { Suspense, useState } from 'react'
 import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -69,6 +70,7 @@ export default function App() {
   const location = useLocation()
   const { network, updateNetwork } = useContractKit()
   const chainId = network.chainId as unknown as ChainId
+  const [showWarning, setShowWarning] = useState(true)
   const wrongNetwork = !location.pathname.includes('optics') && chainId !== NETWORK_CHAIN_ID
   React.useEffect(() => {
     // Close window if search params from Valora redirect are present (handles Valora connection issue)
@@ -112,6 +114,7 @@ export default function App() {
             </>
           )}
           <ErrorBoundary fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}>
+            <WarningModal isOpen={showWarning} onDismiss={() => setShowWarning(false)} />
             <Switch>
               <Route exact path="/">
                 <Redirect to="/swap" />
