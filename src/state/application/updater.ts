@@ -18,33 +18,32 @@ const fetchEthBtcPrices = async (dispatch: any) => {
 }
 // 0x17700282592d6917f6a73d0bf8accf4d578c131e
 
-export function PriceData(): null {
-  const client = new ApolloClient({
-    uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap',
-    cache: new InMemoryCache(),
-  })
-
-  const graphQl = gql`
-    {
-      tokens(where: { derivedCUSD_gt: "0" }) {
-        id
-        derivedCUSD
-      }
+const ubeswapClient = new ApolloClient({
+  uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap',
+  cache: new InMemoryCache(),
+})
+const priceQuery = gql`
+  {
+    tokens(where: { derivedCUSD_gt: "0" }) {
+      id
+      derivedCUSD
     }
-  `
+  }
+`
+
+export function PriceData(): null {
   const dispatch = useDispatch()
-  const { data, loading, error } = useQuery(graphQl, { client })
+  const { data, loading, error } = useQuery(priceQuery, { client: ubeswapClient })
   useEffect(() => {
     if (!loading && !error && data) {
-      console.log(data)
-      const prices: { [address: string]: string } = data.tokens.reduce(
-        (accum, cur) => ({ ...accum, [cur.id.toLowerCase()]: cur.derivedCUSD }),
-        {}
-      )
-
+      const prices: { [address: string]: string } = data.tokens.reduce((accum, cur) => {
+        return { ...accum, [cur.id.toLowerCase()]: cur.derivedCUSD }
+      }, {})
       dispatch(addPrices({ prices }))
+    } else {
+      console.log(loading, error, data)
     }
-  }, [data, loading])
+  }, [data, loading, dispatch, error])
   return null
 }
 
@@ -53,9 +52,8 @@ export default function Updater(): null {
   const { network } = useContractKit()
   const chainId = network.chainId
   const dispatch = useDispatch()
-
+  console.log('Reloading')
   const windowVisible = useIsWindowVisible()
-
   const [state, setState] = useState<{ chainId: number | undefined; blockNumber: number | null }>({
     chainId,
     blockNumber: null,
