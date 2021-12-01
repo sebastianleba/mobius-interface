@@ -40,8 +40,6 @@ export function PriceData(): null {
         return { ...accum, [cur.id.toLowerCase()]: cur.derivedCUSD }
       }, {})
       dispatch(addPrices({ prices }))
-    } else {
-      console.log(loading, error, data)
     }
   }, [data, loading, dispatch, error])
   return null
@@ -52,7 +50,6 @@ export default function Updater(): null {
   const { network } = useContractKit()
   const chainId = network.chainId
   const dispatch = useDispatch()
-  console.log('Reloading')
   const windowVisible = useIsWindowVisible()
   const [state, setState] = useState<{ chainId: number | undefined; blockNumber: number | null }>({
     chainId,
