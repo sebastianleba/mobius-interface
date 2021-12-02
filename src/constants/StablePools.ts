@@ -62,8 +62,8 @@ export const ChainLogo: { [c in Chain]: string } = {
 }
 
 export const PRICE: { [c in Coins]: number } = {
-  [Coins.Bitcoin]: 42295,
-  [Coins.Ether]: 2909,
+  [Coins.Bitcoin]: 55000,
+  [Coins.Ether]: 4200,
   [Coins.USD]: 1,
   [Coins.Celo]: 6,
   [Coins.Eur]: 1.17,
