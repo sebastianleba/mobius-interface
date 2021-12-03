@@ -108,7 +108,7 @@ export const VOTING_ESCROW: { [K in ChainId]: string } = {
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
-      name: 'USDC (Optics)',
+      name: 'USDC (Optics V2)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xef4229c8c3250C675F21BCefa42f58EfbfF6002a'],
       tokens: [
         new WrappedTokenInfo(
@@ -161,7 +161,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'DAI (Optics)',
+      name: 'DAI (Optics V2)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x90Ca507a5D4458a4C6C6249d186b6dCb02a5BCCd'],
       tokens: [
         new WrappedTokenInfo(
@@ -214,7 +214,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'WETH (Optics)',
+      name: 'WETH (Optics V2)',
       tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0x122013fd7dF1C6F636a5bb8f03108E876548b455'],
       tokens: [
         new WrappedTokenInfo(
@@ -265,7 +265,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.Ether,
     },
     {
-      name: 'wBTC (Optics)',
+      name: 'wBTC (Optics V2)',
       tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBAAB46E28388d2779e6E31Fd00cF0e5Ad95E327B'],
       tokens: [
         new WrappedTokenInfo(
@@ -316,7 +316,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.Bitcoin,
     },
     {
-      name: 'pUSDC (Optics)',
+      name: 'pUSDC (Optics V2)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x1bfc26cE035c368503fAE319Cc2596716428ca44'],
       tokens: [
         new WrappedTokenInfo(
@@ -369,7 +369,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'USDC (Optics)',
+      name: 'USDC (Optics V1)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7'],
       tokens: [
         new WrappedTokenInfo(
@@ -573,7 +573,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'pUSDC (Optics)',
+      name: 'pUSDC (Optics V1)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
       tokens: [
         new WrappedTokenInfo(
@@ -626,7 +626,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'wBTC (Optics)',
+      name: 'wBTC (Optics V1)',
       tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
       tokens: [
         new WrappedTokenInfo(
@@ -677,7 +677,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.Bitcoin,
     },
     {
-      name: 'WETH (Optics)',
+      name: 'WETH (Optics V1)',
       tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4'],
       tokens: [
         new WrappedTokenInfo(
