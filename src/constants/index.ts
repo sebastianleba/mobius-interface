@@ -22,6 +22,8 @@ export const AVERAGE_BLOCK_TIME_IN_SECS = 13
 export const PROPOSAL_LENGTH_IN_BLOCKS = 40_320
 export const PROPOSAL_LENGTH_IN_SECS = AVERAGE_BLOCK_TIME_IN_SECS * PROPOSAL_LENGTH_IN_BLOCKS
 
+export const weiScale = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
+
 export const MCUSD = {
   [ChainId.MAINNET]: new Token(
     ChainId.MAINNET,
