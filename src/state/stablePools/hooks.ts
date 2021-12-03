@@ -50,14 +50,7 @@ export interface StablePoolInfo {
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
   const withMetaPools = useSelector<AppState, StableSwapPool[]>((state) =>
-    Object.values(state.stablePools.pools).map(({ pool }) => {
-      if (!pool.metaPool) return pool
-      const underlying = state.stablePools.pools[pool.metaPool]?.pool
-      return {
-        ...pool,
-        tokenAddresses: pool.tokenAddresses.concat(underlying.tokenAddresses),
-      }
-    })
+    Object.values(state.stablePools.pools).map(({ pool }) => pool)
   )
   const pools = withMetaPools.filter(({ tokenAddresses }) => {
     return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
@@ -169,20 +162,20 @@ export function useExpectedLpTokens(
     () => tokens.map((t, i) => tryParseAmount(input[i], t) ?? new TokenAmount(t, '0')),
     [input]
   )
-  //console.log(input)
+
   return useMemo(() => {
-    // console.log(tokenAmounts)
-    // console.log(pool.amountDeposited)
     const allZero = tokenAmounts.reduce((accum, cur) => accum && cur.equalTo('0'), true)
     if (allZero) {
       return [new TokenAmount(pool.lpToken, '0'), tokenAmounts]
     }
+
     if (!pool.totalDeposited || pool.totalDeposited.equalTo('0')) {
       const amount =
         tryParseAmount(
-          tokenAmounts.reduce((accum, cur) => (parseInt(accum) + parseInt(cur.toFixed())).toString(), '0'),
+          tokenAmounts.reduce((accum, cur) => (parseFloat(accum) + parseFloat(cur.toExact())).toString(), '0'),
           pool.lpToken
         ) ?? new TokenAmount(pool.lpToken, '0')
+
       return [amount, tokenAmounts]
     }
     const amount =
