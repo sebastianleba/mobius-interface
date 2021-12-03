@@ -287,6 +287,14 @@ const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }
   const scaledDown = (num: JSBI) => JSBI.divide(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
   const scaleUp = (num: JSBI) => JSBI.multiply(num, JSBI.exponentiate(TEN, JSBI.BigInt(currency.decimals)))
 
+  const decimalPlacesForBalance = tokenBalance?.greaterThan(
+    '1' //JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt(tokenBalance.token.decimals - 2)).toString()
+  )
+    ? 2
+    : tokenBalance?.greaterThan('0')
+    ? 6
+    : 2
+
   const mainRow = (
     <InputRow>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -316,7 +324,7 @@ const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }
   const balanceRow = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
       <BalanceText onClick={() => setInput(tokenBalance?.toFixed(5) ?? '')}>
-        Balance: {tokenBalance?.toFixed(2)}
+        Balance: {tokenBalance?.toFixed(decimalPlacesForBalance)}
       </BalanceText>
     </div>
   )
