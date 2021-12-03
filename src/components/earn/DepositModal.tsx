@@ -323,7 +323,7 @@ const CurrencyRow = ({ tokenAmount, setInput, input, setUsingInsufficientFunds }
   const balanceRow = (
     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
       <BalanceText onClick={() => setInput(tokenBalance?.toFixed(5) ?? '')}>
-        Balance: {tokenBalance?.toFixed(decimalPlacesForBalance)}
+        Balance: {tokenBalance?.toFixed(decimalPlacesForBalance) ?? 'Loading...'}
       </BalanceText>
     </div>
   )
