@@ -2,16 +2,16 @@ import { TransactionResponse } from '@ethersproject/providers'
 import { JSBI, TokenAmount } from '@ubeswap/sdk'
 import CurrencyLogo from 'components/CurrencyLogo'
 import React, { useState } from 'react'
+import { tryParseAmount } from 'state/swap/hooks'
 import styled from 'styled-components'
 
+import { weiScale } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
-import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
 import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
-import { useUserTransactionTTL } from '../../state/user/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { ButtonError, ButtonPrimary } from '../Button'
@@ -22,8 +22,6 @@ import { Input as NumericalInput } from '../NumericalInput'
 import QuestionHelper from '../QuestionHelper'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 import Toggle from '../Toggle'
-
-const TEN = JSBI.BigInt('10')
 
 const ContentWrapper = styled(AutoColumn)`
   width: 100%;
@@ -42,7 +40,7 @@ interface DepositModalProps {
 }
 
 export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositModalProps) {
-  const { library, account } = useActiveContractKit()
+  const { account, network } = useActiveContractKit()
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, peggedTo, pegComesAfter, totalDeposited } = poolInfo
@@ -50,14 +48,18 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
   const [input, setInput] = useState<(string | undefined)[]>(new Array(tokens.length).fill(undefined))
-  // const [selectedAmounts, setSelectedAmounts] = useState<TokenAmount[]>(
-  //   poolInfo.tokens.map((t) => new TokenAmount(t, JSBI.BigInt('0')))
-  // )
   const isFirstDeposit = totalDeposited.equalTo('0')
   const [useEqualAmount, setUseEqualAmount] = useState<boolean>(isFirstDeposit)
-  const [ttl] = useUserTransactionTTL()
-  const blockTimeStamp = useCurrentBlockTimestamp()
   const deadline = useTransactionDeadline()
+
+  const sumAmount = tokens
+    .map((t, i) =>
+      JSBI.multiply(
+        tryParseAmount(input[i], t)?.raw ?? JSBI.BigInt(0),
+        JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18 - t.decimals))
+      )
+    )
+    .reduce((acc, cur) => JSBI.add(acc, cur), JSBI.BigInt(0))
 
   const [expectedLPTokens, selectedAmounts] = useExpectedLpTokens(poolInfo, tokens, input)
   const valueOfLP = new TokenAmount(
@@ -67,6 +69,14 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
       JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
     )
   )
+
+  const diff = JSBI.greaterThan(valueOfLP.raw, sumAmount)
+    ? JSBI.subtract(valueOfLP.raw, sumAmount)
+    : JSBI.subtract(sumAmount, valueOfLP.raw)
+
+  const perDiff = JSBI.equal(sumAmount, JSBI.BigInt(0))
+    ? JSBI.BigInt(0)
+    : JSBI.divide(JSBI.multiply(diff, weiScale), sumAmount)
 
   const decimalPlacesForLP = expectedLPTokens?.greaterThan('1') ? 2 : expectedLPTokens?.greaterThan('0') ? 10 : 2
 
@@ -115,10 +125,6 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   if (!poolInfo?.stakedAmount) {
     error = error ?? 'Enter an amount'
   }
-
-  // if (insufficientFunds) {
-  //   error = 'Insufficient Funds'
-  // }
 
   return (
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
@@ -172,7 +178,14 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
             Expected Lp Tokens Received: {expectedLPTokens.toFixed(decimalPlacesForLP)}
           </TYPE.mediumHeader>
           {!isFirstDeposit && (
-            <TYPE.mediumHeader style={{ textAlign: 'center' }}>
+            <TYPE.mediumHeader
+              style={{
+                textAlign: 'center',
+                color: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 'red' : 'black',
+                fontSize: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 30 : 20,
+                fontWeight: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 800 : 500,
+              }}
+            >
               Equivalent to: {pegComesAfter ? '' : peggedTo}
               {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
             </TYPE.mediumHeader>
