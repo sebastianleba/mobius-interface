@@ -162,14 +162,13 @@ export function useExpectedLpTokens(
     () => tokens.map((t, i) => tryParseAmount(input[i], t) ?? new TokenAmount(t, '0')),
     [input]
   )
-  //console.log(input)
+
   return useMemo(() => {
-    // console.log(tokenAmounts)
-    // console.log(pool.amountDeposited)
     const allZero = tokenAmounts.reduce((accum, cur) => accum && cur.equalTo('0'), true)
     if (allZero) {
       return [new TokenAmount(pool.lpToken, '0'), tokenAmounts]
     }
+
     if (!pool.totalDeposited || pool.totalDeposited.equalTo('0')) {
       const amount =
         tryParseAmount(
