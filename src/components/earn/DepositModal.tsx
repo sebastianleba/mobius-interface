@@ -81,7 +81,6 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
       else return null
     })
     .filter((x) => x !== null)
-
   function wrappedOndismiss() {
     setHash(undefined)
     setAttempting(false)
@@ -178,7 +177,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
               {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
             </TYPE.mediumHeader>
           )}
-          {toApprove.length > 0 && expectedLPTokens.greaterThan(JSBI.BigInt('0')) && (
+          {toApprove.length > 0 && expectedLPTokens.greaterThan('0') && (
             <div style={{ display: 'flex' }}>
               {toApprove.map((i) => (
                 <ApprovalButton
