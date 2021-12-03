@@ -50,14 +50,7 @@ export interface StablePoolInfo {
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
   const withMetaPools = useSelector<AppState, StableSwapPool[]>((state) =>
-    Object.values(state.stablePools.pools).map(({ pool }) => {
-      if (!pool.metaPool) return pool
-      const underlying = state.stablePools.pools[pool.metaPool]?.pool
-      return {
-        ...pool,
-        tokenAddresses: pool.tokenAddresses.concat(underlying.tokenAddresses),
-      }
-    })
+    Object.values(state.stablePools.pools).map(({ pool }) => pool)
   )
   const pools = withMetaPools.filter(({ tokenAddresses }) => {
     return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
