@@ -34,15 +34,13 @@ export default function WarningModal({ isOpen, onDismiss }: ModalProps) {
     <Modal isOpen={!cookieExists && isOpen} onDismiss={dismiss} maxHeight={90}>
       <ContentWrapper gap="lg">
         <RowBetween>
-          <TYPE.red fontSize={[18, 24]}>Optics Update</TYPE.red>
+          <TYPE.main fontSize={[18, 24]}>Optics V2 is Live!</TYPE.main>
           <CloseIcon onClick={onDismiss} />
         </RowBetween>
         <TYPE.body>
-          Optics has been taken out of recovery mode, and the recovery manager has been transfered to a community-owned
-          multisig (Mobius is actually on this multisig). We still await action from cLabs whether or not Optics will be
-          redeployed.
+          Optics V2 bridge interface, Optics V2 pools, and HEAVY Celo rewards are all live for Optics V2 pools!!!
         </TYPE.body>
-        <ExternalLink href="https://forum.celo.org/t/optics-recovery-mode/2452">Read more here</ExternalLink>
+        <ExternalLink href="https://link.medium.com/95I588uhHlb">Read more here</ExternalLink>
         <RowBetween>
           <TYPE.mediumHeader>{"Don't"} show this again</TYPE.mediumHeader>
           <Toggle isActive={neverShow} toggle={() => setNeverShow(!neverShow)} />
