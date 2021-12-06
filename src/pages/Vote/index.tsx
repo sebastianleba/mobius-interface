@@ -1,5 +1,4 @@
-import { Trans } from '@lingui/macro'
-import { Token, TokenAmount } from '@ubeswap/sdk'
+import { TokenAmount } from '@ubeswap/sdk'
 // import { ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardBGImage, CardNoise, CardSection, DataCard } from 'components/earn/styled'
@@ -8,7 +7,7 @@ import Loader from 'components/Loader'
 import { AutoRow, RowBetween } from 'components/Row'
 // import { SwitchLocaleLink } from 'components/SwitchLocaleLink'
 import ProposalEmptyState from 'components/vote/ProposalEmptyState'
-import { useActiveWeb3React } from 'hooks/web3'
+import { useActiveContractKit } from 'hooks'
 import { darken } from 'polished'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -92,17 +91,14 @@ const StyledExternalLink = styled(ExternalLink)`
 `
 
 export default function Vote() {
-  const { account, chainId } = useActiveWeb3React()
+  const { account, chainId } = useActiveContractKit()
 
   // get data to list all proposals
   const { data: allProposals, loading: loadingProposals } = useAllProposalData()
 
   // user data
   const { loading: loadingAvailableVotes, votes: availableVotes } = useUserVotes()
-  const uniBalance: TokenAmount<Token> | undefined = useTokenBalance(
-    account ?? undefined,
-    chainId ? UBE[chainId] : undefined
-  )
+  const uniBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, chainId ? UBE[chainId] : undefined)
 
   return (
     <>
@@ -115,15 +111,15 @@ export default function Vote() {
               <AutoColumn gap="md">
                 <RowBetween>
                   <TYPE.white fontWeight={600}>
-                    <Trans>Mobius Governance</Trans>
+                    <TYPE.main>Mobius Governance</TYPE.main>
                   </TYPE.white>
                 </RowBetween>
                 <RowBetween>
                   <TYPE.white fontSize={14}>
-                    <Trans>
+                    <TYPE.main>
                       UNI tokens represent voting shares in Uniswap governance. You can vote on each proposal yourself
                       or delegate your votes to a third party.
-                    </Trans>
+                    </TYPE.main>
                   </TYPE.white>
                 </RowBetween>
                 <ExternalLink
@@ -132,7 +128,7 @@ export default function Vote() {
                   target="_blank"
                 >
                   <TYPE.white fontSize={14}>
-                    <Trans>Read more about Mobius governance</Trans>
+                    <TYPE.main>Read more about Mobius governance</TYPE.main>
                   </TYPE.white>
                 </ExternalLink>
               </AutoColumn>
@@ -144,14 +140,14 @@ export default function Vote() {
         <TopSection gap="2px">
           <WrapSmall>
             <TYPE.mediumHeader style={{ margin: '0.5rem 0.5rem 0.5rem 0', flexShrink: 0 }}>
-              <Trans>Proposals</Trans>
+              <TYPE.main>Proposals</TYPE.main>
             </TYPE.mediumHeader>
             <AutoRow gap="6px" justify="flex-end">
               {loadingProposals || loadingAvailableVotes ? <Loader /> : null}
               <TYPE.body fontWeight={500} mr="6px">
-                <Trans>
+                <TYPE.main>
                   <FormattedCurrencyAmount currencyAmount={uniBalance} /> Votes
-                </Trans>
+                </TYPE.main>
               </TYPE.body>
 
               {/* <ButtonPrimary
@@ -160,7 +156,7 @@ export default function Vote() {
                 style={{ width: 'fit-content', borderRadius: '8px' }}
                 padding="8px"
               >
-                <Trans>Create Proposal</Trans>
+                <TYPE.main>Create Proposal</TYPE.main>
               </ButtonPrimary> */}
             </AutoRow>
           </WrapSmall>
@@ -170,10 +166,8 @@ export default function Vote() {
             ?.reverse()
             ?.map((p: ProposalData) => {
               return (
-                <Proposal as={Link} to={`/vote/${p.governorIndex}/${p.id}`} key={`${p.governorIndex}${p.id}`}>
-                  <ProposalNumber>
-                    {p.governorIndex}.{p.id}
-                  </ProposalNumber>
+                <Proposal as={Link} to={`/vote//${p.id}`} key={`${p.id}`}>
+                  <ProposalNumber>{p.id}</ProposalNumber>
                   <ProposalTitle>{p.title}</ProposalTitle>
                   <ProposalStatus status={p.status} />
                 </Proposal>
@@ -181,7 +175,7 @@ export default function Vote() {
             })}
         </TopSection>
         <TYPE.subHeader color="text3">
-          <Trans>A minimum threshold of 0.25% of the total UNI supply is required to submit proposals</Trans>
+          <TYPE.main>A minimum threshold of 0.25% of the total UNI supply is required to submit proposals</TYPE.main>
         </TYPE.subHeader>
       </PageWrapper>
       {/* <SwitchLocaleLink /> */}
