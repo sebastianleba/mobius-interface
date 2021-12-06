@@ -140,9 +140,6 @@ function useFormattedProposalCreatedLogs(
   }, [indices, useLogsResult])
 }
 
-const V0_PROPOSAL_IDS = [[1], [2], [3], [4]]
-const V1_PROPOSAL_IDS = [[1], [2], [3]]
-
 function countToIndices(count: number | undefined, skip = 0) {
   return typeof count === 'number' ? new Array(count - skip).fill(0).map((_, i) => [i + 1 + skip]) : []
 }
@@ -163,9 +160,9 @@ export function useAllProposalData(): { data: ProposalData[]; loading: boolean }
   const proposalStates = useSingleContractMultipleData(gov, 'state', govProposalIndexes)
 
   // get metadata from past events
-  const formattedLogs = useFormattedProposalCreatedLogs(gov, govProposalIndexes) ?? []
 
   // early return until events are fetched
+  const formattedLogs = useFormattedProposalCreatedLogs(gov, govProposalIndexes) ?? []
   return useMemo(() => {
     const proposalsCallData = proposals
     const proposalStatesCallData = proposalStates
@@ -198,7 +195,7 @@ export function useAllProposalData(): { data: ProposalData[]; loading: boolean }
       }),
       loading: false,
     }
-  }, [formattedLogs, gov, proposalStates, proposals])
+  }, [gov, proposalStates, proposals])
 }
 
 export function useProposalData(id: string): ProposalData | undefined {
@@ -243,18 +240,22 @@ export function useVoteCallback(): {
   const voteCallback = useCallback(
     (proposalId: string | undefined, voteOption: VoteOption) => {
       if (!account || !GovernanceContract || !proposalId || !chainId) return
-      const args = [proposalId, voteOption === VoteOption.Against ? 0 : voteOption === VoteOption.For ? 1 : 2]
-      return GovernanceContract.estimateGas.castVote(...args, {}).then((estimatedGasLimit) => {
-        return GovernanceContract.castVote(...args, {
-          value: null,
-          gasLimit: calculateGasMargin(estimatedGasLimit),
-        }).then((response: TransactionResponse) => {
-          addTransaction(response, {
-            summary: `Vote ${voteOption} on proposal ${parseInt(proposalId)}`,
+      return GovernanceContract.estimateGas
+        .castVote(proposalId, voteOption === VoteOption.Against ? 0 : voteOption === VoteOption.For ? 1 : 2, {})
+        .then((estimatedGasLimit) => {
+          return GovernanceContract.castVote(
+            proposalId,
+            voteOption === VoteOption.Against ? 0 : voteOption === VoteOption.For ? 1 : 2,
+            {
+              gasLimit: calculateGasMargin(estimatedGasLimit),
+            }
+          ).then((response: TransactionResponse) => {
+            addTransaction(response, {
+              summary: `Vote ${voteOption} on proposal ${parseInt(proposalId)}`,
+            })
+            return response.hash
           })
-          return response.hash
         })
-      })
     },
     [account, addTransaction, GovernanceContract, chainId]
   )
@@ -273,24 +274,29 @@ export function useCreateProposalCallback(): (
     (createProposalData: CreateProposalData | undefined) => {
       if (!account || !GovernanceContract || !createProposalData || !chainId) return undefined
 
-      const args = [
-        createProposalData.targets,
-        createProposalData.values,
-        createProposalData.signatures,
-        createProposalData.calldatas,
-        createProposalData.description,
-      ]
-
-      return GovernanceContract.estimateGas.propose(...args).then((estimatedGasLimit) => {
-        return GovernanceContract.propose(...args, { gasLimit: calculateGasMargin(estimatedGasLimit) }).then(
-          (response: TransactionResponse) => {
+      return GovernanceContract.estimateGas
+        .propose(
+          createProposalData.targets,
+          createProposalData.values,
+          createProposalData.signatures,
+          createProposalData.calldatas,
+          createProposalData.description
+        )
+        .then((estimatedGasLimit) => {
+          return GovernanceContract.propose(
+            createProposalData.targets,
+            createProposalData.values,
+            createProposalData.signatures,
+            createProposalData.calldatas,
+            createProposalData.description,
+            { gasLimit: calculateGasMargin(estimatedGasLimit) }
+          ).then((response: TransactionResponse) => {
             addTransaction(response, {
               summary: 'Proposal created',
             })
             return response.hash
-          }
-        )
-      })
+          })
+        })
     },
     [account, addTransaction, GovernanceContract, chainId]
   )
