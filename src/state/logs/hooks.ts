@@ -1,6 +1,6 @@
+import { useActiveContractKit } from 'hooks'
 import { useEffect, useMemo } from 'react'
 
-import { useActiveWeb3React } from '../../hooks/web3'
 import { useBlockNumber } from '../application/hooks'
 import { useAppDispatch, useAppSelector } from '../hooks'
 import { addListener, removeListener } from './slice'
@@ -30,7 +30,7 @@ export interface UseLogsResult {
  * The filter parameter should _always_ be memoized, or else will trigger constant refetching
  */
 export function useLogs(filter: EventFilter | undefined): UseLogsResult {
-  const { chainId } = useActiveWeb3React()
+  const { chainId } = useActiveContractKit()
   const blockNumber = useBlockNumber()
 
   const logs = useAppSelector((state) => state.logs)
