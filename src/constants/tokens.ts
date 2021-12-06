@@ -33,3 +33,14 @@ export const CELO = makeTokens(
   'CELO',
   'Celo native asset'
 )
+
+export const VEMOBI = makeTokens(
+  {
+    [ChainId.MAINNET]: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
+    [ChainId.ALFAJORES]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
+    [ChainId.BAKLAVA]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
+  },
+  18,
+  'veMOBI',
+  'Voting Escrow MOBI'
+)

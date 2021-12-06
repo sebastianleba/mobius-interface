@@ -31,6 +31,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.0",
     "@typescript-eslint/parser": "^4.28.0",
     "@ubeswap/injected-connector": "^6.1.0",
+    "@uniswap/governance": "^1.0.2",
     "@uniswap/token-lists": "^1.0.0-beta.24",
     "@web3-react/core": "^6.1.9",
     "@web3-react/types": "^6.0.7",

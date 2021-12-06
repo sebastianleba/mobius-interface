@@ -1,5 +1,6 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
+import { GOVERNANCE_ADDRESS } from 'constants/governance'
 import {
   GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS,
   MOBIUS_MINTER_ADDRESS,
@@ -14,6 +15,7 @@ import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
 import EXCHANGE from '../constants/abis/Exchange.json'
 import GAUGE_CONTROLLER from '../constants/abis/GaugeController.json'
+import GOVERNOR_ABI from '../constants/abis/GovernorBravoDelegate.json'
 import LIQUIDITY_GAUGE_V3 from '../constants/abis/LiquidityGaugeV3.json'
 import LP from '../constants/abis/LPToken.json'
 import MINTER from '../constants/abis/Minter.json'
@@ -32,6 +34,7 @@ import {
   ERC20MOBI,
   Exchange,
   GaugeController,
+  GovernorBravoDelegate,
   LiquidityGaugeV3,
   Minter,
   MobiusStrip,
@@ -82,6 +85,12 @@ export function useBridgeRouterContract(address?: string, withSignerIfPossible?:
 export function useMobiContract(address?: string, withSignerIfPossible?: boolean): ERC20MOBI | null {
   const mobi = useMobi()
   return useContract(address ?? mobi?.address, ERC20_MOBI.abi, withSignerIfPossible) as ERC20MOBI
+}
+
+export function useGovernanceContract(address?: string, withSignerIfPossible?: boolean): GovernorBravoDelegate | null {
+  const { chainId } = useActiveContractKit()
+  const govAddress = GOVERNANCE_ADDRESS[chainId]
+  return useContract(address ?? govAddress, GOVERNOR_ABI.abi, withSignerIfPossible) as GovernorBravoDelegate
 }
 
 export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
