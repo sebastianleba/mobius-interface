@@ -46,6 +46,7 @@ export interface StablePoolInfo {
   readonly displayChain: Chain
   readonly coin: Coins
   readonly isDisabled?: boolean
+  readonly isKilled?: boolean
 }
 
 export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
@@ -113,6 +114,7 @@ export const getPoolInfo = (
   displayChain: pool.displayChain,
   coin: pool.coin,
   isDisabled: pool.disabled,
+  isKilled: pool.isKilled,
 })
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {

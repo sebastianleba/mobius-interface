@@ -424,6 +424,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['0'], // ['7302827380000000']
       displayChain: Chain.Ethereum,
       coin: Coins.USD,
+      isKilled: true,
     },
     {
       name: 'aaUSDC (Allbridge)',
@@ -628,6 +629,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['0'], // ['2190848200000000'],
       displayChain: Chain.Polygon,
       coin: Coins.USD,
+      isKilled: true,
     },
     {
       name: 'wBTC (Optics V1)',
@@ -679,6 +681,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       displayChain: Chain.Ethereum,
       coin: Coins.Bitcoin,
+      isKilled: true,
     },
     {
       name: 'WETH (Optics V1)',

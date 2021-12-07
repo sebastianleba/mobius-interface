@@ -245,7 +245,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
@@ -292,6 +292,22 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       {openWithdraw && (
         <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
       )}
+      <TopSection>
+        {poolInfo.isKilled && (
+          <RowFixed>
+            <TYPE.red fontSize={[18, 26]}>[KILLED]</TYPE.red>
+            <QuestionHelper
+              text={
+                <>
+                  The gauge for this pool has been killed.
+                  <br />
+                  It will no longer produce any mobi rewards.
+                </>
+              }
+            />
+          </RowFixed>
+        )}
+      </TopSection>
       <TopSection>
         <RowFixed style={{ gap: '10px' }}>
           <TYPE.black fontWeight={600} fontSize={[18, 24]}>
