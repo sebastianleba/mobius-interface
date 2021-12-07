@@ -245,7 +245,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('10000')))
+  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
 
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
