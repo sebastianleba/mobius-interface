@@ -67,6 +67,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   displayChain: Chain
   coin: Coins
   disabled?: boolean
+  isKilled?: boolean
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable

@@ -293,6 +293,22 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
         <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
       )}
       <TopSection>
+        {poolInfo.isKilled && (
+          <RowFixed>
+            <TYPE.red fontSize={[18, 26]}>[KILLED]</TYPE.red>
+            <QuestionHelper
+              text={
+                <>
+                  The gauge for this pool has been killed.
+                  <br />
+                  It will no longer produce any mobi rewards.
+                </>
+              }
+            />
+          </RowFixed>
+        )}
+      </TopSection>
+      <TopSection>
         <RowFixed style={{ gap: '10px' }}>
           <TYPE.black fontWeight={600} fontSize={[18, 24]}>
             {poolInfo.name}
