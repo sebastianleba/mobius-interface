@@ -733,6 +733,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       displayChain: Chain.Ethereum,
       coin: Coins.Ether,
+      isKilled: true,
     },
     {
       name: 'USDT (Moss)',
