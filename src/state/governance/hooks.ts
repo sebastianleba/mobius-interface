@@ -209,7 +209,7 @@ export function useUserVotes(): { loading: boolean; votes: TokenAmount | undefin
   const veMOBIContract = useVotingEscrowContract()
 
   // check for available votes
-  const { result, loading } = useSingleCallResult(veMOBIContract, 'balanceOf', [account ?? undefined])
+  const { result, loading } = useSingleCallResult(veMOBIContract, 'balanceOf(address)', [account ?? undefined])
   return useMemo(() => {
     const veMOBI = chainId ? VEMOBI[chainId] : undefined
     return { loading, votes: veMOBI && result ? new TokenAmount(veMOBI, result?.[0]) : undefined }

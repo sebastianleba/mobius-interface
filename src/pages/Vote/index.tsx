@@ -1,7 +1,7 @@
 import { TokenAmount } from '@ubeswap/sdk'
 // import { ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
-import { CardBGImage, CardNoise, CardSection, DataCard } from 'components/earn/styled'
+import { CardSection, DataCard } from 'components/earn/styled'
 import FormattedCurrencyAmount from 'components/FormattedCurrencyAmount'
 import Loader from 'components/Loader'
 import { AutoRow, RowBetween } from 'components/Row'
@@ -17,10 +17,12 @@ import { useTokenBalance } from 'state/wallet/hooks'
 import styled from 'styled-components/macro'
 import { ExternalLink, TYPE } from 'theme'
 
-import { UBE } from '../../constants/tokens'
+import { VEMOBI } from '../../constants/tokens'
 import { ProposalStatus } from './styled'
 
-const PageWrapper = styled(AutoColumn)``
+const PageWrapper = styled(AutoColumn)`
+  margin-top: 2rem;
+`
 
 const TopSection = styled(AutoColumn)`
   max-width: 640px;
@@ -58,7 +60,7 @@ const ProposalTitle = styled.span`
 `
 
 const VoteCard = styled(DataCard)`
-  background: radial-gradient(76.02% 75.41% at 1.84% 0%, #27ae60 0%, #000000 100%);
+  background: radial-gradient(100% 100% at 50% 10%, #35d07f 10%, #3488ec 100%);
   overflow: hidden;
 `
 
@@ -98,28 +100,25 @@ export default function Vote() {
 
   // user data
   const { loading: loadingAvailableVotes, votes: availableVotes } = useUserVotes()
-  const uniBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, chainId ? UBE[chainId] : undefined)
+  const uniBalance: TokenAmount | undefined = useTokenBalance(
+    account ?? undefined,
+    chainId ? VEMOBI[chainId] : undefined
+  )
 
   return (
     <>
       <PageWrapper gap="lg" justify="center">
         <TopSection gap="md">
           <VoteCard>
-            <CardBGImage />
-            <CardNoise />
             <CardSection>
               <AutoColumn gap="md">
                 <RowBetween>
-                  <TYPE.white fontWeight={600}>
-                    <TYPE.main>Mobius Governance</TYPE.main>
-                  </TYPE.white>
+                  <TYPE.white fontWeight={600}>Mobius Governance</TYPE.white>
                 </RowBetween>
                 <RowBetween>
                   <TYPE.white fontSize={14}>
-                    <TYPE.main>
-                      UNI tokens represent voting shares in Uniswap governance. You can vote on each proposal yourself
-                      or delegate your votes to a third party.
-                    </TYPE.main>
+                    veMOBI tokens represent voting shares in Mobius governance. You can vote on each proposal yourself
+                    or propose your own.
                   </TYPE.white>
                 </RowBetween>
                 <ExternalLink
@@ -127,14 +126,10 @@ export default function Vote() {
                   href="https://uniswap.org/blog/uni"
                   target="_blank"
                 >
-                  <TYPE.white fontSize={14}>
-                    <TYPE.main>Read more about Mobius governance</TYPE.main>
-                  </TYPE.white>
+                  <TYPE.white fontSize={14}>Read more about Mobius governance</TYPE.white>
                 </ExternalLink>
               </AutoColumn>
             </CardSection>
-            <CardBGImage />
-            <CardNoise />
           </VoteCard>
         </TopSection>
         <TopSection gap="2px">
@@ -175,7 +170,7 @@ export default function Vote() {
             })}
         </TopSection>
         <TYPE.subHeader color="text3">
-          <TYPE.main>A minimum threshold of 0.25% of the total UNI supply is required to submit proposals</TYPE.main>
+          <TYPE.main>A minimum threshold of 0.25% of the total veMOBI supply is required to submit proposals</TYPE.main>
         </TYPE.subHeader>
       </PageWrapper>
       {/* <SwitchLocaleLink /> */}

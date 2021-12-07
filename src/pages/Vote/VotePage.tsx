@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 // eslint-disable-next-line no-restricted-imports
-import { t, Trans } from '@lingui/macro'
-import { CurrencyAmount, Token } from '@uniswap/sdk-core'
+import { TokenAmount } from '@ubeswap/sdk'
+import { useActiveContractKit } from 'hooks'
 import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
 import JSBI from 'jsbi'
 import { DateTime } from 'luxon/src/luxon'
@@ -17,22 +17,13 @@ import { AutoColumn } from '../../components/Column'
 import { CardSection, DataCard } from '../../components/earn/styled'
 import { RowBetween, RowFixed } from '../../components/Row'
 import VoteModal from '../../components/vote/VoteModal'
-import { ZERO_ADDRESS } from '../../constants'
-import {
-  AVERAGE_BLOCK_TIME_IN_SECS,
-  COMMON_CONTRACT_NAMES,
-  DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS,
-} from '../../constants/governance'
-import { UNI } from '../../constants/tokens'
-import { useActiveWeb3React } from '../../hooks/web3'
+import { AVERAGE_BLOCK_TIME_IN_SECS, DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS } from '../../constants/governance'
+import { ApplicationModal } from '../../state/application/actions'
 import { useBlockNumber, useModalOpen, useToggleVoteModal } from '../../state/application/hooks'
-import ApplicationModal from '../../state/application/reducer'
 import { ProposalData, ProposalState, useProposalData, useUserVotesAsOfBlock } from '../../state/governance/hooks'
 import { VoteOption } from '../../state/governance/types'
-import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLink, StyledInternalLink, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
-import { ExplorerDataType, getExplorerLink } from '../../utils/getExplorerLink'
 import { ProposalStatus } from './styled'
 
 const PageWrapper = styled(AutoColumn)`
@@ -40,7 +31,7 @@ const PageWrapper = styled(AutoColumn)`
 `
 
 const ProposalInfo = styled(AutoColumn)`
-  background: ${({ theme }) => theme.bg0};
+  background: ${({ theme }) => theme.bg1};
   border-radius: 12px;
   padding: 1.5rem;
   position: relative;
@@ -116,13 +107,13 @@ const ProposerAddressLink = styled(ExternalLink)`
 
 export default function VotePage({
   match: {
-    params: { governorIndex, id },
+    params: { id },
   },
 }: RouteComponentProps<{ governorIndex: string; id: string }>) {
-  const { chainId, account } = useActiveWeb3React()
+  const { chainId, account } = useActiveContractKit()
 
   // get data for this specific proposal
-  const proposalData: ProposalData | undefined = useProposalData(Number.parseInt(governorIndex), id)
+  const proposalData: ProposalData | undefined = useProposalData(id)
 
   // update vote option based on button interactions
   const [voteOption, setVoteOption] = useState<VoteOption | undefined>(undefined)
@@ -150,15 +141,15 @@ export default function VotePage({
 
   // get total votes and format percentages for UI
   const totalVotes: number | undefined = proposalData ? proposalData.forCount + proposalData.againstCount : undefined
-  const forPercentage: string = t`${
+  const forPercentage = `${
     proposalData && totalVotes ? ((proposalData.forCount * 100) / totalVotes).toFixed(0) : '0'
   } %`
-  const againstPercentage: string = t`${
+  const againstPercentage = `${
     proposalData && totalVotes ? ((proposalData.againstCount * 100) / totalVotes).toFixed(0) : '0'
   } %`
 
   // only count available votes as of the proposal start block
-  const availableVotes: CurrencyAmount<Token> | undefined = useUserVotesAsOfBlock(proposalData?.startBlock ?? undefined)
+  const availableVotes: TokenAmount | undefined = useUserVotesAsOfBlock(proposalData?.startBlock ?? undefined)
 
   // only show voting if user has > 0 votes at proposal start block and proposal is active,
   const showVotingButtons =
@@ -167,25 +158,21 @@ export default function VotePage({
     proposalData &&
     proposalData.status === ProposalState.ACTIVE
 
-  const uniBalance: CurrencyAmount<Token> | undefined = useTokenBalance(
-    account ?? undefined,
-    chainId ? UNI[chainId] : undefined
-  )
-  const userDelegatee: string | undefined = useUserDelegatee()
+  // const uniBalance: TokenAmount | undefined = useTokenBalance(
+  //   account ?? undefined,
+  //   chainId ? VEMOBI[chainId] : undefined
+  // )
 
   // in blurb link to home page if they are able to unlock
-  const showLinkForUnlock = Boolean(
-    uniBalance && JSBI.notEqual(uniBalance.quotient, JSBI.BigInt(0)) && userDelegatee === ZERO_ADDRESS
-  )
+  // const showLinkForUnlock = Boolean(
+  //   uniBalance && JSBI.notEqual(uniBalance.quotient, JSBI.BigInt(0)) && userDelegatee === ZERO_ADDRESS
+  // )
 
   // show links in propsoal details if content is an address
   // if content is contract with common name, replace address with common name
   const linkIfAddress = (content: string) => {
     if (isAddress(content) && chainId) {
-      const commonName = COMMON_CONTRACT_NAMES[chainId]?.[content] ?? content
-      return (
-        <ExternalLink href={getExplorerLink(chainId, content, ExplorerDataType.ADDRESS)}>{commonName}</ExternalLink>
-      )
+      return <ExternalLink href={`https://explorer.celo.org/address/${content}`}>Mobius governance</ExternalLink>
     }
     return <span>{content}</span>
   }
@@ -202,9 +189,9 @@ export default function VotePage({
         <ProposalInfo gap="lg" justify="start">
           <RowBetween style={{ width: '100%' }}>
             <ArrowWrapper to="/vote">
-              <Trans>
+              <TYPE.main>
                 <ArrowLeft size={20} /> All Proposals
-              </Trans>
+              </TYPE.main>
             </ArrowWrapper>
             {proposalData && <ProposalStatus status={proposalData.status} />}
           </RowBetween>
@@ -213,9 +200,11 @@ export default function VotePage({
             <RowBetween>
               <TYPE.main>
                 {endDate && endDate < now ? (
-                  <Trans>Voting ended {endDate && endDate.toLocaleString(DateTime.DATETIME_FULL)}</Trans>
+                  <TYPE.main>Voting ended {endDate && endDate.toLocaleString(DateTime.DATETIME_FULL)}</TYPE.main>
                 ) : proposalData ? (
-                  <Trans>Voting ends approximately {endDate && endDate.toLocaleString(DateTime.DATETIME_FULL)}</Trans>
+                  <TYPE.main>
+                    Voting ends approximately {endDate && endDate.toLocaleString(DateTime.DATETIME_FULL)}
+                  </TYPE.main>
                 ) : (
                   ''
                 )}
@@ -224,18 +213,18 @@ export default function VotePage({
             {proposalData && proposalData.status === ProposalState.ACTIVE && !showVotingButtons && (
               <GreyCard>
                 <TYPE.black>
-                  <Trans>
-                    Only UNI votes that were self delegated or delegated to another address before block{' '}
+                  <TYPE.main>
+                    Only VEMOBI votes that were self delegated or delegated to another address before block{' '}
                     {proposalData.startBlock} are eligible for voting.{' '}
-                  </Trans>
-                  {showLinkForUnlock && (
+                  </TYPE.main>
+                  {/* {showLinkForUnlock && (
                     <span>
-                      <Trans>
+                      <TYPE.main>
                         <StyledInternalLink to="/vote">Unlock voting</StyledInternalLink> to prepare for the next
                         proposal.
-                      </Trans>
+                      </TYPE.main>
                     </span>
-                  )}
+                  )} */}
                 </TYPE.black>
               </GreyCard>
             )}
@@ -250,7 +239,7 @@ export default function VotePage({
                   toggleVoteModal()
                 }}
               >
-                <Trans>Vote For</Trans>
+                <TYPE.main>Vote For</TYPE.main>
               </ButtonPrimary>
               <ButtonPrimary
                 padding="8px"
@@ -260,7 +249,7 @@ export default function VotePage({
                   toggleVoteModal()
                 }}
               >
-                <Trans>Vote Against</Trans>
+                <TYPE.main>Vote Against</TYPE.main>
               </ButtonPrimary>
             </RowFixed>
           ) : (
@@ -272,7 +261,7 @@ export default function VotePage({
                 <AutoColumn gap="md">
                   <WrapSmall>
                     <TYPE.black fontWeight={600}>
-                      <Trans>For</Trans>
+                      <TYPE.main>For</TYPE.main>
                     </TYPE.black>
                     <TYPE.black fontWeight={600}>
                       {proposalData?.forCount?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -289,7 +278,7 @@ export default function VotePage({
                 <AutoColumn gap="md">
                   <WrapSmall>
                     <TYPE.black fontWeight={600}>
-                      <Trans>Against</Trans>
+                      <TYPE.main>Against</TYPE.main>
                     </TYPE.black>
                     <TYPE.black fontWeight={600}>
                       {proposalData?.againstCount?.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -304,7 +293,7 @@ export default function VotePage({
           </CardWrapper>
           <AutoColumn gap="md">
             <TYPE.mediumHeader fontWeight={600}>
-              <Trans>Details</Trans>
+              <TYPE.main>Details</TYPE.main>
             </TYPE.mediumHeader>
             {proposalData?.details?.map((d, i) => {
               return (
@@ -325,7 +314,7 @@ export default function VotePage({
           </AutoColumn>
           <AutoColumn gap="md">
             <TYPE.mediumHeader fontWeight={600}>
-              <Trans>Description</Trans>
+              <TYPE.main>Description</TYPE.main>
             </TYPE.mediumHeader>
             <MarkDownWrapper>
               <ReactMarkdown source={proposalData?.description} />
@@ -333,13 +322,11 @@ export default function VotePage({
           </AutoColumn>
           <AutoColumn gap="md">
             <TYPE.mediumHeader fontWeight={600}>
-              <Trans>Proposer</Trans>
+              <TYPE.main>Proposer</TYPE.main>
             </TYPE.mediumHeader>
             <ProposerAddressLink
               href={
-                proposalData?.proposer && chainId
-                  ? getExplorerLink(chainId, proposalData?.proposer, ExplorerDataType.ADDRESS)
-                  : ''
+                proposalData?.proposer && chainId ? `https://explorer.celo.org/address/${proposalData?.proposer}` : ''
               }
             >
               <ReactMarkdown source={proposalData?.proposer} />

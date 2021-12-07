@@ -26,6 +26,8 @@ import RiskPage from './Risk'
 import Staking from './Staking'
 import Swap from './Swap'
 import { RedirectToSwap } from './Swap/redirects'
+import Vote from './Vote'
+import VotePage from './Vote/VotePage'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -119,6 +121,8 @@ export default function App() {
               <Route exact path="/">
                 <Redirect to="/swap" />
               </Route>
+              <Route exact strict path="/vote" component={Vote} />
+              <Route exact strict path="/vote/:governorIndex/:id" component={VotePage} />
               <Route exact strict path="/swap" component={Swap} />
               <Route exact path="/mint" component={Mento} />
               <Route exact strict path="/pool" component={Pool} />
