@@ -16,26 +16,18 @@ import { GreyCard } from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
 import { CardSection, DataCard } from '../../components/earn/styled'
 import { RowBetween, RowFixed } from '../../components/Row'
-import { SwitchLocaleLink } from '../../components/SwitchLocaleLink'
-import DelegateModal from '../../components/vote/DelegateModal'
 import VoteModal from '../../components/vote/VoteModal'
+import { ZERO_ADDRESS } from '../../constants'
 import {
   AVERAGE_BLOCK_TIME_IN_SECS,
   COMMON_CONTRACT_NAMES,
   DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS,
 } from '../../constants/governance'
-import { ZERO_ADDRESS } from '../../constants/misc'
 import { UNI } from '../../constants/tokens'
 import { useActiveWeb3React } from '../../hooks/web3'
-import { useBlockNumber, useModalOpen, useToggleDelegateModal, useToggleVoteModal } from '../../state/application/hooks'
-import { ApplicationModal } from '../../state/application/reducer'
-import {
-  ProposalData,
-  ProposalState,
-  useProposalData,
-  useUserDelegatee,
-  useUserVotesAsOfBlock,
-} from '../../state/governance/hooks'
+import { useBlockNumber, useModalOpen, useToggleVoteModal } from '../../state/application/hooks'
+import ApplicationModal from '../../state/application/reducer'
+import { ProposalData, ProposalState, useProposalData, useUserVotesAsOfBlock } from '../../state/governance/hooks'
 import { VoteOption } from '../../state/governance/types'
 import { useTokenBalance } from '../../state/wallet/hooks'
 import { ExternalLink, StyledInternalLink, TYPE } from '../../theme'
@@ -139,10 +131,6 @@ export default function VotePage({
   const showVoteModal = useModalOpen(ApplicationModal.VOTE)
   const toggleVoteModal = useToggleVoteModal()
 
-  // toggle for showing delegation modal
-  const showDelegateModal = useModalOpen(ApplicationModal.DELEGATE)
-  const toggleDelegateModal = useToggleDelegateModal()
-
   // get and format date from data
   const currentTimestamp = useCurrentBlockTimestamp()
   const currentBlock = useBlockNumber()
@@ -211,7 +199,6 @@ export default function VotePage({
           proposalId={proposalData?.id}
           voteOption={voteOption}
         />
-        <DelegateModal isOpen={showDelegateModal} onDismiss={toggleDelegateModal} title={<Trans>Unlock Votes</Trans>} />
         <ProposalInfo gap="lg" justify="start">
           <RowBetween style={{ width: '100%' }}>
             <ArrowWrapper to="/vote">
@@ -360,7 +347,6 @@ export default function VotePage({
           </AutoColumn>
         </ProposalInfo>
       </PageWrapper>
-      <SwitchLocaleLink />
     </>
   )
 }
