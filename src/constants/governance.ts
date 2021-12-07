@@ -1,4 +1,6 @@
-export const GOVERNANCE_ADDRESS = ''
+export const GOVERNANCE_ADDRESS: { [chainId: number]: string } = {
+  [44787]: '0xc91fA5ce8B13D0a2228aEaA7316574e6B1005E25',
+}
 
 export const DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS = 5
 

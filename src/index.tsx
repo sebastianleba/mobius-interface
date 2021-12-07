@@ -20,6 +20,7 @@ import App from './pages/App'
 import store from './state'
 import ApplicationUpdater, { PriceData } from './state/application/updater'
 import ListsUpdater from './state/lists/updater'
+import LogsUpdater from './state/logs/updater'
 import MulticallUpdater from './state/multicall/updater'
 import TransactionUpdater from './state/transactions/updater'
 import UserUpdater from './state/user/updater'
@@ -66,6 +67,7 @@ function Updaters() {
       <StakingUpdater />
       <UpdateMento />
       <PriceData />
+      <LogsUpdater />
     </>
   )
 }
