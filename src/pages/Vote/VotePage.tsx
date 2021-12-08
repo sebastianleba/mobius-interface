@@ -17,7 +17,11 @@ import { AutoColumn } from '../../components/Column'
 import { CardSection, DataCard } from '../../components/earn/styled'
 import { RowBetween, RowFixed } from '../../components/Row'
 import VoteModal from '../../components/vote/VoteModal'
-import { AVERAGE_BLOCK_TIME_IN_SECS, DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS } from '../../constants/governance'
+import {
+  AVERAGE_BLOCK_TIME_IN_SECS,
+  DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS,
+  GOVERNANCE_ADDRESS,
+} from '../../constants/governance'
 import { ApplicationModal } from '../../state/application/actions'
 import { useBlockNumber, useModalOpen, useToggleVoteModal } from '../../state/application/hooks'
 import { ProposalData, ProposalState, useProposalData, useUserVotesAsOfBlock } from '../../state/governance/hooks'
@@ -121,6 +125,7 @@ export default function VotePage({
   // modal for casting votes
   const showVoteModal = useModalOpen(ApplicationModal.VOTE)
   const toggleVoteModal = useToggleVoteModal()
+  console.log(proposalData)
 
   // get and format date from data
   const currentTimestamp = useCurrentBlockTimestamp()
@@ -158,6 +163,8 @@ export default function VotePage({
     proposalData &&
     proposalData.status === ProposalState.ACTIVE
 
+  console.log(availableVotes?.toFixed(3), proposalData?.status, ProposalState.ACTIVE)
+
   // const uniBalance: TokenAmount | undefined = useTokenBalance(
   //   account ?? undefined,
   //   chainId ? VEMOBI[chainId] : undefined
@@ -172,7 +179,8 @@ export default function VotePage({
   // if content is contract with common name, replace address with common name
   const linkIfAddress = (content: string) => {
     if (isAddress(content) && chainId) {
-      return <ExternalLink href={`https://explorer.celo.org/address/${content}`}>Mobius governance</ExternalLink>
+      const commonName = content === GOVERNANCE_ADDRESS ? 'Mobius Governance' : content
+      return <ExternalLink href={`https://explorer.celo.org/address/${content}`}>{commonName}</ExternalLink>
     }
     return <span>{content}</span>
   }

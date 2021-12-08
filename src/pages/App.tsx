@@ -122,7 +122,7 @@ export default function App() {
                 <Redirect to="/swap" />
               </Route>
               <Route exact strict path="/vote" component={Vote} />
-              <Route exact strict path="/vote/:governorIndex/:id" component={VotePage} />
+              <Route exact strict path="/vote/:id" component={VotePage} />
               <Route exact strict path="/swap" component={Swap} />
               <Route exact path="/mint" component={Mento} />
               <Route exact strict path="/pool" component={Pool} />

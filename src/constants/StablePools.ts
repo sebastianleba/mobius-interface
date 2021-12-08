@@ -101,7 +101,7 @@ export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
 
 export const VOTING_ESCROW: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
-  [ChainId.ALFAJORES]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
+  [ChainId.ALFAJORES]: '0x7d64708ecf5201cfE74364424AddB0A8FD32174f',
   [ChainId.BAKLAVA]: '',
 }
 

@@ -1,5 +1,5 @@
 export const GOVERNANCE_ADDRESS: { [chainId: number]: string } = {
-  [44787]: '0xc91fA5ce8B13D0a2228aEaA7316574e6B1005E25',
+  [44787]: '0xFEDd9e2801744135f8b1A6B35edBb6fCB8B8AA18',
 }
 
 export const DEFAULT_AVERAGE_BLOCK_TIME_IN_SECS = 5

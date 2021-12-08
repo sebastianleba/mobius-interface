@@ -161,7 +161,7 @@ export default function Vote() {
             ?.reverse()
             ?.map((p: ProposalData) => {
               return (
-                <Proposal as={Link} to={`/vote//${p.id}`} key={`${p.id}`}>
+                <Proposal as={Link} to={`/vote/${p.id}`} key={`${p.id}`}>
                   <ProposalNumber>{p.id}</ProposalNumber>
                   <ProposalTitle>{p.title}</ProposalTitle>
                   <ProposalStatus status={p.status} />
