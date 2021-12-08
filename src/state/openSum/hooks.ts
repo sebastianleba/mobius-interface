@@ -1,5 +1,5 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { Token, TokenAmount } from '@ubeswap/sdk'
+import { Price, Token, TokenAmount } from '@ubeswap/sdk'
 import { JSBI } from '@ubeswap/sdk'
 import { ZERO } from '@ubeswap/sdk/dist/constants'
 import { useSelector } from 'react-redux'
@@ -29,11 +29,18 @@ export function useOpenPools(): readonly ConstantSumPool[] {
   return pools
 }
 
-export function useExpectedOut(
+export function useOpenSumTrade(
   tokenIdIn: string,
   tokenIdOut: string,
-  input: string
-): { output?: TokenAmount; error?: string } {
+  input: string | undefined
+): {
+  input?: TokenAmount
+  poolAddress?: string
+  output?: TokenAmount
+  error?: string
+  executionPrice?: Price
+  fee?: TokenAmount
+} {
   const pool = useCurrentOpenPool(tokenIdIn, tokenIdOut)
 
   if (!pool)
@@ -70,5 +77,9 @@ export function useExpectedOut(
     }
   return {
     output: expectedOut,
+    input: inputAmount,
+    poolAddress: pool.address,
+    executionPrice: new Price(tokenIn, tokenOut, '1', '1'),
+    fee: new TokenAmount(inputAmount, 0),
   }
 }
