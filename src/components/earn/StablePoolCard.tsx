@@ -152,6 +152,24 @@ const StyledNavLink = styled(NavLink)<{ color: string }>`
   textDecoration: underline,
 `
 
+function calcApy(rewardPerYear: Fraction, totalStakedAmount: Fraction) {
+  const apyFraction = rewardPerYear
+    .multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
+    .divide(totalStakedAmount)
+
+  const apy = apyFraction
+    ? new Percent(
+        apyFraction.numerator,
+        JSBI.multiply(apyFraction.denominator, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
+      )
+    : undefined
+
+  const dpy = apy
+    ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
+    : undefined
+  return [apyFraction, apy, dpy]
+}
+
 interface Props {
   poolInfo: StablePoolInfo
 }
@@ -202,29 +220,30 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   //     (rate) => new TokenAmount(rate.token, poolInfo.workingPercentage.multiply(rate.raw).toFixed(0))
   //   )
   // }
-  let rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
+  const rewardPerYear = priceOfMobi.raw.multiply(totalMobiRate.multiply(BIG_INT_SECONDS_IN_YEAR))
+  let rewardPerYearExternal = new Fraction('0', '1')
   for (let i = 0; i < 8; i++) {
     const rate = poolInfo.externalRewardRates?.[i] ?? totalMobiRate
     const priceOfToken =
       tokenPrices[rate.token.address.toLowerCase()] ?? tokenPrices['0x00be915b9dcf56a3cbe739d9b9c202ca692409ec']
     if (poolInfo.externalRewardRates && i < poolInfo.externalRewardRates.length) {
-      rewardPerYear = rewardPerYear.add(priceOfToken?.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0')
+      rewardPerYearExternal = rewardPerYearExternal.add(
+        priceOfToken?.multiply(rate.multiply(BIG_INT_SECONDS_IN_YEAR)) ?? '0'
+      )
     }
   }
-  const apyFraction =
+  const [apyFraction, apy, dpy] =
     mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
-      ? rewardPerYear.multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))).divide(totalStakedAmount)
-      : undefined
-  const apy = apyFraction
-    ? new Percent(
-        apyFraction.numerator,
-        JSBI.multiply(apyFraction.denominator, JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
-      )
-    : undefined
+      ? calcApy(rewardPerYear.add(rewardPerYearExternal), totalStakedAmount)
+      : [undefined, undefined, undefined]
 
-  const dpy = apy
-    ? new Percent(Math.floor(parseFloat(apy.divide('365').toFixed(10)) * 1_000_000).toFixed(0), '1000000')
-    : undefined
+  const [boostedApyFraction, boostedApy, boostedDpy] =
+    mobiRate && totalStakedAmount && !totalStakedAmount.equalTo(JSBI.BigInt(0))
+      ? calcApy(
+          rewardPerYear.multiply(new Fraction(JSBI.BigInt(5), JSBI.BigInt(2))).add(rewardPerYearExternal),
+          totalStakedAmount
+        )
+      : [new Fraction('0', '1'), new Fraction('0', '1'), new Fraction('0', '1')]
 
   let weeklyAPY: React.ReactNode | undefined = <>🤯</>
   try {
@@ -375,9 +394,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               to={'/stake'}
               className="bapr"
             >
-              {apy.denominator.toString() !== '0'
-                ? `${apy.multiply(new Fraction(JSBI.BigInt(500), JSBI.BigInt(2))).toFixed(1, { groupSeparator: ',' })}%`
-                : ' -'}{' '}
+              up to {apy.denominator.toString() !== '0' ? `${boostedApy.toFixed(1, { groupSeparator: ',' })}%` : ' -'}{' '}
               w/ boost
             </StyledNavLink>
           </RowFixed>
