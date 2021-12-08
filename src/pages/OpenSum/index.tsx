@@ -1,5 +1,7 @@
 import { Token, TokenAmount } from '@ubeswap/sdk'
 import { describeTrade } from 'components/swap/routing/describeTrade'
+import { useConstantSumContract } from 'hooks/useContract'
+import useTransactionDeadline from 'hooks/useTransactionDeadline'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
@@ -80,11 +82,22 @@ export default function OpenSum() {
 
   const maxAmountInput: TokenAmount | undefined = maxAmountSpend(input)
   const atMaxAmountInput = Boolean(maxAmountInput && input?.equalTo(maxAmountInput))
+  const swapContract = useConstantSumContract(poolAddress)
+  const deadline = useTransactionDeadline()
+
+  const doTrade = () =>
+    swapContract?.swap(
+      inputToken?.address ?? '',
+      outputToken?.address ?? '',
+      input?.raw.toString() ?? '0',
+      output?.raw.toString() ?? '0',
+      deadline ?? '0'
+    )
 
   const handleSwap = useCallback(() => {
     setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
-    swapCallback()
-      .then((hash) => {
+    doTrade()
+      .then(({ hash }) => {
         setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
 
         ReactGA.event({
