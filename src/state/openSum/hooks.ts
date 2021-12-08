@@ -1,6 +1,9 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { Token, TokenAmount } from '@ubeswap/sdk'
+import { JSBI } from '@ubeswap/sdk'
+import { ZERO } from '@ubeswap/sdk/dist/constants'
 import { useSelector } from 'react-redux'
+import { tryParseAmount } from 'state/swap/hooks'
 
 import { AppState } from '..'
 import { ConstantSumPool } from './reducer'
@@ -24,4 +27,48 @@ export function useCurrentOpenPool(tok1: string, tok2: string): ConstantSumPool 
 export function useOpenPools(): readonly ConstantSumPool[] {
   const pools = useSelector<AppState, ConstantSumPool[]>((state) => state.openSum.pools)
   return pools
+}
+
+export function useExpectedOut(
+  tokenIdIn: string,
+  tokenIdOut: string,
+  input: string
+): { output?: TokenAmount; error?: string } {
+  const pool = useCurrentOpenPool(tokenIdIn, tokenIdOut)
+
+  if (!pool)
+    return {
+      error: 'Select a token',
+    }
+
+  const { tokens, balances } = pool
+  const tokenInIndex = tokens[0].address == tokenIdIn ? 0 : 1
+  const tokenOutIndex = tokens[0].address == tokenIdOut ? 0 : 1
+  const tokenIn = tokens[tokenInIndex]
+  const tokenOut = tokens[tokenOutIndex]
+
+  const inputAmount = tryParseAmount(input, tokenIn)
+
+  let error = ''
+
+  if (!balances) {
+    error = 'Pool Balances Loading'
+  }
+
+  if (!inputAmount && !error) {
+    error = 'Input an Amount'
+  }
+
+  const expectedOut = tryParseAmount(input, tokenOut)
+  if (JSBI.greaterThan(expectedOut?.raw ?? ZERO, balances?.[tokenOutIndex] ?? ZERO)) {
+    error = 'Insufficient Liquidity'
+  }
+
+  if (error)
+    return {
+      error,
+    }
+  return {
+    output: expectedOut,
+  }
 }
