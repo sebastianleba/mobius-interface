@@ -10,6 +10,7 @@ import { useLocation } from 'react-router'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
+import { useOpenSumTradeableTokens } from 'state/openSum/hooks'
 import styled from 'styled-components'
 
 import { useActiveContractKit, useChainId } from '../../hooks'
@@ -84,10 +85,17 @@ export function CurrencySearch({
   const searchToken = useToken(location.pathname.includes('mint'), searchQuery)
   const [tokensInSamePool] = useTokensTradeable(location.pathname.includes('mint'), otherSelectedCurrency)
   const bridgeableTokens = useBridgeableTokens()
+  const openSumTokens = useOpenSumTradeableTokens()
+  const openSumSamePool = useOpenSumTradeableTokens()
+
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
   if (location.pathname.includes('optics')) {
     tokensToSelect = bridgeableTokens
+  }
+  if (location.pathname.includes('opensum')) {
+    tokensToSelect = openSumTokens
+    if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = openSumSamePool
   }
   useEffect(() => {
     if (isAddressSearch) {

@@ -1,5 +1,4 @@
 import { Token, TokenAmount } from '@ubeswap/sdk'
-import { describeTrade } from 'components/swap/routing/describeTrade'
 import { useConstantSumContract } from 'hooks/useContract'
 import useTransactionDeadline from 'hooks/useTransactionDeadline'
 import React, { useCallback, useContext, useEffect, useState } from 'react'
@@ -7,6 +6,7 @@ import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
+import { useWalletModalToggle } from 'state/application/hooks'
 import { useOpenSumTrade } from 'state/openSum/hooks'
 import styled, { ThemeContext } from 'styled-components'
 
@@ -32,10 +32,11 @@ import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import AppBody from '../AppBody'
 
 const VoteCard = styled(DataCard)`
-  background: radial-gradient(90% 90% at 50% 5%, #fbcc5c 0%, #35d07f 100%);
+  background: radial-gradient(95% 100% at 1% 50%, #35d07f 0%, #fbcc5c 100%);
   overflow: hidden;
   margin-bottom: 2rem;
 `
+// #fbcc5c
 
 export default function OpenSum() {
   const isDarkMode = useIsDarkMode()
@@ -120,7 +121,7 @@ export default function OpenSum() {
           txHash: undefined,
         })
       })
-  }, [swapCallback, tradeToConfirm, showConfirm, account, trade, singleHopOnly])
+  }, [tradeToConfirm, showConfirm, account, trade])
 
   // errors
   const [showInverted, setShowInverted] = useState<boolean>(false)
@@ -143,7 +144,7 @@ export default function OpenSum() {
     if (txHash) {
       setInputValue(undefined)
     }
-  }, [attemptingTxn, onUserInput, swapErrorMessage, tradeToConfirm, txHash])
+  }, [attemptingTxn, setInputValue, swapErrorMessage, tradeToConfirm, txHash])
 
   const handleAcceptChanges = useCallback(() => {
     setSwapState({ tradeToConfirm: trade, swapErrorMessage, txHash, attemptingTxn, showConfirm })
@@ -168,9 +169,7 @@ export default function OpenSum() {
   }
   const handleOutputSelect = useCallback((outputCurrency: Token) => setOutputToken(outputCurrency), [setOutputToken])
 
-  const { isEstimate, makeLabel } = describeTrade(true)
-  const actionLabel = makeLabel(true)
-
+  const actionLabel = 'Swap'
   return (
     <>
       <SwapPoolTabs active={'swap'} />
@@ -183,7 +182,9 @@ export default function OpenSum() {
                 <TYPE.white fontWeight={600}>OpenSum Exchange</TYPE.white>
               </RowBetween>
               <RowBetween>
-                <TYPE.white fontSize={14}>{`A consant sum AMM to swap between Optics v1 and v2 assets`}</TYPE.white>
+                <TYPE.white
+                  fontSize={14}
+                >{`A consant sum exchange to swap between Optics v1 and v2 assets.  Every swap is guarunteed to be 1:1.`}</TYPE.white>
               </RowBetween>
             </AutoColumn>
           </CardSection>

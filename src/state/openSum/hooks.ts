@@ -1,13 +1,15 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { Price, Token, TokenAmount } from '@ubeswap/sdk'
 import { JSBI } from '@ubeswap/sdk'
-import { ZERO } from '@ubeswap/sdk/dist/constants'
+import { ConstantSum, ConstantSumInfo } from 'constants/ConstantSum'
+import { useActiveContractKit } from 'hooks'
 import { useSelector } from 'react-redux'
 import { tryParseAmount } from 'state/swap/hooks'
 
 import { AppState } from '..'
 import { ConstantSumPool } from './reducer'
 
+const ZERO = JSBI.BigInt('0')
 export interface MentoPoolInfo {
   readonly poolAddress?: string
   readonly tokens: readonly Token[]
@@ -27,6 +29,35 @@ export function useCurrentOpenPool(tok1: string, tok2: string): ConstantSumPool 
 export function useOpenPools(): readonly ConstantSumPool[] {
   const pools = useSelector<AppState, ConstantSumPool[]>((state) => state.openSum.pools)
   return pools
+}
+
+export function useOpenSumTokenPair(inputToken: string): { [address: string]: Token } {
+  const { chainId } = useActiveContractKit()
+  const tradeableTokens = ConstantSum[chainId]
+    ?.filter(({ tokens }) => tokens[0].address === inputToken || tokens[1].address === inputToken)
+    .reduce(
+      (accum: { [address: string]: Token }, { tokens }: ConstantSumInfo) => ({
+        ...accum,
+        [tokens[0].address]: tokens[0],
+        [tokens[1].address]: tokens[1],
+      }),
+      {}
+    )
+  if (tradeableTokens && tradeableTokens[inputToken]) delete tradeableTokens[inputToken]
+  return tradeableTokens ?? {}
+}
+
+export function useOpenSumTradeableTokens(): { [address: string]: Token } {
+  const { chainId } = useActiveContractKit()
+  const openSumTokens = ConstantSum[chainId]?.reduce(
+    (accum: { [address: string]: Token }, { tokens }: ConstantSumInfo) => ({
+      ...accum,
+      [tokens[0].address]: tokens[0],
+      [tokens[1].address]: tokens[1],
+    }),
+    {}
+  )
+  return openSumTokens ?? {}
 }
 
 export function useOpenSumTrade(

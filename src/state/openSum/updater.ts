@@ -27,7 +27,7 @@ export function UpdateOpenSum(): null {
 
   useMemo(() => {
     const balances = balancesMany?.map(
-      ({ result }) => result?.map((n) => BigIntToJSBI(n as BigInt, '0')) ?? [ZERO, ZERO]
+      ({ result }) => result?.[0].map((n) => BigIntToJSBI(n as BigInt, '0')) ?? [ZERO, ZERO]
     )
     dispatch(updateBalances({ balances }))
   }, [dispatch, balancesMany])
