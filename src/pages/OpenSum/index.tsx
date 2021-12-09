@@ -8,6 +8,7 @@ import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { useWalletModalToggle } from 'state/application/hooks'
 import { getPairedToken, useOpenSumTrade } from 'state/openSum/hooks'
+import { useTransactionAdder } from 'state/transactions/hooks'
 import styled, { ThemeContext } from 'styled-components'
 
 import { ButtonConfirmed, ButtonError } from '../../components/Button'
@@ -85,6 +86,7 @@ export default function OpenSum() {
   const atMaxAmountInput = Boolean(maxAmountInput && input?.equalTo(maxAmountInput))
   const swapContract = useConstantSumContract(poolAddress)
   const deadline = useTransactionDeadline()
+  const addTransaction = useTransactionAdder()
 
   const doTrade = () =>
     swapContract?.swap(
@@ -98,9 +100,17 @@ export default function OpenSum() {
   const handleSwap = useCallback(() => {
     setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
     doTrade()
-      .then(({ hash }) => {
-        setSwapState({ attemptingTxn: false, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: hash })
-
+      .then((response) => {
+        addTransaction(response, {
+          summary: `Swapped ${inputValue} ${inputToken?.symbol} for ${inputValue} ${outputToken?.symbol}`,
+        })
+        setSwapState({
+          attemptingTxn: false,
+          tradeToConfirm,
+          showConfirm,
+          swapErrorMessage: undefined,
+          txHash: response.hash,
+        })
         ReactGA.event({
           category: 'Swap',
           action: 'Swap',

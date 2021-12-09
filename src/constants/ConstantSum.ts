@@ -92,6 +92,34 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
         ),
       ],
     },
+    // {
+    //   // TEST pool
+    //   address: '0xdd61Ab1e6a9A18ad16F952e23e973C94E877e809',
+    //   tokens: [
+    //     new WrappedTokenInfo(
+    //       {
+    //         chainId: ChainId.MAINNET,
+    //         address: '0xC271C9c30C0185d461B51D6B2C8A71EA8E541FBE',
+    //         decimals: 8,
+    //         symbol: 'TESTxV1',
+    //         name: 'US Dollar Coin (Optics Bridge)',
+    //         logoURI: 'https://bit.ly/3CwGimW',
+    //       },
+    //       []
+    //     ),
+    //     new WrappedTokenInfo(
+    //       {
+    //         chainId: ChainId.MAINNET,
+    //         address: '0xf505453b50477a6099E9a86b2B7977Ff6F7Fa306',
+    //         decimals: 8,
+    //         symbol: 'TEST',
+    //         name: 'US Dollar Coin (Optics Bridge)',
+    //         logoURI: 'https://bit.ly/3CwGimW',
+    //       },
+    //       []
+    //     ),
+    //   ],
+    // },
   ],
   [ChainId.ALFAJORES]: [],
   [ChainId.BAKLAVA]: [],

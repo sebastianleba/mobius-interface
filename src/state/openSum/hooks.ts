@@ -111,7 +111,7 @@ export function useOpenSumTrade(
     input: inputAmount,
     poolAddress: pool.address,
     executionPrice: new Price(tokenIn, tokenOut, '1', '1'),
-    fee: new TokenAmount(inputAmount, 0),
+    fee: new TokenAmount(tokenIn, 0),
   }
 }
 
