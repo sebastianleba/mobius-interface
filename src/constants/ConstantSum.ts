@@ -10,7 +10,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
   [ChainId.MAINNET]: [
     {
       // wETH v1/v2 pool
-      address: '0x44c00D9e6e93209683e17D31491fB3C0D0417410',
+      address: '0xb1a0BDe36341065cA916c9f5619aCA82A43659A3',
       tokens: [
         new WrappedTokenInfo(
           {
@@ -38,7 +38,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
     },
     {
       // BTC v1/v2
-      address: '0xf316FE2Dca5b458c87a0778d277a9655bCeB3f42',
+      address: '0xd5ab1BA8b2Ec70752068d1d728e728eAd0E19CBA',
       tokens: [
         new WrappedTokenInfo(
           {
