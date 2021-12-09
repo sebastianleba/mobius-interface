@@ -10,19 +10,8 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
   [ChainId.MAINNET]: [
     {
       // wETH v1/v2 pool
-      address: '0xb4447a7de72Bd6d82dd459419b80feC37C8E43E3',
+      address: '0x44c00D9e6e93209683e17D31491fB3C0D0417410',
       tokens: [
-        new WrappedTokenInfo(
-          {
-            chainId: ChainId.MAINNET,
-            address: '0x122013fd7dF1C6F636a5bb8f03108E876548b455',
-            decimals: 18,
-            symbol: 'wETH',
-            name: 'Wrapped Ether (Optics Bridge)',
-            logoURI: 'https://etherscan.io/token/images/weth_28.png',
-          },
-          []
-        ),
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
@@ -34,11 +23,34 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
           },
           []
         ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x122013fd7dF1C6F636a5bb8f03108E876548b455',
+            decimals: 18,
+            symbol: 'wETH',
+            name: 'Wrapped Ether (Optics Bridge)',
+            logoURI: 'https://etherscan.io/token/images/weth_28.png',
+          },
+          []
+        ),
       ],
     },
     {
-      address: '0x6a805296bBCAb0e917FefFA948a68786DA064011',
+      // BTC v1/v2
+      address: '0xf316FE2Dca5b458c87a0778d277a9655bCeB3f42',
       tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
+            decimals: 8,
+            symbol: 'wBTCxV1',
+            name: 'Wrapped Bitcoin (Optics Bridge)',
+            logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
+          },
+          []
+        ),
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
@@ -50,14 +62,31 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
           },
           []
         ),
+      ],
+    },
+    {
+      // USDC v1/v2
+      address: '0x70bfA1C8Ab4e42B9BE74f65941EFb6e5308148c7',
+      tokens: [
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
-            decimals: 8,
-            symbol: 'wBTCxV1',
-            name: 'Wrapped Bitcoin (Optics Bridge)',
-            logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
+            address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
+            decimals: 6,
+            symbol: 'cUSDCxV1',
+            name: 'US Dollar Coin (Optics Bridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xef4229c8c3250C675F21BCefa42f58EfbfF6002a',
+            decimals: 6,
+            symbol: 'cUSDC',
+            name: 'US Dollar Coin (Optics Bridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
           },
           []
         ),

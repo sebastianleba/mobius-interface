@@ -1,6 +1,6 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
-import { Price, Token, TokenAmount } from '@ubeswap/sdk'
-import { JSBI } from '@ubeswap/sdk'
+import { ChainId } from '@celo-tools/use-contractkit'
+import { JSBI, Price, Token, TokenAmount } from '@ubeswap/sdk'
 import { ConstantSum, ConstantSumInfo } from 'constants/ConstantSum'
 import { useActiveContractKit } from 'hooks'
 import { useSelector } from 'react-redux'
@@ -113,4 +113,37 @@ export function useOpenSumTrade(
     executionPrice: new Price(tokenIn, tokenOut, '1', '1'),
     fee: new TokenAmount(inputAmount, 0),
   }
+}
+
+export function useOpticsV1Tokens(): { [address: string]: Token } {
+  const { chainId } = useActiveContractKit()
+  const openSumTokens = ConstantSum[chainId]?.reduce(
+    (accum: { [address: string]: Token }, { tokens }: ConstantSumInfo) => ({
+      ...accum,
+      [tokens[0].address]: tokens[0],
+    }),
+    {}
+  )
+  return openSumTokens ?? {}
+}
+
+export function useOpticsV2Tokens(): { [address: string]: Token } {
+  const { chainId } = useActiveContractKit()
+  const openSumTokens = ConstantSum[chainId]?.reduce(
+    (accum: { [address: string]: Token }, { tokens }: ConstantSumInfo) => ({
+      ...accum,
+      [tokens[1].address]: tokens[1],
+    }),
+    {}
+  )
+  return openSumTokens ?? {}
+}
+
+export function getPairedToken(selectedTokenAddress: string, chainId: ChainId): Token | undefined {
+  const pool =
+    ConstantSum[chainId]?.filter(
+      ({ tokens }) => tokens[0].address === selectedTokenAddress || tokens[1].address === selectedTokenAddress
+    )?.[0] ?? undefined
+
+  return !pool ? undefined : pool.tokens[0].address == selectedTokenAddress ? pool.tokens[1] : pool.tokens[0]
 }

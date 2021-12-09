@@ -7,13 +7,13 @@ import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { useWalletModalToggle } from 'state/application/hooks'
-import { useOpenSumTrade } from 'state/openSum/hooks'
+import { getPairedToken, useOpenSumTrade } from 'state/openSum/hooks'
 import styled, { ThemeContext } from 'styled-components'
 
 import { ButtonConfirmed, ButtonError } from '../../components/Button'
 import Card from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
-import CurrencyInputPanel from '../../components/CurrencyInputPanel'
+import CurrencyInputPanel, { TokenType } from '../../components/CurrencyInputPanel'
 import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
 import { SwapPoolTabs } from '../../components/NavigationTabs'
@@ -41,7 +41,7 @@ const VoteCard = styled(DataCard)`
 export default function OpenSum() {
   const isDarkMode = useIsDarkMode()
 
-  const { account } = useActiveContractKit()
+  const { account, chainId } = useActiveContractKit()
   const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected
@@ -154,8 +154,9 @@ export default function OpenSum() {
     (inputCurrency: Token) => {
       setApprovalSubmitted(false) // reset 2 step UI for approvals
       setInputToken(inputCurrency)
+      setOutputToken(getPairedToken(inputCurrency.address, chainId))
     },
-    [setInputToken]
+    [setInputToken, setOutputToken, setApprovalSubmitted, chainId]
   )
 
   const handleMaxInput = useCallback(() => {
@@ -163,11 +164,15 @@ export default function OpenSum() {
   }, [maxAmountInput, setInputValue])
 
   const onSwitchTokens = () => {
-    const tokens = [inputToken, outputToken]
-    setInputToken(tokens[1])
-    setOutputToken(tokens[0])
+    alert('You can only swap FROM v1 assets TO v2 assets')
   }
-  const handleOutputSelect = useCallback((outputCurrency: Token) => setOutputToken(outputCurrency), [setOutputToken])
+  const handleOutputSelect = useCallback(
+    (outputCurrency: Token) => {
+      setOutputToken(outputCurrency)
+      setInputToken(getPairedToken(outputCurrency.address, chainId))
+    },
+    [setInputToken, setOutputToken, chainId]
+  )
 
   const actionLabel = 'Swap'
   return (
@@ -184,7 +189,7 @@ export default function OpenSum() {
               <RowBetween>
                 <TYPE.white
                   fontSize={14}
-                >{`A consant sum exchange to swap between Optics v1 and v2 assets.  Every swap is guarunteed to be 1:1.`}</TYPE.white>
+                >{`Mobius Migrate tab allows you to swap from Optics v1 to v2 assets. Every swap is guaranteed to be 1:1.`}</TYPE.white>
               </RowBetween>
             </AutoColumn>
           </CardSection>
@@ -218,6 +223,7 @@ export default function OpenSum() {
                 onMax={handleMaxInput}
                 onCurrencySelect={handleInputSelect}
                 otherCurrency={outputToken}
+                tokenType={TokenType.OpticsV1}
                 id="swap-currency-input"
               />
               <ArrowWrapper clickable>
@@ -238,6 +244,7 @@ export default function OpenSum() {
                 currency={outputToken}
                 onCurrencySelect={handleOutputSelect}
                 otherCurrency={inputToken}
+                tokenType={TokenType.OpticsV2}
                 id="swap-currency-output"
               />
             </div>

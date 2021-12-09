@@ -181,6 +181,11 @@ const StyledBalanceMax = styled.button`
   `};
 `
 
+export enum TokenType {
+  OpticsV1 = 1,
+  OpticsV2 = 2,
+}
+
 interface CurrencyInputPanelProps {
   value: string
   onUserInput: (value: string) => void
@@ -197,6 +202,7 @@ interface CurrencyInputPanelProps {
   id: string
   showCommonBases?: boolean
   customBalanceText?: string
+  tokenType?: TokenType
 }
 
 export default function CurrencyInputPanel({
@@ -215,6 +221,7 @@ export default function CurrencyInputPanel({
   id,
   showCommonBases,
   customBalanceText,
+  tokenType,
   ...rest
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
@@ -317,6 +324,7 @@ export default function CurrencyInputPanel({
           selectedCurrency={currency}
           otherSelectedCurrency={otherCurrency}
           showCommonBases={showCommonBases}
+          tokenType={tokenType}
         />
       )}
     </InputPanel>
