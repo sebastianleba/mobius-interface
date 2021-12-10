@@ -166,7 +166,7 @@ export default function VeMobiRewards() {
             </RowFixed>
             <RowFixed>
               <TYPE.subHeader color={tokenColor} className="apr" fontWeight={800} fontSize={[16, 24]} textAlign="right">
-                {`Average APR: ${avgApr.toFixed(2)}%`}
+                {`Max APR: ${avgApr.toFixed(2)}%`}
               </TYPE.subHeader>
             </RowFixed>
           </TopSection>
