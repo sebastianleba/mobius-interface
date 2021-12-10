@@ -25,23 +25,23 @@ const handleColorType = (status: ProposalState, theme: DefaultTheme) => {
 function StatusText({ status }: { status: ProposalState }) {
   switch (status) {
     case ProposalState.PENDING:
-      return <TYPE.main>Pending</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Pending</TYPE.subHeader>
     case ProposalState.ACTIVE:
-      return <TYPE.main>Active</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Active</TYPE.subHeader>
     case ProposalState.SUCCEEDED:
-      return <TYPE.main>Succeeded</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Succeeded</TYPE.subHeader>
     case ProposalState.EXECUTED:
-      return <TYPE.main>Executed</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Executed</TYPE.subHeader>
     case ProposalState.DEFEATED:
-      return <TYPE.main>Defeated</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Defeated</TYPE.subHeader>
     case ProposalState.QUEUED:
-      return <TYPE.main>Queued</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Queued</TYPE.subHeader>
     case ProposalState.CANCELED:
-      return <TYPE.main>Canceled</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Canceled</TYPE.subHeader>
     case ProposalState.EXPIRED:
-      return <TYPE.main>Expired</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Expired</TYPE.subHeader>
     default:
-      return <TYPE.main>Undetermined</TYPE.main>
+      return <TYPE.subHeader fontWeight={600}>Undetermined</TYPE.subHeader>
   }
 }
 
@@ -51,7 +51,7 @@ const StyledProposalContainer = styled.span<{ status: ProposalState }>`
   padding: 0.5rem;
   border-radius: 8px;
   color: ${({ status, theme }) => handleColorType(status, theme)};
-  border: 1px solid ${({ status, theme }) => handleColorType(status, theme)};
+  border: 2px solid ${({ status, theme }) => handleColorType(status, theme)};
   width: fit-content;
   justify-self: flex-end;
   text-transform: uppercase;

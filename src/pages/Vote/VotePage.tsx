@@ -32,6 +32,7 @@ import { ProposalStatus } from './styled'
 
 const PageWrapper = styled(AutoColumn)`
   width: 100%;
+  margin-top: 2rem;
 `
 
 const ProposalInfo = styled(AutoColumn)`
