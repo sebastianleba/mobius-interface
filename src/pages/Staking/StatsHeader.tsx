@@ -89,7 +89,7 @@ function StatsHeader({ stakingInfo }: PropType) {
       img: isDarkMode ? bankDark : bankLight,
     },
     {
-      label: 'Max Staking APY',
+      label: 'Max Staking APR',
       value: avgApr ? `${avgApr?.toSignificant(2, { groupSeparator: ',' })}%` : '...',
       img: isDarkMode ? atmDark : atmLight,
     },
