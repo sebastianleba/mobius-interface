@@ -8,14 +8,42 @@ export type ConstantSumInfo = {
 
 export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
   [ChainId.MAINNET]: [
+    // {
+    //   // wETH v1/v2 pool
+    //   address: '0xb1a0BDe36341065cA916c9f5619aCA82A43659A3',
+    //   tokens: [
+    //     new WrappedTokenInfo(
+    //       {
+    //         chainId: ChainId.MAINNET,
+    //         address: '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4',
+    //         decimals: 18,
+    //         symbol: 'wETHxV1',
+    //         name: 'Wrapped Ether (Optics Bridge)',
+    //         logoURI: 'https://etherscan.io/token/images/weth_28.png',
+    //       },
+    //       []
+    //     ),
+    //     new WrappedTokenInfo(
+    //       {
+    //         chainId: ChainId.MAINNET,
+    //         address: '0x122013fd7dF1C6F636a5bb8f03108E876548b455',
+    //         decimals: 18,
+    //         symbol: 'wETH',
+    //         name: 'Wrapped Ether (Optics Bridge)',
+    //         logoURI: 'https://etherscan.io/token/images/weth_28.png',
+    //       },
+    //       []
+    //     ),
+    //   ],
+    // },
     {
       // wETH v1/v2 pool
-      address: '0xb1a0BDe36341065cA916c9f5619aCA82A43659A3',
+      address: '0x7e0B5284864916A866Fc391454ac2f452F91a336',
       tokens: [
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4',
+            address: '0xD68536297a01DBB4739a4e2cC1E79a8CFA2E3A3E',
             decimals: 18,
             symbol: 'wETHxV1',
             name: 'Wrapped Ether (Optics Bridge)',
@@ -26,7 +54,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0x122013fd7dF1C6F636a5bb8f03108E876548b455',
+            address: '0xb909F71b53C621e467Ee9ECD387E6662CA4f15eF',
             decimals: 18,
             symbol: 'wETH',
             name: 'Wrapped Ether (Optics Bridge)',
@@ -36,6 +64,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
         ),
       ],
     },
+
     {
       // BTC v1/v2
       address: '0xd5ab1BA8b2Ec70752068d1d728e728eAd0E19CBA',

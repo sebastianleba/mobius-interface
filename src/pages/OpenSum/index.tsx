@@ -9,6 +9,7 @@ import { Text } from 'rebass'
 import { useWalletModalToggle } from 'state/application/hooks'
 import { getPairedToken, useOpenSumTrade } from 'state/openSum/hooks'
 import { useTransactionAdder } from 'state/transactions/hooks'
+import { useTokenBalance } from 'state/wallet/hooks'
 import styled, { ThemeContext } from 'styled-components'
 
 import { ButtonConfirmed, ButtonError } from '../../components/Button'
@@ -29,7 +30,6 @@ import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallbac
 import { MentoTrade } from '../../state/mento/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
 import { TYPE } from '../../theme'
-import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import AppBody from '../AppBody'
 
 const VoteCard = styled(DataCard)`
@@ -82,7 +82,7 @@ export default function OpenSum() {
     }
   }, [approval, approvalSubmitted])
 
-  const maxAmountInput: TokenAmount | undefined = maxAmountSpend(input)
+  const maxAmountInput: TokenAmount | undefined = useTokenBalance(account, inputToken)
   const atMaxAmountInput = Boolean(maxAmountInput && input?.equalTo(maxAmountInput))
   const swapContract = useConstantSumContract(poolAddress)
   const deadline = useTransactionDeadline()
@@ -170,6 +170,7 @@ export default function OpenSum() {
   )
 
   const handleMaxInput = useCallback(() => {
+    console.log(maxAmountInput?.toExact())
     maxAmountInput && setInputValue(maxAmountInput.toExact())
   }, [maxAmountInput, setInputValue])
 
