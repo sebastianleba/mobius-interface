@@ -317,6 +317,9 @@ export default function Header() {
               <StyledNavLink id={`mint-nav-link`} to={'/mint'}>
                 {t('Mint')}
               </StyledNavLink>
+              <StyledNavLink id={`migrate-nav-link`} to={'/opensum'}>
+                {t('Migrate')}
+              </StyledNavLink>
               <StyledNavLink
                 id={`pool-nav-link`}
                 to={'/pool'}

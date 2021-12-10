@@ -4,6 +4,7 @@ import usePrevious from 'hooks/usePrevious'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useLast from '../../hooks/useLast'
+import { TokenType } from '../CurrencyInputPanel'
 import Modal from '../Modal'
 import { CurrencySearch } from './CurrencySearch'
 
@@ -14,6 +15,7 @@ interface CurrencySearchModalProps {
   onCurrencySelect: (currency: Token) => void
   otherSelectedCurrency?: Token | null
   showCommonBases?: boolean
+  tokenType?: TokenType
 }
 
 export enum CurrencyModalView {
@@ -30,6 +32,7 @@ export default function CurrencySearchModal({
   selectedCurrency,
   otherSelectedCurrency,
   showCommonBases = false,
+  tokenType,
 }: CurrencySearchModalProps) {
   const [modalView, setModalView] = useState<CurrencyModalView>(CurrencyModalView.manage)
   const lastOpen = useLast(isOpen)
@@ -73,6 +76,7 @@ export default function CurrencySearchModal({
         showImportView={() => setModalView(CurrencyModalView.importToken)}
         setImportToken={setImportToken}
         showManageView={() => setModalView(CurrencyModalView.manage)}
+        tokenType={tokenType}
       />
     </Modal>
   )
