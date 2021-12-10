@@ -47,6 +47,9 @@ export default createReducer<StakingState>(initialState, (builder) => {
     ...stakingInfo,
   }))
   builder.addCase(updateSNX, (state, { payload }) => {
-    ;(state.snx.tokenRate = payload.rewardRate), (state.snx.leftToClaim = payload.leftToClaim)
+    if (state.snx) {
+      state.snx.tokenRate = payload.rewardRate ?? state.snx.tokenRate
+      state.snx.leftToClaim = payload.leftToClaim ?? state.snx.leftToClaim
+    }
   })
 })

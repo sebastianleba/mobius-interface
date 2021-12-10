@@ -40,10 +40,12 @@ export type MobiStakingInfo = {
 }
 
 export type SNXRewardInfo = {
+  snxAddress: string
   rewardToken: Token
   rewardRate?: TokenAmount
   leftToClaim?: TokenAmount
   avgApr?: Percent
+  userRewardRate?: TokenAmount
 }
 export function calculateBoostedBalance(
   votingPower: JSBI,
@@ -151,17 +153,23 @@ export function useSNXRewardInfo(): SNXRewardInfo {
   const rewardToken = useToken(false, snxInfo?.rewardToken ?? '')
   const priceOfReward = useTokenPrice(snxInfo?.rewardToken)
   const priceOfMobi = useTokenPrice(mobi?.address)
-  if (!snxInfo || !snxInfo.tokenRate) return { rewardToken }
+  if (!snxInfo || !snxInfo.tokenRate) return { snxAddress: snxInfo?.address, rewardToken }
   const yearlyRate = JSBI.multiply(snxInfo.tokenRate, SECONDS_IN_YEAR)
-
   const apy =
     priceOfReward && priceOfMobi
       ? calcApy(priceOfReward?.multiply(yearlyRate), priceOfMobi?.multiply(stakingInfo.totalMobiLocked))[1]
       : undefined
+  const rewardRate = new TokenAmount(rewardToken, JSBI.multiply(snxInfo.tokenRate, SECONDS_IN_WEEK))
+  const userRateJSBI = JSBI.divide(JSBI.multiply(rewardRate.raw, stakingInfo.votingPower), stakingInfo.totalVotingPower)
+  //rewardRate.multiply(stakingInfo.votingPower).divide(stakingInfo.totalVotingPower)
+  const userRewardRate = new TokenAmount(rewardToken, userRateJSBI)
+
   return {
+    snxAddress: snxInfo.address,
     rewardToken,
-    rewardRate: new TokenAmount(rewardToken, JSBI.multiply(snxInfo.tokenRate, SECONDS_IN_WEEK)),
-    leftToClaim: new TokenAmount(rewardToken, snxInfo.leftToClaim),
+    rewardRate,
+    leftToClaim: snxInfo.leftToClaim ? new TokenAmount(rewardToken, snxInfo.leftToClaim) : undefined,
     avgApr: apy,
+    userRewardRate,
   }
 }

@@ -13,6 +13,7 @@ import GaugeWeights from './GaugeWeights'
 import Positions from './Positions'
 import Stake from './Stake'
 import StatsHeader from './StatsHeader'
+import VeMobiRewards from './VeMobiRewards'
 import Vote from './Vote'
 
 const TextContainer = styled.div`
@@ -88,9 +89,10 @@ const Sel = styled.div<{ selected: boolean }>`
 `
 
 enum View {
-  Lock,
-  Vote,
-  Analyze,
+  Lock = 1,
+  Vote = 2,
+  Analyze = 3,
+  Rewards = 4,
 }
 
 export default function Staking() {
@@ -133,6 +135,7 @@ export default function Staking() {
       }
     )
   }
+
   return (
     <OuterContainer>
       <StatsHeader stakingInfo={stakingInfo} />
@@ -147,6 +150,9 @@ export default function Staking() {
           <Sel onClick={() => setView(View.Analyze)} selected={view === View.Analyze}>
             Analyze
           </Sel>
+          <Sel onClick={() => setView(View.Rewards)} selected={view === View.Rewards}>
+            Rewards
+          </Sel>
         </HeaderLinks>
       </div>
       {view === View.Lock ? (
@@ -159,9 +165,13 @@ export default function Staking() {
         <PositionsContainer>
           <Vote summaries={stakingInfo.positions ?? []} lockDate={stakingInfo.lockEnd ?? new Date()} />
         </PositionsContainer>
-      ) : (
+      ) : view === View.Analyze ? (
         <PositionsContainer>
           <GaugeWeights summaries={stakingInfo.positions ?? []} />
+        </PositionsContainer>
+      ) : (
+        <PositionsContainer>
+          <VeMobiRewards />
         </PositionsContainer>
       )}
     </OuterContainer>
