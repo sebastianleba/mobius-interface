@@ -1,18 +1,29 @@
 import { TransactionResponse } from '@ethersproject/abstract-provider'
-import { ButtonEmpty } from 'components/Button'
-import { AutoColumn, ColumnCenter } from 'components/Column'
+import { ButtonEmpty, ButtonPrimary } from 'components/Button'
+import { AutoColumn } from 'components/Column'
 import Loader from 'components/Loader'
-import { RowFixed } from 'components/Row'
+import { RowBetween, RowFixed } from 'components/Row'
 import { useActiveContractKit } from 'hooks'
 import { useStakingContract } from 'hooks/useContract'
 import React, { useState } from 'react'
-import { isMobile } from 'react-device-detect'
 import { useSNXRewardInfo } from 'state/staking/hooks'
 import { useTransactionAdder } from 'state/transactions/hooks'
 import styled from 'styled-components'
 import { TYPE } from 'theme'
 
-import Logo from '../../components/Logo'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
+
+const VoteCard = styled(DataCard)`
+  background: radial-gradient(90% 90% at 50% 5%, #3488ec 0%, #35d07f 100%);
+  overflow: hidden;
+  margin-top: -1rem;
+`
+
+export const InfoWrapper = styled.div<{ mobile: boolean }>`
+  position: relative;
+  max-width: 720px;
+  width: 100%;
+`
 
 const Wrapper = styled(AutoColumn)`
   border-radius: 12px;
@@ -63,19 +74,10 @@ const PositionWrapper = styled(AutoColumn)`
 `}
 `
 
-const StyledLogo = styled(Logo)<{ size: string }>`
-  width: ${({ size }) => size};
-  height: ${({ size }) => size};
-  border-radius: ${({ size }) => size};
-  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.075);
-  background-color: ${({ theme }) => theme.white};
-`
-
-const SecondSection = styled.div<{ mobile: boolean }>`
+const SecondSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
   padding-bottom: 0.25rem;
   padding-top: 0;
   z-index: 1;
@@ -89,7 +91,6 @@ const TopSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
   padding-bottom: 0.25rem;
   padding-top: 0;
   z-index: 1;
@@ -148,14 +149,27 @@ export default function VeMobiRewards() {
     </Wrapper>
   ) : (
     <Wrapper>
-      <TYPE.darkGray>Earn Rewards Just for Staking MOBI</TYPE.darkGray>
-      <TYPE.darkGray>
-        Average APR is calculated by total celo rate / total MOBI locked, actual APR will vary based on lock duration
-      </TYPE.darkGray>
-      <TYPE.darkGray>
-        To begin earning, simply lock Mobi on the {'"Lock"'} tab! If you have already locked MOBI then you are good to
-        go.
-      </TYPE.darkGray>
+      <InfoWrapper mobile={true}>
+        <VoteCard>
+          <CardNoise />
+          <CardSection>
+            <AutoColumn gap="md">
+              <RowBetween>
+                <TYPE.white fontWeight={600} fontSize={[16, 24]}>
+                  Staked Mobi Rewards
+                </TYPE.white>
+              </RowBetween>
+              <RowBetween>
+                <TYPE.white
+                  fontWeight={450}
+                  fontSize={[12, 16]}
+                >{`Earn rewards just for staking Mobi. To begin, simply lock MOBI on the \`Lock\` tab! If you already locked MOBI then you are good to go. Max APR is calculated by total celo rate / total MOBI locked, actual APR will vary based on lock duration.`}</TYPE.white>
+              </RowBetween>
+            </AutoColumn>
+          </CardSection>
+          <CardNoise />
+        </VoteCard>
+      </InfoWrapper>
       <CardContainer>
         <PositionWrapper>
           <TopSection>
@@ -170,9 +184,8 @@ export default function VeMobiRewards() {
               </TYPE.subHeader>
             </RowFixed>
           </TopSection>
-          <SecondSection mobile={isMobile}>
+          <SecondSection>
             <RowFixed style={{ marginTop: 10 }}>
-              {/* <StyledLogo srcs={[rewardToken.logoURI]} size={'24'} /> */}
               <TYPE.darkGray fontWeight={450} fontSize={[15, 20]}>
                 {`${rewardToken.symbol} Rate: `}
               </TYPE.darkGray>
@@ -185,7 +198,7 @@ export default function VeMobiRewards() {
               color={tokenColor}
             >{`${rewardRate.toSignificant(4, { groupSeparator: ',' })} ${rewardToken.symbol} / WEEK`}</TYPE.black>
           </SecondSection>
-          <SecondSection mobile={isMobile}>
+          <SecondSection>
             <RowFixed style={{ marginTop: 10 }}>
               {/* <StyledLogo srcs={[rewardToken.logoURI]} size={'24'} /> */}
               <TYPE.darkGray fontWeight={450} fontSize={[15, 20]}>
@@ -201,30 +214,32 @@ export default function VeMobiRewards() {
             >{`${userRewardRate.toSignificant(4, { groupSeparator: ',' })} ${rewardToken.symbol} / WEEK`}</TYPE.black>
           </SecondSection>
           <Divider />
-          {attempting && !hash ? (
-            <ColumnCenter style={{ height: 'fit-content' }}>
-              <Loader size={'5rem'} />
-              <TYPE.largeHeader marginTop="1rem">{`Claiming ${leftToClaim?.toFixed(2)} CELO`}</TYPE.largeHeader>
-            </ColumnCenter>
-          ) : (
-            <>
-              <StyledButton padding="8px" borderRadius="8px" width="fit-content" onClick={onClaimReward}>
-                Claim
-              </StyledButton>
-              <SecondSection>
-                <TYPE.largeHeader>Available to Claim: </TYPE.largeHeader>
-                {leftToClaim ? (
-                  <TYPE.largeHeader>{`${leftToClaim.toSignificant(4, { groupSeparator: ',' })} ${
-                    rewardToken.symbol
-                  }`}</TYPE.largeHeader>
-                ) : account ? (
-                  <Loader />
-                ) : (
-                  <TYPE.red>Connect Wallet</TYPE.red>
-                )}
-              </SecondSection>{' '}
-            </>
-          )}
+          <>
+            {/* <StyledButton padding="8px" borderRadius="8px" width="fit-content" onClick={onClaimReward}>
+              Claim
+            </StyledButton> */}
+            <SecondSection>
+              <TYPE.largeHeader>Available to Claim: </TYPE.largeHeader>
+              {leftToClaim ? (
+                <TYPE.largeHeader>{`${leftToClaim.toSignificant(4, { groupSeparator: ',' })} ${
+                  rewardToken.symbol
+                }`}</TYPE.largeHeader>
+              ) : account ? (
+                <Loader />
+              ) : (
+                <TYPE.red>Connect Wallet</TYPE.red>
+              )}
+            </SecondSection>
+            <SecondSection style={{ marginTop: '1rem' }}>
+              <ButtonPrimary
+                onClick={onClaimReward}
+                disabled={attempting && !hash}
+                style={{ fontWeight: 700, fontSize: 18, marginBottom: '1rem' }}
+              >
+                {attempting && !hash ? `Claiming ${leftToClaim?.toFixed(2)} CELO...` : 'CLAIM'}
+              </ButtonPrimary>
+            </SecondSection>
+          </>
         </PositionWrapper>
       </CardContainer>
     </Wrapper>
