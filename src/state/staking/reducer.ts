@@ -1,19 +1,34 @@
 import { createReducer } from '@reduxjs/toolkit'
 import { JSBI } from '@ubeswap/sdk'
 
-import { updateStaking } from './actions'
+import { updateSNX, updateStaking } from './actions'
 
 export type VoteLock = {
   amount: JSBI
   end: number // UNIX time stamp
 }
+
+export type SnxRewardsInfo = {
+  address: string
+  rewardToken: string
+  tokenRate?: JSBI
+  leftToClaim?: JSBI
+}
+
 export type StakingState = {
   votingPower: JSBI
   totalVotingPower: JSBI
+  snx?: SnxRewardsInfo
   locked?: VoteLock
   voteWeightLeft?: JSBI
   voteUserPower: JSBI
   totalWeight: JSBI
+  totalMobiLocked: JSBI
+}
+
+const SNX_STATIC: SnxRewardsInfo = {
+  address: '0x05B7fFA9F55d84c5107Ca22c6b0CF1852573de57',
+  rewardToken: '0x471EcE3750Da237f93B8E339c536989b8978a438',
 }
 
 const initialState: StakingState = {
@@ -22,11 +37,16 @@ const initialState: StakingState = {
   voteWeightLeft: JSBI.BigInt(0),
   voteUserPower: JSBI.BigInt(0),
   totalWeight: JSBI.BigInt(0),
+  totalMobiLocked: JSBI.BigInt(1),
+  snx: SNX_STATIC,
 }
 
-export default createReducer<StakingState>(initialState, (builder) =>
+export default createReducer<StakingState>(initialState, (builder) => {
   builder.addCase(updateStaking, (state, { payload: { stakingInfo } }) => ({
     ...state,
     ...stakingInfo,
   }))
-)
+  builder.addCase(updateSNX, (state, { payload }) => {
+    ;(state.snx.tokenRate = payload.rewardRate), (state.snx.leftToClaim = payload.leftToClaim)
+  })
+})
