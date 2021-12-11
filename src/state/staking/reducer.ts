@@ -27,7 +27,7 @@ export type StakingState = {
 }
 
 const SNX_STATIC: SnxRewardsInfo = {
-  address: '0x05B7fFA9F55d84c5107Ca22c6b0CF1852573de57',
+  address: '0x0812f6de916667C5aa820E757704c4ac69159529',
   rewardToken: '0x471EcE3750Da237f93B8E339c536989b8978a438',
 }
 
