@@ -264,7 +264,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayChain: Chain.Ethereum,
       coin: Coins.Ether,
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['0'], //['3694010416000000'], // ['7302827380000000']
+      additionalRewardRate: ['3694010416000000'], // ['7302827380000000']
     },
     {
       name: 'wBTC (Optics V2)',
@@ -317,7 +317,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayChain: Chain.Ethereum,
       coin: Coins.Bitcoin,
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['0'], //['3694010416000000'], // ['7302827380000000']
+      additionalRewardRate: ['3694010416000000'], // ['7302827380000000']
     },
     {
       name: 'pUSDC (Optics V2)',
