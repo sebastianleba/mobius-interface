@@ -8,7 +8,7 @@ import styled from 'styled-components'
 
 import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
-import { useStableSwapContract } from '../../hooks/useContract'
+import { useConstantSumContract } from '../../hooks/useContract'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
@@ -80,14 +80,14 @@ export default function OpenSumDepositModal({ isOpen, onDismiss, poolInfo }: Ope
     onDismiss()
   }
 
-  const stakingContract = useStableSwapContract(poolInfo.address)
+  const stakingContract = useConstantSumContract(poolInfo.address)
   async function onDeposit() {
     const allValid = selectedAmounts.reduce((accum, cur) => accum && !!cur && !!cur.raw, true)
     if (stakingContract) {
       setAttempting(true)
-      const tokenAmounts = selectedAmounts.map((amount) => BigInt(amount.raw.toString()))
+      const tokenAmounts = selectedAmounts.map((amount) => amount?.raw.toString() ?? '0')
       await stakingContract
-        .addLiquidity(tokenAmounts, expectedLPTokens.toString(), deadline, { gasLimit: 10000000 })
+        .addLiquidity(tokenAmounts, expectedLPTokens.raw.toString())
         .then((response: TransactionResponse) => {
           addTransaction(response, {
             summary: `Deposit Liquidity into ${poolInfo.address}`,

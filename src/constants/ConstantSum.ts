@@ -40,7 +40,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
     },
     // {
     //   // wETH v1/v2 pool
-    //   name: 'wETH v1/v2 pool',
+    //   name: 'TEST v1/v2 pool',
     //   address: '0x7e0B5284864916A866Fc391454ac2f452F91a336',
     //   tokens: [
     //     new WrappedTokenInfo(
