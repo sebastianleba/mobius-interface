@@ -152,7 +152,7 @@ const StyledNavLink = styled(NavLink)<{ color: string }>`
   textDecoration: underline,
 `
 
-function calcApy(rewardPerYear: Fraction, totalStakedAmount: Fraction) {
+export function calcApy(rewardPerYear: Fraction, totalStakedAmount: Fraction) {
   const apyFraction = rewardPerYear
     .multiply(JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18')))
     .divide(totalStakedAmount)
