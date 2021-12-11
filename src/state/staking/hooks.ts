@@ -157,7 +157,7 @@ export function useSNXRewardInfo(): SNXRewardInfo {
   const yearlyRate = JSBI.multiply(snxInfo.tokenRate, SECONDS_IN_YEAR)
   const apy =
     priceOfReward && priceOfMobi
-      ? calcApy(priceOfReward?.multiply(yearlyRate), priceOfMobi?.multiply(stakingInfo.totalMobiLocked))[1]
+      ? calcApy(priceOfReward?.multiply(yearlyRate), priceOfMobi?.multiply(stakingInfo.totalVotingPower))[1]
       : undefined
   const rewardRate = new TokenAmount(rewardToken, JSBI.multiply(snxInfo.tokenRate, SECONDS_IN_WEEK))
   const userRateJSBI = JSBI.divide(JSBI.multiply(rewardRate.raw, stakingInfo.votingPower), stakingInfo.totalVotingPower)

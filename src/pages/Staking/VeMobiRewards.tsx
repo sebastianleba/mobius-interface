@@ -163,7 +163,7 @@ export default function VeMobiRewards() {
                 <TYPE.white
                   fontWeight={450}
                   fontSize={[12, 16]}
-                >{`Earn rewards just for staking Mobi. To begin, simply lock MOBI on the \`Lock\` tab! If you already locked MOBI then you are good to go. Max APR is calculated by total celo rate / total MOBI locked, actual APR will vary based on lock duration.`}</TYPE.white>
+                >{`Earn rewards just for staking Mobi. To begin, simply lock MOBI on the \`Lock\` tab! If you already locked MOBI then you are good to go. Max APR is calculated by total celo rate / total veMOBI, actual APR will vary based on lock duration.`}</TYPE.white>
               </RowBetween>
             </AutoColumn>
           </CardSection>
