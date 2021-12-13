@@ -10,6 +10,7 @@ import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
 import BRIDGE_ROUTER from '../constants/abis/BridgeRouter.json'
+import CONSTANT_SUM from '../constants/abis/ConstantSum.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
@@ -30,6 +31,7 @@ import VOTING_ESCROW from '../constants/abis/VotingEscrow.json'
 import { MULTICALL_ABI, MULTICALL_NETWORKS } from '../constants/multicall'
 import {
   BridgeRouter,
+  ConstantSum,
   Erc20,
   ERC20MOBI,
   Exchange,
@@ -109,6 +111,10 @@ export function useGaugeControllerContract(address?: string, withSignerIfPossibl
   const { chainId } = useActiveContractKit()
   const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[chainId]
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
+}
+
+export function useConstantSumContract(address?: string, withSignerIfPossible?: boolean): ConstantSum | null {
+  return useContract(address, CONSTANT_SUM.abi, withSignerIfPossible) as ConstantSum
 }
 
 export function useENSResolverContract(address: string | undefined, withSignerIfPossible?: boolean): Contract | null {

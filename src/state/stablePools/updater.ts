@@ -83,9 +83,11 @@ export function UpdatePools(): null {
         const workingLiquidity = JSBI.BigInt(((await gauge?.working_supply()) ?? '0').toString())
 
         const totalMobiRate = JSBI.BigInt(((await mobiContract?.rate()) ?? '10').toString())
-        const weight = JSBI.BigInt(
-          (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
-        )
+        const weight = poolInfo.isKilled
+          ? JSBI.BigInt('0')
+          : JSBI.BigInt(
+              (await gaugeController?.['gauge_relative_weight(address)'](poolInfo.gaugeAddress))?.toString() ?? '0'
+            )
         const pendingMobi = account
           ? JSBI.BigInt(((await gauge?.claimable_tokens(account)) ?? '0').toString())
           : undefined
@@ -245,7 +247,9 @@ export default function BatchUpdatePools(): null {
         )
         const lpStaked: JSBI = BigIntToJSBI((lpStaked_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const pendingMobi: JSBI = BigIntToJSBI((pendingMobi_multi?.[i]?.result?.[0] as BigInt) ?? '0')
-        const weight: JSBI = BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
+        const weight: JSBI = poolInfo.isKilled
+          ? JSBI.BigInt('0')
+          : BigIntToJSBI((weights?.[i]?.result?.[0] as BigInt) ?? '0')
         const futureWeight: JSBI = BigIntToJSBI((futureWeights?.[i]?.result?.[0] as BigInt) ?? '0')
         const totalStakedAmount: JSBI = BigIntToJSBI((totalStakedAmount_multi?.[i]?.result?.[0] as BigInt) ?? '0')
         const workingLiquidity: JSBI = BigIntToJSBI((workingLiquidityMulti?.[i]?.result?.[0] as BigInt) ?? '0')

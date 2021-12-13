@@ -51,11 +51,13 @@ export default function ConfirmSwapModal({
   swapErrorMessage: string | undefined
   onDismiss: () => void
 }) {
-  const showAcceptChanges = useMemo(
-    () => Boolean(trade && originalTrade && tradeMeaningfullyDiffers(trade, originalTrade)),
-    [originalTrade, trade]
-  )
   const location = useLocation()
+  const supressMeaningfullyDiffers = location.pathname.includes('opensum')
+  const showAcceptChanges = useMemo(
+    () =>
+      Boolean(trade && originalTrade && !supressMeaningfullyDiffers && tradeMeaningfullyDiffers(trade, originalTrade)),
+    [originalTrade, trade, supressMeaningfullyDiffers]
+  )
   const mento = location.pathname.includes('mint')
   const { label } = describeTrade(mento)
 
