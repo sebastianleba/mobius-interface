@@ -1,4 +1,5 @@
 export const GOVERNANCE_ADDRESS: { [chainId: number]: string } = {
+  [42220]: '0x960764F12F11Fca65813CFF5964786b78df9bB44',
   [44787]: '0xA878C6787490c9f0d2406bcd161b61f128Ab2708',
 }
 
