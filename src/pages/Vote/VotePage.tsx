@@ -12,7 +12,7 @@ import { RouteComponentProps } from 'react-router-dom'
 import styled from 'styled-components/macro'
 
 import { ButtonPrimary } from '../../components/Button'
-import { GreyCard } from '../../components/Card'
+import Card from '../../components/Card'
 import { AutoColumn } from '../../components/Column'
 import { CardSection, DataCard } from '../../components/earn/styled'
 import { RowBetween, RowFixed } from '../../components/Row'
@@ -29,6 +29,10 @@ import { VoteOption } from '../../state/governance/types'
 import { ExternalLink, StyledInternalLink, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import { ProposalStatus } from './styled'
+
+const RedCard = styled(Card)`
+  background: #fb7c6d;
+`
 
 const PageWrapper = styled(AutoColumn)`
   width: 100%;
@@ -207,24 +211,14 @@ export default function VotePage({
                 )}
               </TYPE.main>
             </RowBetween>
-            {proposalData && proposalData.status === ProposalState.ACTIVE && !showVotingButtons && (
-              <GreyCard>
-                <TYPE.black>
-                  <TYPE.main>
-                    Only VEMOBI votes that were self delegated or delegated to another address before block{' '}
-                    {proposalData.startBlock} are eligible for voting.{' '}
-                  </TYPE.main>
-                  {/* {showLinkForUnlock && (
-                    <span>
-                      <TYPE.main>
-                        <StyledInternalLink to="/vote">Unlock voting</StyledInternalLink> to prepare for the next
-                        proposal.
-                      </TYPE.main>
-                    </span>
-                  )} */}
-                </TYPE.black>
-              </GreyCard>
-            )}
+            {proposalData &&
+              (proposalData.status === ProposalState.ACTIVE || proposalData.status === ProposalState.PENDING) && (
+                <RedCard>
+                  <TYPE.white>
+                    Only veMOBI that was locked before block {proposalData.startBlock} are eligible for voting.{' '}
+                  </TYPE.white>
+                </RedCard>
+              )}
           </AutoColumn>
           {showVotingButtons ? (
             <RowFixed style={{ width: '100%', gap: '12px' }}>

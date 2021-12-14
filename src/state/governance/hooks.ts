@@ -254,7 +254,9 @@ export function useVoteCallback(): {
             }
           ).then((response: TransactionResponse) => {
             addTransaction(response, {
-              summary: `Vote ${voteOption} on proposal ${parseInt(proposalId)}`,
+              summary: `Vote ${
+                voteOption == VoteOption.For ? 'yes' : voteOption == VoteOption.Against ? 'no' : 'none'
+              } on proposal ${parseInt(proposalId)}`,
             })
             return response.hash
           })
