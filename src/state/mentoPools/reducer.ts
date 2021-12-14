@@ -1,6 +1,6 @@
-import { StableToken } from '@celo/contractkit'
 import { createReducer } from '@reduxjs/toolkit'
 import { Token } from '@ubeswap/sdk'
+import { CeloStableToken } from 'constants/Mento'
 import JSBI from 'jsbi'
 import { MentoMath } from 'utils/mentoMath'
 
@@ -14,7 +14,7 @@ export type MentoVariable = {
 
 export type MentoConstants = {
   tokens: Token[]
-  stable: StableToken
+  stable: CeloStableToken
 }
 
 export type MentoPool = MentoConstants & MentoVariable

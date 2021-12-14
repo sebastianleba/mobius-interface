@@ -1,11 +1,11 @@
-import { CeloContract, StableToken } from '@celo/contractkit'
+import { CeloContract } from '@celo/contractkit'
 import { JSBI } from '@ubeswap/sdk'
 import { Exchange } from 'generated'
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
 
-import { MENTO_POOL_INFO } from '../../constants/StablePools'
+import { CeloStableToken, MENTO_POOL_INFO } from '../../constants/Mento'
 import { useActiveContractKit } from '../../hooks'
 import { UseMentoContract } from '../../hooks/useContract'
 import { AppDispatch } from '../index'
@@ -42,8 +42,10 @@ export function UpdateMento(): null {
     }
     pools.forEach(async (pool) => {
       let address: string
-      if (pool.stable === StableToken.cUSD) {
+      if (pool.stable === CeloStableToken.cUSD) {
         address = await kit.registry.addressFor(CeloContract.Exchange)
+      } else if (pool.stable === CeloStableToken.cBRL) {
+        address = await kit.registry.addressFor(CeloContract.ExchangeBRL)
       } else {
         address = await kit.registry.addressFor(CeloContract.ExchangeEUR)
       }

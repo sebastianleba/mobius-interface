@@ -1,10 +1,11 @@
 import { arrayify } from '@ethersproject/bytes'
 import { parseBytes32String } from '@ethersproject/strings'
 import { Token } from '@ubeswap/sdk'
+import { MENTO_POOL_INFO } from 'constants/Mento'
 import { useMemo } from 'react'
 
 import { filterTokens } from '../components/SearchModal/filtering'
-import { MENTO_POOL_INFO, MOBI_TOKEN, STATIC_POOL_INFO, veMOBI_TOKEN } from '../constants/StablePools'
+import { MOBI_TOKEN, STATIC_POOL_INFO, veMOBI_TOKEN } from '../constants/StablePools'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { isAddress } from '../utils'
 import { TokenAddressMap } from './../state/lists/hooks'

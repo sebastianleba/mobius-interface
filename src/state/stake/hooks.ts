@@ -1,9 +1,10 @@
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
+import { MENTO_POOL_INFO } from 'constants/Mento'
 // Hooks
 import { MentoConstants } from 'state/mentoPools/reducer'
 import { StableSwapConstants } from 'state/stablePools/reducer'
 
-import { MENTO_POOL_INFO, STATIC_POOL_INFO } from '../../constants/StablePools'
+import { STATIC_POOL_INFO } from '../../constants/StablePools'
 import { useActiveContractKit } from '../../hooks'
 import { tryParseAmount } from '../swap/hooks'
 
