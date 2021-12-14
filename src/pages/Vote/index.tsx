@@ -1,4 +1,5 @@
 import { TokenAmount } from '@ubeswap/sdk'
+import { CardNoise } from 'components/claim/styled'
 // import { ButtonPrimary } from 'components/Button'
 import { AutoColumn } from 'components/Column'
 import { CardSection, DataCard } from 'components/earn/styled'
@@ -71,27 +72,6 @@ const WrapSmall = styled(RowBetween)`
   `};
 `
 
-const TextButton = styled(TYPE.main)`
-  color: ${({ theme }) => theme.primary1};
-  :hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`
-
-const AddressButton = styled.div`
-  border: 1px solid ${({ theme }) => theme.bg3};
-  padding: 2px 4px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`
-
-const StyledExternalLink = styled(ExternalLink)`
-  color: ${({ theme }) => theme.text1};
-`
-
 export default function Vote() {
   const { account, chainId } = useActiveContractKit()
 
@@ -110,6 +90,7 @@ export default function Vote() {
       <PageWrapper gap="lg" justify="center">
         <TopSection gap="md">
           <VoteCard>
+            <CardNoise />
             <CardSection>
               <AutoColumn gap="md">
                 <RowBetween>
@@ -170,7 +151,7 @@ export default function Vote() {
             })}
         </TopSection>
         <TYPE.subHeader color="text3">
-          <TYPE.main>A minimum threshold of 0.25% of the total veMOBI supply is required to submit proposals</TYPE.main>
+          <TYPE.main>A minimum threshold of 5,000,000 veMOBI is required to submit proposals</TYPE.main>
         </TYPE.subHeader>
       </PageWrapper>
       {/* <SwitchLocaleLink /> */}

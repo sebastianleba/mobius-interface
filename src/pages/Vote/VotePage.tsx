@@ -1,6 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber'
 // eslint-disable-next-line no-restricted-imports
 import { TokenAmount } from '@ubeswap/sdk'
+import { CardNoise } from 'components/claim/styled'
 import { useActiveContractKit } from 'hooks'
 import useCurrentBlockTimestamp from 'hooks/useCurrentBlockTimestamp'
 import JSBI from 'jsbi'
@@ -216,9 +217,11 @@ export default function VotePage({
             {proposalData &&
               (proposalData.status === ProposalState.ACTIVE || proposalData.status === ProposalState.PENDING) && (
                 <RedCard>
+                  <CardNoise />
                   <TYPE.white>
                     Only veMOBI that was locked before block {proposalData.startBlock} are eligible for voting.{' '}
                   </TYPE.white>
+                  <CardNoise />
                 </RedCard>
               )}
           </AutoColumn>
