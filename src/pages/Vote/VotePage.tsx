@@ -115,7 +115,7 @@ export default function VotePage({
     params: { id },
   },
 }: RouteComponentProps<{ governorIndex: string; id: string }>) {
-  const { chainId, account } = useActiveContractKit()
+  const { chainId } = useActiveContractKit()
 
   // get data for this specific proposal
   const proposalData: ProposalData | undefined = useProposalData(id)
@@ -163,18 +163,6 @@ export default function VotePage({
     JSBI.greaterThan(availableVotes.quotient, JSBI.BigInt(0)) &&
     proposalData &&
     proposalData.status === ProposalState.ACTIVE
-
-  console.log(availableVotes?.toFixed(3), proposalData?.status, ProposalState.ACTIVE)
-
-  // const uniBalance: TokenAmount | undefined = useTokenBalance(
-  //   account ?? undefined,
-  //   chainId ? VEMOBI[chainId] : undefined
-  // )
-
-  // in blurb link to home page if they are able to unlock
-  // const showLinkForUnlock = Boolean(
-  //   uniBalance && JSBI.notEqual(uniBalance.quotient, JSBI.BigInt(0)) && userDelegatee === ZERO_ADDRESS
-  // )
 
   // show links in propsoal details if content is an address
   // if content is contract with common name, replace address with common name
@@ -242,23 +230,23 @@ export default function VotePage({
             <RowFixed style={{ width: '100%', gap: '12px' }}>
               <ButtonPrimary
                 padding="8px"
-                $borderRadius="8px"
+                borderRadius="8px"
                 onClick={() => {
                   setVoteOption(VoteOption.For)
                   toggleVoteModal()
                 }}
               >
-                <TYPE.main>Vote For</TYPE.main>
+                <TYPE.white>Vote For</TYPE.white>
               </ButtonPrimary>
               <ButtonPrimary
                 padding="8px"
-                $borderRadius="8px"
+                borderRadius="8px"
                 onClick={() => {
                   setVoteOption(VoteOption.Against)
                   toggleVoteModal()
                 }}
               >
-                <TYPE.main>Vote Against</TYPE.main>
+                <TYPE.white>Vote Against</TYPE.white>
               </ButtonPrimary>
             </RowFixed>
           ) : (

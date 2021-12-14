@@ -84,11 +84,11 @@ export default function VoteModal({ isOpen, onDismiss, proposalId, voteOption }:
             <RowBetween>
               <TYPE.mediumHeader fontWeight={500}>
                 {voteOption === VoteOption.Against ? (
-                  <TYPE.main>Vote against proposal {proposalId}</TYPE.main>
+                  <TYPE.white>Vote against proposal {proposalId}</TYPE.white>
                 ) : voteOption === VoteOption.For ? (
-                  <TYPE.main>Vote for proposal {proposalId}</TYPE.main>
+                  <TYPE.white>Vote for proposal {proposalId}</TYPE.white>
                 ) : (
-                  <TYPE.main>Vote to abstain on proposal {proposalId}</TYPE.main>
+                  <TYPE.white>Vote to abstain on proposal {proposalId}</TYPE.white>
                 )}
               </TYPE.mediumHeader>
               <StyledClosed stroke="black" onClick={wrappedOndismiss} />
