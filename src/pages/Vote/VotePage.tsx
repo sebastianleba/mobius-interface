@@ -215,7 +215,8 @@ export default function VotePage({
               </TYPE.main>
             </RowBetween>
             {proposalData &&
-              (proposalData.status === ProposalState.ACTIVE || proposalData.status === ProposalState.PENDING) && (
+              (proposalData.status === ProposalState.ACTIVE || proposalData.status === ProposalState.PENDING) &&
+              !showVotingButtons && (
                 <RedCard>
                   <CardNoise />
                   <TYPE.white>
