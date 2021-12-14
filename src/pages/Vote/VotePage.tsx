@@ -32,6 +32,8 @@ import { ProposalStatus } from './styled'
 
 const RedCard = styled(Card)`
   background: #fb7c6d;
+  border-radius: 8px;
+  margin-top: 0.5rem;
 `
 
 const PageWrapper = styled(AutoColumn)`
