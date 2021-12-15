@@ -239,6 +239,7 @@ export default function VotePage({
                 <TYPE.white>Vote For</TYPE.white>
               </ButtonPrimary>
               <ButtonPrimary
+                style={{ background: '#fb7c6d' }}
                 padding="8px"
                 borderRadius="8px"
                 onClick={() => {
