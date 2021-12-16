@@ -108,7 +108,272 @@ export const VOTING_ESCROW: { [K in ChainId]: string } = {
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
-      name: 'USDC (Optics)',
+      name: 'USDC (Optics V2)',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xef4229c8c3250C675F21BCefa42f58EfbfF6002a'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xef4229c8c3250C675F21BCefa42f58EfbfF6002a',
+            decimals: 6,
+            symbol: 'cUSDC',
+            name: 'US Dollar Coin (Optics Bridge)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0x9906589Ea8fd27504974b7e8201DF5bBdE986b03',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x39b6F09ef97dB406ab78D869471adb2384C494E3',
+        18,
+        'MobLP',
+        'Mobius cUSD/cUSDC LP'
+      ),
+      swapFee: JSBI.multiply(JSBI.BigInt('2'), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 0,
+      gaugeAddress: '0xc96AeeaFF32129da934149F6134Aa7bf291a754E',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['29552083330000000'], // ['36940104160000000'], // ['7302827380000000']
+      displayChain: Chain.Ethereum,
+      coin: Coins.USD,
+    },
+    {
+      name: 'DAI (Optics V2)',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x90Ca507a5D4458a4C6C6249d186b6dCb02a5BCCd'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x90Ca507a5D4458a4C6C6249d186b6dCb02a5BCCd',
+            decimals: 18,
+            symbol: 'DAI',
+            name: 'Optics DAI',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_DAI.png',
+          },
+          []
+        ),
+      ],
+      address: '0xF3f65dFe0c8c8f2986da0FEc159ABE6fd4E700B4',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x274DD2dF039f1f6131419C82173D97770e6af6B7',
+        18,
+        'MobLP',
+        'Mobius cUSD/cDAI LP'
+      ),
+      swapFee: JSBI.multiply(JSBI.BigInt('2'), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 0,
+      gaugeAddress: '0xE1f9D952EecC07cfEFa69df9fBB0cEF260957119',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['14776041660000000'], //['18468900000000000'], // ['7302827380000000']
+      displayChain: Chain.Ethereum,
+      coin: Coins.USD,
+    },
+    {
+      name: 'WETH (Optics V2)',
+      tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0x122013fd7dF1C6F636a5bb8f03108E876548b455'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x2DEf4285787d58a2f811AF24755A8150622f4361',
+            decimals: 18,
+            symbol: 'cETH',
+            name: 'Wrapped Ethereum',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cETH.svg',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x122013fd7dF1C6F636a5bb8f03108E876548b455',
+            decimals: 18,
+            symbol: 'wETH',
+            name: 'Wrapped Ether (Optics Bridge)',
+            logoURI: 'https://etherscan.io/token/images/weth_28.png',
+          },
+          []
+        ),
+      ],
+      address: '0x74ef28D635c6C5800DD3Cd62d4c4f8752DaACB09',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x4fF08e2a4E7114af4B575AeF9250144f95790982',
+        18,
+        'MobLP',
+        'Mobius cETH/wETH LP'
+      ),
+      swapFee: JSBI.multiply(JSBI.BigInt('2'), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: 'Ξ',
+      pegComesAfter: true,
+      displayDecimals: 2,
+      gaugeAddress: '0x487c30CB18AA9Ced435911E2B414e0e85D7E52bB',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
+      displayChain: Chain.Ethereum,
+      coin: Coins.Ether,
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['3694010416000000'], // ['7302827380000000']
+    },
+    {
+      name: 'wBTC (Optics V2)',
+      tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBAAB46E28388d2779e6E31Fd00cF0e5Ad95E327B'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xD629eb00dEced2a080B7EC630eF6aC117e614f1b',
+            decimals: 18,
+            symbol: 'cBTC',
+            name: 'Wrapped Bitcoin',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cBTC.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xBAAB46E28388d2779e6E31Fd00cF0e5Ad95E327B',
+            decimals: 8,
+            symbol: 'wBTC',
+            name: 'Wrapped Bitcoin (Optics Bridge)',
+            logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
+          },
+          []
+        ),
+      ],
+      address: '0xaEFc4e8cF655a182E8346B24c8AbcE45616eE0d2',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x20d7274C5aF4f9DE6e8C93025e44aF3979d9Ab2b',
+        18,
+        'MobLP',
+        'Mobius cBTC/wBTC LP'
+      ),
+      swapFee: JSBI.multiply(JSBI.BigInt('2'), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('8')],
+      peggedTo: '₿',
+      pegComesAfter: true,
+      displayDecimals: 2,
+      gaugeAddress: '0x127b524c74C2162Ee4BB2e42d8d2eB9050C0293E',
+      totalMobiRate: JSBI.BigInt('440137000000000000'),
+      displayChain: Chain.Ethereum,
+      coin: Coins.Bitcoin,
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['3694010416000000'], // ['7302827380000000']
+    },
+    {
+      name: 'pUSDC (Optics V2)',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x1bfc26cE035c368503fAE319Cc2596716428ca44'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x1bfc26cE035c368503fAE319Cc2596716428ca44',
+            decimals: 6,
+            symbol: 'pUSDC',
+            name: 'USD Coin (PoS Optics)',
+            logoURI: 'https://bit.ly/3CwGimW',
+          },
+          []
+        ),
+      ],
+      address: '0xcCe0d62Ce14FB3e4363Eb92Db37Ff3630836c252',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x68b239b415970dD7a5234A9701cbB5BfaB544C7C',
+        18,
+        'MobLP',
+        'Mobius cUSD/pUSDC LP'
+      ),
+      swapFee: JSBI.multiply(JSBI.BigInt('2'), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('6')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 0,
+      gaugeAddress: '0x0A125D473cd3b1968e728DDF7d424c928C09222A',
+      totalMobiRate: JSBI.BigInt('1467123000000000000'),
+      additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
+      additionalRewardRate: ['7388020830000000'], //['11080000000000000'], // ['2190848200000000'],
+      displayChain: Chain.Polygon,
+      coin: Coins.USD,
+    },
+    {
+      name: 'USDC (Optics V1)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7'],
       tokens: [
         new WrappedTokenInfo(
@@ -127,7 +392,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0x2A3684e9Dc20B857375EA04235F2F7edBe818FA7',
             decimals: 6,
-            symbol: 'cUSDC',
+            symbol: 'cUSDCxV1',
             name: 'US Dollar Coin (Optics Bridge)',
             logoURI: 'https://bit.ly/3CwGimW',
           },
@@ -156,9 +421,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0xdAA2ab880b7f3D5697e6F85e63c28b9120AA9E07',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['7302827380000000'],
+      additionalRewardRate: ['0'], // ['7302827380000000']
       displayChain: Chain.Ethereum,
       coin: Coins.USD,
+      isKilled: true,
     },
     {
       name: 'aaUSDC (Allbridge)',
@@ -312,7 +578,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'pUSDC (Optics)',
+      name: 'pUSDC (Optics V1)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941'],
       tokens: [
         new WrappedTokenInfo(
@@ -331,7 +597,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xcC82628f6A8dEFA1e2B0aD7ed448bef3647F7941',
             decimals: 6,
-            symbol: 'pUSDC',
+            symbol: 'pUSDCxV1',
             name: 'USD Coin (PoS Optics)',
             logoURI: 'https://bit.ly/3CwGimW',
           },
@@ -360,12 +626,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x52517feb1Fc6141d5CF6718111C7Cc0FD764fA5d',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['2190848200000000'],
+      additionalRewardRate: ['0'], // ['2190848200000000'],
       displayChain: Chain.Polygon,
       coin: Coins.USD,
+      isKilled: true,
     },
     {
-      name: 'wBTC (Optics)',
+      name: 'wBTC (Optics V1)',
       tokenAddresses: ['0xD629eb00dEced2a080B7EC630eF6aC117e614f1b', '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE'],
       tokens: [
         new WrappedTokenInfo(
@@ -384,7 +651,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xBe50a3013A1c94768A1ABb78c3cB79AB28fc1aCE',
             decimals: 8,
-            symbol: 'wBTC(O)',
+            symbol: 'wBTCxV1',
             name: 'Wrapped Bitcoin (Optics Bridge)',
             logoURI: 'https://etherscan.io/token/images/wbtc_28.png?v=1',
           },
@@ -414,9 +681,10 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       displayChain: Chain.Ethereum,
       coin: Coins.Bitcoin,
+      isKilled: true,
     },
     {
-      name: 'WETH (Optics)',
+      name: 'WETH (Optics V1)',
       tokenAddresses: ['0x2DEf4285787d58a2f811AF24755A8150622f4361', '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4'],
       tokens: [
         new WrappedTokenInfo(
@@ -435,7 +703,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xE919F65739c26a42616b7b8eedC6b5524d1e3aC4',
             decimals: 18,
-            symbol: 'wETH',
+            symbol: 'wETHxV1',
             name: 'Wrapped Ether (Optics Bridge)',
             logoURI: 'https://etherscan.io/token/images/weth_28.png',
           },
@@ -465,6 +733,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       displayChain: Chain.Ethereum,
       coin: Coins.Ether,
+      isKilled: true,
     },
     {
       name: 'USDT (Moss)',
@@ -566,7 +835,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0xd1B3C05FE24bda6F52e704daf1ACBa8c440d8573',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['730282730000000'],
+      additionalRewardRate: ['0'], //['730282730000000'],
       displayChain: Chain.Ethereum,
       coin: Coins.USD,
     },

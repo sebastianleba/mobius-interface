@@ -147,7 +147,7 @@ export default function Manage({
     stakingInfo?.workingPercentage.greaterThan('0')
   ) {
     userExternalRates = stakingInfo.externalRewardRates.map(
-      (rate) => new TokenAmount(rate.token, stakingInfo.workingPercentage.multiply(rate.raw).toFixed(0))
+      (rate) => new TokenAmount(rate.token, stakingInfo.totalPercentage.multiply(rate.raw).toFixed(0))
     )
   }
 

@@ -25,6 +25,7 @@ interface GaugeVoteModalProps {
   isOpen: boolean
   onDismiss: () => void
   summary: GaugeSummary
+  disabled: boolean
 }
 
 export const getAllUnclaimedMobi = (summaries: GaugeSummary[]): JSBI =>
@@ -34,7 +35,7 @@ function daysBetween(d1: Date, d2: Date): number {
   return Math.floor((d1.getTime() - d2.getTime()) / (1000 * 3600 * 24))
 }
 
-export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVoteModalProps) {
+export default function GaugeVoteModal({ isOpen, onDismiss, summary, disabled }: GaugeVoteModalProps) {
   const { account } = useActiveContractKit()
 
   // monitor call to help UI loading state
@@ -61,7 +62,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
         .vote_for_gauge_weights(summary.address, input * 100, { gasLimit: 350000 })
         .then((response: TransactionResponse) => {
           addTransaction(response, {
-            summary: `Voted for ${summary.pool} to receive ${input}% of MOBI inflation`,
+            summary: `Voted ${disabled ? 'to burn' : `for ${summary.pool} to receive`} ${input}% of MOBI inflation`,
           })
           setHash(response.hash)
         })
@@ -86,7 +87,7 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
       {!attempting && !hash && (
         <ContentWrapper gap="lg">
           <RowBetween>
-            <TYPE.mediumHeader>Vote for {summary.pool}</TYPE.mediumHeader>
+            <TYPE.mediumHeader>Vote for {disabled ? 'BURN' : summary.pool}</TYPE.mediumHeader>
             <CloseIcon onClick={wrappedOnDismiss} />
           </RowBetween>
           {votesLeft === 0 ? (
@@ -122,7 +123,9 @@ export default function GaugeVoteModal({ isOpen, onDismiss, summary }: GaugeVote
                 </RowBetween>
               </>
               <RowFixed>
-                <TYPE.body>{`Vote for ${summary.pool} to receive ${input.toFixed(0)}% of inflation`}</TYPE.body>
+                <TYPE.body>{`Vote ${
+                  disabled ? 'to burn' : `for ${summary.pool} to receive`
+                } ${input}% of MOBI inflation`}</TYPE.body>
               </RowFixed>
               <ButtonError disabled={!!error} error={!!error} onClick={onClaimReward}>
                 {error ?? `Vote!`}

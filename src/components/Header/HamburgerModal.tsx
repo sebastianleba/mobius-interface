@@ -108,6 +108,10 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         <StyledNavLink id={`mint-nav-link`} to={'/mint'} onClick={onDismiss}>
           {t('Mint')}
         </StyledNavLink>
+        <StyledNavLink id={`migrate-nav-link`} to={'/opensum'} onClick={onDismiss}>
+          {t('Migrate')}
+        </StyledNavLink>
+
         <StyledNavLink
           id={`pool-nav-link`}
           to={'/pool'}

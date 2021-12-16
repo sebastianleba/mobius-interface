@@ -10,6 +10,7 @@ import { useLocation } from 'react-router'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import { FixedSizeList } from 'react-window'
 import { Text } from 'rebass'
+import { useOpticsV1Tokens, useOpticsV2Tokens } from 'state/openSum/hooks'
 import styled from 'styled-components'
 
 import { useActiveContractKit, useChainId } from '../../hooks'
@@ -19,6 +20,7 @@ import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
 import Column from '../Column'
+import { TokenType } from '../CurrencyInputPanel'
 import Row, { RowBetween } from '../Row'
 import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
@@ -53,6 +55,7 @@ interface CurrencySearchProps {
   showImportView: () => void
   setImportToken: (token: Token) => void
   mento?: boolean
+  tokenType?: TokenType
 }
 
 export function CurrencySearch({
@@ -65,6 +68,7 @@ export function CurrencySearch({
   showManageView,
   showImportView,
   setImportToken,
+  tokenType,
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { chainId } = useActiveContractKit()
@@ -84,10 +88,19 @@ export function CurrencySearch({
   const searchToken = useToken(location.pathname.includes('mint'), searchQuery)
   const [tokensInSamePool] = useTokensTradeable(location.pathname.includes('mint'), otherSelectedCurrency)
   const bridgeableTokens = useBridgeableTokens()
+  const opticsV1 = useOpticsV1Tokens()
+  const opticsV2 = useOpticsV2Tokens()
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
   if (location.pathname.includes('optics')) {
     tokensToSelect = bridgeableTokens
+  }
+  if (tokenType) {
+    if (tokenType === TokenType.OpticsV1) {
+      tokensToSelect = opticsV1
+    } else if (tokenType === TokenType.OpticsV2) {
+      tokensToSelect = opticsV2
+    }
   }
   useEffect(() => {
     if (isAddressSearch) {

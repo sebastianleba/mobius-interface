@@ -21,13 +21,6 @@ export function useTokensTradeable(
   if (!mento) pools[chainId].forEach((pool: StableSwapConstants) => (poolMap[pool.name] = pool))
 
   pools[chainId]
-    .map((pool) => {
-      if (!pool.metaPool) return pool
-      return {
-        ...pool,
-        tokens: poolMap[pool.metaPool]?.tokens.concat(pool.tokens),
-      }
-    })
     .filter(
       ({ tokens, disabled }) =>
         tokens

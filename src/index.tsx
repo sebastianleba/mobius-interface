@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 import { UpdateMento } from 'state/mentoPools/updater'
+import { UpdateOpenSum } from 'state/openSum/updater'
 import { BatchUpdateGauges, UpdateVariablePoolInfo } from 'state/stablePools/updater'
 import StakingUpdater from 'state/staking/updater'
 
@@ -67,6 +68,7 @@ function Updaters() {
       <StakingUpdater />
       <UpdateMento />
       <PriceData />
+      <UpdateOpenSum />
     </>
   )
 }
