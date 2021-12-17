@@ -6,6 +6,7 @@ import Row, { RowBetween, RowFixed } from 'components/Row'
 import Toggle from 'components/Toggle'
 import VolumeChart from 'components/VolumeChart'
 import { ChainLogo, Coins, PRICE } from 'constants/StablePools'
+import useTheme from 'hooks/useTheme'
 import { useWindowSize } from 'hooks/useWindowSize'
 import React, { useState } from 'react'
 import { isMobile } from 'react-device-detect'
@@ -134,6 +135,7 @@ export default function Charts() {
   const [showPoolSelect, setShowPoolSelect] = useState(false)
   const pools = usePools().slice()
   const { width } = useWindowSize()
+  const theme = useTheme()
 
   const totals = data
     ? data.swaps.reduce((accum, info) => {
@@ -178,6 +180,10 @@ export default function Charts() {
       <Row>
         {!loading && !error && (
           <ChartContainer paddingBottom="10rem">
+            <TYPE.mediumHeader marginRight="auto" marginLeft="auto" textAlign="center">
+              Volume Over Time
+            </TYPE.mediumHeader>
+
             <RowBetween>
               <RowFixed>
                 <Sel selected={granularity === Granularity.Hour} onClick={() => setGranularity(Granularity.Hour)}>
@@ -191,7 +197,8 @@ export default function Charts() {
                 </Sel>
               </RowFixed>
               <SelectPoolsButton onMouseEnter={() => setShowPoolSelect(true)}>
-                Select Pools{' '}
+                <TYPE.mediumHeader color={theme.primary1}>Select Pools</TYPE.mediumHeader>
+
                 {showPoolSelect && (
                   <PoolDropDown onMouseLeave={() => setShowPoolSelect(false)}>
                     {' '}
