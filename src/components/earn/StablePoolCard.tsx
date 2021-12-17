@@ -1,4 +1,5 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
+import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
 import { ChainLogo, Coins } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
@@ -354,15 +355,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </TYPE.subHeader>
           </RowFixed>
         ) : (
-          feesGenerated && (
-            <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-              Fees Generated: {pegComesAfter ? '' : peggedTo}
-              {feesGenerated.denominator.toString() !== '0'
-                ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
-                : '-'}
-              {pegComesAfter ? peggedTo : ''}
-            </TYPE.subHeader>
-          )
+          <RowFixed>
+            <Loader />
+            <TYPE.main marginLeft="0.5rem">APY Loading</TYPE.main>
+          </RowFixed>
         )}
       </TopSection>
       <SecondSection>
@@ -404,11 +400,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               : '-'}
             {pegComesAfter ? peggedTo : ''}
           </TYPE.subHeader>
-        ) : (
-          <TYPE.black fontWeight={600} fontSize={[14, 18]}>
-            Coming Soon!
-          </TYPE.black>
-        )}
+        ) : null}
       </SecondSection>
       <InfoContainer>
         <div style={{ flex: 3, width: '100%' }}>
