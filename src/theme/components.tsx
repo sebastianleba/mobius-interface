@@ -22,6 +22,25 @@ export const ButtonText = styled.button`
     text-decoration: underline;
   }
 `
+export const Sel = styled.div<{ selected: boolean }>`
+  ${({ theme }) => theme.flexRowNoWrap}
+  align-items: left;
+  border-radius: ${({ selected }) => (selected ? '12px' : '3rem')};
+  outline: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: ${({ theme, selected }) => (selected ? theme.white : theme.text1)};
+  font-size: 1rem;
+  font-weight: ${({ selected }) => (selected ? '999' : '300')};
+  padding: 8px 12px;
+  word-break: break-word;
+  overflow: hidden;
+  white-space: nowrap;
+  background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+    font-size: 0.7rem;
+  `}
+`
 
 export const Button = styled.button.attrs<{ warning: boolean }, { backgroundColor: string }>(({ warning, theme }) => ({
   backgroundColor: warning ? theme.red1 : theme.primary1,

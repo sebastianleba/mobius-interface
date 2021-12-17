@@ -1,16 +1,18 @@
 import { gql, useQuery } from '@apollo/client'
+import Card from 'components/Card'
 import { AutoColumn } from 'components/Column'
 import Logo from 'components/Logo'
 import Row, { RowBetween, RowFixed } from 'components/Row'
 import Toggle from 'components/Toggle'
 import VolumeChart from 'components/VolumeChart'
 import { ChainLogo, Coins, PRICE } from 'constants/StablePools'
-import React, { useEffect, useState } from 'react'
+import { useWindowSize } from 'hooks/useWindowSize'
+import React, { useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { usePools } from 'state/stablePools/hooks'
 import { StableSwapPool } from 'state/stablePools/reducer'
 import styled from 'styled-components'
-import { TYPE } from 'theme'
+import { Sel, TYPE } from 'theme'
 
 const TextContainer = styled.div`
   width: 100%;
@@ -53,12 +55,32 @@ const StyledLogo = styled(Logo)<{ size: string }>`
 `
 
 const PoolSelection = styled(RowBetween)`
-  width: 25rem;
   padding: 0.5rem;
   background: ${({ theme }) => theme.bg1};
   margin: 0.1rem;
   border-radius: 10px;
 `
+
+const ChartContainer = styled(Card)`
+  background: ${({ theme }) => theme.bg1};
+  padding-bottom: 5rem;
+`
+
+const PoolDropDown = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 999;
+  background: ${({ theme }) => theme.bg4};
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  width: min(420px, 80vw);
+`
+
+const SelectPoolsButton = styled.div`
+  position: relative;
+`
+
 const volumeQuery = gql`
   {
     swaps {
@@ -83,15 +105,21 @@ const volumeQuery = gql`
   }
 `
 enum Granularity {
-  Hour,
-  Day,
-  Week,
+  Hour = 1,
+  Day = 2,
+  Week = 3,
+}
+
+const granularityMapping: { [g in Granularity]: string } = {
+  [Granularity.Hour]: 'hourlyVolumes',
+  [Granularity.Day]: 'dailyVolumes',
+  [Granularity.Week]: 'weeklyVolumes',
 }
 
 const timeFormat: { [g: Granularity]: (n: number) => string } = {
-  [Granularity.Hour]: (t: number) => new Date(t * 1000).getHours(),
-  [Granularity.Day]: (t: number) => new Date(t * 1000).getDate(),
-  [Granularity.Week]: (t: number) => new Date(t * 1000).getDate(),
+  [Granularity.Hour]: (t: number) => new Date(t * 1000).toLocaleTimeString(),
+  [Granularity.Day]: (t: number) => new Date(t * 1000).toLocaleDateString(),
+  [Granularity.Week]: (t: number) => new Date(t * 1000).toLocaleDateString(),
 }
 
 function getPoolName(pools: StableSwapPool[], address: string) {
@@ -100,14 +128,12 @@ function getPoolName(pools: StableSwapPool[], address: string) {
 
 export default function Charts() {
   const { data, loading, error } = useQuery(volumeQuery)
-  const [granularity, setGranularity] = useState<Granularity>(Granularity.Day)
+  const [granularity, setGranularity] = useState<Granularity>(Granularity.Week)
   const [showTotal, setShowTotal] = useState(true)
-  const [selectedPools, setSelectedPools] = useState<Set<string>>(new Set())
+  const [selectedPools, setSelectedPools] = useState<Record<string, number | undefined>>({})
+  const [showPoolSelect, setShowPoolSelect] = useState(false)
   const pools = usePools().slice()
-
-  useEffect(() => {
-    console.log(data)
-  }, [data, loading])
+  const { width } = useWindowSize()
 
   const totals = data
     ? data.swaps.reduce((accum, info) => {
@@ -117,30 +143,33 @@ export default function Charts() {
             : info.id === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'.toLowerCase()
             ? PRICE[Coins.Ether]
             : PRICE[Coins.USD]
-        info.weeklyVolumes.forEach((vol, i) => {
+        info[granularityMapping[granularity]].forEach((vol, i) => {
           accum[vol.timestamp] = price * parseInt(vol.volume) + (accum[vol.timestamp] ?? 0)
         })
         return accum
       }, {})
     : undefined
-  console.log(totals)
 
-  const dataAndLabels = data
+  let dataAndLabels = data
     ? data.swaps
-        .filter(({ id }: { id: string }) => selectedPools.has(id))
-        .map(({ id, weeklyVolumes }) => [
-          getPoolName(pools, id),
-          weeklyVolumes.map((vol) => ({
+        .filter(({ id }: { id: string }) => selectedPools[id])
+        .sort((p1, p2) => {
+          if (selectedPools[p1.id] < selectedPools[p2.id]) return 1
+          if (selectedPools[p1.id] > selectedPools[p2.id]) return -1
+          return 0
+        })
+        .map((info) => [
+          getPoolName(pools, info.id),
+          info[granularityMapping[granularity]].map((vol) => ({
             x: parseInt(vol.timestamp),
             y: parseInt(vol.volume),
           })),
         ])
     : []
-
   if (showTotal && totals) {
     dataAndLabels.push(['Total', Object.entries(totals).map(([time, vol]) => ({ x: time, y: vol }))])
-    console.log(dataAndLabels)
   }
+  dataAndLabels = dataAndLabels.reverse()
   const chartData = dataAndLabels.map((group) => group[1])
   const labels = dataAndLabels.map((group) => group[0])
 
@@ -148,40 +177,69 @@ export default function Charts() {
     <OuterContainer>
       <Row>
         {!loading && !error && (
-          <VolumeChart data={chartData} labels={labels} xLabelFormat={timeFormat[Granularity.Day]} />
-        )}
-        <AutoColumn>
-          <PoolSelection>
-            <RowFixed>
-              <TYPE.mediumHeader>Total</TYPE.mediumHeader>
-            </RowFixed>
-            <Toggle isActive={showTotal} toggle={() => setShowTotal(!showTotal)} />
-          </PoolSelection>
+          <ChartContainer paddingBottom="10rem">
+            <RowBetween>
+              <RowFixed>
+                <Sel selected={granularity === Granularity.Hour} onClick={() => setGranularity(Granularity.Hour)}>
+                  1hr
+                </Sel>
+                <Sel selected={granularity === Granularity.Day} onClick={() => setGranularity(Granularity.Day)}>
+                  24hr
+                </Sel>
+                <Sel selected={granularity === Granularity.Week} onClick={() => setGranularity(Granularity.Week)}>
+                  7d
+                </Sel>
+              </RowFixed>
+              <SelectPoolsButton onMouseEnter={() => setShowPoolSelect(true)}>
+                Select Pools{' '}
+                {showPoolSelect && (
+                  <PoolDropDown onMouseLeave={() => setShowPoolSelect(false)}>
+                    {' '}
+                    <AutoColumn>
+                      <PoolSelection>
+                        <RowFixed>
+                          <TYPE.mediumHeader>Total</TYPE.mediumHeader>
+                        </RowFixed>
+                        <Toggle isActive={showTotal} toggle={() => setShowTotal(!showTotal)} />
+                      </PoolSelection>
 
-          {pools
-            .sort((p1, p2) => p1.displayChain - p2.displayChain)
-            .filter(({ disabled }) => !disabled)
-            .map((p) => (
-              <PoolSelection key={`charts-${p.name}`}>
-                <RowFixed>
-                  <StyledLogo size={'32px'} srcs={[ChainLogo[p.displayChain]]} alt={'logo'} />{' '}
-                  <TYPE.mediumHeader style={{ marginLeft: '0.2rem' }}>{p.name}</TYPE.mediumHeader>
-                </RowFixed>
-                <Toggle
-                  isActive={selectedPools.has(p.address.toLowerCase())}
-                  toggle={() => {
-                    const newSet = new Set(selectedPools)
-                    if (selectedPools.has(p.address.toLowerCase())) {
-                      newSet.delete(p.address.toLowerCase())
-                    } else {
-                      newSet.add(p.address.toLowerCase())
-                    }
-                    setSelectedPools(newSet)
-                  }}
-                />
-              </PoolSelection>
-            ))}
-        </AutoColumn>
+                      {pools
+                        .sort((p1, p2) => p1.displayChain - p2.displayChain)
+                        .filter(({ disabled }) => !disabled)
+                        .map((p) => (
+                          <PoolSelection key={`charts-${p.name}`}>
+                            <RowFixed>
+                              <StyledLogo size={'32px'} srcs={[ChainLogo[p.displayChain]]} alt={'logo'} />{' '}
+                              <TYPE.mediumHeader style={{ marginLeft: '0.2rem' }}>{p.name}</TYPE.mediumHeader>
+                            </RowFixed>
+                            <Toggle
+                              isActive={!!selectedPools[p.address.toLowerCase()]}
+                              toggle={() => {
+                                if (selectedPools[p.address.toLowerCase()]) {
+                                  setSelectedPools({ ...selectedPools, [p.address.toLowerCase()]: undefined })
+                                } else {
+                                  setSelectedPools({
+                                    ...selectedPools,
+                                    [p.address.toLowerCase()]: Object.keys(selectedPools).length + 1,
+                                  })
+                                }
+                              }}
+                            />
+                          </PoolSelection>
+                        ))}
+                    </AutoColumn>
+                  </PoolDropDown>
+                )}
+              </SelectPoolsButton>
+            </RowBetween>
+            <VolumeChart
+              data={chartData}
+              labels={labels}
+              width={Math.min(0.9 * width, 0.95 * 1280)}
+              xLabelFormat={timeFormat[granularity]}
+            />
+          </ChartContainer>
+        )}
       </Row>
     </OuterContainer>
   )

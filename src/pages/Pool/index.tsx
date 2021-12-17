@@ -13,7 +13,7 @@ import { StablePoolCard } from '../../components/earn/StablePoolCard'
 import Loader from '../../components/Loader'
 import { Row } from '../../components/Row'
 import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
-import { TYPE } from '../../theme'
+import { Sel, TYPE } from '../../theme'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -40,26 +40,6 @@ const HeaderLinks = styled(Row)`
   grid-auto-flow: column;
   grid-gap: 10px;
   align-items: center;
-`
-
-const Sel = styled.div<{ selected: boolean }>`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: left;
-  border-radius: ${({ selected }) => (selected ? '12px' : '3rem')};
-  outline: none;
-  cursor: pointer;
-  text-decoration: none;
-  color: ${({ theme, selected }) => (selected ? theme.white : theme.text1)};
-  font-size: 1rem;
-  font-weight: ${({ selected }) => (selected ? '999' : '300')};
-  padding: 8px 12px;
-  word-break: break-word;
-  overflow: hidden;
-  white-space: nowrap;
-  background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: 0.7rem;
-  `}
 `
 
 export default function Pool() {
