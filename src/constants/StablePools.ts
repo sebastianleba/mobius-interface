@@ -127,7 +127,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xEadf4A7168A82D30Ba0619e64d5BCf5B30B45226',
             decimals: 18,
-            symbol: 'pUSDV2',
+            symbol: 'pUSD',
             name: 'Poof USD V2',
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
           },
@@ -135,7 +135,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0xa2F0E57d4cEAcF025E81C76f28b9Ad6E9Fbe8735',
-      lpToken: new Token(ChainId.MAINNET, '0x07e137E5605E15C93f22545868Fa70CECfCbbFFE', 18, 'MobLP', 'Mobius pUSD LP'),
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x07e137E5605E15C93f22545868Fa70CECfCbbFFE',
+        18,
+        'MobLP',
+        'Mobius pUSD V2 LP'
+      ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -173,7 +179,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
           {
             address: '0x301a61D01A63c8D670c2B8a43f37d12eF181F997',
             name: 'Poof Celo V2',
-            symbol: 'pCELOV2',
+            symbol: 'pCELO',
             chainId: 42220,
             decimals: 18,
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pCELO.png',
@@ -182,7 +188,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0xFc9e2C63370D8deb3521922a7B2b60f4Cff7e75a',
-      lpToken: new Token(ChainId.MAINNET, '0xAfFD8d6b5e5A0e25034DD3D075532F9CE01C305c', 18, 'MobLP', 'Mobius pCelo LP'),
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0xAfFD8d6b5e5A0e25034DD3D075532F9CE01C305c',
+        18,
+        'MobLP',
+        'Mobius pCelo V2 LP'
+      ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -221,8 +233,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         new WrappedTokenInfo(
           {
             address: '0xD8761DD6c7cB54febD33adD699F5E4440b62E01B',
-            name: 'Poof EUR V2',
-            symbol: 'pEURV2',
+            name: 'Poof EUR',
+            symbol: 'pEUR',
             chainId: 42220,
             decimals: 18,
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pEUR.png',
@@ -231,7 +243,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0x23C95678862a229fAC088bd9705622d78130bC3e',
-      lpToken: new Token(ChainId.MAINNET, '0xec8e37876Fd9De919B58788B87A078e546149F87', 18, 'MobLP', 'Mobius pEUR LP'),
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0xec8e37876Fd9De919B58788B87A078e546149F87',
+        18,
+        'MobLP',
+        'Mobius pEUR V2 LP'
+      ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -623,7 +641,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'Private cUSD',
+      name: 'Private cUSD V1',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809'],
       tokens: [
         new WrappedTokenInfo(
@@ -642,15 +660,21 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809',
             decimals: 18,
-            symbol: 'pUSD',
-            name: 'Poof USD',
+            symbol: 'pUSDxV1',
+            name: 'Poof USD V1',
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
           },
           []
         ),
       ],
       address: '0x02Db089fb09Fda92e05e92aFcd41D9AAfE9C7C7C',
-      lpToken: new Token(ChainId.MAINNET, '0x18d71b8664E69D6Dd61C79247dBf12bFAaf66C10', 18, 'MobLP', 'Mobius pUSD LP'),
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x18d71b8664E69D6Dd61C79247dBf12bFAaf66C10',
+        18,
+        'MobLP',
+        'Mobius pUSD V1 LP'
+      ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -1002,8 +1026,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         new WrappedTokenInfo(
           {
             address: '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1',
-            name: 'Poof Celo',
-            symbol: 'pCELO',
+            name: 'Poof Celo V1',
+            symbol: 'pCELOxV1',
             chainId: 42220,
             decimals: 18,
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pCELO.png',
@@ -1012,7 +1036,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0x413FfCc28e6cDDE7e93625Ef4742810fE9738578',
-      lpToken: new Token(ChainId.MAINNET, '0x4D6B17828d0173668e8Eb730106444556a98c0F9', 18, 'MobLP', 'Mobius pCelo LP'),
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x4D6B17828d0173668e8Eb730106444556a98c0F9',
+        18,
+        'MobLP',
+        'Mobius pCelo V1 LP'
+      ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -1034,7 +1064,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.Celo,
     },
     {
-      name: 'Private cEUR',
+      name: 'Private cEUR V1',
       tokenAddresses: ['0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73', '0x56072D4832642dB29225dA12d6Fd1290E4744682'],
       tokens: [
         new WrappedTokenInfo(
@@ -1051,8 +1081,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         new WrappedTokenInfo(
           {
             address: '0x56072D4832642dB29225dA12d6Fd1290E4744682',
-            name: 'Poof EUR',
-            symbol: 'pEUR',
+            name: 'Poof EUR V1',
+            symbol: 'pEURxV1',
             chainId: 42220,
             decimals: 18,
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pEUR.png',
@@ -1061,7 +1091,13 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         ),
       ],
       address: '0x382Ed834c6b7dBD10E4798B08889eaEd1455E820',
-      lpToken: new Token(ChainId.MAINNET, '0x2642Ab16Bfb7A8b36EE42c9CbA2289C4Ca9F33b9', 18, 'MobLP', 'Mobius pEUR LP'),
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x2642Ab16Bfb7A8b36EE42c9CbA2289C4Ca9F33b9',
+        18,
+        'MobLP',
+        'Mobius pEUR V1 LP'
+      ),
       swapFee: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7')),
       rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
       lendingPrecision: JSBI.BigInt('1'),
@@ -1083,7 +1119,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.Eur,
     },
     {
-      name: 'Private cUSD [DISABLED]',
+      name: 'Private cUSD V1 [DISABLED]',
       tokenAddresses: ['0xB4aa2986622249B1F45eb93F28Cfca2b2606d809'],
       tokens: [
         new WrappedTokenInfo(
@@ -1091,8 +1127,8 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
             chainId: ChainId.MAINNET,
             address: '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809',
             decimals: 18,
-            symbol: 'pUSD',
-            name: 'Poof USD',
+            symbol: 'pUSDxV1',
+            name: 'Poof USD V1',
             logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_pUSD.png',
           },
           []
