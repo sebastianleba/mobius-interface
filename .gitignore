@@ -27,7 +27,6 @@ notes.txt
 .idea/
 
 package-lock.json
-yarn.lock
 
 /src/generated
 .eslintcache
