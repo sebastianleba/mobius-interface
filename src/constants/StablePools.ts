@@ -689,7 +689,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x2459BDb59a3BF6Ab6C412Ac0b220e7CDA1D4ea26',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
-      additionalRewardRate: ['11810185180000000', '16534391530000000'],
+      additionalRewardRate: ['0', '0'],
       displayChain: Chain.Celo,
       coin: Coins.USD,
     },
@@ -1009,7 +1009,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       coin: Coins.USD,
     },
     {
-      name: 'Private CELO',
+      name: 'Private CELO V1',
       tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1'],
       tokens: [
         new WrappedTokenInfo(
@@ -1057,7 +1057,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x5489b2F0A1992b889F47601D71E068Fd15c63f26',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
-      additionalRewardRate: ['11810185180000000', '8267195760000000'],
+      additionalRewardRate: ['0', '0'],
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
       displayChain: Chain.Celo,
@@ -1112,7 +1112,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0xCF34F4ec5DC9E09428A4f4a45475f6277694166c',
       totalMobiRate: JSBI.BigInt('440137000000000000'),
       additionalRewards: ['0x00400FcbF0816bebB94654259de7273f4A05c762', '0x17700282592D6917F6A73D0bF8AcCf4D578c131e'],
-      additionalRewardRate: ['11810185180000000', '8267195760000000'],
+      additionalRewardRate: ['0', '0'],
       // additionalRewards: [''],
       // additionalRewardRate: ['730282730000000'],
       displayChain: Chain.Celo,
