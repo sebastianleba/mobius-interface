@@ -1,11 +1,8 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
 import { GOVERNANCE_ADDRESS } from 'constants/governance'
-import {
-  GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS,
-  MOBIUS_MINTER_ADDRESS,
-  VOTING_ESCROW as VOTING_ESCROW_ADDRESS,
-} from 'constants/StablePools'
+import { GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS, MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
+import { VEMOBI } from 'constants/tokens'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
@@ -53,7 +50,7 @@ import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account, chainId } = useActiveContractKit()
+  const { library, account } = useActiveContractKit()
 
   return useMemo(() => {
     if (!address || !ABI || !library) return null
@@ -104,7 +101,7 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
 export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
   const { chainId } = useActiveContractKit()
 
-  return useContract(address ?? VOTING_ESCROW_ADDRESS[chainId], VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
+  return useContract(address ?? VEMOBI[chainId].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {

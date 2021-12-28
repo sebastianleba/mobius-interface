@@ -22,19 +22,6 @@ const mobiToken = (chainId: number, address: string) =>
     []
   )
 
-const veMobiToken = (chainId: number, address: string) =>
-  new WrappedTokenInfo(
-    {
-      chainId,
-      address,
-      decimals: 18,
-      symbol: 'veMOBI',
-      name: 'Voting-Escrowed MOBI',
-      logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_MOBI.png',
-    },
-    []
-  )
-
 export enum Coins {
   Bitcoin,
   Ether,
@@ -87,21 +74,9 @@ export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
   [ChainId.BAKLAVA]: undefined,
 }
 
-export const veMOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
-  [ChainId.MAINNET]: veMobiToken(ChainId.MAINNET, '0xE9d0375cd6fC027A1a0eC39BB4c9928E5aBec27e'),
-  [ChainId.ALFAJORES]: veMobiToken(ChainId.ALFAJORES, '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7'),
-  [ChainId.BAKLAVA]: undefined,
-}
-
 export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
   [ChainId.MAINNET]: '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25',
   [ChainId.ALFAJORES]: '0x00063Fbe0c90834EE90C6191d0D9F04eaB01A14f',
-  [ChainId.BAKLAVA]: '',
-}
-
-export const VOTING_ESCROW: { [K in ChainId]: string } = {
-  [ChainId.MAINNET]: '0xE9d0375cd6fC027A1a0eC39BB4c9928E5aBec27e',
-  [ChainId.ALFAJORES]: '0x7d64708ecf5201cfE74364424AddB0A8FD32174f',
   [ChainId.BAKLAVA]: '',
 }
 
