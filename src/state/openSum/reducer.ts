@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit'
-import { JSBI } from '@ubeswap/sdk'
+import { JSBI, Token } from '@ubeswap/sdk'
 import { NETWORK_CHAIN_ID } from 'connectors'
 import { ConstantSum } from 'constants/ConstantSum'
 import { WrappedTokenInfo } from 'state/lists/hooks'
@@ -9,6 +9,7 @@ import { updateBalances } from './actions'
 export type ConstantSumPool = {
   name: string
   address: string
+  lpToken: Token
   tokens: [WrappedTokenInfo, WrappedTokenInfo]
   balances?: JSBI[]
 }

@@ -1,10 +1,11 @@
-import { ChainId } from '@ubeswap/sdk'
+import { ChainId, Token } from '@ubeswap/sdk'
 import { WrappedTokenInfo } from 'state/lists/hooks'
 
 export type ConstantSumInfo = {
   name: string
   address: string
   tokens: [WrappedTokenInfo, WrappedTokenInfo]
+  lpToken: Token
 }
 
 export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
@@ -13,6 +14,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
       // wETH v1/v2 pool
       name: 'wETH v1/v2 pool',
       address: '0xb1a0BDe36341065cA916c9f5619aCA82A43659A3',
+      lpToken: new Token(ChainId.MAINNET, '0x772bf80363d40c6a8305da935c063cd3203d16cc', 18),
       tokens: [
         new WrappedTokenInfo(
           {
@@ -39,9 +41,10 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
       ],
     },
     // {
-    //   // wETH v1/v2 pool
+    //   // wETH v1/v2 pool 0x4a4cd1df17c79ef74733e46a84e37b7f6b9ea914
     //   name: 'TEST v1/v2 pool',
     //   address: '0x7e0B5284864916A866Fc391454ac2f452F91a336',
+    //   lpToken: new Token(ChainId.MAINNET, '0x4a4cd1df17c79ef74733e46a84e37b7f6b9ea914', 18),
     //   tokens: [
     //     new WrappedTokenInfo(
     //       {
@@ -71,6 +74,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
       // BTC v1/v2
       name: 'wBTC v1/v2 pool',
       address: '0xd5ab1BA8b2Ec70752068d1d728e728eAd0E19CBA',
+      lpToken: new Token(ChainId.MAINNET, '0x301897c5fc341ec0daab2b61893cb8e5d314a1b1', 18),
       tokens: [
         new WrappedTokenInfo(
           {
@@ -100,6 +104,7 @@ export const ConstantSum: { [K in ChainId]: ConstantSumInfo[] | undefined } = {
       // USDC v1/v2
       name: 'USDC v1/v2 pool',
       address: '0x70bfA1C8Ab4e42B9BE74f65941EFb6e5308148c7',
+      lpToken: new Token(ChainId.MAINNET, '0xe440a01eaf67b88381f2baa7de4538f8503683a0', 18),
       tokens: [
         new WrappedTokenInfo(
           {

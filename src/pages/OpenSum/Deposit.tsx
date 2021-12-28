@@ -1,3 +1,5 @@
+import OpenSumWithdrawModal from 'components/earn/OpenSumWithdrawModal'
+import { RowBetween } from 'components/Row'
 import React, { useState } from 'react'
 import Countdown from 'react-countdown'
 import { NavLink } from 'react-router-dom'
@@ -143,13 +145,21 @@ export default function OpenSumDeposit() {
 
 function OpenPoolCard({ poolInfo }: { poolInfo: ConstantSumPool }) {
   const [openModal, setOpenModal] = useState(false)
+  const [openWithdraw, setOpenWithdraw] = useState(false)
   return (
     <>
       <OpenSumDepositModal isOpen={openModal} onDismiss={() => setOpenModal(false)} poolInfo={poolInfo} />
-      <ButtonConfirmed
-        marginBottom="1rem"
-        onClick={() => setOpenModal(true)}
-      >{`Deposit into ${poolInfo.name} pool`}</ButtonConfirmed>
+      <OpenSumWithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
+      <RowBetween>
+        <ButtonConfirmed
+          marginBottom="1rem"
+          onClick={() => setOpenModal(true)}
+        >{`Deposit into ${poolInfo.name} pool`}</ButtonConfirmed>
+        <ButtonConfirmed
+          marginBottom="1rem"
+          onClick={() => setOpenWithdraw(true)}
+        >{`Withdraw from ${poolInfo.name} pool`}</ButtonConfirmed>
+      </RowBetween>
     </>
   )
 }
