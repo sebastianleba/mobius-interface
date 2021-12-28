@@ -1,12 +1,11 @@
 import { parseUnits } from '@ethersproject/units'
-import { ChainId, cUSD, JSBI, Price, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
+import { ChainId, cUSD, JSBI, Price, Token, TokenAmount, TradeType } from '@ubeswap/sdk'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { MentoPool } from 'state/mentoPools/reducer'
 import { MentoMath } from 'utils/mentoMath'
 
-import { ROUTER_ADDRESS } from '../../constants'
 import { useActiveContractKit } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import useENS from '../../hooks/useENS'
@@ -17,8 +16,6 @@ import { useCurrentPool, useMathUtil, usePools } from '../mentoPools/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, replaceSwapState, selectCurrency, setRecipient, switchCurrencies, typeInput } from './actions'
 import { SwapState } from './reducer'
-
-const ZERO = JSBI.BigInt('0')
 
 export function useSwapState(): AppState['swap'] {
   return useSelector<AppState, AppState['swap']>((state) => state.swap)
@@ -85,25 +82,6 @@ export function tryParseAmount(value?: string, currency?: Token): TokenAmount | 
   }
   // necessary for all paths to return a value
   return undefined
-}
-
-const BAD_RECIPIENT_ADDRESSES: string[] = [
-  '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f', // v2 factory
-  '0xf164fC0Ec4E93095b804a4795bBe1e041497b92a', // v2 router 01
-  '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // v2 router 02
-  ROUTER_ADDRESS,
-]
-
-/**
- * Returns true if any of the pairs or tokens in a trade have the given checksummed address
- * @param trade to check for the given address
- * @param checksummedAddress address to check in the pairs and tokens
- */
-function involvesAddress(trade: Trade, checksummedAddress: string): boolean {
-  return (
-    trade.route.path.some((token) => token.address === checksummedAddress) ||
-    trade.route.pairs.some((pair) => pair.liquidityToken.address === checksummedAddress)
-  )
 }
 
 export type MentoTrade = {
@@ -218,11 +196,8 @@ export function useMentoTradeInfo(): {
   const formattedTo = isAddress(to)
   if (!to || !formattedTo) {
     inputError = inputError ?? 'Enter a recipient'
-  } else {
-    if (BAD_RECIPIENT_ADDRESSES.indexOf(formattedTo) !== -1) {
-      inputError = inputError ?? 'Invalid recipient'
-    }
   }
+
   if (!inputCurrency || !outputCurrency || !parsedAmount || poolsLoading) {
     return {
       currencies,

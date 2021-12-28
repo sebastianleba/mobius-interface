@@ -4,13 +4,10 @@ import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
-import { Exchange, IUniswapV2Router02, Swap, UbeswapMoolaRouter } from 'generated/index'
+import { Exchange, Swap } from 'generated/index'
 
-import { ROUTER_ADDRESS, UBESWAP_MOOLA_ROUTER_ADDRESS } from '../constants'
 import EXCHANGE from '../constants/abis/Exchange.json'
-import IUniswapV2Router02ABI from '../constants/abis/IUniswapV2Router02.json'
 import SWAP from '../constants/abis/Swap.json'
-import UbeswapMoolaRouterABI from '../constants/abis/UbeswapMoolaRouter.json'
 import { TokenAddressMap } from '../state/lists/hooks'
 
 // returns the checksummed address if the address is valid, otherwise returns false
@@ -68,15 +65,6 @@ export function getContract(address: string, ABI: any, library: Web3Provider, ac
   }
 
   return new Contract(address, ABI, getProviderOrSigner(library, account) as any)
-}
-
-// account is optional
-export function getRouterContract(_: number, library: Web3Provider, account?: string): IUniswapV2Router02 {
-  return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account) as IUniswapV2Router02
-}
-
-export function getMoolaRouterContract(_: number, library: Web3Provider, account?: string): UbeswapMoolaRouter {
-  return getContract(UBESWAP_MOOLA_ROUTER_ADDRESS, UbeswapMoolaRouterABI, library, account) as UbeswapMoolaRouter
 }
 
 export function escapeRegExp(string: string): string {

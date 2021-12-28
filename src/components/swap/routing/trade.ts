@@ -1,5 +1,4 @@
 import { Route, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
-import { ROUTER_ADDRESS } from 'constants/index'
 
 export interface TradeRouter {
   routerAddress?: string
@@ -7,10 +6,6 @@ export interface TradeRouter {
 
 export interface PoolLocation {
   poolAddress?: string
-}
-
-export const defaultRouter: TradeRouter = {
-  routerAddress: ROUTER_ADDRESS,
 }
 
 export class UbeswapTrade extends Trade {
@@ -35,7 +30,7 @@ export class UbeswapTrade extends Trade {
   }
 
   static fromNormalTrade(trade: Trade): UbeswapTrade {
-    return UbeswapTrade.fromInnerTrade(trade, defaultRouter, trade.route.path)
+    return UbeswapTrade.fromInnerTrade(trade, null, trade.route.path)
   }
 }
 

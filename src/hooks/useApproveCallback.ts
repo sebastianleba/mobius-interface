@@ -2,15 +2,11 @@ import { useContractKit, useGetConnectedSigner } from '@celo-tools/use-contractk
 import { MaxUint256 } from '@ethersproject/constants'
 import { TokenAmount } from '@ubeswap/sdk'
 import { useDoTransaction } from 'components/swap/routing'
-import { useMoolaConfig } from 'components/swap/routing/moola/useMoola'
 import { useCallback, useMemo } from 'react'
-import { MobiusTrade } from 'state/swap/hooks'
 import { useUserMinApprove } from 'state/user/hooks'
 
 import { useTokenAllowance } from '../data/Allowances'
-import { Field } from '../state/swap/actions'
 import { useHasPendingApproval } from '../state/transactions/hooks'
-import { computeSlippageAdjustedAmounts } from '../utils/prices'
 import { useTokenContract } from './useContract'
 
 export enum ApprovalState {
@@ -103,14 +99,4 @@ export function useApproveCallback(
   ])
 
   return [approvalState, approve]
-}
-
-// wraps useApproveCallback in the context of a swap
-export function useApproveCallbackFromTrade(trade?: MobiusTrade, allowedSlippage = 0) {
-  const amountToApprove = useMemo(
-    () => (trade ? computeSlippageAdjustedAmounts(trade, allowedSlippage)[Field.INPUT] : undefined),
-    [trade, allowedSlippage]
-  )
-  const moola = useMoolaConfig()
-  return useApproveCallback(amountToApprove, trade?.pool.address)
 }
