@@ -1,5 +1,7 @@
 import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
+import QuestionHelper from 'components/QuestionHelper'
+import { RowFixed } from 'components/Row'
 import { Chain, Coins, PRICE } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
@@ -175,12 +177,17 @@ export default function Pool() {
           )}
         </PoolSection>
         <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center' }}>
-          <TYPE.largeHeader
-            style={{ textDecoration: 'underline', cursor: 'pointer' }}
-            onClick={() => setShowDeprecated(!showDeprecated)}
-          >
-            {showDeprecated ? 'Hide deprecated pools' : 'Show deprecated pools'}
-          </TYPE.largeHeader>
+          <RowFixed>
+            <TYPE.largeHeader
+              style={{ textDecoration: 'underline', cursor: 'pointer' }}
+              onClick={() => setShowDeprecated(!showDeprecated)}
+            >
+              {showDeprecated ? 'Hide deprecated pools' : 'Show deprecated pools'}
+            </TYPE.largeHeader>
+            <QuestionHelper
+              text={<>The gauge for these pools have been killed and will no longer produce any mobi rewards</>}
+            />
+          </RowFixed>
         </AutoColumn>
         <PoolSection>
           {showDeprecated &&
