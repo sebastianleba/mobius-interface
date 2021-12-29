@@ -151,7 +151,7 @@ export default function Vote() {
             })}
         </TopSection>
         <TYPE.subHeader color="text3">
-          <TYPE.main>A minimum threshold of 5,000,000 veMOBI is required to submit proposals</TYPE.main>
+          <TYPE.main>A minimum threshold of 1,000 veMOBI is required to submit proposals</TYPE.main>
         </TYPE.subHeader>
       </PageWrapper>
       {/* <SwitchLocaleLink /> */}
