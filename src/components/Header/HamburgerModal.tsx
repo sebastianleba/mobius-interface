@@ -90,10 +90,6 @@ const StyledExternalLink = styled(ExternalLink).attrs({
 export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean; onDismiss: () => void }) {
   const { t } = useTranslation()
 
-  const launchTime = new Date(Date.UTC(2021, 8, 19, 2))
-  const now = new Date()
-  const isLive = true
-
   return (
     <CustomModal isOpen={isOpen} onDismiss={onDismiss} maxHeight={90}>
       <LinkContainer>
@@ -126,8 +122,11 @@ export default function HamburgerModal({ isOpen, onDismiss }: { isOpen: boolean;
         >
           {t('Pool')}
         </StyledNavLink>
-        <StyledNavLink id={`swap-nav-link`} to={'/stake'} onClick={onDismiss}>
+        <StyledNavLink id={`stake-nav-link`} to={'/stake'} onClick={onDismiss}>
           {t('Stake')}
+        </StyledNavLink>
+        <StyledNavLink id={`vote-nav-link`} to={'/vote'} onClick={onDismiss}>
+          {t('Vote')}
         </StyledNavLink>
         <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
           {t('Bridge')}

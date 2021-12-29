@@ -1,10 +1,8 @@
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
-import {
-  GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS,
-  MOBIUS_MINTER_ADDRESS,
-  VOTING_ESCROW as VOTING_ESCROW_ADDRESS,
-} from 'constants/StablePools'
+import { GOVERNANCE_ADDRESS } from 'constants/governance'
+import { GAUGE_CONTROLLER as GAUGE_CONTROLLER_ADDRESS, MOBIUS_MINTER_ADDRESS } from 'constants/StablePools'
+import { VEMOBI } from 'constants/tokens'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
@@ -15,6 +13,7 @@ import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
 import ERC20_MOBI from '../constants/abis/ERC20MOBI.json'
 import EXCHANGE from '../constants/abis/Exchange.json'
 import GAUGE_CONTROLLER from '../constants/abis/GaugeController.json'
+import GOVERNOR_ABI from '../constants/abis/GovernorBravoDelegate.json'
 import LIQUIDITY_GAUGE_V3 from '../constants/abis/LiquidityGaugeV3.json'
 import LP from '../constants/abis/LPToken.json'
 import MINTER from '../constants/abis/Minter.json'
@@ -34,6 +33,7 @@ import {
   ERC20MOBI,
   Exchange,
   GaugeController,
+  GovernorBravoDelegate,
   LiquidityGaugeV3,
   Minter,
   MobiusStrip,
@@ -50,7 +50,7 @@ import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account, chainId } = useActiveContractKit()
+  const { library, account } = useActiveContractKit()
 
   return useMemo(() => {
     if (!address || !ABI || !library) return null
@@ -86,6 +86,12 @@ export function useMobiContract(address?: string, withSignerIfPossible?: boolean
   return useContract(address ?? mobi?.address, ERC20_MOBI.abi, withSignerIfPossible) as ERC20MOBI
 }
 
+export function useGovernanceContract(address?: string, withSignerIfPossible?: boolean): GovernorBravoDelegate | null {
+  const { chainId } = useActiveContractKit()
+  const govAddress = GOVERNANCE_ADDRESS[chainId]
+  return useContract(address ?? govAddress, GOVERNOR_ABI.abi, withSignerIfPossible) as GovernorBravoDelegate
+}
+
 export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
   const { chainId } = useActiveContractKit()
 
@@ -95,7 +101,7 @@ export function useMobiMinterContract(address?: string, withSignerIfPossible?: b
 export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
   const { chainId } = useActiveContractKit()
 
-  return useContract(address ?? VOTING_ESCROW_ADDRESS[chainId], VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
+  return useContract(address ?? VEMOBI[chainId].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {

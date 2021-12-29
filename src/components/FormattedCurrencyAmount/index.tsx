@@ -7,12 +7,12 @@ export default function FormattedTokenAmount({
   currencyAmount,
   significantDigits = 4,
 }: {
-  currencyAmount: TokenAmount
+  currencyAmount: TokenAmount | undefined
   significantDigits?: number
 }) {
   return (
     <>
-      {currencyAmount.equalTo(JSBI.BigInt(0))
+      {!currencyAmount || currencyAmount.equalTo(JSBI.BigInt(0))
         ? '0'
         : currencyAmount.greaterThan(CURRENCY_AMOUNT_MIN)
         ? currencyAmount.toSignificant(significantDigits)

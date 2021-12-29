@@ -15,7 +15,7 @@ const makeTokens = (
 export const UBE = makeTokens(
   {
     [ChainId.MAINNET]: '0x73a210637f6F6B7005512677Ba6B3C96bb4AA44B',
-    [ChainId.ALFAJORES]: '0x00Be915B9dCf56a3CBE739D9B9c202ca692409EC',
+    [ChainId.ALFAJORES]: '0x17a139f275102bBaB5BcbF1c4b7143F08B635EA2',
     [ChainId.BAKLAVA]: '0x00Be915B9dCf56a3CBE739D9B9c202ca692409EC',
   },
   18,
@@ -32,4 +32,15 @@ export const CELO = makeTokens(
   18,
   'CELO',
   'Celo native asset'
+)
+
+export const VEMOBI = makeTokens(
+  {
+    [ChainId.MAINNET]: '0xE9d0375cd6fC027A1a0eC39BB4c9928E5aBec27e',
+    [ChainId.ALFAJORES]: '0x7d64708ecf5201cfE74364424AddB0A8FD32174f',
+    [ChainId.BAKLAVA]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
+  },
+  18,
+  'veMOBI',
+  'Voting Escrow MOBI'
 )
