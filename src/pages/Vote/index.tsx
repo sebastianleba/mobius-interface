@@ -104,7 +104,7 @@ export default function Vote() {
                 </RowBetween>
                 <ExternalLink
                   style={{ color: 'white', textDecoration: 'underline' }}
-                  href="https://uniswap.org/blog/uni"
+                  href="https://medium.com/@mobiusmoney/mobiusdao-decentralizing-and-roadmap-for-q1-2022-c925250236d"
                   target="_blank"
                 >
                   <TYPE.white fontSize={14}>Read more about Mobius governance</TYPE.white>
