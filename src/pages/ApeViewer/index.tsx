@@ -214,7 +214,6 @@ export default function ApeViewer() {
     })
   }
   const baseUrl = 'https://ipfs.io/ipfs/bafybeiasnbk7bztvmytiqf2a5aw5jmivvnxhrdwtp72ihbpjrlh33g32ee/apes/'
-  console.log(apeIDs)
   return (
     <Container>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>

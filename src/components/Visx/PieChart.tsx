@@ -36,10 +36,6 @@ export default function DoublePieChart({
   margin = defaultMargin,
   animate = true,
 }: PieProps) {
-  console.log({
-    innerChartData,
-    outerChartData,
-  })
   const outerLabels = outerChartData.map(({ label }) => label)
   const innerLabels = innerChartData.map(({ label }) => label)
   const getOuterColor = scaleOrdinal({

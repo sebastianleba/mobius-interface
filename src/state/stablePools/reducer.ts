@@ -6,6 +6,10 @@ import { StableSwapMath } from 'utils/stableSwapMath'
 
 import { initPool, updateExternalRewards, updateVariableData } from './actions'
 
+export enum WarningType {
+  POOF = 'poof',
+}
+
 export type StableStakingInfo = {
   userStaked: JSBI
   totalStakedAmount: JSBI
@@ -68,6 +72,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   coin: Coins
   disabled?: boolean
   isKilled?: boolean
+  warningType?: WarningType
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
