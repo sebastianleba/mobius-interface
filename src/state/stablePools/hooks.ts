@@ -10,9 +10,10 @@ import { useDefaultTokenList } from 'state/lists/hooks'
 import { useSingleContractMultipleData } from 'state/multicall/hooks'
 import { tryParseAmount } from 'state/swap/hooks'
 
+import WARNINGS from '../../constants/PoolWarnings.json'
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
-import { StableSwapPool } from './reducer'
+import { StableSwapPool, WarningType } from './reducer'
 import { BigIntToJSBI } from './updater'
 
 export interface StablePoolInfo {
@@ -246,4 +247,12 @@ export function useExternalRewards({ poolName }: { poolName: string }): TokenAmo
       )
   )
   return externalRewards
+}
+
+export function useWarning(pool: string | undefined): { warning: string; link?: string } | undefined {
+  const warningType = useSelector<AppState, WarningType | undefined>(
+    (state) => state.stablePools.pools[pool ?? '']?.pool?.warningType ?? undefined
+  )
+  if (!warningType) return undefined
+  return WARNINGS[warningType] as any as { warning: string; link?: string }
 }
