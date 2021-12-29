@@ -3,7 +3,7 @@ import { ChainId, Fraction, JSBI, Token } from '@ubeswap/sdk'
 import { VestType } from 'state/claim/reducer'
 import { WrappedTokenInfo } from 'state/lists/hooks'
 import { MentoConstants } from 'state/mentoPools/reducer'
-import { StableSwapConstants } from 'state/stablePools/reducer'
+import { StableSwapConstants, WarningType } from 'state/stablePools/reducer'
 
 import celoLogo from '../assets/images/celo-chain-logo.png'
 import ethLogo from '../assets/images/ethereum-chain-logo.png'
@@ -109,6 +109,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
       name: 'Private cUSD V2',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xEadf4A7168A82D30Ba0619e64d5BCf5B30B45226'],
       tokens: [
         new WrappedTokenInfo(
@@ -162,6 +163,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     },
     {
       name: 'Private CELO V2',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0x301a61D01A63c8D670c2B8a43f37d12eF181F997'],
       tokens: [
         new WrappedTokenInfo(
@@ -217,6 +219,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     },
     {
       name: 'Private cEUR V2',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73', '0xD8761DD6c7cB54febD33adD699F5E4440b62E01B'],
       tokens: [
         new WrappedTokenInfo(
@@ -642,6 +645,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     },
     {
       name: 'Private cUSD V1',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xB4aa2986622249B1F45eb93F28Cfca2b2606d809'],
       tokens: [
         new WrappedTokenInfo(
@@ -692,6 +696,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       additionalRewardRate: ['0', '0'],
       displayChain: Chain.Celo,
       coin: Coins.USD,
+      isKilled: true,
     },
     {
       name: 'asUSDC (AllBridge)',
@@ -1010,6 +1015,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
     },
     {
       name: 'Private CELO V1',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0x471EcE3750Da237f93B8E339c536989b8978a438', '0xE74AbF23E1Fdf7ACbec2F3a30a772eF77f1601E1'],
       tokens: [
         new WrappedTokenInfo(
@@ -1062,9 +1068,11 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       // additionalRewardRate: ['730282730000000'],
       displayChain: Chain.Celo,
       coin: Coins.Celo,
+      isKilled: true,
     },
     {
       name: 'Private cEUR V1',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73', '0x56072D4832642dB29225dA12d6Fd1290E4744682'],
       tokens: [
         new WrappedTokenInfo(
@@ -1117,9 +1125,11 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       // additionalRewardRate: ['730282730000000'],
       displayChain: Chain.Celo,
       coin: Coins.Eur,
+      isKilled: true,
     },
     {
       name: 'Private cUSD V1 [DISABLED]',
+      warningType: WarningType.POOF,
       tokenAddresses: ['0xB4aa2986622249B1F45eb93F28Cfca2b2606d809'],
       tokens: [
         new WrappedTokenInfo(
