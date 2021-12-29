@@ -1180,6 +1180,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       displayChain: Chain.Celo,
       coin: Coins.USD,
       disabled: true,
+      isKilled: true,
     },
   ],
   [ChainId.ALFAJORES]: [
