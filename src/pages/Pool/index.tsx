@@ -185,7 +185,7 @@ export default function Pool() {
               {showDeprecated ? 'Hide deprecated pools' : 'Show deprecated pools'}
             </TYPE.largeHeader>
             <QuestionHelper
-              text={<>The gauges for these pools have been killed and will no longer produce any mobi rewards</>}
+              text={<>Users are encouraged to withdraw from these pools as they have been replaced with new ones. The gauges for these pools have been killed and will no longer produce any mobi rewards</>}
             />
           </RowFixed>
         </AutoColumn>
