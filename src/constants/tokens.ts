@@ -36,7 +36,7 @@ export const CELO = makeTokens(
 
 export const VEMOBI = makeTokens(
   {
-    [ChainId.MAINNET]: '0xE9d0375cd6fC027A1a0eC39BB4c9928E5aBec27e',
+    [ChainId.MAINNET]: '0xd813a846aA9D572140d7ABBB4eFaC8cD786b4c0E',
     [ChainId.ALFAJORES]: '0x7d64708ecf5201cfE74364424AddB0A8FD32174f',
     [ChainId.BAKLAVA]: '0xFe2434bcE62C9B4845fe0C57438f5F86fA4771A7',
   },
