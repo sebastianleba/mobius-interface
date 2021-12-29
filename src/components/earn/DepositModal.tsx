@@ -10,11 +10,11 @@ import { useActiveContractKit } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useStableSwapContract } from '../../hooks/useContract'
 import useTransactionDeadline from '../../hooks/useTransactionDeadline'
-import { StablePoolInfo, useExpectedLpTokens } from '../../state/stablePools/hooks'
+import { StablePoolInfo, useExpectedLpTokens, useWarning } from '../../state/stablePools/hooks'
 import { useTransactionAdder } from '../../state/transactions/hooks'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
-import { CloseIcon, TYPE } from '../../theme'
-import { ButtonError, ButtonPrimary } from '../Button'
+import { CloseIcon, ExternalLink, TYPE } from '../../theme'
+import { ButtonConfirmed, ButtonError, ButtonPrimary } from '../Button'
 import { AutoColumn } from '../Column'
 import Modal from '../Modal'
 import { LoadingView, SubmittedView } from '../ModalViews'
@@ -44,10 +44,12 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, peggedTo, pegComesAfter, totalDeposited } = poolInfo
+  const warning = useWarning(poolInfo.name ?? undefined)
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)
   const [input, setInput] = useState<(string | undefined)[]>(new Array(tokens.length).fill(undefined))
+  const [warningAcknowledged, setWarningAcknowledged] = useState<boolean>(!warning)
   const isFirstDeposit = totalDeposited.equalTo('0')
   const [useEqualAmount, setUseEqualAmount] = useState<boolean>(isFirstDeposit)
   const deadline = useTransactionDeadline()
@@ -130,88 +132,104 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
     <Modal isOpen={isOpen} onDismiss={wrappedOndismiss} maxHeight={90}>
       {!attempting && !hash && (
         <ContentWrapper gap="lg">
-          <RowBetween>
-            <TYPE.largeHeader>Deposit to {poolInfo.name}</TYPE.largeHeader>
-            <CloseIcon onClick={wrappedOndismiss} />
-          </RowBetween>
-          {isFirstDeposit && (
-            <AutoRow>
-              <TYPE.body color="red">
-                You are the first to deposit into the pool! <br />
-                Because of this, you will need to deposit an equal amount of tokens.
-              </TYPE.body>
-            </AutoRow>
-          )}
-          <RowBetween>
-            <RowFixed>
-              <TYPE.subHeader fontWeight={400} fontSize={14}>
-                Equal Amount
-              </TYPE.subHeader>
-              <QuestionHelper text="Automatically deposit an equal amount of each token." />
-            </RowFixed>
-            <Toggle
-              id="toggle-equal-amount-button"
-              isActive={useEqualAmount}
-              toggle={() => !isFirstDeposit && setUseEqualAmount(!useEqualAmount)}
-            />
-          </RowBetween>
-          {poolInfo.tokens.map((token, i) => (
-            <div key={`deposit-row-${token.symbol}-${i}-${poolInfo.name}`}>
-              <CurrencyRow
-                tokenAmount={selectedAmounts[i]}
-                input={input[i]}
-                setInput={(val: string) => {
-                  if (useEqualAmount) {
-                    setInput(new Array(tokens.length).fill(val))
-                  } else {
-                    setInput([...input.slice(0, i), val, ...input.slice(i + 1)])
-                  }
-                }}
-                // setUsingInsufficientFunds={setInsufficientFunds}
-              />
-              {i !== selectedAmounts.length - 1 && (
-                <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>+</TYPE.largeHeader>
+          {!warningAcknowledged && warning ? (
+            <>
+              <RowBetween>
+                <TYPE.main fontSize={[18, 24]}>WARNING</TYPE.main>
+                <CloseIcon onClick={onDismiss} />
+              </RowBetween>
+              <TYPE.body>{warning.warning}</TYPE.body>
+              {warning.link && <ExternalLink href={warning?.link}>Learn More</ExternalLink>}
+              <ButtonConfirmed onClick={() => setWarningAcknowledged(true)}>Acknowledge</ButtonConfirmed>
+            </>
+          ) : (
+            <>
+              <RowBetween>
+                <TYPE.largeHeader>Deposit to {poolInfo.name}</TYPE.largeHeader>
+                <CloseIcon onClick={wrappedOndismiss} />
+              </RowBetween>
+              {isFirstDeposit && (
+                <AutoRow>
+                  <TYPE.body color="red">
+                    You are the first to deposit into the pool! <br />
+                    Because of this, you will need to deposit an equal amount of tokens.
+                  </TYPE.body>
+                </AutoRow>
               )}
-            </div>
-          ))}
-          <TYPE.mediumHeader style={{ textAlign: 'center' }}>
-            Expected Lp Tokens Received: {expectedLPTokens.toFixed(decimalPlacesForLP)}
-          </TYPE.mediumHeader>
-          {!isFirstDeposit && (
-            <TYPE.mediumHeader
-              style={{
-                textAlign: 'center',
-                color: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 'red' : 'black',
-                fontSize: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 30 : 20,
-                fontWeight: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 800 : 500,
-              }}
-            >
-              Equivalent to: {pegComesAfter ? '' : peggedTo}
-              {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
-            </TYPE.mediumHeader>
-          )}
-          {toApprove.length > 0 && expectedLPTokens.greaterThan('0') && (
-            <div style={{ display: 'flex' }}>
-              {toApprove.map((i) => (
-                <ApprovalButton
-                  key={`Approval-modal-${i}`}
-                  disabled={approving}
-                  onClick={async () => {
-                    setApproving(true)
-                    await approvals[i][1]()
-                    await new Promise((resolve) => setTimeout(resolve, 20000))
-                    setApproving(false)
+              <RowBetween>
+                <RowFixed>
+                  <TYPE.subHeader fontWeight={400} fontSize={14}>
+                    Equal Amount
+                  </TYPE.subHeader>
+                  <QuestionHelper text="Automatically deposit an equal amount of each token." />
+                </RowFixed>
+                <Toggle
+                  id="toggle-equal-amount-button"
+                  isActive={useEqualAmount}
+                  toggle={() => !isFirstDeposit && setUseEqualAmount(!useEqualAmount)}
+                />
+              </RowBetween>
+              {poolInfo.tokens.map((token, i) => (
+                <div key={`deposit-row-${token.symbol}-${i}-${poolInfo.name}`}>
+                  <CurrencyRow
+                    tokenAmount={selectedAmounts[i]}
+                    input={input[i]}
+                    setInput={(val: string) => {
+                      if (useEqualAmount) {
+                        setInput(new Array(tokens.length).fill(val))
+                      } else {
+                        setInput([...input.slice(0, i), val, ...input.slice(i + 1)])
+                      }
+                    }}
+                    // setUsingInsufficientFunds={setInsufficientFunds}
+                  />
+                  {i !== selectedAmounts.length - 1 && (
+                    <TYPE.largeHeader style={{ marginTop: '1rem', width: '100%', textAlign: 'center' }}>
+                      +
+                    </TYPE.largeHeader>
+                  )}
+                </div>
+              ))}
+              <TYPE.mediumHeader style={{ textAlign: 'center' }}>
+                Expected Lp Tokens Received: {expectedLPTokens.toFixed(decimalPlacesForLP)}
+              </TYPE.mediumHeader>
+              {!isFirstDeposit && (
+                <TYPE.mediumHeader
+                  style={{
+                    textAlign: 'center',
+                    color: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 'red' : 'black',
+                    fontSize: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 30 : 20,
+                    fontWeight: JSBI.greaterThan(perDiff, JSBI.divide(weiScale, JSBI.BigInt(100))) ? 800 : 500,
                   }}
                 >
-                  Approve {tokens[i].symbol}
-                </ApprovalButton>
-              ))}
-            </div>
-          )}
-          {toApprove.length === 0 && (
-            <ButtonError disabled={!!error} error={!!error && !!poolInfo?.stakedAmount} onClick={onDeposit}>
-              {error ?? 'Deposit'}
-            </ButtonError>
+                  Equivalent to: {pegComesAfter ? '' : peggedTo}
+                  {valueOfLP.toFixed(4)} {pegComesAfter ? poolInfo.peggedTo : ''}
+                </TYPE.mediumHeader>
+              )}
+              {toApprove.length > 0 && expectedLPTokens.greaterThan('0') && (
+                <div style={{ display: 'flex' }}>
+                  {toApprove.map((i) => (
+                    <ApprovalButton
+                      key={`Approval-modal-${i}`}
+                      disabled={approving}
+                      onClick={async () => {
+                        setApproving(true)
+                        await approvals[i][1]()
+                        await new Promise((resolve) => setTimeout(resolve, 20000))
+                        setApproving(false)
+                      }}
+                    >
+                      Approve {tokens[i].symbol}
+                    </ApprovalButton>
+                  ))}
+                </div>
+              )}
+              {toApprove.length === 0 && (
+                <ButtonError disabled={!!error} error={!!error && !!poolInfo?.stakedAmount} onClick={onDeposit}>
+                  {error ?? 'Deposit'}
+                </ButtonError>
+              )}
+            </>
           )}
         </ContentWrapper>
       )}
