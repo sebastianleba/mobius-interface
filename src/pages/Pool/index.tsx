@@ -156,7 +156,7 @@ export default function Pool() {
                 <RowBetween>
                   <TYPE.white
                     fontSize={16}
-                  >{`Please use caution when providing liquidity into pools. Do your own research to understand the stablility mechanisms behind each token, especially PoofCash p-tokens. Mobius does not guarantee the value of any asset.`}</TYPE.white>
+                  >{`Please use caution when providing liquidity into pools. Do your own research to understand the stablility mechanisms behind each token--Mobius does not guarantee the value of any asset.`}</TYPE.white>
                 </RowBetween>
               </AutoColumn>
             </CardSection>
