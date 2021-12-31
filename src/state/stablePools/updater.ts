@@ -41,6 +41,7 @@ export function UpdateVariablePoolInfo(): null {
     account ?? undefined,
   ])
   const virtualPrices = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getVirtualPrice')
+  const balances = useMultipleContractSingleData(poolAddresses, SwapInterface, 'getBalances')
 
   const query = gql`
     {
@@ -62,22 +63,25 @@ export function UpdateVariablePoolInfo(): null {
     }
   `
   const { data, loading, error } = useQuery(query)
-
-  const lpInfo: { [address: string]: { total: JSBI; user: JSBI; virtualPrice: JSBI } } = lpTotalSupplies
-    .filter((total, i) => !(total?.loading || lpOwned_multiple[i]?.loading))
-    .map((total, i) => [
-      BigIntToJSBI((total?.result?.[0] as BigInt) ?? '0'),
-      BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0'),
-      BigIntToJSBI((virtualPrices?.[i]?.result?.[0] as BigInt) ?? '0'),
-      poolAddresses[i],
-    ])
-    .reduce(
-      (accum, [total, user, virtualPrice, address]) => ({
-        ...accum,
-        [(address as any as string).toLowerCase()]: { total, user, virtualPrice },
-      }),
-      {}
-    )
+  const lpInfo: { [address: string]: { total: JSBI; user: JSBI; virtualPrice: JSBI; balances: JSBI[] } } =
+    lpTotalSupplies
+      .filter((total, i) => !(total?.loading || lpOwned_multiple[i]?.loading))
+      .map((total, i) => [
+        BigIntToJSBI((total?.result?.[0] as BigInt) ?? '0'),
+        BigIntToJSBI((lpOwned_multiple?.[i]?.result?.[0] as BigInt) ?? '0'),
+        BigIntToJSBI((virtualPrices?.[i]?.result?.[0] as BigInt) ?? '0'),
+        balances?.[i]?.result?.[0]
+          ? balances?.[i]?.result?.[0].map((amt: BigInt): JSBI => BigIntToJSBI(amt))
+          : undefined,
+        poolAddresses[i],
+      ])
+      .reduce(
+        (accum, [total, user, virtualPrice, balance, address]) => ({
+          ...accum,
+          [(address as any as string).toLowerCase()]: { total, user, balance, virtualPrice },
+        }),
+        {}
+      )
   return useMemo(() => {
     if (error) console.log(error)
     if (loading) return null
@@ -89,15 +93,13 @@ export function UpdateVariablePoolInfo(): null {
           day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
           week: parseFloat(pool.weeklyVolumes[1]?.volume ?? '0'),
         },
-        balances: pool.balances.map((b: string) => JSBI.BigInt(b)),
+        balances: lpInfo[pool.id].balances ?? pool?.balances?.map((b: string) => JSBI.BigInt(b)),
         amp: JSBI.BigInt(pool.A),
         aPrecise: JSBI.BigInt(pool.A),
         virtualPrice: lpInfo[pool.id].virtualPrice,
         lpTotalSupply: lpInfo[pool.id].total,
         lpOwned: lpInfo[pool.id].user,
       }))
-    console.log(poolInfo)
-
     dispatch(updatePools({ info: poolInfo }))
     return null
   }, [data, loading, error, dispatch, blockNumber, library, chainId, account, lpInfo])
