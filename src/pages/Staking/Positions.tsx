@@ -83,7 +83,11 @@ export default function Positions({ stakingInfo, unclaimedMobi }: PositionsProps
   const [openModal, setOpenModal] = useState(false)
   return (
     <Container>
-      <ClaimAllMobiModal isOpen={openModal} onDismiss={() => setOpenModal(false)} summaries={greaterThanZero} />
+      <ClaimAllMobiModal
+        isOpen={openModal}
+        onDismiss={() => setOpenModal(false)}
+        summaries={greaterThanZero.filter(({ unclaimedMobi }) => unclaimedMobi.greaterThan('0'))}
+      />
       <RowBetween style={{ marginBottom: '1rem' }}>
         <TYPE.largeHeader>Your Positions</TYPE.largeHeader>
         <TYPE.green
