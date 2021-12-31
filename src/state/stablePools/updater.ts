@@ -95,7 +95,7 @@ export function UpdateVariablePoolInfo(): null {
         },
         balances: lpInfo[pool.id].balances ?? pool?.balances?.map((b: string) => JSBI.BigInt(b)),
         amp: JSBI.BigInt(pool.A),
-        aPrecise: JSBI.BigInt(pool.A),
+        aPrecise: JSBI.BigInt(parseInt(pool.A) * 100),
         virtualPrice: lpInfo[pool.id].virtualPrice,
         lpTotalSupply: lpInfo[pool.id].total,
         lpOwned: lpInfo[pool.id].user,
