@@ -33,7 +33,7 @@ export const getDepositValues = (
   const scale = scaleAmount(virtualPrice)
 
   const valueOfStaked = scale(stakedAmount)
-  const valueOfDeposited = scale(amountDeposited)
+  const valueOfDeposited = scale(amountDeposited?.add(stakedAmount))
   const totalValueStaked = workingSupply
     ? scale(totalStakedAmount?.add(new TokenAmount(totalStakedAmount.token, workingSupply)))
     : scale(totalStakedAmount)

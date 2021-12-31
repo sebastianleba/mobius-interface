@@ -114,7 +114,7 @@ export function usePriceOfDeposits() {
     const allPools = state.stablePools.pools
     return Object.values(allPools)
       .map(({ pool }) => pool)
-      .filter((pool) => pool.lpOwned && JSBI.greaterThan(pool.lpOwned, JSBI.BigInt('0')))
+      .filter((pool) => pool.userStaked && JSBI.greaterThan(pool.userStaked, JSBI.BigInt('0')))
   })
   const prices = useSelector((state: AppState) => ({
     ethPrice: state.application.ethPrice,
