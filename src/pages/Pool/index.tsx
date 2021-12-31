@@ -17,7 +17,7 @@ import Loader from '../../components/Loader'
 import { Row, RowBetween } from '../../components/Row'
 import { InfoWrapper } from '../../components/swap/styleds'
 import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
-import { TYPE } from '../../theme'
+import { Sel, TYPE } from '../../theme'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
@@ -58,26 +58,6 @@ const HeaderLinks = styled(Row)`
   align-items: center;
 `
 
-const Sel = styled.div<{ selected: boolean }>`
-  ${({ theme }) => theme.flexRowNoWrap}
-  align-items: left;
-  border-radius: ${({ selected }) => (selected ? '12px' : '3rem')};
-  outline: none;
-  cursor: pointer;
-  text-decoration: none;
-  color: ${({ theme, selected }) => (selected ? theme.white : theme.text1)};
-  font-size: 1rem;
-  font-weight: ${({ selected }) => (selected ? '999' : '300')};
-  padding: 8px 12px;
-  word-break: break-word;
-  overflow: hidden;
-  white-space: nowrap;
-  background-color: ${({ theme, selected }) => (selected ? theme.celoGreen : theme.bg1)};
-  ${({ theme }) => theme.mediaWidth.upToSmall`
-    font-size: 0.7rem;
-  `}
-`
-
 export default function Pool() {
   const { chainId } = useActiveContractKit()
 
@@ -86,24 +66,27 @@ export default function Pool() {
   const [selection, setSelection] = React.useState<Chain>(Chain.All)
   const [showDeprecated, setShowDeprecated] = React.useState(false)
 
-  const tvl = stablePools.reduce((accum, poolInfo) => {
-    const price =
-      poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
-        ? JSBI.BigInt(PRICE[Coins.Bitcoin])
-        : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
-        ? JSBI.BigInt(PRICE[Coins.Ether])
-        : JSBI.BigInt(PRICE[Coins.USD])
-    const lpPrice = JSBI.divide(
-      JSBI.multiply(price, poolInfo.virtualPrice),
-      JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
-    )
-    const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
-    return JSBI.add(accum, priceDeposited)
-  }, JSBI.BigInt('0'))
+  const tvl = stablePools
+    .filter((pool) => pool && pool.virtualPrice)
+    .reduce((accum, poolInfo) => {
+      const price =
+        poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+          ? JSBI.BigInt(PRICE[Coins.Bitcoin])
+          : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+          ? JSBI.BigInt(PRICE[Coins.Ether])
+          : JSBI.BigInt(PRICE[Coins.USD])
+      const lpPrice = JSBI.divide(
+        JSBI.multiply(price, poolInfo.virtualPrice),
+        JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('18'))
+      )
+      const priceDeposited = JSBI.multiply(poolInfo?.totalDeposited?.raw ?? JSBI.BigInt('0'), lpPrice)
+      return JSBI.add(accum, priceDeposited)
+    }, JSBI.BigInt('0'))
   const tvlAsTokenAmount = new TokenAmount(cUSD[chainId], tvl)
   const mobiprice = useCUSDPrice(useMobi())
 
   const sortCallback = (pool1: StablePoolInfo, pool2: StablePoolInfo) => {
+    if (!pool1 || !pool2) return true
     const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount.greaterThan('0')
     const isStaking2 = pool2.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool2.stakedAmount.greaterThan('0')
     if (isStaking1 && !isStaking2) return false
@@ -185,7 +168,12 @@ export default function Pool() {
               {showDeprecated ? 'Hide deprecated pools' : 'Show deprecated pools'}
             </TYPE.largeHeader>
             <QuestionHelper
-              text={<>Users are encouraged to withdraw from these pools as they have been replaced with new ones. The gauges for these pools have been killed and will no longer produce any mobi rewards</>}
+              text={
+                <>
+                  Users are encouraged to withdraw from these pools as they have been replaced with new ones. The gauges
+                  for these pools have been killed and will no longer produce any mobi rewards
+                </>
+              }
             />
           </RowFixed>
         </AutoColumn>

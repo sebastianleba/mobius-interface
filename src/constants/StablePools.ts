@@ -3,7 +3,6 @@ import { ChainId, Fraction, JSBI, Token } from '@ubeswap/sdk'
 import { VestType } from 'state/claim/reducer'
 import { WrappedTokenInfo } from 'state/lists/hooks'
 import { MentoConstants } from 'state/mentoPools/reducer'
-import { StableSwapConstants, WarningType } from 'state/stablePools/reducer'
 
 import celoLogo from '../assets/images/celo-chain-logo.png'
 import ethLogo from '../assets/images/ethereum-chain-logo.png'
@@ -39,6 +38,41 @@ export enum Chain {
   All,
 }
 
+enum WarningType {
+  POOF = 'poof',
+}
+
+type StableSwapMathConstants = {
+  name: string
+  rates: JSBI[]
+  lendingPrecision: JSBI
+  precision: JSBI
+  feeDenominator: JSBI
+  precisionMul: JSBI[]
+  feeIndex: number
+  decimals: JSBI[]
+  swapFee: JSBI
+}
+type StableSwapConstants = StableSwapMathConstants & {
+  tokens: Token[]
+  tokenAddresses: string[]
+  address: string
+  gaugeAddress: string
+  lpToken: Token
+  peggedTo: string
+  pegComesAfter: boolean | undefined
+  displayDecimals: number
+  additionalRewards?: string[]
+  additionalRewardRate?: string[]
+  lastClaim?: Date
+  displayChain: Chain
+  coin: Coins
+  disabled?: boolean
+  metaPool?: string
+  isKilled?: boolean
+  warningType?: WarningType
+}
+
 export const ChainLogo: { [c in Chain]: string } = {
   [Chain.Celo]: celoLogo,
   [Chain.Ethereum]: ethLogo,
@@ -49,8 +83,8 @@ export const ChainLogo: { [c in Chain]: string } = {
 }
 
 export const PRICE: { [c in Coins]: number } = {
-  [Coins.Bitcoin]: 42295,
-  [Coins.Ether]: 2909,
+  [Coins.Bitcoin]: 55000,
+  [Coins.Ether]: 4200,
   [Coins.USD]: 1,
   [Coins.Celo]: 6,
   [Coins.Eur]: 1.17,

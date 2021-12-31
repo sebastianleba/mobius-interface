@@ -13,7 +13,7 @@ import { Provider } from 'react-redux'
 import { HashRouter } from 'react-router-dom'
 import { UpdateMento } from 'state/mentoPools/updater'
 import { UpdateOpenSum } from 'state/openSum/updater'
-import UpdatePools from 'state/stablePools/updater'
+import { BatchUpdateGauges, UpdateVariablePoolInfo } from 'state/stablePools/updater'
 import StakingUpdater from 'state/staking/updater'
 
 import mobiusIcon from './assets/svg/mobius.svg'
@@ -52,7 +52,7 @@ if (process.env.REACT_APP_SENTRY_DSN) {
 }
 
 const client = new ApolloClient({
-  uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap-backup',
+  uri: 'https://api.thegraph.com/subgraphs/name/d-mooers/mobius',
   cache: new InMemoryCache(),
 })
 
@@ -64,7 +64,8 @@ function Updaters() {
       <ApplicationUpdater />
       <TransactionUpdater />
       <MulticallUpdater />
-      <UpdatePools />
+      <BatchUpdateGauges />
+      <UpdateVariablePoolInfo />
       <StakingUpdater />
       <UpdateMento />
       <PriceData />

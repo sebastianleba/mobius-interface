@@ -30,7 +30,7 @@ interface StakingModalProps {
 export default function ExternalRewardsModal({ isOpen, onDismiss, stakingInfo }: StakingModalProps) {
   const { account, chainId } = useActiveContractKit()
   const mobi = useMobi()
-  const externalRewards = useExternalRewards({ poolName: stakingInfo.name })
+  const externalRewards = useExternalRewards({ address: stakingInfo.poolAddress ?? '' })
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const [hash, setHash] = useState<string | undefined>()

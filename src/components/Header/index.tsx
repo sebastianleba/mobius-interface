@@ -332,7 +332,10 @@ export default function Header() {
               >
                 {t('Pool')}
               </StyledNavLink>
-              <StyledNavLink id={`stake-nav-link`} to={'/stake'}>
+              <StyledNavLink id={`charts-nav-link`} to={'/charts'}>
+                {t('Charts')}
+              </StyledNavLink>
+              <StyledNavLink id={`swap-nav-link`} to={'/stake'}>
                 {t('Stake')}
               </StyledNavLink>
               <StyledNavLink id={`vote-nav-link`} to={'/vote'}>

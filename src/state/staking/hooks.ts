@@ -16,6 +16,7 @@ const ONE_FRACTION = new Fraction('1', '1')
 
 export type GaugeSummary = {
   pool: string
+  poolAddress: string
   address: string
   baseBalance: TokenAmount
   totalStaked: TokenAmount
@@ -84,6 +85,7 @@ export function useMobiStakingInfo(): MobiStakingInfo {
   }
   const positions = pools.map((pool) => ({
     pool: pool.name,
+    poolAddress: pool.address,
     address: pool.gaugeAddress ?? '',
     baseBalance: new TokenAmount(pool.lpToken, pool.staking?.userStaked ?? '0'),
     totalStaked: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),

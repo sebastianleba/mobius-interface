@@ -1,20 +1,15 @@
-import { createReducer } from '@reduxjs/toolkit'
+import { createReducer, current } from '@reduxjs/toolkit'
 import { Fraction, Percent, Token } from '@ubeswap/sdk'
-import { Chain, Coins } from 'constants/StablePools'
+import { NETWORK_CHAIN_ID } from 'connectors'
+import { Chain, Coins, STATIC_POOL_INFO } from 'constants/StablePools'
 import JSBI from 'jsbi'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { initPool, updateExternalRewards, updateVariableData } from './actions'
+import { updateExternalRewards, updateGauges, updatePools } from './actions'
 
+const ZERO = JSBI.BigInt('0')
 export enum WarningType {
   POOF = 'poof',
-}
-
-export type StableStakingInfo = {
-  userStaked: JSBI
-  totalStakedAmount: JSBI
-  totalMobiRate: JSBI
-  pendingMobi: JSBI
 }
 
 export type ExternalRewards = {
@@ -22,16 +17,28 @@ export type ExternalRewards = {
   unclaimed: JSBI
 }
 
-export type StableSwapVariable = {
+export type PoolOnlyInfo = {
+  id: string
+  volume: {
+    day: number
+    week: number
+  }
   balances: JSBI[]
   amp: JSBI
-  lpTotalSupply: JSBI
-  workingLiquidity: JSBI
-  lpOwned: JSBI
   virtualPrice: JSBI
   aPrecise: JSBI
-  feesGenerated: JSBI
-  staking?: StableStakingInfo
+  lpTotalSupply: JSBI
+  lpOwned: JSBI
+  loadingPool: boolean
+}
+
+export type GaugeOnlyInfo = {
+  id: string
+  userStaked: JSBI
+  totalStakedAmount: JSBI
+  totalMobiRate: JSBI
+  pendingMobi: JSBI
+  workingLiquidity: JSBI
   poolWeight: Percent
   effectiveBalance: JSBI
   totalEffectiveBalance: JSBI
@@ -39,10 +46,15 @@ export type StableSwapVariable = {
   powerAllocated: number
   futureWeight: JSBI
   externalRewards?: ExternalRewards[]
+  gaugeAddress?: string
+  relativeGaugeWeight?: Fraction
+  lastClaim: Date
+  loadingGauge: boolean
 }
 
+export type StableSwapVariable = PoolOnlyInfo & GaugeOnlyInfo
+
 export type StableSwapMathConstants = {
-  totalMobiRate: JSBI
   name: string
   rates: JSBI[]
   lendingPrecision: JSBI
@@ -58,71 +70,102 @@ export type StableSwapConstants = StableSwapMathConstants & {
   tokens: Token[]
   tokenAddresses: string[]
   address: string
+  gaugeAddress: string
   lpToken: Token
   peggedTo: string
   pegComesAfter: boolean | undefined
   displayDecimals: number
-  gaugeAddress?: string
-  relativeGaugeWeight?: Fraction
-  metaPool?: string
   additionalRewards?: string[]
   additionalRewardRate?: string[]
   lastClaim?: Date
   displayChain: Chain
   coin: Coins
   disabled?: boolean
+  metaPool?: string
   isKilled?: boolean
   warningType?: WarningType
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
-
 export interface PoolState {
   readonly pools: {
     [address: string]: {
-      pool: StableSwapPool
-      math: StableSwapMath
+      pool: StableSwapPool | StableSwapConstants
+      math: StableSwapMath | undefined
     }
   }
 }
 
 const initialState: PoolState = {
-  pools: {},
+  pools: Object.values(STATIC_POOL_INFO[NETWORK_CHAIN_ID]).reduce(
+    (
+      accum: {
+        [address: string]: {
+          pool: StableSwapConstants
+          math: StableSwapMath | undefined
+        }
+      },
+      cur: StableSwapConstants
+    ) => ({
+      ...accum,
+      [cur.address.toLowerCase()]: {
+        pool: {
+          ...cur,
+          balances: Array(cur.tokenAddresses.length).fill(ZERO),
+          userStaked: ZERO,
+          totalStakedAmount: ZERO,
+          totalMobiRate: ZERO,
+          pendingMobi: ZERO,
+          workingLiquidity: ZERO,
+          virtualPrice: ZERO,
+          poolWeight: new Percent('0', '1'),
+          effectiveBalance: ZERO,
+          totalEffectiveBalance: ZERO,
+          futureWeight: ZERO,
+          lpTotalSupply: ZERO,
+          lpOwned: ZERO,
+          loadingGauge: true,
+          loadingPool: true,
+          volume: {
+            day: 0,
+            week: 0,
+          },
+        },
+        math: undefined,
+      },
+    }),
+    {}
+  ),
 }
 
 export default createReducer<PoolState>(initialState, (builder) =>
   builder
-    .addCase(initPool, (state, { payload: { address, pool } }) => {
-      const mathModel = new StableSwapMath(pool)
-      return {
-        ...state,
-        pools: {
-          ...state.pools,
-          [address]: {
-            pool,
-            math: mathModel,
-          },
-        },
-      }
-    })
     .addCase(updateExternalRewards, (state, { payload: { pool, externalRewards } }) => {
-      if (!state.pools[pool]) return
+      if (!state.pools[pool].math) return
       state.pools[pool].pool.externalRewards = externalRewards
     })
-    .addCase(updateVariableData, (state, { payload: { address, variableData } }) => {
-      const pool = state.pools[address]
-      return {
-        ...state,
-        pools: {
-          ...state.pools,
-          [address]: {
-            ...pool,
-            pool: {
-              ...pool.pool,
-              ...variableData,
-            },
-          },
-        },
-      }
+    .addCase(updatePools, (state, { payload: { info } }) => {
+      const copiedState = current(state)
+      info.forEach((pool) => {
+        const cur = copiedState.pools[pool.id].pool as any as StableSwapPool
+        const newPool = { ...cur, ...pool, loadingPool: false }
+
+        const math = new StableSwapMath(newPool)
+        state.pools[pool.id] = {
+          pool: newPool,
+          math,
+        }
+      })
+    })
+    .addCase(updateGauges, (state, { payload: { info } }) => {
+      const copiedState = current(state)
+      info.forEach((gauge) => {
+        const cur = copiedState.pools[gauge.id].pool as any as StableSwapPool
+        const newPool = { ...cur, ...gauge, loadingGauge: false }
+        state.pools[gauge.id] = {
+          pool: newPool,
+          math: state.pools[gauge.id].math,
+        }
+      })
     })
 )

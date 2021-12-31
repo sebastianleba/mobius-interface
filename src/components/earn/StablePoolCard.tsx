@@ -1,4 +1,5 @@
 import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
+import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
 import { ChainLogo, Coins } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
@@ -249,8 +250,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       return new TokenAmount(amount.currency, JSBI.divide(ratio.numerator, ratio.denominator))
     })
   }
-  const totalVolume = new TokenAmount(poolInfo.lpToken, JSBI.multiply(feesGenerated.raw, JSBI.BigInt('1000')))
-
   // get the color of the token
   const backgroundColorStart = useColor(tokens[0])
   let backgroundColorEnd = useColor(tokens[tokens.length - 1])
@@ -325,15 +324,10 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
             </TYPE.subHeader>
           </RowFixed>
         ) : (
-          feesGenerated && (
-            <TYPE.subHeader color={backgroundColorStart} className="apr" fontWeight={800} fontSize={[14, 18]}>
-              Fees Generated: {pegComesAfter ? '' : peggedTo}
-              {feesGenerated.denominator.toString() !== '0'
-                ? `${feesGenerated.toFixed(displayDecimals, { groupSeparator: ',' })}`
-                : '-'}
-              {pegComesAfter ? peggedTo : ''}
-            </TYPE.subHeader>
-          )
+          <RowFixed>
+            <Loader />
+            <TYPE.main marginLeft="0.5rem">APY Loading</TYPE.main>
+          </RowFixed>
         )}
       </TopSection>
       <SecondSection>
@@ -375,11 +369,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               : '-'}
             {pegComesAfter ? peggedTo : ''}
           </TYPE.subHeader>
-        ) : (
-          <TYPE.black fontWeight={600} fontSize={[14, 18]}>
-            Coming Soon!
-          </TYPE.black>
-        )}
+        ) : null}
       </SecondSection>
       <InfoContainer>
         <div style={{ flex: 3, width: '100%' }}>
@@ -407,11 +397,13 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               </RowBetween>
 
               <RowBetween>
-                <TYPE.darkGray>Total volume</TYPE.darkGray>
+                <TYPE.darkGray>Weekly volume</TYPE.darkGray>
                 <RowFixed>
                   <TYPE.black fontWeight={800}>
-                    {totalVolume
-                      ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(totalVolume)} ${pegComesAfter ? peggedTo : ''}`
+                    {poolInfo.weeklyVolume
+                      ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(poolInfo.weeklyVolume)} ${
+                          pegComesAfter ? peggedTo : ''
+                        }`
                       : '-'}
                   </TYPE.black>
                 </RowFixed>
@@ -539,7 +531,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 background={theme(false).celoGold}
                 backgroundHover={theme(false).celoGold}
                 style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18 }}
-                onClick={() => history.push(`/farm/${poolInfo.name}`)}
+                onClick={() => history.push(`/farm/${poolInfo.poolAddress}`)}
               >
                 FARM
               </DepositWithdrawBtn>

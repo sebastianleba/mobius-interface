@@ -1,3 +1,4 @@
+import { ApolloClient, InMemoryCache, NormalizedCacheObject } from '@apollo/client'
 import { createReducer, nanoid } from '@reduxjs/toolkit'
 
 import {
@@ -24,6 +25,7 @@ export interface ApplicationState {
   readonly btcPrice: string
   readonly ethPrice: string
   readonly tokenPrices: TokenPrices
+  readonly ubeswapClient: ApolloClient<NormalizedCacheObject>
 }
 
 const initialState: ApplicationState = {
@@ -33,6 +35,10 @@ const initialState: ApplicationState = {
   btcPrice: '41000',
   ethPrice: '2700',
   tokenPrices: {},
+  ubeswapClient: new ApolloClient({
+    uri: 'https://api.thegraph.com/subgraphs/name/ubeswap/ubeswap',
+    cache: new InMemoryCache(),
+  }),
 }
 
 export default createReducer(initialState, (builder) =>

@@ -1,19 +1,20 @@
 // To-Do: Implement Hooks to update Client-Side contract representation
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
+import { TokenList } from '@uniswap/token-lists'
 import { Chain, Coins } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useLiquidityGaugeContract, useStableSwapContract } from 'hooks/useContract'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useEthBtcPrice } from 'state/application/hooks'
-import { useDefaultTokenList } from 'state/lists/hooks'
+import { useDefaultTokenList, WrappedTokenInfo } from 'state/lists/hooks'
 import { useSingleContractMultipleData } from 'state/multicall/hooks'
 import { tryParseAmount } from 'state/swap/hooks'
 
 import WARNINGS from '../../constants/PoolWarnings.json'
 import { StableSwapMath } from '../../utils/stableSwapMath'
 import { AppState } from '..'
-import { StableSwapPool, WarningType } from './reducer'
+import { StableSwapConstants, StableSwapPool, WarningType } from './reducer'
 import { BigIntToJSBI } from './updater'
 
 export interface StablePoolInfo {
@@ -35,7 +36,6 @@ export interface StablePoolInfo {
   readonly priceOfStaked: TokenAmount
   readonly balances: TokenAmount[]
   readonly pegComesAfter: boolean | undefined
-  readonly feesGenerated: TokenAmount
   readonly mobiRate: JSBI | undefined
   readonly pendingMobi: JSBI | undefined
   readonly gaugeAddress?: string
@@ -47,12 +47,23 @@ export interface StablePoolInfo {
   readonly displayChain: Chain
   readonly coin: Coins
   readonly isDisabled?: boolean
+  readonly weeklyVolume: TokenAmount
+  readonly poolLoading: boolean
+  readonly gaugeLoading: boolean
   readonly isKilled?: boolean
 }
 
-export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool] {
-  const withMetaPools = useSelector<AppState, StableSwapPool[]>((state) =>
-    Object.values(state.stablePools.pools).map(({ pool }) => pool)
+export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwapPool | undefined] {
+  const withMetaPools = useSelector<AppState, (StableSwapPool | StableSwapConstants)[]>((state) =>
+    Object.values(state.stablePools.pools).map(({ pool }) => {
+      if (!pool.metaPool || pool.disabled) return pool
+      const underlying = state.stablePools.pools[pool.metaPool]?.pool
+      console.log(pool)
+      return {
+        ...pool,
+        tokenAddresses: pool.tokenAddresses.concat(underlying.tokenAddresses),
+      }
+    })
   )
   const pools = withMetaPools.filter(({ tokenAddresses }) => {
     return tokenAddresses.includes(tok1) && tokenAddresses.includes(tok2)
@@ -79,47 +90,59 @@ export const getPoolInfo = (
       list: TokenList
     }
   } = {}
-): StablePoolInfo => ({
-  name: pool.name,
-  poolAddress: pool.address,
-  lpToken: pool.lpToken,
-  tokens: pool.tokens,
-  amountDeposited: new TokenAmount(pool.lpToken, JSBI.add(pool.lpOwned, pool.staking?.userStaked ?? JSBI.BigInt('0'))),
-  totalDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply),
-  stakedAmount: new TokenAmount(pool.lpToken, pool.staking?.userStaked || JSBI.BigInt('0')),
-  apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
-  peggedTo: pool.peggedTo,
-  virtualPrice: pool.virtualPrice,
-  priceOfStaked: tokenAmountScaled(
-    pool.lpToken,
-    JSBI.multiply(pool.virtualPrice, JSBI.add(pool.lpOwned, pool.staking?.userStaked || JSBI.BigInt('0')))
-  ),
-  workingSupply: pool.workingLiquidity,
-  balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
-  pegComesAfter: pool.pegComesAfter,
-  feesGenerated: new TokenAmount(pool.lpToken, pool.feesGenerated),
-  mobiRate: pool.staking?.totalMobiRate,
-  pendingMobi: pool.staking?.pendingMobi,
-  gaugeAddress: pool.gaugeAddress,
-  displayDecimals: pool.displayDecimals,
-  totalStakedAmount: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
-  workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
-  totalPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
-  externalRewardRates:
-    pool.additionalRewardRate?.map(
-      (rate, i) =>
-        tokens[pool.additionalRewards?.[i]] && new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
-    ) ?? undefined,
-  lastClaim: pool.lastClaim,
-  meta: pool.metaPool,
-  displayChain: pool.displayChain,
-  coin: pool.coin,
-  isDisabled: pool.disabled,
-  isKilled: pool.isKilled,
-})
+): StablePoolInfo | Record<string, never> =>
+  !pool.lpTotalSupply
+    ? {}
+    : {
+        name: pool.name,
+        poolAddress: pool.address,
+        lpToken: pool.lpToken,
+        tokens: pool.tokens,
+        amountDeposited: new TokenAmount(
+          pool.lpToken,
+          JSBI.add(pool.lpOwned ?? JSBI.BigInt('0'), pool.userStaked ?? JSBI.BigInt('0'))
+        ),
+        totalDeposited: new TokenAmount(pool.lpToken, pool.lpTotalSupply ?? JSBI.BigInt('0')),
+        stakedAmount: new TokenAmount(pool.lpToken, pool.userStaked || JSBI.BigInt('0')),
+        apr: new TokenAmount(pool.lpToken, JSBI.BigInt('100000000000000000')),
+        peggedTo: pool.peggedTo,
+        virtualPrice: pool.virtualPrice,
+        priceOfStaked: tokenAmountScaled(
+          pool.lpToken,
+          JSBI.multiply(
+            pool.virtualPrice ?? JSBI.BigInt('0'),
+            JSBI.add(pool.lpOwned ?? JSBI.BigInt('0'), pool.userStaked ?? JSBI.BigInt('0'))
+          )
+        ),
+        workingSupply: pool.workingLiquidity,
+        balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
+        pegComesAfter: pool.pegComesAfter,
+        mobiRate: pool.totalMobiRate,
+        pendingMobi: pool.pendingMobi,
+        gaugeAddress: pool.gaugeAddress,
+        displayDecimals: pool.displayDecimals,
+        totalStakedAmount: new TokenAmount(pool.lpToken, pool.totalStakedAmount ?? '0'),
+        workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
+        totalPercentage: new Percent(pool.userStaked ?? '0', pool.totalStakedAmount ?? '1'),
+        externalRewardRates:
+          pool.additionalRewardRate?.map(
+            (rate, i) =>
+              tokens[pool.additionalRewards?.[i]] &&
+              new TokenAmount(tokens[pool.additionalRewards?.[i] ?? ''].token, rate)
+          ) ?? undefined,
+        lastClaim: pool.lastClaim,
+        meta: pool.metaPool,
+        displayChain: pool.displayChain,
+        coin: pool.coin,
+        isDisabled: pool.disabled,
+        isKilled: pool.isKilled,
+        weeklyVolume: tryParseAmount(pool.volume.week.toFixed(6), pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
+        poolLoading: pool.loadingPool,
+        gaugeLoading: pool.loadingGauge,
+      }
 
 export function useStablePoolInfoByName(name: string): StablePoolInfo | undefined {
-  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name]?.pool)
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[name.toLowerCase()]?.pool)
   const { chainId } = useActiveContractKit()
   const tokens = useDefaultTokenList()[chainId]
   return !pool ? undefined : { ...getPoolInfo(pool, tokens) }
@@ -160,7 +183,7 @@ export function useExpectedLpTokens(
   input: (string | undefined)[],
   isDeposit = true
 ): [TokenAmount, TokenAmount[]] {
-  const mathUtil = useMathUtil(pool.name)
+  const mathUtil = useMathUtil(pool.poolAddress ?? pool.address)
   const tokenAmounts = useMemo(
     () => tokens.map((t, i) => tryParseAmount(input[i], t) ?? new TokenAmount(t, '0')),
     [input]
@@ -191,8 +214,8 @@ export function useExpectedLpTokens(
 }
 
 export function useMathUtil(pool: StableSwapPool | string): StableSwapMath | undefined {
-  const name = !pool ? '' : typeof pool == 'string' ? pool : pool.name
-  const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name]?.math)
+  const name = !pool ? '' : typeof pool == 'string' ? pool : pool.address
+  const math = useSelector<AppState, StableSwapMath>((state) => state.stablePools.pools[name.toLowerCase()]?.math)
   return math
 }
 
@@ -213,8 +236,8 @@ export function usePool(): readonly [StableSwapPool] {
   return useCurrentPool(tok1, tok2)
 }
 
-export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAmount | undefined {
-  const pool = useStablePoolInfoByName(poolName)
+export function usePriceOfLp(address: string, amountOfLp: TokenAmount): TokenAmount | undefined {
+  const pool = useStablePoolInfoByName(address)
   const price = useEthBtcPrice(pool?.poolAddress ?? '')
   return pool && price && amountOfLp
     ? new TokenAmount(
@@ -227,8 +250,8 @@ export function usePriceOfLp(poolName: string, amountOfLp: TokenAmount): TokenAm
     : undefined
 }
 
-export function useExternalRewards({ poolName }: { poolName: string }): TokenAmount[] {
-  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[poolName]?.pool)
+export function useExternalRewards({ address }: { address: string }): TokenAmount[] {
+  const pool = useSelector<AppState, StableSwapPool>((state) => state.stablePools.pools[address.toLowerCase()]?.pool)
   const gauge = useLiquidityGaugeContract(pool?.gaugeAddress ?? undefined)
   const { account, chainId } = useActiveContractKit()
   gauge?.claimable_reward_write
@@ -251,7 +274,7 @@ export function useExternalRewards({ poolName }: { poolName: string }): TokenAmo
 
 export function useWarning(pool: string | undefined): { warning: string; link?: string } | undefined {
   const warningType = useSelector<AppState, WarningType | undefined>(
-    (state) => state.stablePools.pools[pool ?? '']?.pool?.warningType ?? undefined
+    (state) => state.stablePools.pools[pool?.toLowerCase() ?? '']?.pool?.warningType ?? undefined
   )
   if (!warningType) return undefined
   return WARNINGS[warningType] as any as { warning: string; link?: string }

@@ -105,7 +105,7 @@ export default function Manage({
 }: RouteComponentProps<{ poolName: string }>) {
   const { account, chainId } = useActiveContractKit()
   const mobi = useMobi()
-  const externalRewards = useExternalRewards({ poolName })
+  const externalRewards = useExternalRewards({ address: poolName })
 
   // get currencies and pair
 
