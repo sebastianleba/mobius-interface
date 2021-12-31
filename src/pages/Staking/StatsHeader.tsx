@@ -1,4 +1,3 @@
-import { TokenAmount } from '@ubeswap/sdk'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
@@ -15,7 +14,6 @@ import cashLight from '../../assets/images/cash.png'
 import cashDark from '../../assets/images/cash-d.png'
 import lockLight from '../../assets/images/lock.png'
 import lockDark from '../../assets/images/lock-d.png'
-import { getAllUnclaimedMobi } from './ClaimAllMobiModal'
 
 const Container = styled.div`
   display: block;
@@ -69,7 +67,6 @@ function StatsHeader({ stakingInfo }: PropType) {
   const priceOfDeposits = usePriceOfDeposits()
   const mobi = useMobi()
   const { avgApr } = useSNXRewardInfo()
-  const unclaimedMobi = new TokenAmount(mobi, getAllUnclaimedMobi(stakingInfo.positions ?? []))
   const isDarkMode = useIsDarkMode()
 
   const displayData = [
