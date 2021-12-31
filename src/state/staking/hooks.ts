@@ -87,9 +87,9 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     pool: pool.name,
     poolAddress: pool.address,
     address: pool.gaugeAddress ?? '',
-    baseBalance: new TokenAmount(pool.lpToken, pool.staking?.userStaked ?? '0'),
-    totalStaked: new TokenAmount(pool.lpToken, pool.staking?.totalStakedAmount ?? '0'),
-    unclaimedMobi: new TokenAmount(mobi, pool.staking?.pendingMobi ?? '0'),
+    baseBalance: new TokenAmount(pool.lpToken, pool.userStaked ?? '0'),
+    totalStaked: new TokenAmount(pool.lpToken, pool.totalStakedAmount ?? '0'),
+    unclaimedMobi: new TokenAmount(mobi, pool.pendingMobi ?? '0'),
     firstToken: pool.tokens[0],
     currentWeight: pool.poolWeight,
     futureWeight: new Percent(
@@ -99,7 +99,7 @@ export function useMobiStakingInfo(): MobiStakingInfo {
     workingBalance: new TokenAmount(pool.lpToken, pool.effectiveBalance),
     totalWorkingBalance: new TokenAmount(pool.lpToken, pool.totalEffectiveBalance),
     workingPercentage: new Percent(pool.effectiveBalance, pool.totalEffectiveBalance),
-    actualPercentage: new Percent(pool.staking?.userStaked ?? '0', pool.staking?.totalStakedAmount ?? '1'),
+    actualPercentage: new Percent(pool.userStaked ?? '0', pool.totalStakedAmount ?? '1'),
     lastVote: new Date(pool.lastUserVote * 1000),
     powerAllocated: pool.powerAllocated,
   }))
