@@ -274,7 +274,7 @@ export function useExternalRewards({ address }: { address: string }): TokenAmoun
 
 export function useWarning(pool: string | undefined): { warning: string; link?: string } | undefined {
   const warningType = useSelector<AppState, WarningType | undefined>(
-    (state) => state.stablePools.pools[pool ?? '']?.pool?.warningType ?? undefined
+    (state) => state.stablePools.pools[pool?.toLowerCase() ?? '']?.pool?.warningType ?? undefined
   )
   if (!warningType) return undefined
   return WARNINGS[warningType] as any as { warning: string; link?: string }

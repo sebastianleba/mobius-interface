@@ -44,7 +44,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   // monitor call to help UI loading state
   const addTransaction = useTransactionAdder()
   const { tokens, peggedTo, pegComesAfter, totalDeposited } = poolInfo
-  const warning = useWarning(poolInfo.name ?? undefined)
+  const warning = useWarning(poolInfo.poolAddress ?? undefined)
   const [hash, setHash] = useState<string | undefined>()
   const [attempting, setAttempting] = useState(false)
   const [approving, setApproving] = useState(false)

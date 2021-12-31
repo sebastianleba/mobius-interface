@@ -531,7 +531,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                 background={theme(false).celoGold}
                 backgroundHover={theme(false).celoGold}
                 style={{ fontWeight: 700, fontSize: isMobile ? 15 : 18 }}
-                onClick={() => history.push(`/farm/${poolInfo.name}`)}
+                onClick={() => history.push(`/farm/${poolInfo.poolAddress}`)}
               >
                 FARM
               </DepositWithdrawBtn>
