@@ -6,6 +6,7 @@ import burn from './burn/reducer'
 import claim from './claim/reducer'
 import { updateVersion } from './global/actions'
 import lists from './lists/reducer'
+import logs from './logs/slice'
 import mento from './mento/reducer'
 import mentoPools from './mentoPools/reducer'
 import mint from './mint/reducer'
@@ -34,6 +35,7 @@ const store = configureStore({
     mento,
     claim,
     staking,
+    logs,
     openSum,
   },
   middleware: [...getDefaultMiddleware({ thunk: false }), save({ states: PERSISTED_KEYS })],

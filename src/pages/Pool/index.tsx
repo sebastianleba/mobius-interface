@@ -1,5 +1,7 @@
 import { ErrorBoundary } from '@sentry/react'
 import { cUSD, JSBI, TokenAmount } from '@ubeswap/sdk'
+import QuestionHelper from 'components/QuestionHelper'
+import { RowFixed } from 'components/Row'
 import { Chain, Coins, PRICE } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
@@ -10,15 +12,29 @@ import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import { AutoColumn } from '../../components/Column'
 import { StablePoolCard } from '../../components/earn/StablePoolCard'
+import { CardNoise, CardSection, DataCard } from '../../components/earn/styled'
 import Loader from '../../components/Loader'
-import { Row } from '../../components/Row'
+import { Row, RowBetween } from '../../components/Row'
+import { InfoWrapper } from '../../components/swap/styleds'
 import { StablePoolInfo, useStablePoolInfo } from '../../state/stablePools/hooks'
 import { Sel, TYPE } from '../../theme'
 
 const PageWrapper = styled(AutoColumn)`
   max-width: 640px;
   width: 100%;
-  margin-top: 3rem;
+`
+
+const VoteCard = styled(DataCard)`
+  justify-self: center;
+  background: radial-gradient(90% 90% at 50% 5%, #fbcc5c 0%, #fb7c6d 100%);
+  width: 100%;
+  max-width: 640px;
+  overflow: hidden;
+  margin-bottom: 4rem;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  position: relative;
 `
 
 const PoolSection = styled.div`
@@ -48,6 +64,7 @@ export default function Pool() {
   const stablePools = useStablePoolInfo()
 
   const [selection, setSelection] = React.useState<Chain>(Chain.All)
+  const [showDeprecated, setShowDeprecated] = React.useState(false)
 
   const tvl = stablePools
     .filter((pool) => pool && pool.virtualPrice)
@@ -75,6 +92,10 @@ export default function Pool() {
     if (isStaking1 && !isStaking2) return false
     return true
   }
+
+  const sortedFilterdPools = stablePools
+    ?.sort(sortCallback)
+    .filter((pool) => selection === Chain.All || selection === pool.displayChain)
 
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
@@ -105,19 +126,66 @@ export default function Pool() {
             AVAX
           </Sel>
         </HeaderLinks>
+        <InfoWrapper mobile={true} style={{ maxWidth: '640px' }}>
+          <VoteCard>
+            <CardNoise />
+            <CardSection>
+              <AutoColumn gap="md">
+                <RowBetween>
+                  <TYPE.white fontWeight={600} fontSize={20}>
+                    Use caution when depositing
+                  </TYPE.white>
+                </RowBetween>
+                <RowBetween>
+                  <TYPE.white
+                    fontSize={16}
+                  >{`Please use caution when providing liquidity into pools. Do your own research to understand the stablility mechanisms behind each token--Mobius does not guarantee the value of any asset.`}</TYPE.white>
+                </RowBetween>
+              </AutoColumn>
+            </CardSection>
+            <CardNoise />
+          </VoteCard>
+        </InfoWrapper>
         <PoolSection>
           {stablePools && stablePools?.length === 0 ? (
             <Loader style={{ margin: 'auto' }} />
           ) : (
-            stablePools
-              ?.sort(sortCallback)
-              .filter((pool) => selection === Chain.All || selection === pool.displayChain)
+            sortedFilterdPools
+              .filter((pool) => !pool.isKilled && !pool.disabled)
               .map((pool) => (
                 <ErrorBoundary key={pool.poolAddress || '000'}>
                   <StablePoolCard poolInfo={pool} />
                 </ErrorBoundary>
               ))
           )}
+        </PoolSection>
+        <AutoColumn gap="lg" style={{ width: '100%', maxWidth: '720px', justifyContent: 'center' }}>
+          <RowFixed>
+            <TYPE.largeHeader
+              style={{ textDecoration: 'underline', cursor: 'pointer' }}
+              onClick={() => setShowDeprecated(!showDeprecated)}
+            >
+              {showDeprecated ? 'Hide deprecated pools' : 'Show deprecated pools'}
+            </TYPE.largeHeader>
+            <QuestionHelper
+              text={
+                <>
+                  Users are encouraged to withdraw from these pools as they have been replaced with new ones. The gauges
+                  for these pools have been killed and will no longer produce any mobi rewards
+                </>
+              }
+            />
+          </RowFixed>
+        </AutoColumn>
+        <PoolSection>
+          {showDeprecated &&
+            sortedFilterdPools
+              .filter((pool) => pool.isKilled || pool.disabled)
+              .map((pool) => (
+                <ErrorBoundary key={pool.poolAddress || '000'}>
+                  <StablePoolCard poolInfo={pool} />
+                </ErrorBoundary>
+              ))}
         </PoolSection>
       </AutoColumn>
     </PageWrapper>

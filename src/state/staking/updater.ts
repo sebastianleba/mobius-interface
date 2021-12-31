@@ -29,9 +29,6 @@ export default function StakingUpdater() {
   const totalWeight = useSingleCallResult(controller, 'get_total_weight')
   const snxRewardRate = useSingleCallResult(snxContract, 'rewardRate()')
   const snxToClaim = useSingleCallResult(snxContract, 'earned(address)', [account ?? undefined])
-  console.log(`address: ${snxAddress}`)
-  console.log('To claim: ', snxToClaim)
-  console.log('Reward rate: ', snxRewardRate)
   dispatch(
     updateSNX({
       rewardRate: snxRewardRate?.result ? JSBI.BigInt(snxRewardRate?.result?.[0] ?? '0') : undefined,

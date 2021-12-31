@@ -22,7 +22,7 @@ interface ModalProps {
 
 export default function WarningModal({ isOpen, onDismiss }: ModalProps) {
   const [neverShow, setNeverShow] = useState(false)
-  const COOKIE_NAME = 'optics-warning'
+  const COOKIE_NAME = 'staking-rewards' // optics-warning
   const dismiss = () => {
     if (neverShow) {
       setCookie(COOKIE_NAME, 'true', 31)
@@ -34,13 +34,16 @@ export default function WarningModal({ isOpen, onDismiss }: ModalProps) {
     <Modal isOpen={!cookieExists && isOpen} onDismiss={dismiss} maxHeight={90}>
       <ContentWrapper gap="lg">
         <RowBetween>
-          <TYPE.main fontSize={[18, 24]}>Optics V2 is Live!</TYPE.main>
+          <TYPE.main fontSize={[18, 24]}>MOBI Stakers now receive CELO</TYPE.main>
           <CloseIcon onClick={onDismiss} />
         </RowBetween>
         <TYPE.body>
-          Optics V2 bridge interface, Optics V2 pools, and HEAVY Celo rewards are all live for Optics V2 pools!!!
+          We have partnered with the Celo Foundation and DeFi for the People to bring CELO rewards to users who
+          lock/stake veMOBI. As we fully decentralize, those who stake veMOBI will control all governable parameters of
+          the Mobius protocol. Reserve your spot governing the future of Mobius and earn triple digit yield (while
+          supplies last).
         </TYPE.body>
-        <ExternalLink href="https://link.medium.com/95I588uhHlb">Read more here</ExternalLink>
+        <ExternalLink href="https://mobius.money/#/stake">Start Staking</ExternalLink>
         <RowBetween>
           <TYPE.mediumHeader>{"Don't"} show this again</TYPE.mediumHeader>
           <Toggle isActive={neverShow} toggle={() => setNeverShow(!neverShow)} />

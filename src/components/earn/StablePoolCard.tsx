@@ -26,21 +26,6 @@ import { Row, RowBetween, RowFixed } from '../Row'
 import DepositModal from './DepositModal'
 import WithdrawModal from './WithdrawModal'
 
-const SubHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 1rem;
-  padding-top: 0;
-`
-
-const Divider = styled.div`
-  width: 100%;
-  height: 1px;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
-  background: ${({ theme }) => theme.bg4};
-`
-
 const StyledButton = styled(ButtonPrimary)<{ background: any; backgroundHover: any; eth: boolean }>`
   background: ${({ background }) => background};
   flex: 0.6;
@@ -310,22 +295,6 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
       {openWithdraw && (
         <WithdrawModal isOpen={openWithdraw} onDismiss={() => setOpenWithdraw(false)} poolInfo={poolInfo} />
       )}
-      <TopSection>
-        {poolInfo.isKilled && (
-          <RowFixed>
-            <TYPE.red fontSize={[18, 26]}>[KILLED]</TYPE.red>
-            <QuestionHelper
-              text={
-                <>
-                  The gauge for this pool has been killed.
-                  <br />
-                  It will no longer produce any mobi rewards.
-                </>
-              }
-            />
-          </RowFixed>
-        )}
-      </TopSection>
       <TopSection>
         <RowFixed style={{ gap: '10px' }}>
           <TYPE.black fontWeight={600} fontSize={[18, 24]}>

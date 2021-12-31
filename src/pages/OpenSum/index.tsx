@@ -170,7 +170,6 @@ export default function OpenSum() {
   )
 
   const handleMaxInput = useCallback(() => {
-    console.log(maxAmountInput?.toExact())
     maxAmountInput && setInputValue(maxAmountInput.toExact())
   }, [maxAmountInput, setInputValue])
 

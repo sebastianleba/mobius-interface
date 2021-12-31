@@ -8,6 +8,9 @@ import { StableSwapMath } from 'utils/stableSwapMath'
 import { updateExternalRewards, updateGauges, updatePools } from './actions'
 
 const ZERO = JSBI.BigInt('0')
+export enum WarningType {
+  POOF = 'poof',
+}
 
 export type ExternalRewards = {
   token: string
@@ -80,6 +83,7 @@ export type StableSwapConstants = StableSwapMathConstants & {
   disabled?: boolean
   metaPool?: string
   isKilled?: boolean
+  warningType?: WarningType
 }
 
 export type StableSwapPool = StableSwapConstants & StableSwapVariable
