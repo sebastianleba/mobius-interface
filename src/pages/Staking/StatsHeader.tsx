@@ -1,3 +1,5 @@
+import Column from 'components/Column'
+import Loader from 'components/Loader'
 import { useMobi } from 'hooks/Tokens'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
@@ -72,22 +74,22 @@ function StatsHeader({ stakingInfo }: PropType) {
   const displayData = [
     {
       label: 'Your Voting Power',
-      value: stakingInfo.votingPower.toSignificant(4, { groupSeparator: ',' }),
+      value: stakingInfo?.votingPower?.toSignificant(4, { groupSeparator: ',' }),
       img: isDarkMode ? lockDark : lockLight,
     },
     {
       label: 'Your total deposits',
-      value: '$' + priceOfDeposits.toSignificant(4, { groupSeparator: ',' }),
+      value: priceOfDeposits ? '$' + priceOfDeposits?.toSignificant(4, { groupSeparator: ',' }) : undefined,
       img: isDarkMode ? cashDark : cashLight,
     },
     {
       label: 'Total Voting Power',
-      value: stakingInfo.totalVotingPower.toSignificant(4, { groupSeparator: ',' }),
+      value: stakingInfo?.totalVotingPower?.toSignificant(4, { groupSeparator: ',' }),
       img: isDarkMode ? bankDark : bankLight,
     },
     {
       label: 'Max Staking APR',
-      value: avgApr ? `${avgApr?.toSignificant(2, { groupSeparator: ',' })}%` : '...',
+      value: avgApr ? `${avgApr?.toSignificant(2, { groupSeparator: ',' })}%` : undefined,
       img: isDarkMode ? atmDark : atmLight,
     },
   ]
@@ -97,10 +99,10 @@ function StatsHeader({ stakingInfo }: PropType) {
       {displayData.map(({ label, value, img }, i) => (
         <Stat key={`staking-stats-${label}`} showBottom={isMobile && i % 2 === 0}>
           <StatIcon src={img} alt={label} />
-          <div>
+          <Column>
             <StatSpan>{label}</StatSpan>
-            <TYPE.subHeader fontSize={[15, 20]}>{value}</TYPE.subHeader>
-          </div>
+            {value ? <TYPE.subHeader fontSize={[15, 20]}>{value}</TYPE.subHeader> : <Loader />}
+          </Column>
         </Stat>
       ))}
     </Container>

@@ -1,9 +1,8 @@
 import { TokenAmount } from '@ubeswap/sdk'
 import { useMobi } from 'hooks/Tokens'
-import { useWindowSize } from 'hooks/useWindowSize'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
-import { useMobiStakingInfo, usePriceOfDeposits } from 'state/staking/hooks'
+import { useMobiStakingInfo } from 'state/staking/hooks'
 import styled from 'styled-components'
 
 import { Row } from '../../components/Row'
@@ -97,44 +96,10 @@ enum View {
 
 export default function Staking() {
   const stakingInfo = useMobiStakingInfo()
-  const priceOfDeposits = usePriceOfDeposits()
-  const { width, height } = useWindowSize()
   const mobi = useMobi()
   const unclaimedMobi = new TokenAmount(mobi, getAllUnclaimedMobi(stakingInfo.positions ?? []))
 
   const [view, setView] = React.useState<View>(View.Lock)
-
-  const displayData = [
-    {
-      label: 'Your Voting Power',
-      value: stakingInfo.votingPower.toSignificant(4, { groupSeparator: ',' }),
-    },
-    {
-      label: 'Total Voting Power',
-      value: stakingInfo.totalVotingPower.toSignificant(4, { groupSeparator: ',' }),
-    },
-    {
-      label: 'Your total deposits',
-      value: '$' + priceOfDeposits.toSignificant(4, { groupSeparator: ',' }),
-    },
-    {
-      label: 'Unclaimed Mobi',
-      value: unclaimedMobi.toSignificant(4, { groupSeparator: ',' }),
-    },
-  ]
-  if (width && width > 1280) {
-    displayData.push(
-      {
-        label: 'Mobi Locked',
-        value: stakingInfo.mobiLocked?.toSignificant(4) ?? '0',
-      },
-      {
-        label: 'Lock Ends',
-        value:
-          stakingInfo.lockEnd && stakingInfo.lockEnd.valueOf() > 0 ? stakingInfo.lockEnd.toLocaleDateString() : 'N/A',
-      }
-    )
-  }
 
   return (
     <OuterContainer>

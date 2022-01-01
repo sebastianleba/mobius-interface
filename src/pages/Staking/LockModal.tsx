@@ -1,4 +1,10 @@
+import { TransactionResponse } from '@ethersproject/abstract-provider'
+import { ButtonConfirmed } from 'components/Button'
+import Loader from 'components/Loader'
+import { useStakingContract } from 'hooks/useContract'
 import React, { useState } from 'react'
+import { useSNXRewardInfo } from 'state/staking/hooks'
+import { useTransactionAdder } from 'state/transactions/hooks'
 import styled from 'styled-components'
 
 import { AutoColumn } from '../../components/Column'
@@ -36,8 +42,30 @@ const ModifiedWrapper = styled(ContentWrapper)`
 
 export default function LockModal({ isOpen, onDismiss, lockType = LockType.initial }: LockModalProps) {
   // monitor call to help UI loading state
+  const { snxAddress } = useSNXRewardInfo()
+  const stakingContract = useStakingContract(snxAddress)
+  const addTransaction = useTransactionAdder()
   const [hash, setHash] = useState<string | undefined>()
+  const [hasSnapshot, setHasSnapshot] = useState(0)
   const [attempting, setAttempting] = useState(false)
+
+  async function onSnapshotRewards() {
+    if (stakingContract) {
+      setHasSnapshot(1)
+      await stakingContract
+        .getReward()
+        .then((response: TransactionResponse) => {
+          addTransaction(response, {
+            summary: `Snapshot for MOBI staking rewards`,
+          })
+          response.wait().then(() => setHasSnapshot(2))
+        })
+        .catch((error: any) => {
+          setAttempting(false)
+          console.log(error)
+        })
+    }
+  }
 
   function wrappedOndismiss() {
     setHash(undefined)
@@ -59,7 +87,11 @@ export default function LockModal({ isOpen, onDismiss, lockType = LockType.initi
             </TYPE.largeHeader>
             <CloseIcon onClick={wrappedOndismiss} />
           </RowBetween>
-          {lockType === LockType.initial ? (
+          {hasSnapshot !== 2 ? (
+            <ButtonConfirmed onClick={onSnapshotRewards} disabled={hasSnapshot > 0}>
+              {hasSnapshot === 0 ? <TYPE.mediumHeader>Snapshot veMOBI Celo Rewards</TYPE.mediumHeader> : <Loader />}
+            </ButtonConfirmed>
+          ) : lockType === LockType.initial ? (
             <Lock setAttempting={setAttempting} setHash={setHash} />
           ) : lockType === LockType.extend ? (
             <ExtendLock setAttempting={setAttempting} setHash={setHash} />

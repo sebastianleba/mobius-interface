@@ -121,20 +121,22 @@ export function usePriceOfDeposits() {
     btcPrice: state.application.btcPrice,
   }))
   const dummyToken = useMobi()
-  return new TokenAmount(
-    dummyToken,
-    pools.reduce((accum, pool) => {
-      const address = pool.address
-      const { valueOfDeposited } = getDepositValues(getPoolInfo(pool))
-      const price =
-        address === '0x19260b9b573569dDB105780176547875fE9fedA3'
-          ? JSBI.BigInt(prices.btcPrice)
-          : address === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
-          ? JSBI.BigInt(prices.ethPrice)
-          : JSBI.BigInt('1')
-      return JSBI.add(accum, JSBI.multiply(valueOfDeposited.raw, price))
-    }, JSBI.BigInt('0'))
-  )
+  return !pools[0] || pools[0].loadingGauge
+    ? undefined
+    : new TokenAmount(
+        dummyToken,
+        pools.reduce((accum, pool) => {
+          const address = pool.address
+          const { valueOfStaked } = getDepositValues(getPoolInfo(pool))
+          const price =
+            address === '0x19260b9b573569dDB105780176547875fE9fedA3'
+              ? JSBI.BigInt(prices.btcPrice)
+              : address === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+              ? JSBI.BigInt(prices.ethPrice)
+              : JSBI.BigInt('1')
+          return JSBI.add(accum, JSBI.multiply(valueOfStaked.raw, price))
+        }, JSBI.BigInt('0'))
+      )
 }
 
 export function useLockEnd(): number {
