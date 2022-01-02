@@ -133,13 +133,13 @@ export default function Pool() {
               <AutoColumn gap="md">
                 <RowBetween>
                   <TYPE.white fontWeight={600} fontSize={20}>
-                    Use caution when depositing
+                    Celo Rewards Paused
                   </TYPE.white>
                 </RowBetween>
                 <RowBetween>
                   <TYPE.white
                     fontSize={16}
-                  >{`Please use caution when providing liquidity into pools. Do your own research to understand the stablility mechanisms behind each token--Mobius does not guarantee the value of any asset.`}</TYPE.white>
+                  >{`Celo rewards for the Optics V2 pools and veMOBI stakers are temporarily paused while we wait for the Celo foundation to provide the next tranche of rewards.  Celo rewards are expected to resume January 3rd.`}</TYPE.white>
                 </RowBetween>
               </AutoColumn>
             </CardSection>
