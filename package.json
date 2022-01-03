@@ -142,6 +142,7 @@
     "@ledgerhq/errors": "^6.0.2",
     "@ledgerhq/hw-transport-webusb": "^6.0.2",
     "@pedrouid/environment": "^1.0.1",
+    "@pedrouid/pino-utils": "^1.0.1",
     "@sentry/react": "^6.9.0",
     "@sentry/tracing": "^6.9.0",
     "@types/react-date-range": "^1.1.8",

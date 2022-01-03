@@ -2380,6 +2380,13 @@
   resolved "https://registry.yarnpkg.com/@pedrouid/environment/-/environment-1.0.1.tgz#858f0f8a057340e0b250398b75ead77d6f4342ec"
   integrity sha512-HaW78NszGzRZd9SeoI3JD11JqY+lubnaOx7Pewj5pfjqWXOEATpeKIFb9Z4t2WBUK2iryiXX3lzWwmYWgUL0Ug==
 
+"@pedrouid/pino-utils@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@pedrouid/pino-utils/-/pino-utils-1.0.1.tgz#83ea202c7e67e4480bac2fa135a6bc0bcb782588"
+  integrity sha512-a20vNltMhvk/bvhgnpSvBLFqL9B4xXNCukDEo70lO1bCSwRy5Tmu6Gc/1DsuYY+oNgE6b424j5J+8/J1OJenCg==
+  dependencies:
+    pino "^6.7.0"
+
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.4.3.tgz#1eec460596d200c0236bf195b078a5d1df89b766"
