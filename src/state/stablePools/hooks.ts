@@ -117,7 +117,7 @@ export const getPoolInfo = (
         workingSupply: pool.workingLiquidity,
         balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
         pegComesAfter: pool.pegComesAfter,
-        mobiRate: pool.totalMobiRate,
+        mobiRate: pool.isKilled ? JSBI.BigInt('0') : pool.totalMobiRate,
         pendingMobi: pool.pendingMobi,
         gaugeAddress: pool.gaugeAddress,
         displayDecimals: pool.displayDecimals,
