@@ -22,12 +22,28 @@ import styled from 'styled-components/macro'
 import { ExternalLink, TYPE } from 'theme'
 
 import { CreateProposalTabs } from '../../components/NavigationTabs'
-import { VEMOBI } from '../../constants/tokens'
-import AppBody from '../AppBody'
+import { UBE } from '../../constants/tokens'
 import { ProposalActionDetail } from './ProposalActionDetail'
 import { ProposalAction, ProposalActionSelector, ProposalActionSelectorModal } from './ProposalActionSelector'
 import { ProposalEditor } from './ProposalEditor'
 import { ProposalSubmissionModal } from './ProposalSubmissionModal'
+
+const Upper = styled(AutoColumn)`
+  border-radius: 20px;
+  width: 640px;
+  overflow: hidden;
+  position: relative;
+  padding: 1rem;
+  background: ${({ theme }) => theme.bg1};
+  color: ${({ theme }) => theme.text1} !important;
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.01), 0px 4px 8px rgba(0, 0, 0, 0.04), 0px 16px 24px rgba(0, 0, 0, 0.04),
+    0px 24px 32px rgba(0, 0, 0, 0.01);
+  ${({ theme }) => theme.mediaWidth.upToSmall`
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  max-width: 420px;
+`}
+`
 
 const CreateProposalButton = ({
   proposalThreshold,
@@ -78,11 +94,6 @@ const CreateProposalWrapper = styled(Wrapper)`
   flex-flow: column wrap;
 `
 
-const AutonomousProposalCTA = styled.div`
-  text-align: center;
-  margin-top: 10px;
-`
-
 export default function CreateProposal() {
   const { account, chainId } = useActiveContractKit()
 
@@ -97,7 +108,7 @@ export default function CreateProposal() {
   const [attempting, setAttempting] = useState(false)
   const [proposalAction, setProposalAction] = useState(ProposalAction.TRANSFER_TOKEN)
   const [toAddressValue, setToAddressValue] = useState('')
-  const [currencyValue, setCurrencyValue] = useState<Token>(VEMOBI[chainId ?? 1])
+  const [currencyValue, setCurrencyValue] = useState<Token>(UBE[chainId ?? 42220])
   const [amountValue, setAmountValue] = useState('')
   const [titleValue, setTitleValue] = useState('')
   const [bodyValue, setBodyValue] = useState('')
@@ -219,7 +230,7 @@ ${bodyValue}
   }
 
   return (
-    <AppBody {...{ maxWidth: '800px' }}>
+    <Upper>
       <CreateProposalTabs />
       <CreateProposalWrapper>
         <BlueCard>
@@ -228,8 +239,8 @@ ${bodyValue}
               <TYPE.main>
                 <strong>Tip:</strong> Select an action and describe your proposal for the community. The proposal cannot
                 be modified after submission, so please verify all information before submitting. The voting period will
-                begin immediately and last for 7 days. To propose a custom action,{' '}
-                <ExternalLink href="https://uniswap.org/docs/v2/governance/governance-reference/#propose">
+                begin after 1 day and last for 3 days. To propose a custom action,{' '}
+                <ExternalLink href="https://github.com/mobiusAMM/mobius-governance/blob/main/README.md">
                   read the docs
                 </ExternalLink>
                 .
@@ -263,12 +274,6 @@ ${bodyValue}
           isFormInvalid={isFormInvalid}
           handleCreateProposal={handleCreateProposal}
         />
-        {!hasEnoughVote ? (
-          <AutonomousProposalCTA>
-            Don’t have 2.5M votes? Anyone can create an autonomous proposal using{' '}
-            <ExternalLink href="https://fish.vote">fish.vote</ExternalLink>
-          </AutonomousProposalCTA>
-        ) : null}
       </CreateProposalWrapper>
       <ProposalActionSelectorModal
         isOpen={modalOpen}
@@ -276,6 +281,6 @@ ${bodyValue}
         onProposalActionSelect={(proposalAction: ProposalAction) => handleActionChange(proposalAction)}
       />
       <ProposalSubmissionModal isOpen={attempting} hash={hash} onDismiss={handleDismissSubmissionModal} />
-    </AppBody>
+    </Upper>
   )
 }

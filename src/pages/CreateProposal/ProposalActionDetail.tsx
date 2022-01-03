@@ -74,6 +74,7 @@ export const ProposalActionDetail = ({
             showMaxButton={false}
             showCommonBases={false}
             hideBalance={true}
+            disableCurrencySelect={true}
             id="currency-input"
           />
         ) : null
