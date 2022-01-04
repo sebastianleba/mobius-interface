@@ -165,10 +165,6 @@ export default function VeMobiRewards() {
                   fontSize={[12, 16]}
                 >{`Earn rewards just for staking Mobi. To begin, simply lock MOBI on the \`Lock\` tab! If you already locked MOBI then you are good to go. Max APR is calculated by total celo rate / total veMOBI, actual APR will vary based on lock duration.`}</TYPE.white>
               </RowBetween>
-              <TYPE.white fontWeight={700} fontSize={[12, 16]}>
-                We are currently waiting on the Celo foundation to refill the next tranche of rewards. Celo rewards for
-                veMOBI stakers will resume shortly
-              </TYPE.white>
             </AutoColumn>
           </CardSection>
           <CardNoise />
