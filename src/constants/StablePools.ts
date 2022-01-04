@@ -331,7 +331,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0xc96AeeaFF32129da934149F6134Aa7bf291a754E',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['0'], // ['29552083330000000'], // ['36940104160000000'], // ['7302827380000000']
+      additionalRewardRate: ['29552082670000000'], // ['29552083330000000'], // ['36940104160000000'], // ['7302827380000000']
       displayChain: Chain.Ethereum,
       coin: Coins.USD,
     },
@@ -384,7 +384,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0xE1f9D952EecC07cfEFa69df9fBB0cEF260957119',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['0'], // ['14776041660000000'], //['18468900000000000'], // ['7302827380000000']
+      additionalRewardRate: ['18470051670000000'], // ['14776041660000000'], //['18468900000000000'], // ['7302827380000000']
       displayChain: Chain.Ethereum,
       coin: Coins.USD,
     },
@@ -543,7 +543,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x0A125D473cd3b1968e728DDF7d424c928C09222A',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['0'], // ['7388020830000000'], //['11080000000000000'], // ['2190848200000000'],
+      additionalRewardRate: ['5541015500000000'], // ['7388020830000000'], //['11080000000000000'], // ['2190848200000000'],
       displayChain: Chain.Polygon,
       coin: Coins.USD,
     },
@@ -756,7 +756,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
       gaugeAddress: '0x27D9Bfa5F864862BeDC23cFab7e00b6b94488CC6',
       totalMobiRate: JSBI.BigInt('1467123000000000000'),
       additionalRewards: ['0x471EcE3750Da237f93B8E339c536989b8978a438'],
-      additionalRewardRate: ['1460565500000000'],
+      additionalRewardRate: ['14776041330000000'],
       displayChain: Chain.Solana,
       coin: Coins.USD,
     },
