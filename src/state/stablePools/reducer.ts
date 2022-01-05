@@ -20,6 +20,7 @@ export type ExternalRewards = {
 export type PoolOnlyInfo = {
   id: string
   volume: {
+    total: number
     day: number
     week: number
   }
