@@ -411,6 +411,19 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
 
               {openManage && (
                 <>
+                  <RowBetween>
+                    <TYPE.darkGray>Total volume</TYPE.darkGray>
+                    <RowFixed>
+                      <TYPE.black fontWeight={800}>
+                        {poolInfo.totalVolume
+                          ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(poolInfo.totalVolume)} ${
+                              pegComesAfter ? peggedTo : ''
+                            }`
+                          : '-'}
+                      </TYPE.black>
+                    </RowFixed>
+                  </RowBetween>
+
                   {mobiRate && (
                     <RowBetween>
                       <TYPE.darkGray>MOBI rate</TYPE.darkGray>

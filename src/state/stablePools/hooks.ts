@@ -137,6 +137,7 @@ export const getPoolInfo = (
         isDisabled: pool.disabled,
         isKilled: pool.isKilled,
         weeklyVolume: tryParseAmount(pool.volume.week.toFixed(6), pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
+        totalVolume: tryParseAmount(pool.volume.total?.toFixed(6), pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
         poolLoading: pool.loadingPool,
         gaugeLoading: pool.loadingGauge,
       }

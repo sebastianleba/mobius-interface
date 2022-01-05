@@ -50,7 +50,7 @@ export function UpdateVariablePoolInfo(): null {
         A
         balances
         virtualPrice
-        dailyVolumes(first: 2, orderBy: timestamp, orderDirection: desc) {
+        dailyVolumes(orderBy: timestamp, orderDirection: desc) {
           volume
         }
         weeklyVolumes(first: 2, orderBy: timestamp, orderDirection: desc) {
@@ -87,6 +87,7 @@ export function UpdateVariablePoolInfo(): null {
       .map((pool) => ({
         id: pool.id,
         volume: {
+          total: pool.dailyVolumes.reduce((accum: number, el: string) => accum + parseFloat(el.volume), 0),
           day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
           week: parseFloat(pool.weeklyVolumes[0]?.volume ?? '0'),
         },
