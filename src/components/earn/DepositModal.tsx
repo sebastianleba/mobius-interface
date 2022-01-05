@@ -51,7 +51,8 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
   const [input, setInput] = useState<(string | undefined)[]>(new Array(tokens.length).fill(undefined))
   const [warningAcknowledged, setWarningAcknowledged] = useState<boolean>(!warning)
   const isFirstDeposit = totalDeposited.equalTo('0')
-  const [useEqualAmount, setUseEqualAmount] = useState<boolean>(isFirstDeposit)
+  const forceEqualDeposit = isFirstDeposit || warning?.modification === 'require-equal-deposit'
+  const [useEqualAmount, setUseEqualAmount] = useState<boolean>(forceEqualDeposit)
   const deadline = useTransactionDeadline()
 
   const sumAmount = tokens
@@ -148,11 +149,10 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
                 <TYPE.largeHeader>Deposit to {poolInfo.name}</TYPE.largeHeader>
                 <CloseIcon onClick={wrappedOndismiss} />
               </RowBetween>
-              {isFirstDeposit && (
+              {forceEqualDeposit && (
                 <AutoRow>
                   <TYPE.body color="red">
-                    You are the first to deposit into the pool! <br />
-                    Because of this, you will need to deposit an equal amount of tokens.
+                    Due to the current conditions of this pool, deposits must be made in equal amounts of both tokens.
                   </TYPE.body>
                 </AutoRow>
               )}
@@ -166,7 +166,7 @@ export default function DepositModal({ isOpen, onDismiss, poolInfo }: DepositMod
                 <Toggle
                   id="toggle-equal-amount-button"
                   isActive={useEqualAmount}
-                  toggle={() => !isFirstDeposit && setUseEqualAmount(!useEqualAmount)}
+                  toggle={() => !forceEqualDeposit && setUseEqualAmount(!useEqualAmount)}
                 />
               </RowBetween>
               {poolInfo.tokens.map((token, i) => (

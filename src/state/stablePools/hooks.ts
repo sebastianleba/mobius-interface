@@ -17,6 +17,8 @@ import { AppState } from '..'
 import { StableSwapConstants, StableSwapPool, WarningType } from './reducer'
 import { BigIntToJSBI } from './updater'
 
+export type WarningModifications = 'require-equal-deposit' | 'none'
+
 export interface StablePoolInfo {
   readonly name: string
   readonly poolAddress?: string
@@ -273,10 +275,12 @@ export function useExternalRewards({ address }: { address: string }): TokenAmoun
   return externalRewards
 }
 
-export function useWarning(pool: string | undefined): { warning: string; link?: string } | undefined {
+export function useWarning(
+  pool: string | undefined
+): { warning: string; link?: string; modification?: WarningModifications } | undefined {
   const warningType = useSelector<AppState, WarningType | undefined>(
     (state) => state.stablePools.pools[pool?.toLowerCase() ?? '']?.pool?.warningType ?? undefined
   )
   if (!warningType) return undefined
-  return WARNINGS[warningType] as any as { warning: string; link?: string }
+  return WARNINGS[warningType] as any as { warning: string; link?: string; modification?: WarningModifications }
 }
