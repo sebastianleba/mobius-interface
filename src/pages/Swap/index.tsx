@@ -2,7 +2,6 @@ import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { describeTrade } from 'components/swap/routing/describeTrade'
 import { MoolaDirectTrade } from 'components/swap/routing/moola/MoolaDirectTrade'
 import { useTradeCallback } from 'components/swap/routing/useTradeCallback'
-import { useIsTransactionUnsupported } from 'hooks/Trades'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { ArrowDown } from 'react-feather'
@@ -10,7 +9,7 @@ import ReactGA from 'react-ga'
 import { Text } from 'rebass'
 import { ThemeContext } from 'styled-components'
 
-import { ButtonConfirmed, ButtonError, ButtonPrimary } from '../../components/Button'
+import { ButtonConfirmed, ButtonError } from '../../components/Button'
 import Card, { GreyCard } from '../../components/Card'
 import Column, { AutoColumn } from '../../components/Column'
 import CurrencyInputPanel from '../../components/CurrencyInputPanel'
@@ -35,7 +34,7 @@ import {
   useSwapActionHandlers,
   useSwapState,
 } from '../../state/swap/hooks'
-import { useExpertModeManager, useIsDarkMode, useUserSlippageTolerance } from '../../state/user/hooks'
+import { useIsDarkMode, useUserSlippageTolerance } from '../../state/user/hooks'
 import { TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
@@ -64,7 +63,6 @@ export default function Swap() {
 
   // for expert mode
   const toggleSettings = useToggleSettingsMenu()
-  const [isExpertMode] = useExpertModeManager()
 
   // get custom setting values for user
   const [allowedSlippage] = useUserSlippageTolerance()
@@ -177,12 +175,12 @@ export default function Swap() {
 
   // show approve flow when: no error on inputs, not approved or pending, or approved in current session
   // never show if price impact is above threshold in non expert mode
+
   const showApproveFlow =
     !swapInputError &&
     (approval === ApprovalState.NOT_APPROVED ||
       approval === ApprovalState.PENDING ||
-      (approvalSubmitted && approval === ApprovalState.APPROVED)) &&
-    !(priceImpactSeverity > 3 && !isExpertMode)
+      (approvalSubmitted && approval === ApprovalState.APPROVED))
 
   const handleConfirmDismiss = useCallback(() => {
     setSwapState({ showConfirm: false, tradeToConfirm, attemptingTxn, swapErrorMessage, txHash })
@@ -212,8 +210,6 @@ export default function Swap() {
     (outputCurrency) => onCurrencySelection(Field.OUTPUT, outputCurrency),
     [onCurrencySelection]
   )
-
-  const swapIsUnsupported = useIsTransactionUnsupported(currencies?.INPUT, currencies?.OUTPUT)
 
   const { isEstimate, makeLabel } = describeTrade()
   const actionLabel = makeLabel(independentField !== Field.INPUT)
@@ -301,11 +297,7 @@ export default function Swap() {
             </Card>
           </AutoColumn>
           <BottomGrouping>
-            {swapIsUnsupported ? (
-              <ButtonPrimary disabled={true}>
-                <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
-              </ButtonPrimary>
-            ) : !account ? (
+            {!account ? (
               <ButtonError disabledStyle={true} onClick={toggleWalletModal}>
                 Connect Wallet
               </ButtonError>
@@ -334,17 +326,7 @@ export default function Swap() {
                 </ButtonConfirmed>
                 <ButtonError
                   onClick={() => {
-                    if (isExpertMode) {
-                      handleSwap()
-                    } else {
-                      setSwapState({
-                        tradeToConfirm: trade,
-                        attemptingTxn: false,
-                        swapErrorMessage: undefined,
-                        showConfirm: true,
-                        txHash: undefined,
-                      })
-                    }
+                    handleSwap()
                   }}
                   width="48%"
                   id="swap-button"
@@ -352,26 +334,14 @@ export default function Swap() {
                   error={isValid}
                 >
                   <Text fontSize={16} fontWeight={500}>
-                    {priceImpactSeverity > 3 && !isExpertMode
-                      ? `Price Impact High`
-                      : `${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
+                    {`${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
                   </Text>
                 </ButtonError>
               </RowBetween>
             ) : (
               <ButtonError
                 onClick={() => {
-                  if (isExpertMode) {
-                    handleSwap()
-                  } else {
-                    setSwapState({
-                      tradeToConfirm: trade,
-                      attemptingTxn: false,
-                      swapErrorMessage: undefined,
-                      showConfirm: true,
-                      txHash: undefined,
-                    })
-                  }
+                  handleSwap()
                 }}
                 id="swap-button"
                 disabled={!isValid || !!swapCallbackError}
@@ -380,7 +350,7 @@ export default function Swap() {
                 <Text fontSize={20} fontWeight={500} color={isValid && actionLabel && (isDarkMode ? 'black' : 'white')}>
                   {swapInputError
                     ? swapInputError
-                    : priceImpactSeverity > 3 && isExpertMode
+                    : priceImpactSeverity > 3
                     ? `Price Impact Too High`
                     : `${actionLabel}${priceImpactSeverity > 2 ? ' Anyway' : ''}`}
                 </Text>
@@ -391,16 +361,11 @@ export default function Swap() {
                 <ProgressSteps steps={[approval === ApprovalState.APPROVED]} />
               </Column>
             )}
-            {isExpertMode && swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
+            {swapErrorMessage ? <SwapCallbackError error={swapErrorMessage} /> : null}
           </BottomGrouping>
           <AutoRow style={{ justifyContent: 'center' }}></AutoRow>
         </Wrapper>
       </AppBody>
-      {/* {!swapIsUnsupported ? (
-        <AdvancedSwapDetailsDropdown trade={trade} />
-      ) : (
-        <UnsupportedCurrencyFooter show={swapIsUnsupported} currencies={[currencies.INPUT, currencies.OUTPUT]} />
-      )} */}
     </>
   )
 }
