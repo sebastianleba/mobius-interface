@@ -4,6 +4,7 @@ import { Token, TokenAmount } from '@ubeswap/sdk'
 import { ButtonError } from 'components/Button'
 import { BlueCard } from 'components/Card'
 import { AutoColumn } from 'components/Column'
+import { GAUGE_CONTROLLER } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import JSBI from 'jsbi'
 import { Wrapper } from 'pages/Pool/styleds'
@@ -108,6 +109,7 @@ export default function CreateProposal() {
   const [attempting, setAttempting] = useState(false)
   const [proposalAction, setProposalAction] = useState(ProposalAction.TRANSFER_TOKEN)
   const [toAddressValue, setToAddressValue] = useState('')
+  const [gaugeAddressValue, setGaugeAddressValue] = useState('')
   const [currencyValue, setCurrencyValue] = useState<Token>(UBE[chainId ?? 42220])
   const [amountValue, setAmountValue] = useState('')
   const [titleValue, setTitleValue] = useState('')
@@ -138,6 +140,13 @@ export default function CreateProposal() {
       setToAddressValue(toAddress)
     },
     [setToAddressValue]
+  )
+
+  const handleGaugeAddressInput = useCallback(
+    (gaugeAddress: string) => {
+      setGaugeAddressValue(gaugeAddress)
+    },
+    [setGaugeAddressValue]
   )
 
   const handleCurrencySelect = useCallback(
@@ -171,9 +180,14 @@ export default function CreateProposal() {
   const isFormInvalid = useMemo(
     () =>
       Boolean(
-        !proposalAction || !isAddress(toAddressValue) || amountValue === '' || titleValue === '' || bodyValue === ''
+        !proposalAction ||
+          !isAddress(toAddressValue) ||
+          !isAddress(gaugeAddressValue) ||
+          amountValue === '' ||
+          titleValue === '' ||
+          bodyValue === ''
       ),
-    [proposalAction, toAddressValue, amountValue, titleValue, bodyValue]
+    [proposalAction, toAddressValue, gaugeAddressValue, amountValue, titleValue, bodyValue]
   )
 
   const hasEnoughVote = Boolean(
@@ -192,7 +206,25 @@ export default function CreateProposal() {
     const tokenAmount = tryParseAmount(amountValue, currencyValue)
     if (!tokenAmount) return
 
-    createProposalData.targets = [currencyValue.address]
+    switch (proposalAction) {
+      case ProposalAction.TRANSFER_TOKEN: {
+        createProposalData.targets = [currencyValue.address]
+        break
+      }
+      case ProposalAction.APPROVE_TOKEN: {
+        createProposalData.targets = [currencyValue.address]
+        break
+      }
+      case ProposalAction.ADD_GAUGE: {
+        createProposalData.targets = [GAUGE_CONTROLLER[chainId ?? 42220]]
+        break
+      }
+      case ProposalAction.KILL_GAUGE: {
+        createProposalData.targets = ['GAUGE_PROXY']
+        break
+      }
+    }
+
     createProposalData.values = ['0']
     createProposalData.description = `# ${titleValue}
 
@@ -214,6 +246,19 @@ ${bodyValue}
         values = [[getAddress(toAddressValue), tokenAmount.quotient.toString()]]
         createProposalData.signatures = [`approve(${types[0].join(',')})`]
         break
+      }
+
+      case ProposalAction.ADD_GAUGE: {
+        types = [['address', 'int128', 'uint256']]
+        values = [[getAddress(gaugeAddressValue), '0', '0']]
+        createProposalData.signatures = [`add_gauge(${types[0].join(',')})`]
+        break
+      }
+
+      case ProposalAction.KILL_GAUGE: {
+        types = [['address', 'bool']]
+        values = [[getAddress(gaugeAddressValue), '1']]
+        createProposalData.signatures = [`set_killed(${types[0].join(',')})`]
       }
     }
 
@@ -255,9 +300,11 @@ ${bodyValue}
           currency={currencyValue}
           amount={amountValue}
           toAddress={toAddressValue}
+          gaugeAddress={gaugeAddressValue}
           onCurrencySelect={handleCurrencySelect}
           onAmountInput={handleAmountInput}
           onToAddressInput={handleToAddressInput}
+          onGaugeAddressInput={handleGaugeAddressInput}
         />
         <ProposalEditor
           title={titleValue}
