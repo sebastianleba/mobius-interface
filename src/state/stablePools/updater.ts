@@ -50,13 +50,10 @@ export function UpdateVariablePoolInfo(): null {
         A
         balances
         virtualPrice
-        hourlyVolumes(first: 2) {
+        dailyVolumes(first: 2, orderBy: timestamp, orderDirection: desc) {
           volume
         }
-        dailyVolumes(first: 2) {
-          volume
-        }
-        weeklyVolumes(first: 2) {
+        weeklyVolumes(first: 2, orderBy: timestamp, orderDirection: desc) {
           volume
         }
       }
@@ -91,7 +88,7 @@ export function UpdateVariablePoolInfo(): null {
         id: pool.id,
         volume: {
           day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
-          week: parseFloat(pool.weeklyVolumes[1]?.volume ?? '0'),
+          week: parseFloat(pool.weeklyVolumes[0]?.volume ?? '0'),
         },
         balances: lpInfo[pool.id].balances ?? pool?.balances?.map((b: string) => JSBI.BigInt(b)),
         amp: JSBI.BigInt(pool.A),
