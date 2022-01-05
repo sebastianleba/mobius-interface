@@ -64,15 +64,6 @@ export const ProposalActionDetail = ({
         type: ProposalActionDetailField.CURRENCY,
       },
     ],
-    [ProposalAction.APPROVE_TOKEN]: [
-      {
-        type: ProposalActionDetailField.ADDRESS,
-        label: 'To',
-      },
-      {
-        type: ProposalActionDetailField.CURRENCY,
-      },
-    ],
   }
 
   return (

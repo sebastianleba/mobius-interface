@@ -211,10 +211,6 @@ export default function CreateProposal() {
         createProposalData.targets = [currencyValue.address]
         break
       }
-      case ProposalAction.APPROVE_TOKEN: {
-        createProposalData.targets = [currencyValue.address]
-        break
-      }
       case ProposalAction.ADD_GAUGE: {
         createProposalData.targets = [GAUGE_CONTROLLER[chainId ?? 42220]]
         break
@@ -238,13 +234,6 @@ ${bodyValue}
         types = [['address', 'uint256']]
         values = [[getAddress(toAddressValue), tokenAmount.quotient.toString()]]
         createProposalData.signatures = [`transfer(${types[0].join(',')})`]
-        break
-      }
-
-      case ProposalAction.APPROVE_TOKEN: {
-        types = [['address', 'uint256']]
-        values = [[getAddress(toAddressValue), tokenAmount.quotient.toString()]]
-        createProposalData.signatures = [`approve(${types[0].join(',')})`]
         break
       }
 

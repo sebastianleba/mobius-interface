@@ -10,7 +10,6 @@ import { CloseIcon, TYPE } from 'theme'
 
 export enum ProposalAction {
   TRANSFER_TOKEN = 'Transfer Token',
-  APPROVE_TOKEN = 'Approve Token',
   ADD_GAUGE = 'Add Gauge',
   KILL_GAUGE = 'Kill Gauge',
 }
@@ -128,13 +127,6 @@ export function ProposalActionSelectorModal({
           <Column>
             <Text fontWeight={500}>
               <TYPE.main>Transfer Token</TYPE.main>
-            </Text>
-          </Column>
-        </MenuItem>
-        <MenuItem onClick={() => handleProposalActionSelect(ProposalAction.APPROVE_TOKEN)}>
-          <Column>
-            <Text fontWeight={500}>
-              <TYPE.main>Approve Token</TYPE.main>
             </Text>
           </Column>
         </MenuItem>
