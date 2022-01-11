@@ -272,6 +272,7 @@ export type MobiusTrade = {
   executionPrice: Price
   tradeType: TradeType
   fee: TokenAmount
+  priceImpact: Percent
   isMeta?: boolean
 }
 
@@ -502,6 +503,17 @@ export function useMobiusTradeInfo(): {
     underlyingMath,
     underlyingPool
   )
+
+  const basisTrade = calcInputOutput(
+    inputCurrency,
+    outputCurrency,
+    isExactIn,
+    tryParseAmount('1', inputCurrency),
+    mathUtil,
+    pool,
+    underlyingMath,
+    underlyingPool
+  )
   const input = tradeData[0]
   const output = tradeData[1]
   const fee = tradeData[2]
@@ -511,6 +523,9 @@ export function useMobiusTradeInfo(): {
   }
 
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
+  const basisPrice = new Price(inputCurrency, outputCurrency, basisTrade[0]?.raw, basisTrade[1]?.raw)
+  const priceImpactFraction = basisPrice.subtract(executionPrice).divide(basisPrice)
+  const priceImpact = new Percent(priceImpactFraction.numerator, priceImpactFraction.denominator)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
   const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
 
@@ -523,7 +538,7 @@ export function useMobiusTradeInfo(): {
 
   const v2Trade: MobiusTrade | undefined =
     input && output && pool
-      ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta }
+      ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta, priceImpact }
       : undefined
 
   return {

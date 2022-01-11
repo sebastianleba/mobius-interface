@@ -276,16 +276,22 @@ export default function Swap() {
             <Card padding={'0px'} borderRadius={'8px'}>
               <AutoColumn gap="8px" style={{ padding: '0 8px' }}>
                 {Boolean(trade) && (
-                  <RowBetween align="center">
-                    <Text fontWeight={500} fontSize={14} color={theme.text2}>
-                      Price
-                    </Text>
-                    <TradePrice
-                      price={trade?.executionPrice}
-                      showInverted={showInverted}
-                      setShowInverted={setShowInverted}
-                    />
-                  </RowBetween>
+                  <>
+                    <RowBetween align="center">
+                      <Text fontWeight={500} fontSize={14} color={theme.text2}>
+                        Price
+                      </Text>
+                      <TradePrice
+                        price={trade?.executionPrice}
+                        showInverted={showInverted}
+                        setShowInverted={setShowInverted}
+                      />
+                    </RowBetween>
+                    <RowBetween>
+                      <TYPE.body>Price Impact</TYPE.body>
+                      <TYPE.body>{`${trade?.priceImpact.toFixed(4)}%`}</TYPE.body>
+                    </RowBetween>
+                  </>
                 )}
                 {allowedSlippage !== INITIAL_ALLOWED_SLIPPAGE && (
                   <RowBetween align="center">
