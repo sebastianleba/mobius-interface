@@ -317,10 +317,8 @@ function calcInputOutput(
         const lpIndexFrom = poolInfo.tokenAddresses.indexOf(underlyingPool?.lpToken.address)
 
         const metaexpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
-        console.log('metaExtectedOut', metaexpectedOut.toString())
         details[0] = parsedAmount
         const [expectedOut, fee] = math.calculateSwap(lpIndexFrom, indexTo, metaexpectedOut, math.calc_xp())
-        console.log('expected', expectedOut.toString())
         details[1] = new TokenAmount(output, expectedOut)
         details[2] = new TokenAmount(input, fee)
       } else {
@@ -339,9 +337,7 @@ function calcInputOutput(
         const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount.raw, math.calc_xp())
 
         const metaIndexOut = underTokens.map(({ address }) => address).indexOf(output.address)
-        console.log('djfdia', metaExpectedOut.toString())
         const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaIndexOut, metaExpectedOut)
-        console.log(expectedOut.toString(), 'expreccc')
         details[0] = parsedAmount
         details[1] = new TokenAmount(output, expectedOut)
         details[2] = new TokenAmount(

@@ -60,7 +60,6 @@ export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwap
     Object.values(state.stablePools.pools).map(({ pool }) => {
       if (!pool.metaPool || pool.disabled) return pool
       const underlying = state.stablePools.pools[pool.metaPool]?.pool
-      console.log(pool)
       return {
         ...pool,
         tokenAddresses: pool.tokenAddresses.concat(underlying.tokenAddresses),
