@@ -439,8 +439,7 @@ export function useMobiusTradeInfo(): {
   if (!parsedAmount) {
     inputError = inputError ?? 'Enter an amount'
   }
-
-  if (!pool) {
+  if (!pool || pool.loadingPool) {
     inputError = inputError ?? 'Pool Info Loading'
   }
 

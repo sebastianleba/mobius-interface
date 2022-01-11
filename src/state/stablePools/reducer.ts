@@ -24,6 +24,7 @@ export type PoolOnlyInfo = {
     day: number
     week: number
   }
+  approxBalances: JSBI[]
   balances: JSBI[]
   amp: JSBI
   virtualPrice: JSBI
@@ -149,7 +150,7 @@ export default createReducer<PoolState>(initialState, (builder) =>
       const copiedState = current(state)
       info.forEach((pool) => {
         const cur = copiedState.pools[pool.id].pool as any as StableSwapPool
-        const newPool = { ...cur, ...pool, loadingPool: false }
+        const newPool = { ...cur, ...pool }
 
         const math = new StableSwapMath(newPool)
         state.pools[pool.id] = {
