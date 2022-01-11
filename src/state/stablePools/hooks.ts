@@ -60,7 +60,6 @@ export function useCurrentPool(tok1: string, tok2: string): readonly [StableSwap
     Object.values(state.stablePools.pools).map(({ pool }) => {
       if (!pool.metaPool || pool.disabled) return pool
       const underlying = state.stablePools.pools[pool.metaPool]?.pool
-      console.log(pool)
       return {
         ...pool,
         tokenAddresses: pool.tokenAddresses.concat(underlying.tokenAddresses),
@@ -117,7 +116,7 @@ export const getPoolInfo = (
           )
         ),
         workingSupply: pool.workingLiquidity,
-        balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.balances[i] ?? '0')),
+        balances: pool.tokens.map((token, i) => new TokenAmount(token, pool.approxBalances[i] ?? '0')),
         pegComesAfter: pool.pegComesAfter,
         mobiRate: pool.isKilled ? JSBI.BigInt('0') : pool.totalMobiRate,
         pendingMobi: pool.pendingMobi,

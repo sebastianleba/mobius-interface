@@ -73,9 +73,9 @@ export function UpdateVariablePoolInfo(): null {
         poolAddresses[i],
       ])
       .reduce(
-        (accum, [total, user, virtualPrice, balance, address]) => ({
+        (accum, [total, user, virtualPrice, balances, address]) => ({
           ...accum,
-          [(address as any as string).toLowerCase()]: { total, user, balance, virtualPrice },
+          [(address as any as string).toLowerCase()]: { total, user, balances, virtualPrice },
         }),
         {}
       )
@@ -91,12 +91,14 @@ export function UpdateVariablePoolInfo(): null {
           day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
           week: parseFloat(pool.weeklyVolumes[0]?.volume ?? '0'),
         },
-        balances: lpInfo[pool.id].balances ?? pool?.balances?.map((b: string) => JSBI.BigInt(b)),
+        approxBalances: pool?.balances?.map((b: string) => JSBI.BigInt(b)),
+        balances: lpInfo[pool.id].total ? lpInfo[pool.id].balances : undefined,
         amp: JSBI.BigInt(pool.A),
         aPrecise: JSBI.BigInt(parseInt(pool.A) * 100),
         virtualPrice: lpInfo[pool.id].virtualPrice,
         lpTotalSupply: lpInfo[pool.id].total,
         lpOwned: lpInfo[pool.id].user,
+        loadingPool: !lpInfo[pool.id].total,
       }))
     dispatch(updatePools({ info: poolInfo }))
     return null

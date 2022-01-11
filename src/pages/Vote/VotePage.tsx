@@ -133,7 +133,6 @@ export default function VotePage({
   // modal for casting votes
   const showVoteModal = useModalOpen(ApplicationModal.VOTE)
   const toggleVoteModal = useToggleVoteModal()
-  console.log(proposalData)
 
   // get and format date from data
   const currentTimestamp = useCurrentBlockTimestamp()

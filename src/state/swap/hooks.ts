@@ -272,6 +272,7 @@ export type MobiusTrade = {
   executionPrice: Price
   tradeType: TradeType
   fee: TokenAmount
+  priceImpact: Percent
   isMeta?: boolean
 }
 
@@ -316,10 +317,8 @@ function calcInputOutput(
         const lpIndexFrom = poolInfo.tokenAddresses.indexOf(underlyingPool?.lpToken.address)
 
         const metaexpectedOut = underlyingMath.calculateTokenAmount(lpInput, true)
-        console.log('metaExtectedOut', metaexpectedOut.toString())
         details[0] = parsedAmount
         const [expectedOut, fee] = math.calculateSwap(lpIndexFrom, indexTo, metaexpectedOut, math.calc_xp())
-        console.log('expected', expectedOut.toString())
         details[1] = new TokenAmount(output, expectedOut)
         details[2] = new TokenAmount(input, fee)
       } else {
@@ -338,9 +337,7 @@ function calcInputOutput(
         const [metaExpectedOut, metaFee] = math.calculateSwap(indexFrom, lpIndexTo, parsedAmount.raw, math.calc_xp())
 
         const metaIndexOut = underTokens.map(({ address }) => address).indexOf(output.address)
-        console.log('djfdia', metaExpectedOut.toString())
         const [expectedOut, fee] = underlyingMath.calculateWithdrawOneToken(metaIndexOut, metaExpectedOut)
-        console.log(expectedOut.toString(), 'expreccc')
         details[0] = parsedAmount
         details[1] = new TokenAmount(output, expectedOut)
         details[2] = new TokenAmount(
@@ -439,8 +436,7 @@ export function useMobiusTradeInfo(): {
   if (!parsedAmount) {
     inputError = inputError ?? 'Enter an amount'
   }
-
-  if (!pool) {
+  if (!pool || pool.loadingPool) {
     inputError = inputError ?? 'Pool Info Loading'
   }
 
@@ -503,6 +499,17 @@ export function useMobiusTradeInfo(): {
     underlyingMath,
     underlyingPool
   )
+
+  const basisTrade = calcInputOutput(
+    inputCurrency,
+    outputCurrency,
+    isExactIn,
+    tryParseAmount('1', inputCurrency),
+    mathUtil,
+    pool,
+    underlyingMath,
+    underlyingPool
+  )
   const input = tradeData[0]
   const output = tradeData[1]
   const fee = tradeData[2]
@@ -512,6 +519,9 @@ export function useMobiusTradeInfo(): {
   }
 
   const executionPrice = new Price(inputCurrency, outputCurrency, input?.raw, output?.raw)
+  const basisPrice = new Price(inputCurrency, outputCurrency, basisTrade[0]?.raw, basisTrade[1]?.raw)
+  const priceImpactFraction = basisPrice.subtract(executionPrice).divide(basisPrice)
+  const priceImpact = new Percent(priceImpactFraction.numerator, priceImpactFraction.denominator)
   const tradeType = isExactIn ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
   const isMeta = indexFrom >= tokens.length || indexTo >= tokens.length
 
@@ -524,7 +534,7 @@ export function useMobiusTradeInfo(): {
 
   const v2Trade: MobiusTrade | undefined =
     input && output && pool
-      ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta }
+      ? { input, output, pool, indexFrom, indexTo, executionPrice, tradeType, fee, isMeta, priceImpact }
       : undefined
 
   return {

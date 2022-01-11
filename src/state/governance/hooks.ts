@@ -223,7 +223,6 @@ export function useUserVotesAsOfBlock(block: number | undefined): TokenAmount | 
 
   // check for available votes
   const veMOBI = chainId ? VEMOBI[chainId] : undefined
-  console.log(account, block)
   const votes = useSingleCallResult(veMOBIContract, 'balanceOfAt(address, uint256)', [
     account ?? undefined,
     block ?? undefined,
