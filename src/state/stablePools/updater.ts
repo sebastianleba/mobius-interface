@@ -91,7 +91,7 @@ export function UpdateVariablePoolInfo(): null {
           day: parseFloat(pool.dailyVolumes[0]?.volume ?? '0'),
           week: parseFloat(pool.weeklyVolumes[0]?.volume ?? '0'),
         },
-        approxBalances: pool?.balances?.map((b: string) => JSBI.BigInt(b)),
+        approxBalances: pool.balances.map((b: string) => JSBI.BigInt(b)),
         balances: lpInfo[pool.id].total ? lpInfo[pool.id].balances : undefined,
         amp: JSBI.BigInt(pool.A),
         aPrecise: JSBI.BigInt(parseInt(pool.A) * 100),
