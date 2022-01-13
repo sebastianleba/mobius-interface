@@ -58,6 +58,8 @@ const HeaderLinks = styled(Row)`
   align-items: center;
 `
 
+const OtherChains = new Set<Chain>([Chain.Avax, Chain.Polygon, Chain.Celo])
+
 export default function Pool() {
   const { chainId } = useActiveContractKit()
 
@@ -95,7 +97,12 @@ export default function Pool() {
 
   const sortedFilterdPools = stablePools
     ?.sort(sortCallback)
-    .filter((pool) => selection === Chain.All || selection === pool.displayChain)
+    .filter(
+      (pool) =>
+        selection === Chain.All ||
+        selection === pool.displayChain ||
+        (selection === Chain.Other && OtherChains.has(pool.displayChain))
+    )
 
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
@@ -110,20 +117,17 @@ export default function Pool() {
           <Sel onClick={() => setSelection(Chain.All)} selected={selection === Chain.All}>
             ALL
           </Sel>
-          <Sel onClick={() => setSelection(Chain.Celo)} selected={selection === Chain.Celo}>
-            CELO
-          </Sel>
           <Sel onClick={() => setSelection(Chain.Ethereum)} selected={selection === Chain.Ethereum}>
             ETH
-          </Sel>
-          <Sel onClick={() => setSelection(Chain.Polygon)} selected={selection === Chain.Polygon}>
-            POLY
           </Sel>
           <Sel onClick={() => setSelection(Chain.Solana)} selected={selection === Chain.Solana}>
             SOL
           </Sel>
-          <Sel onClick={() => setSelection(Chain.Avax)} selected={selection === Chain.Avax}>
-            AVAX
+          <Sel onClick={() => setSelection(Chain.Terra)} selected={selection === Chain.Terra}>
+            TERRA
+          </Sel>
+          <Sel onClick={() => setSelection(Chain.Other)} selected={selection === Chain.Other}>
+            OTHER
           </Sel>
         </HeaderLinks>
         <InfoWrapper mobile={true} style={{ maxWidth: '640px' }}>
