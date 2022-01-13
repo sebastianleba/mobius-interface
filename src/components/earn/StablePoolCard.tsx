@@ -187,6 +187,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
   const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
+  if (!tokens) {
+    console.log({ name: poolInfo.name, tokens })
+  }
   const coinPrice = tokens.reduce(
     (accum: Fraction | undefined, { address }) => accum ?? tokenPrices[address.toLowerCase()],
     undefined

@@ -89,8 +89,8 @@ export default function Pool() {
 
   const sortCallback = (pool1: StablePoolInfo, pool2: StablePoolInfo) => {
     if (!pool1 || !pool2) return true
-    const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount.greaterThan('0')
-    const isStaking2 = pool2.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool2.stakedAmount.greaterThan('0')
+    const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount?.greaterThan('0')
+    const isStaking2 = pool2.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool2.stakedAmount?.greaterThan('0')
     if (isStaking1 && !isStaking2) return false
     return true
   }

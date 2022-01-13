@@ -91,9 +91,9 @@ export const getPoolInfo = (
       list: TokenList
     }
   } = {}
-): StablePoolInfo | Record<string, never> =>
+): StablePoolInfo | Record<string, never> | undefined =>
   !pool.lpTotalSupply
-    ? {}
+    ? undefined
     : {
         name: pool.name,
         poolAddress: pool.address,
@@ -156,7 +156,7 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
   const pools = usePools()
   const { chainId } = useActiveContractKit()
   const tokens = useDefaultTokenList()[chainId]
-  return pools.map((pool) => getPoolInfo(pool, tokens))
+  return pools.map((pool) => getPoolInfo(pool, tokens)).filter((el) => el)
 }
 
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {
