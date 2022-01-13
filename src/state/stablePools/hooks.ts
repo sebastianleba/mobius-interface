@@ -49,7 +49,7 @@ export interface StablePoolInfo {
   readonly displayChain: Chain
   readonly coin: Coins
   readonly isDisabled?: boolean
-  readonly weeklyVolume: TokenAmount
+  readonly weeklyVolume?: TokenAmount
   readonly poolLoading: boolean
   readonly gaugeLoading: boolean
   readonly isKilled?: boolean
@@ -91,9 +91,9 @@ export const getPoolInfo = (
       list: TokenList
     }
   } = {}
-): StablePoolInfo | Record<string, never> =>
+): StablePoolInfo | Record<string, never> | undefined =>
   !pool.lpTotalSupply
-    ? {}
+    ? undefined
     : {
         name: pool.name,
         poolAddress: pool.address,
@@ -139,8 +139,8 @@ export const getPoolInfo = (
         coin: pool.coin,
         isDisabled: pool.disabled,
         isKilled: pool.isKilled,
-        weeklyVolume: tryParseAmount(pool.volume.week.toFixed(6), pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
-        totalVolume: tryParseAmount(pool.volume.total?.toFixed(6), pool.lpToken) ?? new TokenAmount(pool.lpToken, '0'),
+        weeklyVolume: pool.volume ? tryParseAmount(pool.volume.week.toFixed(6), pool.lpToken) : undefined,
+        totalVolume: pool.volume ? tryParseAmount(pool.volume.total?.toFixed(6), pool.lpToken) : undefined,
         poolLoading: pool.loadingPool,
         gaugeLoading: pool.loadingGauge,
       }
@@ -156,7 +156,7 @@ export function useStablePoolInfo(): readonly StablePoolInfo[] {
   const pools = usePools()
   const { chainId } = useActiveContractKit()
   const tokens = useDefaultTokenList()[chainId]
-  return pools.map((pool) => getPoolInfo(pool, tokens))
+  return pools.map((pool) => getPoolInfo(pool, tokens)).filter((el) => el)
 }
 
 export function useExpectedTokens(pool: StablePoolInfo, lpAmount: TokenAmount): TokenAmount[] {

@@ -79,6 +79,9 @@ export function UpdateVariablePoolInfo(): null {
         }),
         {}
       )
+  const inSubgraph: Set<string> =
+    data?.swaps.reduce((accum: Set<string>, cur: any) => new Set([...accum, cur.id]), new Set()) ?? new Set()
+  const poolsNotInSubgraph = poolAddresses.map((a) => a.toLowerCase()).filter((addr) => !inSubgraph.has(addr))
   return useMemo(() => {
     if (error) console.log(error)
     if (loading) return null
@@ -100,7 +103,27 @@ export function UpdateVariablePoolInfo(): null {
         lpOwned: lpInfo[pool.id].user,
         loadingPool: !lpInfo[pool.id].total,
       }))
-    dispatch(updatePools({ info: poolInfo }))
+
+    dispatch(
+      updatePools({
+        info:
+          poolsNotInSubgraph.length > 0
+            ? poolInfo.concat(
+                poolsNotInSubgraph.map((id) => ({
+                  id,
+                  volume: undefined,
+                  balances: lpInfo[id]?.total ? lpInfo[id].balances : undefined,
+                  amp: JSBI.BigInt(50),
+                  aPrecise: JSBI.BigInt(50 * 100),
+                  virtualPrice: lpInfo[id]?.virtualPrice,
+                  lpTotalSupply: lpInfo[id]?.total ?? JSBI.BigInt('1'),
+                  lpOwned: lpInfo[id]?.user ?? JSBI.BigInt('0'),
+                  loadingPool: !lpInfo[id]?.total,
+                }))
+              )
+            : poolInfo,
+      })
+    )
     return null
   }, [data, loading, error, dispatch, blockNumber, library, chainId, account, lpInfo])
 }

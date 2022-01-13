@@ -7,6 +7,7 @@ import { MentoConstants } from 'state/mentoPools/reducer'
 import celoLogo from '../assets/images/celo-chain-logo.png'
 import ethLogo from '../assets/images/ethereum-chain-logo.png'
 import polygonLogo from '../assets/images/polygon-chain-logo.png'
+import terraLogo from '../assets/images/terra-logo.png'
 
 const mobiToken = (chainId: number, address: string) =>
   new WrappedTokenInfo(
@@ -36,6 +37,8 @@ export enum Chain {
   Solana,
   Avax,
   All,
+  Terra,
+  Other,
 }
 
 enum WarningType {
@@ -79,7 +82,9 @@ export const ChainLogo: { [c in Chain]: string } = {
   [Chain.Polygon]: polygonLogo,
   [Chain.Solana]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_SOL.png',
   [Chain.Avax]: 'https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png',
-  [Chain.All]: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_CELO.png',
+  [Chain.All]: '',
+  [Chain.Terra]: terraLogo,
+  [Chain.Other]: '',
 }
 
 export const PRICE: { [c in Coins]: number } = {
@@ -116,6 +121,56 @@ export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
 
 export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
+    {
+      name: 'UST (Allbridge)',
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xEd193C4E69F591E42398eF54DEa65aa1bb02835c'],
+      tokens: [
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0x765DE816845861e75A25fCA122bb6898B8B1282a',
+            decimals: 18,
+            symbol: 'cUSD',
+            name: 'Celo Dollar',
+            logoURI: 'https://raw.githubusercontent.com/ubeswap/default-token-list/master/assets/asset_cUSD.png',
+          },
+          []
+        ),
+        new WrappedTokenInfo(
+          {
+            chainId: ChainId.MAINNET,
+            address: '0xEd193C4E69F591E42398eF54DEa65aa1bb02835c',
+            decimals: 18,
+            symbol: 'UST',
+            name: 'Allbridge UST',
+            logoURI: 'https://raw.githubusercontent.com/kyscott18/default-token-list/master/assets/asset_UST.png',
+          },
+          []
+        ),
+      ],
+      address: '0x9F4AdBD0af281C69a582eB2E6fa2A594D4204CAe',
+      lpToken: new Token(
+        ChainId.MAINNET,
+        '0x9438e7281D7E3e99A9dD21e0EAd9c6a254e17ab2',
+        18,
+        'MobLP',
+        'Mobius cUSD/aUST LP'
+      ),
+      swapFee: JSBI.multiply(JSBI.BigInt('2'), JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('7'))),
+      rates: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      lendingPrecision: JSBI.BigInt('1'),
+      precision: JSBI.BigInt('18'),
+      feeDenominator: JSBI.exponentiate(JSBI.BigInt('10'), JSBI.BigInt('10')),
+      precisionMul: [JSBI.BigInt('1'), JSBI.BigInt('1')],
+      feeIndex: 0,
+      decimals: [JSBI.BigInt('18'), JSBI.BigInt('18')],
+      peggedTo: '$',
+      pegComesAfter: false,
+      displayDecimals: 0,
+      gaugeAddress: '0x107F94409746E8c8E6eFF139A100D17D9ca7FdfE',
+      displayChain: Chain.Terra,
+      coin: Coins.USD,
+    },
     {
       name: 'USDC (Optics V2)',
       tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xef4229c8c3250C675F21BCefa42f58EfbfF6002a'],
