@@ -404,7 +404,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                       ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(poolInfo.weeklyVolume)} ${
                           pegComesAfter ? peggedTo : ''
                         }`
-                      : '-'}
+                      : 'Subgraph Syncing...'}
                   </TYPE.black>
                 </RowFixed>
               </RowBetween>
@@ -419,7 +419,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                           ? `${!pegComesAfter ? peggedTo : ''}${totalDisplay(poolInfo.totalVolume)} ${
                               pegComesAfter ? peggedTo : ''
                             }`
-                          : '-'}
+                          : 'Subgraph Syncing...'}
                       </TYPE.black>
                     </RowFixed>
                   </RowBetween>
