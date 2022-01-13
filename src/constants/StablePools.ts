@@ -123,7 +123,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
   [ChainId.MAINNET]: [
     {
       name: 'UST (Allbridge)',
-      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xed193c4e69f591e42398ef54dea65aa1bb02835c'],
+      tokenAddresses: ['0x765DE816845861e75A25fCA122bb6898B8B1282a', '0xEd193C4E69F591E42398eF54DEa65aa1bb02835c'],
       tokens: [
         new WrappedTokenInfo(
           {
@@ -139,7 +139,7 @@ export const STATIC_POOL_INFO: { [K in ChainId]: StableSwapConstants[] } = {
         new WrappedTokenInfo(
           {
             chainId: ChainId.MAINNET,
-            address: '0xed193c4e69f591e42398ef54dea65aa1bb02835c',
+            address: '0xEd193C4E69F591E42398eF54DEa65aa1bb02835c',
             decimals: 18,
             symbol: 'UST',
             name: 'Allbridge UST',

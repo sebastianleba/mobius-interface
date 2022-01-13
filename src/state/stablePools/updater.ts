@@ -116,8 +116,8 @@ export function UpdateVariablePoolInfo(): null {
                   amp: JSBI.BigInt(50),
                   aPrecise: JSBI.BigInt(50 * 100),
                   virtualPrice: lpInfo[id]?.virtualPrice,
-                  lpTotalSupply: lpInfo[id]?.total,
-                  lpOwned: lpInfo[id]?.user,
+                  lpTotalSupply: lpInfo[id]?.total ?? JSBI.BigInt('1'),
+                  lpOwned: lpInfo[id]?.user ?? JSBI.BigInt('0'),
                   loadingPool: !lpInfo[id]?.total,
                 }))
               )

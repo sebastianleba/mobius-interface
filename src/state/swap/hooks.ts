@@ -459,6 +459,7 @@ export function useMobiusTradeInfo(): {
     !inputCurrency ||
     !outputCurrency ||
     !parsedAmount ||
+    !pool ||
     poolsLoading ||
     JSBI.equal(pool.lpTotalSupply, JSBI.BigInt('0'))
   ) {
