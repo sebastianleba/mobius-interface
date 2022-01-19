@@ -97,7 +97,7 @@ export const MOBIUS_STRIP_ADDRESS: { [K in ChainId]: string } = {
 }
 
 export const MOBIUS_MINTER_ADDRESS: { [K in ChainId]: string } = {
-  [ChainId.MAINNET]: '0x2B52d2160b088029f689D481BD1f5D3E83e57ba8',
+  [ChainId.MAINNET]: '0x5F0200CA03196D5b817E2044a0Bb0D837e0A7823',
   [ChainId.ALFAJORES]: '0x5c212FA1cf8b1143f2142C26161e65404034c01f',
   [ChainId.BAKLAVA]: '',
 }
@@ -109,7 +109,7 @@ export const MOBI_TOKEN: { [K in ChainId]: Token | undefined } = {
 }
 
 export const GAUGE_CONTROLLER: { [K in ChainId]: string } = {
-  [ChainId.MAINNET]: '0xF8eABb30A124AAc16B9eD6aFaed830BE30fB128E',
+  [ChainId.MAINNET]: '0x7530E03056D3a8eD0323e61091ea2f17a1aC5C25',
   [ChainId.ALFAJORES]: '0x00063Fbe0c90834EE90C6191d0D9F04eaB01A14f',
   [ChainId.BAKLAVA]: '',
 }
