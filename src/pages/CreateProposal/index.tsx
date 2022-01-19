@@ -181,8 +181,9 @@ export default function CreateProposal() {
     () =>
       Boolean(
         !proposalAction ||
-          !isAddress(toAddressValue) ||
-          !isAddress(gaugeAddressValue) ||
+          (proposalAction === ProposalAction.TRANSFER_TOKEN && !isAddress(toAddressValue)) ||
+          ((proposalAction === ProposalAction.ADD_GAUGE || proposalAction === ProposalAction.KILL_GAUGE) &&
+            !isAddress(gaugeAddressValue)) ||
           amountValue === '' ||
           titleValue === '' ||
           bodyValue === ''
