@@ -4,7 +4,7 @@ import { Token, TokenAmount } from '@ubeswap/sdk'
 import { ButtonError } from 'components/Button'
 import { BlueCard } from 'components/Card'
 import { AutoColumn } from 'components/Column'
-import { GAUGE_CONTROLLER } from 'constants/StablePools'
+import { GAUGE_CONTROLLER, GAUGE_PROXY } from 'constants/StablePools'
 import { useActiveContractKit } from 'hooks'
 import JSBI from 'jsbi'
 import { Wrapper } from 'pages/Pool/styleds'
@@ -65,7 +65,6 @@ const CreateProposalButton = ({
         JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(proposalThreshold.currency.decimals))
       ).toLocaleString()
     : undefined
-
   return (
     <ButtonError
       style={{ marginTop: '18px' }}
@@ -184,7 +183,7 @@ export default function CreateProposal() {
           (proposalAction === ProposalAction.TRANSFER_TOKEN && !isAddress(toAddressValue)) ||
           ((proposalAction === ProposalAction.ADD_GAUGE || proposalAction === ProposalAction.KILL_GAUGE) &&
             !isAddress(gaugeAddressValue)) ||
-          amountValue === '' ||
+          (proposalAction === ProposalAction.TRANSFER_TOKEN && amountValue === '') ||
           titleValue === '' ||
           bodyValue === ''
       ),
@@ -197,7 +196,7 @@ export default function CreateProposal() {
 
   const createProposalCallback = useCreateProposalCallback()
 
-  const handleCreateProposal = async () => {
+  const handleCreateProposal = useCallback(async () => {
     setAttempting(true)
 
     const createProposalData: CreateProposalData = {} as CreateProposalData
@@ -205,8 +204,7 @@ export default function CreateProposal() {
     if (!createProposalCallback || !proposalAction) return
 
     const tokenAmount = tryParseAmount(amountValue, currencyValue)
-    if (!tokenAmount) return
-
+    if (!tokenAmount && proposalAction === ProposalAction.TRANSFER_TOKEN) return
     switch (proposalAction) {
       case ProposalAction.TRANSFER_TOKEN: {
         createProposalData.targets = [currencyValue.address]
@@ -217,11 +215,10 @@ export default function CreateProposal() {
         break
       }
       case ProposalAction.KILL_GAUGE: {
-        createProposalData.targets = ['GAUGE_PROXY']
+        createProposalData.targets = [GAUGE_PROXY[chainId ?? 42220]]
         break
       }
     }
-
     createProposalData.values = ['0']
     createProposalData.description = `# ${titleValue}
 
@@ -262,7 +259,17 @@ ${bodyValue}
     })
 
     if (hash) setHash(hash)
-  }
+  }, [
+    amountValue,
+    bodyValue,
+    chainId,
+    createProposalCallback,
+    currencyValue,
+    gaugeAddressValue,
+    proposalAction,
+    titleValue,
+    toAddressValue,
+  ])
 
   return (
     <Upper>
