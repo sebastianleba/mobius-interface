@@ -51,13 +51,12 @@ import { useMobi } from './Tokens'
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
   const { library, account } = useActiveContractKit()
-
   return useMemo(() => {
     if (!address || !ABI || !library) return null
     try {
       return getContract(address, ABI, library, withSignerIfPossible && account ? account : undefined)
     } catch (error) {
-      console.error('Failed to get contract', error)
+      console.log('Failed to get contract', error)
       return null
     }
   }, [address, ABI, library, withSignerIfPossible, account])

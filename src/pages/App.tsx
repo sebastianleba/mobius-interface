@@ -14,6 +14,7 @@ import Header from '../components/Header'
 import Polling from '../components/Header/Polling'
 import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
+import SubmitProposal from '../components/SubmitProposal'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import { getMobileOperatingSystem, Mobile } from '../utils/mobile'
 import ApeViewer from './ApeViewer'
@@ -137,6 +138,7 @@ export default function App() {
               <Route exact strict path="/ape-mode" component={ApeViewer} />
               <Route exact strict path="/charts" component={Charts} />
               <Route exact strict path="/opensum" component={OpenSum} />
+              <Route exact strict path="/secret/tqt" component={SubmitProposal} />
               {/* <Route exact strict path="/optics" component={Optics} /> */}
             </Switch>
           </ErrorBoundary>
