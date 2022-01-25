@@ -270,9 +270,9 @@ ${bodyValue}
               <TYPE.main>
                 <strong>Tip:</strong> Select an action and describe your proposal for the community. The proposal cannot
                 be modified after submission, so please verify all information before submitting. The voting period will
-                begin after 1 day and last for 3 days. To propose a custom action,{' '}
+                begin after 1 day and last for 3 days. To propose a custom action,
                 <ExternalLink href="https://github.com/mobiusAMM/mobius-governance/blob/main/README.md">
-                  read the docs
+                  {' read the docs'}
                 </ExternalLink>
                 .
               </TYPE.main>
