@@ -198,6 +198,7 @@ interface CurrencyInputPanelProps {
   hideBalance?: boolean
   pair?: Pair | null
   hideInput?: boolean
+  disableInput?: boolean
   otherCurrency?: Token | null
   id: string
   showCommonBases?: boolean
@@ -215,6 +216,7 @@ export default function CurrencyInputPanel({
   currency,
   disableCurrencySelect = false,
   hideBalance = false,
+  disableInput = false,
   pair = null, // used for double token logo
   hideInput = false,
   otherCurrency,
@@ -308,6 +310,7 @@ export default function CurrencyInputPanel({
               <NumericalInput
                 className="token-amount-input"
                 value={value}
+                disabled={disableInput}
                 onUserInput={(val) => {
                   onUserInput(val)
                 }}
