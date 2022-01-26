@@ -1,3 +1,4 @@
+import { ArrowBackIos, ArrowForwardIos } from '@material-ui/icons'
 import { CELO, TokenAmount } from '@ubeswap/sdk'
 import { CardNoise } from 'components/earn/styled'
 import Modal from 'components/Modal'
@@ -282,6 +283,8 @@ export default function Header() {
   const countUpValue = aggregateBalance?.toFixed(0) ?? '0'
   const countUpValuePrevious = usePrevious(countUpValue) ?? '0'
 
+  const [desktopExpand, setDesktopExpand] = useState(false)
+
   return (
     <HeaderFrame>
       <HamburgerModal isOpen={toggleMenu} onDismiss={() => setToggleMenu(false)} />
@@ -313,27 +316,12 @@ export default function Header() {
               <StyledNavLink id={`swap-nav-link`} to={'/swap'}>
                 {t('Swap')}
               </StyledNavLink>
-              <StyledNavLink id={`mint-nav-link`} to={'/mint'}>
-                {t('Mint')}
-              </StyledNavLink>
-              <StyledNavLink id={`migrate-nav-link`} to={'/opensum'}>
-                {t('Migrate')}
-              </StyledNavLink>
               <StyledNavLink
                 id={`pool-nav-link`}
                 to={'/pool'}
-                isActive={(match, { pathname }) =>
-                  Boolean(match) ||
-                  pathname.startsWith('/add') ||
-                  pathname.startsWith('/remove') ||
-                  pathname.startsWith('/create') ||
-                  pathname.startsWith('/find')
-                }
+                isActive={(match, { pathname }) => Boolean(match) || pathname.startsWith('/farm')}
               >
                 {t('Pool')}
-              </StyledNavLink>
-              <StyledNavLink id={`charts-nav-link`} to={'/charts'}>
-                {t('Charts')}
               </StyledNavLink>
               <StyledNavLink id={`swap-nav-link`} to={'/stake'}>
                 {t('Stake')}
@@ -341,12 +329,28 @@ export default function Header() {
               <StyledNavLink id={`vote-nav-link`} to={'/vote'}>
                 {t('Vote')}
               </StyledNavLink>
-              <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
-                {t('Bridge')}
-              </StyledExternalLink>
-              <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
-                {t('Risks')}
-              </StyledNavLink>
+              {desktopExpand ? (
+                <>
+                  <ArrowBackIos onClick={() => setDesktopExpand(false)} />
+                  <StyledNavLink id={`mint-nav-link`} to={'/mint'}>
+                    {t('Mint')}
+                  </StyledNavLink>
+                  <StyledNavLink id={`migrate-nav-link`} to={'/opensum'}>
+                    {t('Migrate')}
+                  </StyledNavLink>
+                  <StyledNavLink id={`charts-nav-link`} to={'/charts'}>
+                    {t('Charts')}
+                  </StyledNavLink>
+                  <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
+                    {t('Bridge')}
+                  </StyledExternalLink>
+                  <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
+                    {t('Risks')}
+                  </StyledNavLink>
+                </>
+              ) : (
+                <ArrowForwardIos onClick={() => setDesktopExpand(true)} />
+              )}
             </>
           )}
         </HeaderLinks>
