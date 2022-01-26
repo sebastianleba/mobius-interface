@@ -37,18 +37,20 @@ export const ProposalEditor = ({
   onTitleInput: (title: string) => void
   onBodyInput: (body: string) => void
 }) => {
-  const bodyPlaceholder = `## Summary
+  const bodyPlaceholder = `## TL;DR
 
-Insert your summary here
+## Proposal Summary
 
-## Methodology
-  
-Insert your methodology here
+## Why I think this should pass
 
-## Conclusion
-  
-Insert your conclusion here
-  
+## How it Works 
+
+## Contracts (optional)
+
+## Potential Risks
+
+## Who is Proposing
+
   `
 
   return (
