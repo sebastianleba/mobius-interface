@@ -341,9 +341,9 @@ export default function Header() {
               <StyledNavLink id={`vote-nav-link`} to={'/vote'}>
                 {t('Vote')}
               </StyledNavLink>
-              <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
+              {/* <StyledExternalLink id="bridge-nav-link" target="_self" href="https://bridge.mobius.money/#/">
                 {t('Bridge')}
-              </StyledExternalLink>
+              </StyledExternalLink> */}
               <StyledNavLink id={`swap-nav-link`} to={'/risk'}>
                 {t('Risks')}
               </StyledNavLink>
