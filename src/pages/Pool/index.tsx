@@ -67,14 +67,13 @@ export default function Pool() {
 
   const [selection, setSelection] = React.useState<Chain>(Chain.All)
   const [showDeprecated, setShowDeprecated] = React.useState(false)
-
   const tvl = stablePools
     .filter((pool) => pool && pool.virtualPrice)
     .reduce((accum, poolInfo) => {
       const price =
-        poolInfo.poolAddress === '0x19260b9b573569dDB105780176547875fE9fedA3'
+        poolInfo.coin === Coins.Bitcoin
           ? JSBI.BigInt(PRICE[Coins.Bitcoin])
-          : poolInfo.poolAddress === '0xE0F2cc70E52f05eDb383313393d88Df2937DA55a'
+          : poolInfo.coin === Coins.Ether
           ? JSBI.BigInt(PRICE[Coins.Ether])
           : JSBI.BigInt(PRICE[Coins.USD])
       const lpPrice = JSBI.divide(
