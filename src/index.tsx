@@ -17,6 +17,7 @@ import { BatchUpdateGauges, UpdateVariablePoolInfo } from 'state/stablePools/upd
 import StakingUpdater from 'state/staking/updater'
 
 import mobiusIcon from './assets/svg/mobius.svg'
+import { Web3ContextProvider } from './hooks'
 import App from './pages/App'
 import store from './state'
 import ApplicationUpdater, { PriceData } from './state/application/updater'
@@ -110,13 +111,15 @@ ReactDOM.render(
     >
       <ApolloProvider client={client}>
         <Provider store={store}>
-          <Updaters />
-          <ThemeProvider>
-            <ThemedGlobalStyle />
-            <HashRouter>
-              <App />
-            </HashRouter>
-          </ThemeProvider>
+          <Web3ContextProvider>
+            <Updaters />
+            <ThemeProvider>
+              <ThemedGlobalStyle />
+              <HashRouter>
+                <App />
+              </HashRouter>
+            </ThemeProvider>
+          </Web3ContextProvider>
         </Provider>
       </ApolloProvider>
     </ContractKitProvider>

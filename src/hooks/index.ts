@@ -1,5 +1,7 @@
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 
+export * from './web3'
+
 export function useActiveContractKit() {
   const kit = useContractKit()
   const {
