@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { usePair } from '../../data/Reserves'
 import { useTotalSupply } from '../../data/TotalSupply'
-import { useActiveContractKit } from '../../hooks'
+import { useWeb3Context } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { tryParseAmount } from '../swap/hooks'
 import { useTokenBalances } from '../wallet/hooks'
@@ -27,7 +27,7 @@ export function useDerivedBurnInfo(
   }
   error?: string
 } {
-  const { account } = useActiveContractKit()
+  const { address, connected } = useWeb3Context()
 
   const { independentField, typedValue } = useBurnState()
 
@@ -35,7 +35,7 @@ export function useDerivedBurnInfo(
   const [, pair] = usePair(currencyA, currencyB)
 
   // balances
-  const relevantTokenBalances = useTokenBalances(account ?? undefined, [pair?.liquidityToken])
+  const relevantTokenBalances = useTokenBalances(connected ? address : undefined, [pair?.liquidityToken])
   const userLiquidity: undefined | TokenAmount = relevantTokenBalances?.[pair?.liquidityToken?.address ?? '']
 
   const [tokenA, tokenB] = [currencyA as Token, currencyB as Token]
@@ -117,7 +117,7 @@ export function useDerivedBurnInfo(
   }
 
   let error: string | undefined
-  if (!account) {
+  if (!connected) {
     error = 'Connect Wallet'
   }
 

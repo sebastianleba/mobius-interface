@@ -23,7 +23,7 @@ import { ArrowWrapper, BottomGrouping, SwapCallbackError, Wrapper } from '../../
 import SwapHeader from '../../components/swap/SwapHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
-import { useActiveContractKit } from '../../hooks'
+import { useWeb3Context } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
@@ -56,7 +56,7 @@ export default function Swap() {
     [loadedInputCurrency, loadedOutputCurrency]
   )
 
-  const { account } = useActiveContractKit()
+  const { connected } = useWeb3Context()
   const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected
@@ -315,7 +315,7 @@ export default function Swap() {
               <ButtonPrimary disabled={true}>
                 <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
               </ButtonPrimary>
-            ) : !account ? (
+            ) : !connected ? (
               <ButtonError disabledStyle={true} onClick={toggleWalletModal}>
                 Connect Wallet
               </ButtonError>

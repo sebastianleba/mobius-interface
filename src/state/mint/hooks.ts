@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { PairState, usePair } from '../../data/Reserves'
 import { useTotalSupply } from '../../data/TotalSupply'
-import { useActiveContractKit } from '../../hooks'
+import { useWeb3Context } from '../../hooks'
 import { AppDispatch, AppState } from '../index'
 import { tryParseAmount } from '../swap/hooks'
 import { Field, typeInput } from './actions'
@@ -56,7 +56,7 @@ export function useDerivedMintInfo(
   poolTokenPercentage?: Percent
   error?: string
 } {
-  const { account } = useActiveContractKit()
+  const { connected } = useWeb3Context()
 
   const { independentField, typedValue, otherTypedValue } = useMintState()
 
@@ -154,7 +154,7 @@ export function useDerivedMintInfo(
   }, [liquidityMinted, totalSupply])
 
   let error: string | undefined
-  if (!account) {
+  if (!connected) {
     error = 'Connect Wallet'
   }
 

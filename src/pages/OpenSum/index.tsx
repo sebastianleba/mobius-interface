@@ -26,7 +26,7 @@ import { ArrowWrapper, BottomGrouping, InfoWrapper, Wrapper } from '../../compon
 import SwapHeader from '../../components/swap/SwapHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { CHAIN } from '../../constants'
-import { useActiveContractKit, useWeb3Context } from '../../hooks'
+import { useWeb3Context } from '../../hooks'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { MentoTrade } from '../../state/mento/hooks'
 import { useIsDarkMode } from '../../state/user/hooks'
@@ -43,7 +43,6 @@ const VoteCard = styled(DataCard)`
 export default function OpenSum() {
   const isDarkMode = useIsDarkMode()
 
-  const { account, chainId } = useActiveContractKit()
   const { address, connected } = useWeb3Context()
   const theme = useContext(ThemeContext)
 
