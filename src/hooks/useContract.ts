@@ -88,20 +88,20 @@ export function useMobiContract(address?: string, withSignerIfPossible?: boolean
 }
 
 export function useGovernanceContract(address?: string, withSignerIfPossible?: boolean): GovernorBravoDelegate | null {
-  const govAddress = GOVERNANCE_ADDRESS[CHAIN.chainId]
+  const govAddress = GOVERNANCE_ADDRESS[CHAIN]
   return useContract(address ?? govAddress, GOVERNOR_ABI.abi, withSignerIfPossible) as GovernorBravoDelegate
 }
 
 export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
-  return useContract(address ?? MOBIUS_MINTER_ADDRESS[CHAIN.chainId], MINTER.abi, withSignerIfPossible) as Minter
+  return useContract(address ?? MOBIUS_MINTER_ADDRESS[CHAIN], MINTER.abi, withSignerIfPossible) as Minter
 }
 
 export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
-  return useContract(address ?? VEMOBI[CHAIN.chainId].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
+  return useContract(address ?? VEMOBI[CHAIN].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
-  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[CHAIN.chainId]
+  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[CHAIN]
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 
@@ -138,7 +138,7 @@ export function UseMentoContract(exchangeAddress: string, withSignerIfPossible?:
 }
 
 export function useMulticallContract(): Contract | null {
-  return useContract(MULTICALL_NETWORKS[CHAIN.chainId], MULTICALL_ABI, false)
+  return useContract(MULTICALL_NETWORKS[CHAIN], MULTICALL_ABI, false)
 }
 
 export function useStakingContract(stakingAddress?: string, withSignerIfPossible?: boolean): StakingRewards | null {
