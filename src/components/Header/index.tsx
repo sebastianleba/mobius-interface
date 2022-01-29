@@ -17,7 +17,8 @@ import { ExternalLink } from 'theme/components'
 import { CountUp } from 'use-count-up'
 
 import Logo from '../../assets/svg/mobius.svg'
-import { useActiveContractKit, useWeb3Context } from '../../hooks'
+import { CHAIN } from '../../constants'
+import { useWeb3Context } from '../../hooks'
 import useTheme from '../../hooks/useTheme'
 import { useDarkModeManager } from '../../state/user/hooks'
 import Menu from '../Menu'
@@ -271,12 +272,11 @@ export const StyledMenuButton = styled.button`
 // }
 
 export default function Header() {
-  const { chainId } = useActiveContractKit()
   const { address, connected } = useWeb3Context()
   console.log(connected, address)
   const { t } = useTranslation()
   const theme = useTheme()
-  const userCELOBalance = useTokenBalance(connected ? address : undefined, CELO[chainId])
+  const userCELOBalance = useTokenBalance(connected ? address : undefined, CELO[CHAIN])
   const [darkMode, toggleDarkMode] = useDarkModeManager()
   const [showUbeBalanceModal, setShowUbeBalanceModal] = useState<boolean>(false)
   const [toggleMenu, setToggleMenu] = useState<boolean>(false)

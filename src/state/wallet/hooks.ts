@@ -133,7 +133,7 @@ export function useAllTokenBalances(): { [tokenAddress: string]: TokenAmount | u
 export function useAggregateUbeBalance(): TokenAmount | undefined {
   const { address, connected } = useWeb3Context()
 
-  const ube = UBE[CHAIN.chainId]
+  const ube = UBE[CHAIN]
 
   const ubeBalance: TokenAmount | undefined = useTokenBalance(connected ? address : undefined, ube)
 

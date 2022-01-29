@@ -9,10 +9,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { StableSwapPool } from 'state/stablePools/reducer'
 import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { ROUTER_ADDRESS } from '../../constants'
-import { useActiveContractKit } from '../../hooks'
+import { CHAIN, ROUTER_ADDRESS } from '../../constants'
+import { useWeb3Context } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
-import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
@@ -174,9 +173,7 @@ export function useDerivedStableSwapInfo(): {
   v2Trade?: MobiTrade | undefined
   inputError?: string
 } {
-  const { account, chainId } = useActiveContractKit()
-  const ONE = JSBI.BigInt(1)
-
+  const { address, connected } = useWeb3Context()
   const {
     typedValue,
     [Field.INPUT]: { currencyId: inputCurrencyId },
@@ -186,13 +183,12 @@ export function useDerivedStableSwapInfo(): {
 
   const inputCurrency = useCurrency(false, inputCurrencyId)
   const outputCurrency = useCurrency(false, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
-  const [poolInfo] = POOLS_TO_TOKENS[chainId].filter(
+  const to: string | null = connected ? address : null
+  const [poolInfo] = POOLS_TO_TOKENS[CHAIN].filter(
     ({ tokens }) => tokens.includes(inputCurrency?.address || '') && tokens.includes(outputCurrency?.address || '')
   )
 
-  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+  const relevantTokenBalances = useCurrencyBalances(connected ? address : undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,
   ])
@@ -215,7 +211,7 @@ export function useDerivedStableSwapInfo(): {
   const outputIndex = tokenOrder.indexOf(outputCurrencyId || '')
 
   let inputError: string | undefined
-  if (!account) {
+  if (!connected) {
     inputError = 'Connect Wallet'
   }
 
@@ -389,7 +385,7 @@ export function useMobiusTradeInfo(): {
   v2Trade: MobiusTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveContractKit()
+  const { address, connected } = useWeb3Context()
 
   const {
     independentField,
@@ -400,7 +396,6 @@ export function useMobiusTradeInfo(): {
   } = useSwapState()
   const inputCurrency = useCurrency(false, inputCurrencyId)
   const outputCurrency = useCurrency(false, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
 
   const pools = usePools()
   const poolsLoading = pools.length === 0
@@ -409,8 +404,8 @@ export function useMobiusTradeInfo(): {
   const mathUtil = useMathUtil(pool)
   const underlyingPool = useUnderlyingPool(pool?.name ?? '')
 
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
-  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+  const to: string | null = connected ? address : null
+  const relevantTokenBalances = useCurrencyBalances(connected ? address : undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,
   ])
@@ -429,7 +424,7 @@ export function useMobiusTradeInfo(): {
   }
 
   let inputError: string | undefined
-  if (!account) {
+  if (!connected) {
     inputError = 'Connect Wallet'
   }
 
@@ -555,7 +550,7 @@ export function useDerivedSwapInfo(): {
   v2Trade: UbeswapTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveContractKit()
+  const { address, connected } = useWeb3Context()
 
   const {
     independentField,
@@ -567,10 +562,9 @@ export function useDerivedSwapInfo(): {
 
   const inputCurrency = useCurrency(false, inputCurrencyId)
   const outputCurrency = useCurrency(false, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
+  const to: string | null = connected ? address : null
 
-  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+  const relevantTokenBalances = useCurrencyBalances(connected ? address : undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,
   ])
@@ -594,7 +588,7 @@ export function useDerivedSwapInfo(): {
   }
 
   let inputError: string | undefined
-  if (!account) {
+  if (!connected) {
     inputError = 'Connect Wallet'
   }
 
@@ -703,15 +697,13 @@ export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: ChainId)
 export function useDefaultsFromURLSearch():
   | { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined }
   | undefined {
-  const { chainId } = useActiveContractKit()
   const dispatch = useDispatch<AppDispatch>()
   const parsedQs = useParsedQueryString()
   const [result, setResult] = useState<
     { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined
   >()
   useEffect(() => {
-    if (!chainId) return
-    const parsed = queryParametersToSwapState(parsedQs, chainId)
+    const parsed = queryParametersToSwapState(parsedQs, CHAIN)
 
     dispatch(
       replaceSwapState({
@@ -725,7 +717,7 @@ export function useDefaultsFromURLSearch():
 
     setResult({ inputCurrencyId: parsed[Field.INPUT].currencyId, outputCurrencyId: parsed[Field.OUTPUT].currencyId })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, chainId])
+  }, [dispatch])
 
   return result
 }
