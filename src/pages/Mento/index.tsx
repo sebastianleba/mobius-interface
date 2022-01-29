@@ -25,7 +25,7 @@ import { ArrowWrapper, BottomGrouping, InfoWrapper, SwapCallbackError, Wrapper }
 import SwapHeader from '../../components/swap/SwapHeader'
 import TradePrice from '../../components/swap/TradePrice'
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
-import { useActiveContractKit } from '../../hooks'
+import { useWeb3Context } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
@@ -65,7 +65,7 @@ export default function Mento() {
 
   // dismiss warning if all imported tokens are in active lists
 
-  const { account } = useActiveContractKit()
+  const { address, connected } = useWeb3Context()
   const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected
@@ -179,7 +179,7 @@ export default function Mento() {
           txHash: undefined,
         })
       })
-  }, [swapCallback, tradeToConfirm, showConfirm, account, trade, singleHopOnly])
+  }, [swapCallback, tradeToConfirm, showConfirm, trade, singleHopOnly])
 
   // errors
   const [showInverted, setShowInverted] = useState<boolean>(false)
@@ -340,7 +340,7 @@ export default function Mento() {
               <ButtonPrimary disabled={true}>
                 <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
               </ButtonPrimary>
-            ) : !account ? (
+            ) : !connected ? (
               <ButtonError disabledStyle={true} onClick={toggleWalletModal}>
                 Connect Wallet
               </ButtonError>

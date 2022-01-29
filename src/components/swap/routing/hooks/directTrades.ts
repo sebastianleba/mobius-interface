@@ -1,22 +1,18 @@
 import { Pair, Token, TokenAmount, Trade } from '@ubeswap/sdk'
-import { useActiveContractKit } from 'hooks'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
 import { useUserSingleHopOnly } from 'state/user/hooks'
 import { isTradeBetter } from 'utils/trades'
 
-import { BASES_TO_CHECK_TRADES_AGAINST, BETTER_TRADE_LESS_HOPS_THRESHOLD } from '../../../../constants'
+import { BASES_TO_CHECK_TRADES_AGAINST, BETTER_TRADE_LESS_HOPS_THRESHOLD, CHAIN } from '../../../../constants'
 import { PairState, usePairs } from '../../../../data/Reserves'
 import { UbeswapTrade } from '../trade'
 
 function useAllCommonPairs(tokenA?: Token, tokenB?: Token): Pair[] {
-  const { chainId } = useActiveContractKit()
-
   const bases: Token[] = useMemo(() => {
-    if (!chainId) return []
-    const common = BASES_TO_CHECK_TRADES_AGAINST[chainId] ?? []
+    const common = BASES_TO_CHECK_TRADES_AGAINST[CHAIN] ?? []
     return [...common]
-  }, [chainId])
+  }, [])
 
   const basePairs: [Token, Token][] = useMemo(
     () => flatMap(bases, (base): [Token, Token][] => bases.map((otherBase) => [base, otherBase])),

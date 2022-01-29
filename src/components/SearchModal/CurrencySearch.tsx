@@ -14,7 +14,6 @@ import { useOpticsV1Tokens, useOpticsV2Tokens } from 'state/openSum/hooks'
 import styled from 'styled-components'
 
 import { CHAIN } from '../../constants'
-import { useBridgeableTokens } from '../../hooks/optics'
 import { useFoundOnInactiveList, useSwappableTokens, useToken } from '../../hooks/Tokens'
 import { useTokensTradeable } from '../../state/stake/hooks'
 import { CloseIcon, TYPE } from '../../theme'
@@ -85,14 +84,10 @@ export function CurrencySearch({
   const isAddressSearch = isAddress(searchQuery)
   const searchToken = useToken(location.pathname.includes('mint'), searchQuery)
   const [tokensInSamePool] = useTokensTradeable(location.pathname.includes('mint'), otherSelectedCurrency)
-  const bridgeableTokens = useBridgeableTokens()
   const opticsV1 = useOpticsV1Tokens()
   const opticsV2 = useOpticsV2Tokens()
   let tokensToSelect = allTokens
   if (otherSelectedCurrency && !selectedCurrency) tokensToSelect = tokensInSamePool
-  if (location.pathname.includes('optics')) {
-    tokensToSelect = bridgeableTokens
-  }
   if (tokenType) {
     if (tokenType === TokenType.OpticsV1) {
       tokensToSelect = opticsV1

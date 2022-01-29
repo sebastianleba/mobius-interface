@@ -9,11 +9,11 @@ import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
 import { CELO } from '../constants/tokens'
 import { MentoTrade } from '../state/mento/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getMentoContract, isAddress, shortenAddress } from '../utils'
+import { calculateGasMargin, getMentoContract } from '../utils'
 import isZero from '../utils/isZero'
-import { useActiveContractKit } from './index'
 import useENS from './useENS'
 import useTransactionDeadline from './useTransactionDeadline'
+import { useWeb3Context } from './web3'
 
 export enum SwapCallbackState {
   INVALID,
@@ -86,18 +86,17 @@ export function useSwapCallback(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } {
-  const { account, chainId, library } = useActiveContractKit()
+  const { address, connected, provider } = useWeb3Context()
 
   const swapCalls = useSwapCallArguments(trade, allowedSlippage, recipientAddressOrName)
 
   const addTransaction = useTransactionAdder()
 
-  const { address: recipientAddress } = useENS(recipientAddressOrName)
-  const recipient = recipientAddressOrName === null ? account : recipientAddress
+  const recipient = address
   const getConnectedSigner = useGetConnectedSigner()
 
   return useMemo(() => {
-    if (!trade || !library || !account || !chainId) {
+    if (!trade || !provider || !connected) {
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Missing dependencies' }
     }
     if (!recipient) {
@@ -182,14 +181,7 @@ export function useSwapCallback(
             const outputAmount = trade.output.toSignificant(6)
 
             const base = `Swap ${inputAmount} ${inputSymbol} for ${outputAmount} ${outputSymbol}`
-            const withRecipient =
-              recipient === account
-                ? base
-                : `${base} to ${
-                    recipientAddressOrName && isAddress(recipientAddressOrName)
-                      ? shortenAddress(recipientAddressOrName)
-                      : recipientAddressOrName
-                  }`
+            const withRecipient = base
 
             addTransaction(response, {
               summary: withRecipient,
@@ -210,15 +202,5 @@ export function useSwapCallback(
       },
       error: null,
     }
-  }, [
-    trade,
-    library,
-    account,
-    chainId,
-    recipient,
-    recipientAddressOrName,
-    swapCalls,
-    getConnectedSigner,
-    addTransaction,
-  ])
+  }, [trade, provider, connected, recipient, recipientAddressOrName, swapCalls, getConnectedSigner, addTransaction])
 }
