@@ -2,7 +2,7 @@ import { cUSD, Fraction, JSBI, Percent, Price, TokenAmount } from '@ubeswap/sdk'
 import Loader from 'components/Loader'
 import QuestionHelper from 'components/QuestionHelper'
 import { ChainLogo, Coins } from 'constants/StablePools'
-import { useActiveContractKit } from 'hooks'
+import { useWeb3Context } from 'hooks'
 import { useMobi } from 'hooks/Tokens'
 import { darken } from 'polished'
 import React, { useState } from 'react'
@@ -161,7 +161,7 @@ interface Props {
 }
 
 export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
-  const { account, chainId } = useActiveContractKit()
+  const { connected } = useWeb3Context()
   const {
     tokens,
     peggedTo,
@@ -454,7 +454,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
                         </TYPE.black>
                       </RowBetween>
                     ))}
-                  {!!account && isStaking && (
+                  {connected && isStaking && (
                     <RowBetween>
                       <TYPE.darkGray fontWeight={500}>Your share</TYPE.darkGray>
                       <RowFixed>
@@ -484,7 +484,7 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
               <StyledButton
                 background={poolColor}
                 backgroundHover={poolColor}
-                onClick={account ? () => (isStaking ? setOpenManage(true) : setOpenDeposit(true)) : toggleWalletModal}
+                onClick={connected ? () => (isStaking ? setOpenManage(true) : setOpenDeposit(true)) : toggleWalletModal}
                 eth={coin === Coins.Ether}
                 style={{
                   width: '10%',
@@ -505,14 +505,14 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
           <StyledButton
             background={poolColor}
             backgroundHover={poolColor}
-            onClick={account ? () => setOpenDeposit(true) : toggleWalletModal}
+            onClick={connected ? () => setOpenDeposit(true) : toggleWalletModal}
             eth={coin === Coins.Ether}
             style={{ fontWeight: 700, fontSize: 18 }}
           >
             DEPOSIT
           </StyledButton>
         )}
-        {!!account && isStaking && (openManage || isMobile) && (
+        {connected && isStaking && (openManage || isMobile) && (
           <div
             style={{
               display: 'flex',

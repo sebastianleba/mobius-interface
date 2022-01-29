@@ -45,22 +45,22 @@ import {
   VotingEscrow,
 } from '../generated'
 import { getContract } from '../utils'
-import { useActiveContractKit } from './index'
+import { useWeb3Context } from './index'
 import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { library, account } = useActiveContractKit()
+  const { provider } = useWeb3Context()
 
   return useMemo(() => {
-    if (!address || !ABI || !library) return null
+    if (!address || !ABI || !provider) return null
     try {
-      return getContract(address, ABI, library, withSignerIfPossible && account ? account : undefined)
+      return getContract(address, ABI, provider)
     } catch (error) {
       console.error('Failed to get contract', error)
       return null
     }
-  }, [address, ABI, library, withSignerIfPossible, account])
+  }, [address, ABI, provider])
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Erc20 | null {
@@ -87,26 +87,26 @@ export function useMobiContract(address?: string, withSignerIfPossible?: boolean
 }
 
 export function useGovernanceContract(address?: string, withSignerIfPossible?: boolean): GovernorBravoDelegate | null {
-  const { chainId } = useActiveContractKit()
-  const govAddress = GOVERNANCE_ADDRESS[chainId]
+  const { chainID } = useWeb3Context()
+  const govAddress = GOVERNANCE_ADDRESS[chainID]
   return useContract(address ?? govAddress, GOVERNOR_ABI.abi, withSignerIfPossible) as GovernorBravoDelegate
 }
 
 export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
-  const { chainId } = useActiveContractKit()
+  const { chainID } = useWeb3Context()
 
-  return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainId], MINTER.abi, withSignerIfPossible) as Minter
+  return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainID], MINTER.abi, withSignerIfPossible) as Minter
 }
 
 export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
-  const { chainId } = useActiveContractKit()
+  const { chainID } = useWeb3Context()
 
-  return useContract(address ?? VEMOBI[chainId].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
+  return useContract(address ?? VEMOBI[chainID].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
-  const { chainId } = useActiveContractKit()
-  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[chainId]
+  const { chainID } = useWeb3Context()
+  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[chainID]
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 
@@ -143,8 +143,8 @@ export function UseMentoContract(exchangeAddress: string, withSignerIfPossible?:
 }
 
 export function useMulticallContract(): Contract | null {
-  const { chainId } = useActiveContractKit()
-  return useContract(chainId ? MULTICALL_NETWORKS[chainId] : undefined, MULTICALL_ABI, false)
+  const { chainID } = useWeb3Context()
+  return useContract(chainID ? MULTICALL_NETWORKS[chainID] : undefined, MULTICALL_ABI, false)
 }
 
 export function useStakingContract(stakingAddress?: string, withSignerIfPossible?: boolean): StakingRewards | null {

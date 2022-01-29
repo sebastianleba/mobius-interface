@@ -2,7 +2,7 @@ import { getAddress } from '@ethersproject/address'
 import { BigNumber } from '@ethersproject/bignumber'
 import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
-import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
+import { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
 import { Exchange, IUniswapV2Router02, Swap, UbeswapMoolaRouter } from 'generated/index'
 
@@ -52,8 +52,8 @@ export function calculateSlippageAmount(value: TokenAmount, slippage: number): [
 }
 
 // account is not optional
-export function getSigner(library: Web3Provider, account: string): JsonRpcSigner {
-  return library.getSigner(account).connectUnchecked()
+export function getSigner(provider: JsonRpcProvider, address: string): JsonRpcSigner {
+  return provider.getSigner(address)
 }
 
 // account is optional
@@ -62,21 +62,21 @@ export function getProviderOrSigner(library: Web3Provider, account?: string): We
 }
 
 // account is optional
-export function getContract(address: string, ABI: any, library: Web3Provider, account?: string): Contract {
+export function getContract(address: string, ABI: any, provider: JsonRpcProvider): Contract {
   if (!isAddress(address) || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
 
-  return new Contract(address, ABI, getProviderOrSigner(library, account) as any)
+  return new Contract(address, ABI, getSigner(provider, address) as any)
 }
 
 // account is optional
 export function getRouterContract(_: number, library: Web3Provider, account?: string): IUniswapV2Router02 {
-  return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account) as IUniswapV2Router02
+  return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library) as IUniswapV2Router02
 }
 
 export function getMoolaRouterContract(_: number, library: Web3Provider, account?: string): UbeswapMoolaRouter {
-  return getContract(UBESWAP_MOOLA_ROUTER_ADDRESS, UbeswapMoolaRouterABI, library, account) as UbeswapMoolaRouter
+  return getContract(UBESWAP_MOOLA_ROUTER_ADDRESS, UbeswapMoolaRouterABI, library) as UbeswapMoolaRouter
 }
 
 export function escapeRegExp(string: string): string {
@@ -87,9 +87,9 @@ export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Token):
   return Boolean(currency instanceof Token && defaultTokens[currency.chainId]?.[currency.address])
 }
 export function getStableSwapContract(address: string, library: Web3Provider, account?: string): Swap {
-  return getContract(address, SWAP.abi, library, account) as Swap
+  return getContract(address, SWAP.abi, library) as Swap
 }
 
 export function getMentoContract(address: string, library: Web3Provider, account?: string): Exchange {
-  return getContract(address, EXCHANGE, library, account) as Exchange
+  return getContract(address, EXCHANGE, library) as Exchange
 }
