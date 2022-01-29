@@ -6,6 +6,7 @@ import { VEMOBI } from 'constants/tokens'
 import { ReleaseUbe } from 'generated/ReleaseUbe'
 import { useMemo } from 'react'
 
+import { CHAIN } from '../constants'
 import BRIDGE_ROUTER from '../constants/abis/BridgeRouter.json'
 import CONSTANT_SUM from '../constants/abis/ConstantSum.json'
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
@@ -87,26 +88,20 @@ export function useMobiContract(address?: string, withSignerIfPossible?: boolean
 }
 
 export function useGovernanceContract(address?: string, withSignerIfPossible?: boolean): GovernorBravoDelegate | null {
-  const { chainID } = useWeb3Context()
-  const govAddress = GOVERNANCE_ADDRESS[chainID]
+  const govAddress = GOVERNANCE_ADDRESS[CHAIN.chainId]
   return useContract(address ?? govAddress, GOVERNOR_ABI.abi, withSignerIfPossible) as GovernorBravoDelegate
 }
 
 export function useMobiMinterContract(address?: string, withSignerIfPossible?: boolean): Minter | null {
-  const { chainID } = useWeb3Context()
-
-  return useContract(address ?? MOBIUS_MINTER_ADDRESS[chainID], MINTER.abi, withSignerIfPossible) as Minter
+  return useContract(address ?? MOBIUS_MINTER_ADDRESS[CHAIN.chainId], MINTER.abi, withSignerIfPossible) as Minter
 }
 
 export function useVotingEscrowContract(address?: string, withSignerIfPossible?: boolean): VotingEscrow | null {
-  const { chainID } = useWeb3Context()
-
-  return useContract(address ?? VEMOBI[chainID].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
+  return useContract(address ?? VEMOBI[CHAIN.chainId].address, VOTING_ESCROW.abi, withSignerIfPossible) as VotingEscrow
 }
 
 export function useGaugeControllerContract(address?: string, withSignerIfPossible?: boolean): GaugeController | null {
-  const { chainID } = useWeb3Context()
-  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[chainID]
+  const fallBackAddress = GAUGE_CONTROLLER_ADDRESS[CHAIN.chainId]
   return useContract(address ?? fallBackAddress, GAUGE_CONTROLLER.abi, withSignerIfPossible) as GaugeController
 }
 
@@ -143,8 +138,7 @@ export function UseMentoContract(exchangeAddress: string, withSignerIfPossible?:
 }
 
 export function useMulticallContract(): Contract | null {
-  const { chainID } = useWeb3Context()
-  return useContract(chainID ? MULTICALL_NETWORKS[chainID] : undefined, MULTICALL_ABI, false)
+  return useContract(MULTICALL_NETWORKS[CHAIN.chainId], MULTICALL_ABI, false)
 }
 
 export function useStakingContract(stakingAddress?: string, withSignerIfPossible?: boolean): StakingRewards | null {

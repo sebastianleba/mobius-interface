@@ -1,3 +1,4 @@
+import { Mainnet } from '@celo-tools/use-contractkit'
 import moolaRouterAddresses from '@ubeswap/moola/deployments/router.mainnet.addresses.json'
 import { CELO, ChainId, cUSD, JSBI, Percent, Token } from '@ubeswap/sdk'
 
@@ -118,7 +119,7 @@ export const PINNED_PAIRS: { [chainId: number]: [Token, Token][] } = {
   [ChainId.BAKLAVA]: [[cUSD[ChainId.BAKLAVA], CELO[ChainId.BAKLAVA]]],
 }
 
-export const NetworkContextName = 'NETWORK'
+export const CHAIN = Mainnet
 
 // default allowed slippage, in bips
 export const INITIAL_ALLOWED_SLIPPAGE = 50
