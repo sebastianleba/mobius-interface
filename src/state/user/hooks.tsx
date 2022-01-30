@@ -1,6 +1,5 @@
 import { Pair, Token } from '@ubeswap/sdk'
 import { useCallback } from 'react'
-import ReactGA from 'react-ga'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 
 import { AppDispatch, AppState } from '../index'
@@ -11,13 +10,10 @@ import {
   SerializedPair,
   SerializedToken,
   toggleURLWarning,
-  updateUserAllowMoolaWithdrawal,
   updateUserDarkMode,
   updateUserDeadline,
-  updateUserDisableSmartRouting,
   updateUserExpertMode,
   updateUserMinApprove,
-  updateUserSingleHopOnly,
   updateUserSlippageTolerance,
 } from './actions'
 
@@ -92,55 +88,6 @@ export function useUserMinApprove(): [boolean, (minApprove: boolean) => void] {
     [dispatch]
   )
   return [minApprove, setMinApprove]
-}
-
-export function useUserAllowMoolaWithdrawal(): [boolean, (allowMoolaWithdrawal: boolean) => void] {
-  const dispatch = useDispatch<AppDispatch>()
-  const allowMoolaWithdrawal = useSelector<AppState, AppState['user']['userAllowMoolaWithdrawal']>(
-    (state) => state.user.userAllowMoolaWithdrawal
-  )
-  const setAllowMoolaWithdrawal = useCallback(
-    (newallowMoolaWithdrawal: boolean) => {
-      dispatch(updateUserAllowMoolaWithdrawal({ userAllowMoolaWithdrawal: newallowMoolaWithdrawal }))
-    },
-    [dispatch]
-  )
-  return [allowMoolaWithdrawal, setAllowMoolaWithdrawal]
-}
-
-export function useUserDisableSmartRouting(): [boolean, (disableSmartRouting: boolean) => void] {
-  const dispatch = useDispatch<AppDispatch>()
-  const disableSmartRouting = useSelector<AppState, AppState['user']['userDisableSmartRouting']>(
-    (state) => state.user.userDisableSmartRouting
-  )
-  const setDisableSmartRouting = useCallback(
-    (newSmartRouting: boolean) => {
-      dispatch(updateUserDisableSmartRouting({ userDisableSmartRouting: newSmartRouting }))
-    },
-    [dispatch]
-  )
-  return [disableSmartRouting, setDisableSmartRouting]
-}
-
-export function useUserSingleHopOnly(): [boolean, (newSingleHopOnly: boolean) => void] {
-  const dispatch = useDispatch<AppDispatch>()
-
-  const singleHopOnly = useSelector<AppState, AppState['user']['userSingleHopOnly']>(
-    (state) => state.user.userSingleHopOnly
-  )
-
-  const setSingleHopOnly = useCallback(
-    (newSingleHopOnly: boolean) => {
-      ReactGA.event({
-        category: 'Routing',
-        action: newSingleHopOnly ? 'enable single hop' : 'disable single hop',
-      })
-      dispatch(updateUserSingleHopOnly({ userSingleHopOnly: newSingleHopOnly }))
-    },
-    [dispatch]
-  )
-
-  return [singleHopOnly, setSingleHopOnly]
 }
 
 export function useUserSlippageTolerance(): [number, (slippage: number) => void] {
@@ -220,13 +167,4 @@ export function useURLWarningVisible(): boolean {
 export function useURLWarningToggle(): () => void {
   const dispatch = useDispatch()
   return useCallback(() => dispatch(toggleURLWarning()), [dispatch])
-}
-
-/**
- * Given two tokens return the liquidity token that represents its liquidity shares
- * @param tokenA one of the two tokens
- * @param tokenB the other token
- */
-export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
-  return new Token(tokenA.chainId, Pair.getAddress(tokenA, tokenB), 18, 'ULP', 'Ubeswap LP Token')
 }

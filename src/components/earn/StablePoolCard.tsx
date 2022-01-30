@@ -13,7 +13,7 @@ import styled from 'styled-components'
 import { getDepositValues } from 'utils/stableSwaps'
 import { getCUSDPrices, useCUSDPrice } from 'utils/useCUSDPrice'
 
-import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR } from '../../constants'
+import { BIG_INT_SECONDS_IN_WEEK, BIG_INT_SECONDS_IN_YEAR, CHAIN } from '../../constants'
 import { useColor, usePoolColor } from '../../hooks/useColor'
 import { useTokenPrices, useWalletModalToggle } from '../../state/application/hooks'
 import { StablePoolInfo } from '../../state/stablePools/hooks'
@@ -184,12 +184,9 @@ export const StablePoolCard: React.FC<Props> = ({ poolInfo }: Props) => {
   const history = useHistory()
 
   const mobi = useMobi()
-  const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[chainId], '100', '1')
+  const priceOfMobi = useCUSDPrice(mobi) ?? new Price(mobi, cUSD[CHAIN], '100', '1')
   const userLP = poolInfo.amountDeposited
   const { totalValueStaked, totalValueDeposited, valueOfDeposited } = getDepositValues(poolInfo, workingSupply)
-  if (!tokens) {
-    console.log({ name: poolInfo.name, tokens })
-  }
   const coinPrice = tokens.reduce(
     (accum: Fraction | undefined, { address }) => accum ?? tokenPrices[address.toLowerCase()],
     undefined

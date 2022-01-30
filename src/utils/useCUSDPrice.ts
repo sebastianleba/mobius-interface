@@ -21,6 +21,9 @@ export function getCUSDPrices(prices?: TokenPrices): { [address: string]: Fracti
  */
 export function useCUSDPrice(tokens?: Token[] | Token): Price | undefined {
   const CUSD = cUSD[CHAIN]
+  if (tokens instanceof Token) {
+    tokens = [tokens]
+  }
 
   const p1 = useTokenPrice(tokens?.[0]?.address)
   const p2 = useTokenPrice(tokens?.[1]?.address)

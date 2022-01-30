@@ -62,7 +62,6 @@ const OtherChains = new Set<Chain>([Chain.Avax, Chain.Polygon, Chain.Celo])
 
 export default function Pool() {
   const stablePools = useStablePoolInfo()
-
   const [selection, setSelection] = React.useState<Chain>(Chain.All)
   const [showDeprecated, setShowDeprecated] = React.useState(false)
   const tvl = stablePools
@@ -83,7 +82,6 @@ export default function Pool() {
     }, JSBI.BigInt('0'))
   const tvlAsTokenAmount = new TokenAmount(cUSD[CHAIN], tvl)
   const mobiprice = useCUSDPrice(useMobi())
-
   const sortCallback = (pool1: StablePoolInfo, pool2: StablePoolInfo) => {
     if (!pool1 || !pool2) return true
     const isStaking1 = pool1.amountDeposited?.greaterThan(JSBI.BigInt('0')) || pool1.stakedAmount?.greaterThan('0')

@@ -30,12 +30,7 @@ import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallbac
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
 import { MentoTrade } from '../../state/mento/hooks'
 import { Field } from '../../state/swap/actions'
-import {
-  useExpertModeManager,
-  useIsDarkMode,
-  useUserSingleHopOnly,
-  useUserSlippageTolerance,
-} from '../../state/user/hooks'
+import { useExpertModeManager, useIsDarkMode, useUserSlippageTolerance } from '../../state/user/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeMentoTradePriceBreakdown, warningSeverity } from '../../utils/prices'
@@ -147,8 +142,6 @@ export default function Mento() {
   const { callback: swapCallback, error: swapCallbackError } = useMentoTradeCallback(trade, allowedSlippage, null)
   const { priceImpactWithoutFee } = computeMentoTradePriceBreakdown(trade)
 
-  const [singleHopOnly] = useUserSingleHopOnly()
-
   const handleSwap = useCallback(() => {
     setSwapState({ attemptingTxn: true, tradeToConfirm, showConfirm, swapErrorMessage: undefined, txHash: undefined })
     swapCallback()
@@ -160,11 +153,6 @@ export default function Mento() {
           action: 'Swap',
           label: [trade?.input?.currency?.symbol, trade?.output?.currency?.symbol].join('/'),
         })
-
-        ReactGA.event({
-          category: 'Routing',
-          action: singleHopOnly ? 'Swap with multihop disabled' : 'Swap with multihop enabled',
-        })
       })
       .catch((error) => {
         setSwapState({
@@ -175,7 +163,7 @@ export default function Mento() {
           txHash: undefined,
         })
       })
-  }, [swapCallback, tradeToConfirm, showConfirm, trade, singleHopOnly])
+  }, [swapCallback, tradeToConfirm, showConfirm, trade])
 
   // errors
   const [showInverted, setShowInverted] = useState<boolean>(false)
