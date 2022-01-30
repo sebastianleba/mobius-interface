@@ -120,14 +120,14 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
 
     setProviderChainID(chainId)
 
-    if (chainId === Mainnet.chainId) {
+    if (chainId === CHAIN) {
       setProvider(connectedProvider)
     }
 
     setConnected(true)
 
     return connectedProvider
-  }, [provider, web3Modal, connected])
+  }, [web3Modal, _initListeners])
 
   const checkWrongNetwork = async (): Promise<boolean> => {
     if (providerChainID !== CHAIN) {
