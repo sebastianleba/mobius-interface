@@ -273,7 +273,6 @@ export const StyledMenuButton = styled.button`
 
 export default function Header() {
   const { address, connected } = useWeb3Context()
-  console.log(connected, address)
   const { t } = useTranslation()
   const theme = useTheme()
   const userCELOBalance = useTokenBalance(connected ? address : undefined, CELO[CHAIN])

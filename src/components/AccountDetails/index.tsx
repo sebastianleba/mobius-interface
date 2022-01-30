@@ -232,6 +232,7 @@ export default function AccountDetails({
           <YourAccount>
             <InfoCard>
               <AccountGroupingRow>
+                <WalletName>Connected to Celo Network</WalletName>
                 <div>
                   <WalletAction
                     style={{ fontSize: '.825rem', fontWeight: 400, marginRight: '8px' }}
