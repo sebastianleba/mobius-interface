@@ -6,10 +6,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { MentoPool } from 'state/mentoPools/reducer'
 import { MentoMath } from 'utils/mentoMath'
 
-import { ROUTER_ADDRESS } from '../../constants'
-import { useActiveContractKit } from '../../hooks'
+import { CHAIN, ROUTER_ADDRESS } from '../../constants'
+import { useWeb3Context } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
-import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
 import { isAddress } from '../../utils'
 import { AppDispatch, AppState } from '../index'
@@ -166,7 +165,7 @@ export function useMentoTradeInfo(): {
   v2Trade: MentoTrade | undefined
   inputError?: string
 } {
-  const { account } = useActiveContractKit()
+  const { address, connected } = useWeb3Context()
 
   const {
     independentField,
@@ -177,14 +176,13 @@ export function useMentoTradeInfo(): {
   } = useSwapState()
   const inputCurrency = useCurrency(true, inputCurrencyId)
   const outputCurrency = useCurrency(true, outputCurrencyId)
-  const recipientLookup = useENS(recipient ?? undefined)
   const pools = usePools()
   const poolsLoading = pools.length === 0
   const [pool] = useCurrentPool(inputCurrency?.address, outputCurrency?.address)
   const mathUtil = useMathUtil(pool)
 
-  const to: string | null = (recipient === null ? account : recipientLookup.address) ?? null
-  const relevantTokenBalances = useCurrencyBalances(account ?? undefined, [
+  const to: string | null = connected ? address : null
+  const relevantTokenBalances = useCurrencyBalances(connected ? address : undefined, [
     inputCurrency ?? undefined,
     outputCurrency ?? undefined,
   ])
@@ -202,7 +200,7 @@ export function useMentoTradeInfo(): {
     [Field.OUTPUT]: outputCurrency ?? undefined,
   }
   let inputError: string | undefined
-  if (!account) {
+  if (!connected) {
     inputError = 'Connect Wallet'
   }
 
@@ -321,15 +319,13 @@ export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: ChainId)
 export function useDefaultsFromURLSearch():
   | { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined }
   | undefined {
-  const { chainId } = useActiveContractKit()
   const dispatch = useDispatch<AppDispatch>()
   const parsedQs = useParsedQueryString()
   const [result, setResult] = useState<
     { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined
   >()
   useEffect(() => {
-    if (!chainId) return
-    const parsed = queryParametersToSwapState(parsedQs, chainId)
+    const parsed = queryParametersToSwapState(parsedQs, CHAIN)
 
     dispatch(
       replaceSwapState({
@@ -343,7 +339,7 @@ export function useDefaultsFromURLSearch():
 
     setResult({ inputCurrencyId: parsed[Field.INPUT].currencyId, outputCurrencyId: parsed[Field.OUTPUT].currencyId })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, chainId])
+  }, [dispatch])
 
   return result
 }

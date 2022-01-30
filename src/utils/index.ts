@@ -86,10 +86,10 @@ export function escapeRegExp(string: string): string {
 export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Token): boolean {
   return Boolean(currency instanceof Token && defaultTokens[currency.chainId]?.[currency.address])
 }
-export function getStableSwapContract(address: string, library: Web3Provider, account?: string): Swap {
-  return getContract(address, SWAP.abi, library) as Swap
+export function getStableSwapContract(address: string, provider: JsonRpcProvider, account?: string): Swap {
+  return getContract(address, SWAP.abi, provider) as Swap
 }
 
-export function getMentoContract(address: string, library: Web3Provider, account?: string): Exchange {
-  return getContract(address, EXCHANGE, library) as Exchange
+export function getMentoContract(address: string, provider: JsonRpcProvider, account?: string): Exchange {
+  return getContract(address, EXCHANGE, provider) as Exchange
 }

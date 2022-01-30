@@ -1,4 +1,3 @@
-import { useContractKit, useGetConnectedSigner } from '@celo-tools/use-contractkit'
 import { MaxUint256 } from '@ethersproject/constants'
 import { TokenAmount } from '@ubeswap/sdk'
 import { useDoTransaction } from 'components/swap/routing'
@@ -11,6 +10,7 @@ import { Field } from '../state/swap/actions'
 import { useHasPendingApproval } from '../state/transactions/hooks'
 import { computeSlippageAdjustedAmounts } from '../utils/prices'
 import { useTokenContract } from './useContract'
+import { useWeb3Context } from './web3'
 
 export enum ApprovalState {
   UNKNOWN,
@@ -24,8 +24,7 @@ export function useApproveCallback(
   amountToApprove?: TokenAmount,
   spender?: string
 ): [ApprovalState, () => Promise<void>] {
-  const { address: account } = useContractKit()
-  const getConnectedSigner = useGetConnectedSigner()
+  const { address: account, provider } = useWeb3Context()
 
   const token = amountToApprove instanceof TokenAmount ? amountToApprove.token : undefined
   const [minApprove] = useUserMinApprove()
@@ -75,7 +74,7 @@ export function useApproveCallback(
     }
 
     // connect
-    const tokenContract = tokenContractDisconnected.connect(await getConnectedSigner())
+    const tokenContract = tokenContractDisconnected.connect(provider.getSigner())
 
     if (minApprove) {
       await doTransaction(tokenContract, 'approve', {
@@ -90,16 +89,7 @@ export function useApproveCallback(
         approval: { tokenAddress: token.address, spender: spender },
       })
     }
-  }, [
-    approvalState,
-    token,
-    tokenContractDisconnected,
-    amountToApprove,
-    spender,
-    getConnectedSigner,
-    minApprove,
-    doTransaction,
-  ])
+  }, [approvalState, token, tokenContractDisconnected, amountToApprove, spender, provider, minApprove, doTransaction])
 
   return [approvalState, approve]
 }

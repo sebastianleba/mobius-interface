@@ -1,4 +1,3 @@
-import { useContractKit, useGetConnectedSigner, useProvider } from '@celo-tools/use-contractkit'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { JSBI, SwapParameters } from '@ubeswap/sdk'
@@ -48,18 +47,16 @@ function useSwapCallArguments(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): SwapCall[] {
-  const { address: account, network } = useContractKit()
-  const library = useProvider()
-  const chainId = network.chainId
+  const { provider, connected, address: account } = useWeb3Context()
 
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
   const deadline = useTransactionDeadline()
 
   return useMemo(() => {
-    if (!trade || !recipient || !library || !account || !chainId || !deadline) return []
+    if (!trade || !recipient || !provider || !connected || !deadline) return []
 
-    const contract = getStableSwapContract(trade.pool.address, library, account)
+    const contract = getStableSwapContract(trade.pool.address, provider, account)
     const { indexFrom = 0, indexTo = 0 } = trade || {}
     const outputRaw = trade.output.raw
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
@@ -77,7 +74,7 @@ function useSwapCallArguments(
     const swapMethods = [swapCallParameters]
 
     return swapMethods.map((parameters) => ({ parameters, contract }))
-  }, [account, allowedSlippage, chainId, deadline, library, recipient, trade])
+  }, [account, allowedSlippage, deadline, provider, recipient, trade])
 }
 
 // returns a function that will execute a swap, if the parameters are all valid
@@ -93,7 +90,6 @@ export function useSwapCallback(
 
   const addTransaction = useTransactionAdder()
   const recipient = address
-  const getConnectedSigner = useGetConnectedSigner()
 
   return useMemo(() => {
     if (!trade || !provider || !connected) {
@@ -171,7 +167,7 @@ export function useSwapCallback(
           gasEstimate,
         } = successfulEstimation
 
-        const contract = disconnectedContract.connect(await getConnectedSigner())
+        const contract = disconnectedContract.connect(provider.getSigner())
         return contract[methodName](...args, {
           gasLimit: gasEstimate,
         })
@@ -203,5 +199,5 @@ export function useSwapCallback(
       },
       error: null,
     }
-  }, [trade, provider, connected, recipient, recipientAddressOrName, swapCalls, getConnectedSigner, addTransaction])
+  }, [trade, provider, connected, recipient, recipientAddressOrName, swapCalls, addTransaction])
 }

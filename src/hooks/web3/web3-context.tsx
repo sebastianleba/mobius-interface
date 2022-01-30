@@ -1,9 +1,10 @@
-import { Mainnet } from '@celo-tools/use-contractkit'
 import { JsonRpcProvider, StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import React, { ReactElement, useCallback, useContext, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import Web3Modal from 'web3modal'
+
+import { CHAIN } from '../../constants'
 
 type onChainProvider = {
   connect: () => Promise<Web3Provider>
@@ -48,11 +49,12 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
   const dispatch = useDispatch()
 
   const [connected, setConnected] = useState(false)
-  const [chainID, setChainID] = useState(Mainnet.chainId)
-  const [providerChainID, setProviderChainID] = useState(Mainnet.chainId)
+  const [chainID, setChainID] = useState(CHAIN)
+  const [providerChainID, setProviderChainID] = useState(CHAIN)
   const [address, setAddress] = useState('')
 
-  const uri = Mainnet.rpcUrl
+  // TODO: make dynamic
+  const uri = 'https://forno.celo.org'
   const [provider, setProvider] = useState<JsonRpcProvider>(new StaticJsonRpcProvider(uri))
 
   const [web3Modal] = useState<Web3Modal>(
@@ -128,7 +130,7 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
   }, [provider, web3Modal, connected])
 
   const checkWrongNetwork = async (): Promise<boolean> => {
-    if (providerChainID !== Mainnet.chainId) {
+    if (providerChainID !== CHAIN) {
       // const shouldSwitch = window.confirm(messages.switch_to_avalanche)
       // if (shouldSwitch) {
       //   await swithNetwork()
