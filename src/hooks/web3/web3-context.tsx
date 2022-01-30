@@ -71,7 +71,7 @@ const addChainRequest = () => {
   })
 }
 
-export const swithNetwork = async () => {
+export const switchNetwork = async () => {
   if (window.ethereum) {
     try {
       await switchRequest()
@@ -164,6 +164,9 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
 
     if (chainId === CHAIN) {
       setProvider(connectedProvider)
+    } else {
+      //TODO: could be an error
+      await switchNetwork()
     }
 
     setConnected(true)
@@ -171,10 +174,12 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
     return connectedProvider
   }, [web3Modal, _initListeners])
 
+  //TODO: could be an error without a screen reload
   const checkWrongNetwork = async (): Promise<boolean> => {
     if (providerChainID !== CHAIN) {
-      await swithNetwork()
-      window.location.reload()
+      await switchNetwork()
+      await connect()
+      // window.location.reload()
       return true
     }
     return false
