@@ -52,13 +52,13 @@ export function calculateSlippageAmount(value: TokenAmount, slippage: number): [
 }
 
 // account is not optional
-export function getSigner(provider: JsonRpcProvider, address: string): JsonRpcSigner {
-  return provider.getSigner(address)
+export function getSigner(provider: JsonRpcProvider): JsonRpcSigner {
+  return provider.getSigner()
 }
 
 // account is optional
 export function getProviderOrSigner(library: Web3Provider, account?: string): Web3Provider | JsonRpcSigner {
-  return account ? getSigner(library, account) : library
+  return account ? getSigner(library) : library
 }
 
 // account is optional
@@ -66,8 +66,8 @@ export function getContract(address: string, ABI: any, provider: JsonRpcProvider
   if (!isAddress(address) || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
-
-  return new Contract(address, ABI, getSigner(provider, address) as any)
+  console.log('provider', provider)
+  return new Contract(address, ABI, getSigner(provider) as any)
 }
 
 // account is optional
