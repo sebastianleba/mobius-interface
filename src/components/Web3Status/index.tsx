@@ -107,8 +107,6 @@ const StatusIcon: React.FC = () => {
 function Web3StatusInner() {
   const { t } = useTranslation()
   const { connect, address, connected, providerChainID, checkWrongNetwork } = useWeb3Context()
-  const error = null
-
   const allTransactions = useAllTransactions()
 
   const sortedRecentTransactions = useMemo(() => {
@@ -128,32 +126,30 @@ function Web3StatusInner() {
       </Web3StatusError>
     )
   }
-  let accountName
-  if (address) {
-    accountName = shortenAddress(address)
-  }
-  if (accountName) {
-    return (
-      <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
-        {hasPendingTransactions ? (
-          <RowBetween>
-            <Text>{pending?.length} Pending</Text> <Loader stroke="white" />
-          </RowBetween>
-        ) : (
-          <>
-            <Text>{accountName}</Text>
-          </>
-        )}
-        {!hasPendingTransactions && <StatusIcon />}
-      </Web3StatusConnected>
-    )
-  } else if (error) {
-    return (
-      <Web3StatusError onClick={() => connect().catch(console.warn)}>
-        <NetworkIcon />
-        <Text>{error === 'unsupported' ? 'Wrong Network' : 'Error'}</Text>
-      </Web3StatusError>
-    )
+  if (connected) {
+    if (providerChainID !== CHAIN) {
+      return (
+        <Web3StatusError onClick={() => checkWrongNetwork()}>
+          <NetworkIcon />
+          <Text>Wrong Network</Text>
+        </Web3StatusError>
+      )
+    } else {
+      return (
+        <Web3StatusConnected id="web3-status-connected" onClick={toggleWalletModal} pending={hasPendingTransactions}>
+          {hasPendingTransactions ? (
+            <RowBetween>
+              <Text>{pending?.length} Pending</Text> <Loader stroke="white" />
+            </RowBetween>
+          ) : (
+            <>
+              <Text>{shortenAddress(address)}</Text>
+            </>
+          )}
+          {!hasPendingTransactions && <StatusIcon />}
+        </Web3StatusConnected>
+      )
+    }
   } else {
     return (
       <Web3StatusConnect id="connect-wallet" onClick={() => connect().catch(console.warn)} faded={!address}>
