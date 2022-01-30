@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { useCUSDPrice } from 'utils/useCUSDPrice'
 
 import tokenLogo from '../../assets/images/MOBI-200.png'
-import { CHAIN, UBE } from '../../constants'
+import { CHAIN, MOBI } from '../../constants'
 import { useWeb3Context } from '../../hooks'
 import { useAggregateUbeBalance } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE, UbeTokenAnimated } from '../../theme'
@@ -41,7 +41,7 @@ const StyledClose = styled(X)`
  */
 export default function UbeBalanceContent({ setShowUbeBalanceModal }: { setShowUbeBalanceModal: any }) {
   const { connected } = useWeb3Context()
-  const ube = UBE[CHAIN]
+  const ube = MOBI[CHAIN]
 
   const total = useAggregateUbeBalance()
   // const ubeBalance: TokenAmount | undefined = useTokenBalance(account ?? undefined, ube)

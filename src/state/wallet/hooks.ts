@@ -4,7 +4,7 @@ import { useBlockNumber } from 'state/application/hooks'
 
 import { CHAIN } from '../../constants'
 import ERC20_INTERFACE from '../../constants/abis/erc20'
-import { UBE } from '../../constants/tokens'
+import { MOBI } from '../../constants/tokens'
 import { useWeb3Context } from '../../hooks'
 import { useAllTokens } from '../../hooks/Tokens'
 import { useTokenContract } from '../../hooks/useContract'
@@ -133,7 +133,7 @@ export function useAllTokenBalances(): { [tokenAddress: string]: TokenAmount | u
 export function useAggregateUbeBalance(): TokenAmount | undefined {
   const { address, connected } = useWeb3Context()
 
-  const ube = UBE[CHAIN]
+  const ube = MOBI[CHAIN]
 
   const ubeBalance: TokenAmount | undefined = useTokenBalance(connected ? address : undefined, ube)
 

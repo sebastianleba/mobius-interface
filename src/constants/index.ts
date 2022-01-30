@@ -1,9 +1,9 @@
 import moolaRouterAddresses from '@ubeswap/moola/deployments/router.mainnet.addresses.json'
 import { CELO, ChainId, cUSD, JSBI, Percent, Token } from '@ubeswap/sdk'
 
-import { UBE } from './tokens'
+import { MOBI } from './tokens'
 
-export { UBE } from './tokens'
+export { MOBI } from './tokens'
 
 export const ROUTER_ADDRESS = '0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121'
 
@@ -88,7 +88,7 @@ export const CEUR = {
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  [ChainId.MAINNET]: [cUSD, CELO, CEUR, UBE, MCUSD, MCEUR, MCELO].map((el) => el[ChainId.MAINNET]),
+  [ChainId.MAINNET]: [cUSD, CELO, CEUR, MOBI, MCUSD, MCEUR, MCELO].map((el) => el[ChainId.MAINNET]),
   [ChainId.ALFAJORES]: [cUSD, CELO, CEUR].map((el) => el[ChainId.ALFAJORES]),
   [ChainId.BAKLAVA]: [cUSD, CELO].map((el) => el[ChainId.BAKLAVA]),
 }
@@ -108,8 +108,8 @@ export const PINNED_PAIRS: { [chainId: number]: [Token, Token][] } = {
     [cUSD, CELO],
     [MCUSD, CELO],
     [MCEUR, CELO],
-    [MCUSD, UBE],
-    [MCEUR, UBE],
+    [MCUSD, MOBI],
+    [MCEUR, MOBI],
   ].map((el) => el.map((t) => t[ChainId.MAINNET]) as [Token, Token]),
   [ChainId.ALFAJORES]: [
     [cUSD, CELO],

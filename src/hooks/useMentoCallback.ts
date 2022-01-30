@@ -57,7 +57,7 @@ function useSwapCallArguments(
   return useMemo(() => {
     if (!trade || !recipient || !provider || !connected || !deadline) return []
 
-    const contract = getMentoContract(trade.pool.address, provider, account)
+    const contract = getMentoContract(trade.pool.address, provider)
     const outputRaw = trade.output.raw
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))
 
@@ -73,7 +73,7 @@ function useSwapCallArguments(
     const swapMethods = [swapCallParameters]
 
     return swapMethods.map((parameters) => ({ parameters, contract }))
-  }, [trade, recipient, provider, connected, deadline, account, allowedSlippage])
+  }, [trade, recipient, provider, connected, deadline, allowedSlippage])
 }
 
 // returns a function that will execute a swap, if the parameters are all valid

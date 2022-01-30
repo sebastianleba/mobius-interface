@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber'
 import { JSBI, Percent, TokenAmount } from '@ubeswap/sdk'
-import { UBE } from 'constants/tokens'
+import { MOBI } from 'constants/tokens'
 import { useMobiContract } from 'hooks/useContract'
 import { useEffect, useState } from 'react'
 import { useSingleContractMultipleData } from 'state/multicall/hooks'
@@ -21,7 +21,7 @@ const nonCirculatingAddresses = {
  * Fetches the circulating supply
  */
 export const useCirculatingSupply = (): { supply: TokenAmount; staked: Percent } | undefined => {
-  const mobi = UBE[CHAIN]
+  const mobi = MOBI[CHAIN]
   const mobiContract = useMobiContract()
 
   // compute amount that is locked up
