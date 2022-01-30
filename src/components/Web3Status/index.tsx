@@ -5,6 +5,7 @@ import { Activity } from 'react-feather'
 import { useTranslation } from 'react-i18next'
 import styled, { css } from 'styled-components'
 
+import { CHAIN } from '../../constants'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { isTransactionRecent, useAllTransactions } from '../../state/transactions/hooks'
 import { TransactionDetails } from '../../state/transactions/reducer'
@@ -105,7 +106,7 @@ const StatusIcon: React.FC = () => {
 
 function Web3StatusInner() {
   const { t } = useTranslation()
-  const { connect, address, disconnect, connected, web3, providerChainID, checkWrongNetwork } = useWeb3Context()
+  const { connect, address, connected, providerChainID, checkWrongNetwork } = useWeb3Context()
   const error = null
 
   const allTransactions = useAllTransactions()
@@ -119,6 +120,14 @@ function Web3StatusInner() {
 
   const hasPendingTransactions = !!pending.length
   const toggleWalletModal = useWalletModalToggle()
+  if (connected && providerChainID !== CHAIN) {
+    return (
+      <Web3StatusError onClick={() => checkWrongNetwork()}>
+        <NetworkIcon />
+        <Text>Wrong Network</Text>
+      </Web3StatusError>
+    )
+  }
   let accountName
   if (address) {
     accountName = shortenAddress(address)
@@ -155,7 +164,6 @@ function Web3StatusInner() {
 }
 
 export default function Web3Status() {
-  const { connect, disconnect, connected, web3, providerChainID, checkWrongNetwork } = useWeb3Context()
   const allTransactions = useAllTransactions()
 
   const sortedRecentTransactions = useMemo(() => {

@@ -1,7 +1,6 @@
 import { JsonRpcProvider, StaticJsonRpcProvider, Web3Provider } from '@ethersproject/providers'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import React, { ReactElement, useCallback, useContext, useMemo, useState } from 'react'
-import { useDispatch } from 'react-redux'
 import Web3Modal from 'web3modal'
 
 import { CHAIN } from '../../constants'
@@ -36,7 +35,7 @@ export const useWeb3Context = () => {
   const { onChainProvider } = web3Context
   return useMemo(() => {
     return { ...onChainProvider }
-  }, [web3Context])
+  }, [onChainProvider])
 }
 
 export const useAddress = () => {
@@ -44,10 +43,54 @@ export const useAddress = () => {
   return address
 }
 
+//TODO make dynamic for alfajores
+const switchRequest = () => {
+  console.log(window.ethereum)
+  return window.ethereum?.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: '0xA4EC' }],
+  })
+}
+
+const addChainRequest = () => {
+  return window.ethereum?.request({
+    method: 'wallet_addEthereumChain',
+    params: [
+      {
+        chainId: '0xA4EC',
+        chainName: 'Celo Mainnet',
+        rpcUrls: ['https://forno.celo.org'],
+        blockExplorerUrls: ['https://explorer.celo.org'],
+        nativeCurrency: {
+          name: 'CELO',
+          symbol: 'CELO',
+          decimals: 18,
+        },
+      },
+    ],
+  })
+}
+
+export const swithNetwork = async () => {
+  if (window.ethereum) {
+    try {
+      await switchRequest()
+    } catch (error: any) {
+      if (error.code === 4902) {
+        try {
+          await addChainRequest()
+          await switchRequest()
+        } catch (addError) {
+          console.log(error)
+        }
+      }
+      console.log(error)
+    }
+  }
+}
+
 // eslint-disable-next-line react/prop-types
 export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ children }) => {
-  const dispatch = useDispatch()
-
   const [connected, setConnected] = useState(false)
   const [chainID, setChainID] = useState(CHAIN)
   const [providerChainID, setProviderChainID] = useState(CHAIN)
@@ -109,7 +152,6 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
     const rawProvider = await web3Modal.connect()
 
     _initListeners(rawProvider)
-    console.log(rawProvider, 'this')
 
     const connectedProvider = new Web3Provider(rawProvider, 'any')
 
@@ -131,14 +173,10 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
 
   const checkWrongNetwork = async (): Promise<boolean> => {
     if (providerChainID !== CHAIN) {
-      // const shouldSwitch = window.confirm(messages.switch_to_avalanche)
-      // if (shouldSwitch) {
-      //   await swithNetwork()
-      //   window.location.reload()
-      // }
+      await swithNetwork()
+      window.location.reload()
       return true
     }
-
     return false
   }
 
