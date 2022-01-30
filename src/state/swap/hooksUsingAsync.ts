@@ -1,14 +1,13 @@
 import { parseUnits } from '@ethersproject/units'
-import { ChainId, cUSD, JSBI, Percent, Price, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
+import { ChainId, cUSD, JSBI, Percent, Price, Token, TokenAmount, TradeType } from '@ubeswap/sdk'
 import { useStableSwapContract } from 'hooks/useContract'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useBlockNumber } from 'state/application/hooks'
 import { StableSwapPool } from 'state/stablePools/reducer'
-import { StableSwapMath } from 'utils/stableSwapMath'
 
-import { CHAIN, ROUTER_ADDRESS } from '../../constants'
+import { CHAIN } from '../../constants'
 import { useWeb3Context } from '../../hooks'
 import { useCurrency } from '../../hooks/Tokens'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
@@ -87,25 +86,6 @@ export function tryParseAmount(value?: string, currency?: Token): TokenAmount | 
   }
   // necessary for all paths to return a value
   return undefined
-}
-
-const BAD_RECIPIENT_ADDRESSES: string[] = [
-  '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f', // v2 factory
-  '0xf164fC0Ec4E93095b804a4795bBe1e041497b92a', // v2 router 01
-  '0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D', // v2 router 02
-  ROUTER_ADDRESS,
-]
-
-/**
- * Returns true if any of the pairs or tokens in a trade have the given checksummed address
- * @param trade to check for the given address
- * @param checksummedAddress address to check in the pairs and tokens
- */
-function involvesAddress(trade: Trade, checksummedAddress: string): boolean {
-  return (
-    trade.route.path.some((token) => token.address === checksummedAddress) ||
-    trade.route.pairs.some((pair) => pair.liquidityToken.address === checksummedAddress)
-  )
 }
 
 export type MobiTrade = {
@@ -270,47 +250,6 @@ export type MobiusTrade = {
   fee: TokenAmount
 }
 
-function calcInputOutput(
-  input: Token | undefined,
-  output: Token | undefined,
-  isExactIn: boolean,
-  parsedAmount: TokenAmount | undefined,
-  math: StableSwapMath,
-  poolInfo: StableSwapPool
-): readonly [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] {
-  if (!input && !output) {
-    return [undefined, undefined, undefined]
-  }
-  const { tokens } = poolInfo
-  if (!output) {
-    return [parsedAmount, undefined, undefined]
-  }
-  if (!input) {
-    return [undefined, parsedAmount, undefined]
-  }
-  const indexFrom = tokens.map(({ address }) => address).indexOf(input.address)
-  const indexTo = tokens.map(({ address }) => address).indexOf(output.address)
-
-  const details: [TokenAmount | undefined, TokenAmount | undefined, TokenAmount | undefined] = [
-    undefined,
-    undefined,
-    undefined,
-  ]
-  if (isExactIn) {
-    details[0] = parsedAmount
-    const [expectedOut, fee] = math.calculateSwap(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    details[1] = new TokenAmount(output, expectedOut)
-    details[2] = new TokenAmount(input, fee)
-  } else {
-    details[1] = parsedAmount
-    // TODO: add fee to this
-    const requiredIn = math.get_dx(indexFrom, indexTo, parsedAmount.raw, math.calc_xp())
-    details[0] = new TokenAmount(input, requiredIn)
-    details[2] = new TokenAmount(input, JSBI.BigInt('0'))
-  }
-  return details
-}
-
 export function useMobiusTradeInfo(): {
   currencies: { [field in Field]?: Token }
   currencyBalances: { [field in Field]?: TokenAmount }
@@ -386,10 +325,6 @@ export function useMobiusTradeInfo(): {
   const formattedTo = isAddress(to)
   if (!to || !formattedTo) {
     inputError = inputError ?? 'Enter a recipient'
-  } else {
-    if (BAD_RECIPIENT_ADDRESSES.indexOf(formattedTo) !== -1) {
-      inputError = inputError ?? 'Invalid recipient'
-    }
   }
   if (!inputCurrency || !outputCurrency || !parsedAmount) {
     return {
