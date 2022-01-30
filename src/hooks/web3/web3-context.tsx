@@ -165,8 +165,9 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
     if (chainId === CHAIN) {
       setProvider(connectedProvider)
     } else {
-      //TODO: could be an error
+      //TODO: is it possible to connecte wallet after?
       await switchNetwork()
+      window.location.reload()
     }
 
     setConnected(true)
@@ -174,12 +175,11 @@ export const Web3ContextProvider: React.FC<{ children: ReactElement }> = ({ chil
     return connectedProvider
   }, [web3Modal, _initListeners])
 
-  //TODO: could be an error without a screen reload
   const checkWrongNetwork = async (): Promise<boolean> => {
     if (providerChainID !== CHAIN) {
       await switchNetwork()
+      window.location.reload()
       await connect()
-      // window.location.reload()
       return true
     }
     return false
