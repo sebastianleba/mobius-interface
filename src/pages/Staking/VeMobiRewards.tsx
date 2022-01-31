@@ -147,9 +147,7 @@ export default function VeMobiRewards() {
   }
 
   async function claimFees() {
-    console.log('Hello')
     if (feeDistributorContract && account) {
-      console.log('Hi')
       setAttemptingFees(true)
       await feeDistributorContract['claim(address)'](account)
         .then((response: TransactionResponse) => {
