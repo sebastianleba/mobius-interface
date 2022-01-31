@@ -266,6 +266,7 @@ export default function Swap() {
                 label={independentField === Field.INPUT && trade ? `To${isEstimate ? ' (estimated)' : ''}` : 'To'}
                 showMaxButton={false}
                 currency={currencies[Field.OUTPUT]}
+                disableInput={true}
                 onCurrencySelect={handleOutputSelect}
                 otherCurrency={currencies[Field.INPUT]}
                 id="swap-currency-output"
@@ -287,8 +288,12 @@ export default function Swap() {
                       />
                     </RowBetween>
                     <RowBetween>
-                      <TYPE.body>Price Impact</TYPE.body>
-                      <TYPE.body>{`${trade?.priceImpact.toFixed(4)}%`}</TYPE.body>
+                      <Text fontWeight={500} fontSize={14} color={theme.text2}>
+                        PriceImpact
+                      </Text>
+                      <Text fontWeight={500} fontSize={14} color={theme.text2}>
+                        {`${trade?.priceImpact.toFixed(4)}%`}
+                      </Text>
                     </RowBetween>
                   </>
                 )}

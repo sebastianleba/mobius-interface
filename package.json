@@ -96,8 +96,9 @@
     "typechain": "typechain --target=ethers-v5 'src/**/abis/**/*.json' --out-dir src/generated/",
     "typechain:windows": "typechain --target=ethers-v5 src/**/abis/**/*.json --out-dir src/generated/",
     "test": "craco test --env=jsdom",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "eslint src/ --cache",
+    "lint:fix": "eslint --fix --cache src/",
+    "typecheck": "tsc",
     "prepare": "husky install"
   },
   "browserslist": {
