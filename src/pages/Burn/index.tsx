@@ -43,21 +43,21 @@ export default function BurnPage() {
   const pools = useStablePoolInfo()
 
   const initProcess = async () => {
-    // for (let i = 0; i < pools.length; i += 20) {
-    //   const addresses = pools.slice(i, Math.min(i + 20, pools.length)).map((p) => p.poolAddress)
-    //   await poolProxy
-    //     ?.withdraw_many(addresses, { gasLimit: 10000000 })
-    //     .then((response: TransactionResponse) => {
-    //       addTransaction(response, {
-    //         summary: `Collected fees for ${addresses?.length} pools`,
-    //       })
-    //       setStage(`Collecting fees for ${addresses?.length} pools`)
-    //       response.wait().then(() => null)
-    //     })
-    //     .catch((error: any) => {
-    //       console.log(error)
-    //     })
-    // }
+    for (let i = 0; i < pools.length; i += 20) {
+      const addresses = pools.slice(i, Math.min(i + 20, pools.length)).map((p) => p.poolAddress)
+      await poolProxy
+        ?.withdraw_many(addresses, { gasLimit: 10000000 })
+        .then((response: TransactionResponse) => {
+          addTransaction(response, {
+            summary: `Collected fees for ${addresses?.length} pools`,
+          })
+          setStage(`Collecting fees for ${addresses?.length} pools`)
+          response.wait().then(() => null)
+        })
+        .catch((error: any) => {
+          console.log(error)
+        })
+    }
     for (let i = 0; i < tokens.length; i++) {
       await poolProxy
         ?.burn(tokens[i], { gasLimit: 10000000 })
@@ -71,20 +71,19 @@ export default function BurnPage() {
           console.log(error)
         })
     }
+    await feeDistributor
+      ?.checkpoint_token()
+      .then((response: TransactionResponse) => {
+        addTransaction(response, {
+          summary: `Checkpointed FeeDistributor`,
+        })
+        setStage(`Checkpointing FeeDistributor`)
+        response.wait().then(() => null)
+      })
+      .catch((error: any) => {
+        console.log(error)
+      })
     setStage('Done!')
-    // await feeDistributor
-    //   ?.checkpoint_token()
-    //   .then((response: TransactionResponse) => {
-    //     addTransaction(response, {
-    //       summary: `Checkpointed FeeDistributor`,
-    //     })
-    //     setStage(`Checkpointing FeeDistributor`)
-    //     response.wait().then(() => null)
-    //   })
-    //   .catch((error: any) => {
-    //     console.log(error)
-    //     exit()
-    //   })
   }
   return (
     <PageWrapper gap="lg" justify="center" style={{ marginTop: isMobile ? '-1rem' : '3rem' }}>
