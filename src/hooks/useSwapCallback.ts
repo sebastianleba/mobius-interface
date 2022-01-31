@@ -56,7 +56,7 @@ function useSwapCallArguments(
   return useMemo(() => {
     if (!trade || !recipient || !provider || !connected || !deadline) return []
 
-    const contract = getStableSwapContract(trade.pool.address, provider)
+    const contract = getStableSwapContract(trade.pool.address, provider, connected)
     const { indexFrom = 0, indexTo = 0 } = trade || {}
     const outputRaw = trade.output.raw
     const minDy = JSBI.subtract(outputRaw, JSBI.divide(outputRaw, JSBI.divide(BIPS_BASE, JSBI.BigInt(allowedSlippage))))

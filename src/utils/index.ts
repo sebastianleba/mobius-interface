@@ -2,7 +2,7 @@ import { getAddress } from '@ethersproject/address'
 import { BigNumber } from '@ethersproject/bignumber'
 import { AddressZero } from '@ethersproject/constants'
 import { Contract } from '@ethersproject/contracts'
-import { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
+import { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers'
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk'
 import { Exchange, Swap } from 'generated/index'
 
@@ -54,16 +54,16 @@ export function getSigner(provider: JsonRpcProvider): JsonRpcSigner {
 }
 
 // account is optional
-export function getProviderOrSigner(library: Web3Provider, account?: string): Web3Provider | JsonRpcSigner {
-  return account ? getSigner(library) : library
+export function getProviderOrSigner(provider: JsonRpcProvider, connected: boolean): JsonRpcProvider | JsonRpcSigner {
+  return connected ? getSigner(provider) : provider
 }
 
 // account is optional
-export function getContract(address: string, ABI: any, provider: JsonRpcProvider): Contract {
+export function getContract(address: string, ABI: any, provider: JsonRpcProvider, connected: boolean): Contract {
   if (!isAddress(address) || address === AddressZero) {
     throw Error(`Invalid 'address' parameter '${address}'.`)
   }
-  return new Contract(address, ABI, getSigner(provider) as any)
+  return new Contract(address, ABI, getProviderOrSigner(provider, connected) as any)
 }
 
 export function escapeRegExp(string: string): string {
@@ -73,10 +73,10 @@ export function escapeRegExp(string: string): string {
 export function isTokenOnList(defaultTokens: TokenAddressMap, currency?: Token): boolean {
   return Boolean(currency instanceof Token && defaultTokens[currency.chainId]?.[currency.address])
 }
-export function getStableSwapContract(address: string, provider: JsonRpcProvider): Swap {
-  return getContract(address, SWAP.abi, provider) as Swap
+export function getStableSwapContract(address: string, provider: JsonRpcProvider, connected: boolean): Swap {
+  return getContract(address, SWAP.abi, provider, connected) as Swap
 }
 
-export function getMentoContract(address: string, provider: JsonRpcProvider): Exchange {
-  return getContract(address, EXCHANGE, provider) as Exchange
+export function getMentoContract(address: string, provider: JsonRpcProvider, connected: boolean): Exchange {
+  return getContract(address, EXCHANGE, provider, connected) as Exchange
 }

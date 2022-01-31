@@ -51,17 +51,17 @@ import { useMobi } from './Tokens'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { provider } = useWeb3Context()
+  const { provider, connected } = useWeb3Context()
 
   return useMemo(() => {
     if (!address || !ABI || !provider) return null
     try {
-      return getContract(address, ABI, provider)
+      return getContract(address, ABI, provider, connected)
     } catch (error) {
       console.error('Failed to get contract', error)
       return null
     }
-  }, [address, ABI, provider])
+  }, [address, ABI, provider, connected])
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Erc20 | null {
